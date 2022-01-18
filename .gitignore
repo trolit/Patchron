@@ -7,4 +7,3 @@ coverage
 lib
 
 package-lock.json
-test/fixtures/mock-cert.pem
