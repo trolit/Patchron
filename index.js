@@ -7,7 +7,6 @@
  */
 module.exports = (app) => {
   // Your code here
-  app.log.info("Yay, the app was loaded!");
   app.on(
     ["pull_request.opened", "pull_request.synchronize"],
     async (context) => {
@@ -37,7 +36,6 @@ module.exports = (app) => {
       const deploymentId = res.data.id;
       await context.octokit.repos.createDeploymentStatus(
         context.repo({
-          deployment_id: deploymentId,
           state: "success", // The state of the status. Can be one of error, failure, inactive, pending, or success
           log_url: "https://example.com", // The log URL to associate with this status. This URL should contain output to keep the user updated while the task is running or serve as historical information for what happened in the deployment.
           description: "My Probot App set a deployment status!", // A short description of the status.

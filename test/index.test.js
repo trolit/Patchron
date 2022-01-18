@@ -8,10 +8,6 @@ const fs = require("fs");
 const path = require("path");
 
 const deployment = {
-  ref: "hiimbex-patch-1",
-  task: "deploy",
-  auto_merge: true,
-  required_contexts: [],
   payload: {
     schema: "rocks!",
   },
