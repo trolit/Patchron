@@ -5,3 +5,5 @@ npm-debug.log
 .env
 coverage
 lib
+
+package-lock.json
