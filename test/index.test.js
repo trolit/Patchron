@@ -1,4 +1,5 @@
 const nock = require('nock');
+const { StatusCodes: HTTP } = require('http-status-codes');
 
 // Requiring our app implementation
 const myProbotApp = require('..');
@@ -66,7 +67,7 @@ describe('My Probot app', () => {
         const mock = nock('https://api.github.com')
             // Test that we correctly return a test token
             .post('/app/installations/2/access_tokens')
-            .reply(200, {
+            .reply(HTTP.OK, {
                 token: 'test',
                 permissions: {
                     deployments: 'write',
@@ -79,7 +80,7 @@ describe('My Probot app', () => {
                 expect(body).toMatchObject(deployment);
                 return true;
             })
-            .reply(200, { id: 123 })
+            .reply(HTTP.OK, { id: 123 })
 
             // Test that a deployment status is created
             .post(
@@ -89,7 +90,7 @@ describe('My Probot app', () => {
                     return true;
                 }
             )
-            .reply(200);
+            .reply(HTTP.OK);
 
         // Receive a webhook event
         await probot.receive({ name: 'pull_request', payload });
