@@ -7,7 +7,7 @@
  */
 module.exports = (app) => {
     // Your code here
-    app.log.info('Yay, the app was loaded!')
+    app.log.info('Yay, the app was loaded!');
     app.on(
         ['pull_request.opened', 'pull_request.synchronize'],
         async (context) => {
@@ -15,7 +15,7 @@ module.exports = (app) => {
             // Then sets the deployment status to success
             // NOTE: this example doesn't actually integrate with a cloud
             // provider to deploy your app, it just demos the basic API usage.
-            app.log.info(context.payload)
+            app.log.info(context.payload);
 
             // Probot API note: context.repo() => { username: 'hiimbex', repo: 'testing-things' }
             const res = await context.octokit.repos.createDeployment(
@@ -32,9 +32,9 @@ module.exports = (app) => {
                     transient_environment: false, // Specifies if the given environment is specific to the deployment and will no longer exist at some point in the future.
                     production_environment: true, // Specifies if the given environment is one that end-users directly interact with.
                 })
-            )
+            );
 
-            const deploymentId = res.data.id
+            const deploymentId = res.data.id;
             await context.octokit.repos.createDeploymentStatus(
                 context.repo({
                     deployment_id: deploymentId,
@@ -44,13 +44,13 @@ module.exports = (app) => {
                     environment_url: 'https://example.com', // Sets the URL for accessing your environment.
                     auto_inactive: true, // Adds a new inactive status to all prior non-transient, non-production environment deployments with the same repository and environment name as the created status's deployment. An inactive status is only added to deployments that had a success state.
                 })
-            )
+            );
         }
-    )
+    );
 
     // For more information on building apps:
     // https://probot.github.io/docs/
 
     // To get your app running against GitHub, see:
     // https://probot.github.io/docs/development/
-}
+};

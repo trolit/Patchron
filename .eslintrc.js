@@ -14,7 +14,6 @@ module.exports = {
     },
 
     rules: {
-        camelcase: ['error', { properties: 'never ' }],
         'consistent-return': 'error',
         'no-console': 'warn',
         'no-self-compare': 'error',
@@ -22,7 +21,7 @@ module.exports = {
         'no-unreachable-loop': 'error',
         'no-use-before-define': 'error',
         'no-alert': 'error',
-        'no-bitwise': 'error',
+        'no-bitwise': ['error', { allow: ['~'] }],
         'no-empty': 'error',
         'no-implicit-globals': ['error', { lexicalBindings: true }],
         'no-inline-comments': 'error',
@@ -34,4 +33,4 @@ module.exports = {
         'require-await': 'error',
         'no-invalid-this': 'error',
     },
-}
+};
