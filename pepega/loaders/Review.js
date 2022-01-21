@@ -12,6 +12,7 @@ class Review {
         this.file = {
             ...file,
             content: decode(file.content),
+            extension: file.name.split('.').pop(),
         };
 
         this.rules = rules;
