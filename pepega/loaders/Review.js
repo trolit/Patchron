@@ -21,7 +21,7 @@ class Review {
     /**
      * @return {Array<string>} comments related to the reviewed file
      */
-    invoke() {
+    start() {
         let comments = [];
 
         switch (this.file.extension) {

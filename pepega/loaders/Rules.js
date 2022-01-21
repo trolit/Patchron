@@ -12,7 +12,9 @@ class RulesLoader {
     against(rules) {
         const review = new Review(this.file, rules);
 
-        return review.invoke();
+        const comments = review.start();
+
+        return comments;
     }
 }
 
