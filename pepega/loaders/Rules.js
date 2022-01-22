@@ -10,6 +10,14 @@ class RulesLoader {
      * @return {Array<string>} comments related to the reviewed file
      */
     against(rules) {
+        if (!this.rules.length) {
+            probotInstance.log.warn(
+                `Review skipped (no rules provided) -> ${__filename}`
+            );
+
+            return [];
+        }
+
         const review = new Review(this.file, rules);
 
         const comments = review.start();

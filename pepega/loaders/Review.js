@@ -3,12 +3,6 @@ const { decode } = require('js-base64');
 
 class Review {
     constructor(file, rules) {
-        if (!file || !file.content) {
-            probotInstance.log.warn(
-                `Review skipped (no file found or it's content is empty): ${__filename}`
-            );
-        }
-
         this.file = {
             ...file,
             content: decode(file.content),
@@ -25,6 +19,9 @@ class Review {
         let comments = [];
 
         switch (this.file.extension) {
+            case 'vue':
+                comments = [...Js.review(this.file, this.rules)];
+                break;
             case 'js':
                 comments = Js.review(this.file, this.rules);
                 break;

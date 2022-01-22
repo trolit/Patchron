@@ -9,6 +9,14 @@ class Pepega {
      * @return {Array<string>}  comments related to the reviewed file
      */
     static investigate(file) {
+        if (!this.file || !this.file.content) {
+            probotInstance.log.warn(
+                `Review skipped (no file found or it's content is empty) -> ${__filename}`
+            );
+
+            return null;
+        }
+
         return new FileLoader(file);
     }
 }
