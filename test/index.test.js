@@ -27,7 +27,6 @@ const deployment = {
         schema: 'rocks!',
     },
     environment: 'production',
-    description: "My Probot App's first deploy!",
     transient_environment: false,
     production_environment: true,
 };
@@ -109,3 +108,5 @@ describe('My Probot app', () => {
 
 // For more information about testing with Nock see:
 // https://github.com/nock/nock
+
+ate;
