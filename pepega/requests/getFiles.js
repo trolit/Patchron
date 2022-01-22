@@ -16,6 +16,8 @@ module.exports = async (context, payload) => {
         probotInstance.log.error(
             `Failed to fetch files from PR:${payload.pull_number} of ${payload.repo} -> ${__filename}`
         );
+
+        probotInstance.log.error(error);
     }
 
     return files;
