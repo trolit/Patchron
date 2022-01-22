@@ -1,5 +1,5 @@
 /**
- * fetches file from specified pull request
+ * fetches specified file from pull request within it's content encoded in base64.
  * @param {object} context WebhookEvent instance.
  * @param {string} contents_url path to file's content URL.
  * @param {object} payload repository details.
