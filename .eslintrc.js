@@ -13,8 +13,8 @@ module.exports = {
         node: true,
     },
 
-    global: {
-        probotInstance,
+    globals: {
+        probotInstance: true,
     },
 
     rules: {
