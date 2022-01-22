@@ -13,10 +13,6 @@ module.exports = {
         node: true,
     },
 
-    globals: {
-        probotInstance: true,
-    },
-
     rules: {
         'consistent-return': 'error',
         'no-console': 'warn',

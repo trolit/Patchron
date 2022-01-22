@@ -10,13 +10,7 @@ const payload = require('./fixtures/pull_request.opened');
 const fs = require('fs');
 const path = require('path');
 
-const {
-    describe,
-    expect,
-    test,
-    beforeEach,
-    afterEach,
-} = require('@jest/globals');
+const { expect, test, beforeEach, afterEach } = require('@jest/globals');
 
 const deployment = {
     ref: 'hiimbex-patch-1',
@@ -39,10 +33,7 @@ const deploymentStatus = {
     auto_inactive: true,
 };
 
-const privateKey = fs.readFileSync(
-    path.join(__dirname, 'fixtures/mock-cert.pem'),
-    'utf-8'
-);
+const privateKey = fs.readFileSync('utf-8');
 
 describe('My Probot app', () => {
     let probot;
@@ -99,7 +90,6 @@ describe('My Probot app', () => {
 
     afterEach(() => {
         nock.cleanAll();
-        nock.enableNetConnect();
     });
 });
 
