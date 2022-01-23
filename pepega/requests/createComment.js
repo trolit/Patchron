@@ -1,7 +1,7 @@
 /**
  * creates comment under PR
  * @param {object} context WebhookEvent instance.
- * @param {string} body text.
+ * @param {string} body text of the comment.
  */
 module.exports = async (context, body) => {
     const comment = context.issue({
