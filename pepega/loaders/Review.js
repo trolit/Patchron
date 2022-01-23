@@ -13,7 +13,7 @@ class Review {
     }
 
     /**
-     * @return {Array<string>} comments related to the reviewed file
+     * @returns {Array<object>} comments related to the reviewed file
      */
     start() {
         let comments = [];
