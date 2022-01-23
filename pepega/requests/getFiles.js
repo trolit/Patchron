@@ -5,7 +5,7 @@
  * @param {string} payload.owner repository owner's name
  * @param {string} payload.repo repository name
  * @param {string} payload.pull_number pull request Id
- * @return {Array<object>} array of files.
+ * @returns {Array<object>} array of files.
  */
 module.exports = async (context, payload) => {
     let files = [];

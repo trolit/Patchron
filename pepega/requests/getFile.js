@@ -6,7 +6,7 @@
  * @param {string} payload.owner repository owner's name
  * @param {string} payload.repo repository name
  * @param {string} payload.pull_number pull request Id
- * @return {object} file details and it's content encoded in base64.
+ * @returns {object} file details and it's content encoded in base64.
  */
 module.exports = async (context, contents_url, payload) => {
     let result = null;
