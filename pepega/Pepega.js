@@ -3,12 +3,11 @@ const FileLoader = require('./loaders/File');
 class Pepega {
     /**
      * Investigates file against selected rules.
-     * @param {object} file File from pull request.
-     * @param file.name The name of the file.
-     * @param file.content file content in base64 encoding.
+     * @param {object} file object received via ..octokit.pulls.listFiles()
+     * @param {object} repo object received via context.repo()
      * @return {Array<string>}  comments related to the reviewed file
      */
-    static investigate(file) {
+    static investigate(file, repo) {
         if (!this.file || !this.file.content) {
             probotInstance.log.warn(
                 `Review skipped (no file found or it's content is empty) -> ${__filename}`
@@ -16,6 +15,8 @@ class Pepega {
 
             return null;
         }
+
+        file = { ...file, ...repo };
 
         return new FileLoader(file);
     }
