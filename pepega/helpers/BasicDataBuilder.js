@@ -9,7 +9,7 @@ class BasicDataBuilder {
      * @param {string} file.path relative path to the file
      * @param {string} file.commit_id
      * @example
-     * +other params returned by GitHub API
+     * + other params returned by GitHub API (01.2022)
      * - sha,
      * - status,
      * - additions,
