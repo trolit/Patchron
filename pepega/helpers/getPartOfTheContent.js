@@ -1,10 +1,10 @@
 /**
- * returns specified part from the content
- * @param {string} content decoded file content
- * @typedef {object} restriction
+ * attempts to extract specified part of the content
+ * @param {string} content file content
+ * @param {object} restriction
  * @param {string} restriction.from start of the substring
  * @param {string} restriction.to end of the substring
- * @returns {string|null} part of the content (if indexes were found)
+ * @returns {string} part of the content (or unchanged if indexes were not found)
  */
 module.exports = (content, restriction) => {
     const { from, to } = restriction;
@@ -17,8 +17,8 @@ module.exports = (content, restriction) => {
     }
 
     probotInstance.log.warn(
-        `Couldn't extract | from: ${from}, to: ${to} | from given content -> ${__filename}`
+        `Couldn't extract | from: ${from}, to: ${to} | from given content. -> ${__filename}`
     );
 
-    return null;
+    return content;
 };
