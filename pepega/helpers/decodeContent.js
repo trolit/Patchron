@@ -1,7 +1,8 @@
 const { decode } = require('js-base64');
 
 /**
- * @returns {object} object expanded with decoded file's content received via getFile request
+ * @param {object} file object received via getFile
+ * @returns {object} object expanded with decoded file's content
  */
 module.exports = (file) => {
     const decoded_content = decode(file.content);

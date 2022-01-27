@@ -8,6 +8,16 @@ class BasicDataBuilder {
      * @param {string} file.patch changes made to file
      * @param {string} file.path relative path to the file
      * @param {string} file.commit_id
+     * @example
+     * + other params returned by GitHub API (01.2022)
+     * - sha,
+     * - status,
+     * - additions,
+     * - deletions,
+     * - changes,
+     * - blob_url,
+     * - raw_url,
+     * - contents_url
      */
     constructor(file) {
         const { filename, contents_url } = file;
