@@ -6,6 +6,7 @@ class BasicDataBuilder {
      * @param {string} file.repo repository name
      * @param {string} file.pull_number pull request Id
      * @param {string} file.patch changes made to file
+     * @param {string} file.split_patch changes made to file (split by newline)
      * @param {string} file.path relative path to the file
      * @param {string} file.commit_id
      * @example
@@ -20,16 +21,19 @@ class BasicDataBuilder {
      * - contents_url
      */
     constructor(file) {
-        const { filename, contents_url } = file;
+        const { filename, contents_url, patch } = file;
 
         const commit_id = contents_url.split('ref=').pop();
 
         const path = filename;
 
+        const split_patch = patch.split('\n');
+
         const content = {
             ...file,
             commit_id,
             path,
+            split_patch,
         };
 
         return content;
