@@ -1,22 +1,27 @@
 /**
  * returns nearest **hunk data**
- * @param {Array<string>} split_content array including code.
+ * @param {Array<string>} split_content array including code
  * @param {number} current_row id of current loop iteration.
  *
  * @link https://www.edureka.co/community/7949/what-are-these-in-github
  *
- * @example
- * ┌─────────┬────────────┐
- * │ (index) │    Values  │
- * ├─────────┼────────────┤
- * │    0    │     '@@'   │
- * │    1    │   '-10,13' │
- * │    2    │   '+10,7'  │
- * │    3    │     '@@'   │
- * └─────────┴────────────┘
+ * @example (a) = @
+ * ┌─────────┬───────────────────────────────┐
+ * │ (index) │            Values             │
+ * ├─────────┼───────────────────────────────┤
+ * │    0    │  '(a)(a) -0,0 +1,33 (a)(a)'   │
+ * │    1    │ '+// SIMPLE "FLAVOUR" TESTS'  │
+ * │    2    │              '+'              │
+ * │    3    │ '+ // breakline above return' │
+ * │    4    │    '+ function test1() {'     │
+ * │    5    │    '+    const w = 2;   '     │
+ * │    6    │       '+    return w;'        │
+ * │    7    │              '}'              │
+ * └─────────┴───────────────────────────────┘
+ *
  * {
- *  source_file: { start_line: '10', hunk_length: '13' },
- *  modified_file: { start_line: '10', hunk_length: '7' }
+ *  source_file: { start_line: '0', hunk_length: '0' },
+ *  modified_file: { start_line: '1', hunk_length: '33' }
  * }
  *
  * @returns {object}
@@ -32,8 +37,8 @@ module.exports = (split_content, current_row) => {
         return result;
     }
 
-    for (let i = current_row; i > 0; i--) {
-        const row_content = split_content[current_row];
+    for (let i = current_row; i >= 0; i--) {
+        const row_content = split_content[i];
 
         if (row_content.startsWith('@@')) {
             const split_row_content = row_content.split(' ');
