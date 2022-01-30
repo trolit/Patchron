@@ -19,6 +19,8 @@ class BasicDataBuilder {
      * - blob_url,
      * - raw_url,
      * - contents_url
+     * @summary
+     * due to **GitHub API** snake_case keys naming convention, some props share that convention
      */
     constructor(file) {
         const { filename, contents_url, patch } = file;
