@@ -12,17 +12,11 @@
  * │    0    │  '(a)(a) -0,0 +1,33 (a)(a)'   │
  * │    1    │ '+// SIMPLE "FLAVOUR" TESTS'  │
  * │    2    │              '+'              │
- * │    3    │ '+ // breakline above return' │
- * │    4    │    '+ function test1() {'     │
- * │    5    │    '+    const w = 2;   '     │
- * │    6    │       '+    return w;'        │
- * │    7    │              '}'              │
  * └─────────┴───────────────────────────────┘
- *
  * {
- *  hunk_position: 0,
- *  source_file: { start_line: '0', hunk_length: '0' },
- *  modified_file: { start_line: '1', hunk_length: '33' }
+ * | hunk_position: 0,
+ * | source_file: { start_line: '0', hunk_length: '0' },
+ * | modified_file: { start_line: '1', hunk_length: '33' }
  * }
  *
  * @returns {object}
