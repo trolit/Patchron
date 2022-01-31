@@ -1,5 +1,5 @@
 /**
- * returns line number of current row (single line comments only)
+ * returns line number of current row according to hunk header
  * @param {string} startLine startLine of **source_file** or **modified_file** hunk header
  * @param {number} row
  *
