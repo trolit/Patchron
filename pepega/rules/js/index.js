@@ -2,13 +2,13 @@ class Js {
     static review(file, rules) {
         let comments = [];
 
-        for (const rule in rules) {
-            let rule_comments = rules[rule].invoke(file);
+        rules.forEach((rule) => {
+            const ruleComments = rule.instance.invoke(file);
 
-            if (rule_comments.length) {
-                comments.push(...rule_comments);
+            if (ruleComments.length) {
+                comments.push(...ruleComments);
             }
-        }
+        });
 
         return comments;
     }
