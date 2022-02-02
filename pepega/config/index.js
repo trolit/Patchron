@@ -3,7 +3,7 @@ const noUnmarkedComments = require('../rules/js/NoUnmarkedComments');
 module.exports = {
     js: [
         {
-            rule: new noUnmarkedComments({
+            instance: new noUnmarkedComments({
                 prefixes: [
                     {
                         value: 'TODO:',
