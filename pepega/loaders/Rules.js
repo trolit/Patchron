@@ -10,7 +10,7 @@ class RulesLoader {
      * @return {Array<string>} comments related to the reviewed file
      */
     against(rules) {
-        if (!this.rules.length) {
+        if (!rules) {
             probotInstance.log.warn(
                 `Review skipped (no rules provided) -> ${__filename}`
             );
