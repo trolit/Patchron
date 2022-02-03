@@ -48,9 +48,9 @@ module.exports = (app) => {
             let reviewComments = [];
 
             for (let i = 0; i < files.length; i++) {
-                const file = files[i];
+                const file = { ...files[i], ...repo };
 
-                const comments = Pepega.investigate(file, repo).against(rules);
+                const comments = Pepega.investigate(file).against(rules);
 
                 reviewComments = [...reviewComments, ...comments];
             }

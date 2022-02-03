@@ -7,7 +7,7 @@ class Pepega {
      * @param {object} repo object received via context.repo()
      * @return {Array<string>}  comments related to the reviewed file
      */
-    static investigate(file, repo) {
+    static investigate(file) {
         if (!file) {
             probotInstance.log.warn(
                 `Review skipped (no file found or it's content is empty) -> ${__filename}`
@@ -15,8 +15,6 @@ class Pepega {
 
             return null;
         }
-
-        file = { ...file, ...repo };
 
         return new FileLoader(file);
     }
