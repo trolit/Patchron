@@ -16,8 +16,8 @@
 const rules = require('./pepega/config');
 const Pepega = require('./pepega/Pepega');
 const getFiles = require('./pepega/requests/getFiles');
-const createMultiLineReviewComment = require('./pepega/requests/createMultiLineReviewComment');
-const createSingleLineReviewComment = require('./pepega/requests/createSingleLineReviewComment');
+const addMultiLineReviewComment = require('./pepega/requests/addMultiLineReviewComment');
+const addSingleLineReviewComment = require('./pepega/requests/addSingleLineReviewComment');
 
 /**
  * This is the main entrypoint of Pepega Probot app
@@ -60,7 +60,7 @@ module.exports = (app) => {
 
                 if (reviewComment.start_line) {
                     try {
-                        await createMultiLineReviewComment(context, {
+                        await addMultiLineReviewComment(context, {
                             ...reviewComment,
                         });
                     } catch (error) {
@@ -68,7 +68,7 @@ module.exports = (app) => {
                     }
                 } else if (reviewComment.line) {
                     try {
-                        await createSingleLineReviewComment(context, {
+                        await addSingleLineReviewComment(context, {
                             ...reviewComment,
                         });
                     } catch (error) {
