@@ -8,7 +8,7 @@ class Pepega {
      * @return {Array<string>}  comments related to the reviewed file
      */
     static investigate(file, repo) {
-        if (!this.file || !this.file.content) {
+        if (!file) {
             probotInstance.log.warn(
                 `Review skipped (no file found or it's content is empty) -> ${__filename}`
             );
