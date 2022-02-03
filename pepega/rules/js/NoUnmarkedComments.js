@@ -94,8 +94,6 @@ class NoUnmarkedCommentsRule {
             }
         }
 
-        console.log(unmarkedComments);
-
         return unmarkedComments;
     }
 
