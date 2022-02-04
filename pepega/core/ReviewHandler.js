@@ -1,7 +1,7 @@
 const Js = require('../rules/js');
 const BasicDataBuilder = require('../builders/BasicData');
 
-class Review {
+class ReviewHandler {
     constructor(file, rules) {
         this.file = {
             ...file,
@@ -37,4 +37,4 @@ class Review {
     }
 }
 
-module.exports = Review;
+module.exports = ReviewHandler;

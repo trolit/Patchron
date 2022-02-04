@@ -1,4 +1,4 @@
-const FileLoader = require('./loaders/File');
+const Review = require('./core/ReviewLoader');
 
 class Pepega {
     /**
@@ -16,7 +16,7 @@ class Pepega {
             return null;
         }
 
-        return new FileLoader(file);
+        return new Review(file);
     }
 }
 

@@ -1,6 +1,6 @@
-const Review = require('./Review');
+const ReviewHandler = require('./ReviewHandler');
 
-class RulesLoader {
+class ReviewLoader {
     constructor(file) {
         this.file = file;
     }
@@ -18,7 +18,7 @@ class RulesLoader {
             return [];
         }
 
-        const review = new Review(this.file, rules);
+        const review = new ReviewHandler(this.file, rules);
 
         const comments = review.start();
 
@@ -26,4 +26,4 @@ class RulesLoader {
     }
 }
 
-module.exports = RulesLoader;
+module.exports = ReviewLoader;
