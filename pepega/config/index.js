@@ -1,4 +1,4 @@
-const noUnmarkedComments = require('../rules/js/NoUnmarkedComments');
+const noUnmarkedComments = require('../rules/common/NoUnmarkedComments');
 
 require('dotenv').config({
     path: '../../.env',
