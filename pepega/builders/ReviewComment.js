@@ -2,7 +2,7 @@ class ReviewCommentBuilder {
     constructor(file) {
         const { owner, repo, pull_number, path, commit_id } = file;
 
-        this.basic_information = {
+        this.basicInformation = {
             owner,
             repo,
             pull_number,
@@ -23,7 +23,7 @@ class ReviewCommentBuilder {
         const { body, line, side } = data;
 
         const comment = {
-            ...this.basic_information,
+            ...this.basicInformation,
             body,
             line,
             side,
@@ -45,7 +45,7 @@ class ReviewCommentBuilder {
         const { body, start_line, start_side, position } = data;
 
         const comment = {
-            ...this.basic_information,
+            ...this.basicInformation,
             body,
             start_line,
             start_side,
