@@ -21,6 +21,7 @@ class ReviewHandler {
 
         switch (this.file.extension) {
             case 'vue':
+                // TODO:
                 comments = [...Js.review(this.file, this.rules.js)];
                 break;
             case 'js':
