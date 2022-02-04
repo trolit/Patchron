@@ -13,9 +13,10 @@
 // To get your app running against GitHub, see:
 // https://probot.github.io/docs/development/
 
-const rules = require('./pepega/config');
+const { rules } = require('./pepega/config');
 const Pepega = require('./pepega/Pepega');
 const getFiles = require('./pepega/requests/getFiles');
+const printBotName = require('./pepega/helpers/printBotName');
 const addMultiLineReviewComment = require('./pepega/requests/addMultiLineReviewComment');
 const addSingleLineReviewComment = require('./pepega/requests/addSingleLineReviewComment');
 
@@ -24,7 +25,7 @@ const addSingleLineReviewComment = require('./pepega/requests/addSingleLineRevie
  * @param {import('probot').Probot} app
  */
 module.exports = (app) => {
-    app.log.info('Pepega loaded ^_____^');
+    printBotName();
 
     global.probotInstance = app;
 
