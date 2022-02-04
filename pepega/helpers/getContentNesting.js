@@ -26,31 +26,31 @@ const getPartOfTheContent = require('./getPartOfTheContent');
  * @returns {Array<{from, to}>}
  */
 module.exports = (content, restriction = null) => {
-    let split_content = content.split('\n');
+    let splitContent = content.split('\n');
 
     if (restriction) {
-        split_content = getPartOfTheContent(content, restriction);
+        splitContent = getPartOfTheContent(content, restriction);
     }
 
-    let content_nests = [];
+    let contentNests = [];
 
-    for (let row = 0; row < split_content.length; row++) {
-        const rowContent = split_content[row];
+    for (let row = 0; row < splitContent.length; row++) {
+        const rowContent = splitContent[row];
 
         for (let charIndex = 0; charIndex < rowContent.length; charIndex++) {
             const char = rowContent[charIndex];
 
             if (char === '{') {
-                content_nests.push({
+                contentNests.push({
                     from: row,
                 });
             } else if (char === '}') {
-                for (let i = content_nests.length - 1; i >= 0; i--) {
-                    if (content_nests[i].to) {
+                for (let i = contentNests.length - 1; i >= 0; i--) {
+                    if (contentNests[i].to) {
                         continue;
                     }
 
-                    content_nests[i].to = row;
+                    contentNests[i].to = row;
 
                     break;
                 }
@@ -58,5 +58,5 @@ module.exports = (content, restriction = null) => {
         }
     }
 
-    return content_nests;
+    return contentNests;
 };
