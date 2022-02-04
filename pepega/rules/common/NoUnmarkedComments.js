@@ -269,7 +269,7 @@ class NoUnmarkedCommentsRule {
 
         this.prefixes.forEach((prefix) => {
             formattedPrefixes = `${formattedPrefixes}
-            - **${prefix.value}** (${prefix.meaning})`;
+            - \` ${prefix.value} \` (${prefix.meaning})`;
         });
 
         const commentBody = `Prefix comments with one of the predefined values 
