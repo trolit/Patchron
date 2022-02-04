@@ -22,10 +22,10 @@ class ReviewHandler {
         switch (this.file.extension) {
             case 'vue':
                 // TODO:
-                comments = [...Js.review(this.file, this.rules.js)];
+                comments = [...Js.review(this.file, this.rules)];
                 break;
             case 'js':
-                comments = Js.review(basicData, this.rules.js);
+                comments = Js.review(basicData, this.rules);
                 break;
             default:
                 probotInstance.log.warn(
