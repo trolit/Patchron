@@ -1,14 +1,16 @@
+const review = require('../review');
+
 class Js {
     static review(file, rules) {
-        let comments = [];
+        if (!rules.js.length) {
+            probotInstance.log.warn(
+                `Attempted to review file against js rules but no rules were provided: ${__filename}`
+            );
 
-        rules.forEach((rule) => {
-            const ruleComments = rule.instance.invoke(file);
+            return [];
+        }
 
-            if (ruleComments.length) {
-                comments.push(...ruleComments);
-            }
-        });
+        const comments = review(file, rules.js);
 
         return comments;
     }
