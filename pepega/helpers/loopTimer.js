@@ -6,6 +6,6 @@
  * https://stackoverflow.com/a/44476626
  *
  */
-module.exports = async (milliseconds) => {
+module.exports = (milliseconds) => {
     return new Promise((result) => setTimeout(result, milliseconds));
 };
