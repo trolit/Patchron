@@ -15,11 +15,14 @@
  * ?: To get your app running against GitHub, see:
  * https://probot.github.io/docs/development/
  *
- * ?: GitHub API - best practices
+ * ?: GitHub Rest API - best practices
  * https://docs.github.com/en/rest/guides/best-practices-for-integrators
  *
- * ?: GitHub API - rate limits
+ * ?: GitHub Rest API - rate limits
  * https://docs.github.com/en/developers/apps/building-github-apps/rate-limits-for-github-apps
+ *
+ * ?: GitHub Rest API - pulls
+ * https://docs.github.com/en/rest/reference/pulls
  *
  */
 
