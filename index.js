@@ -54,11 +54,15 @@ module.exports = (app) => {
                 addPullRequestSenderAsAssignee(context, repo, payload);
             }
 
-            const { files, reviewComments } = await reviewPullRequest(
-                app,
-                context,
-                repo
-            );
+            let files = null;
+
+            try {
+                files = await getFiles(context, repo);
+            } catch (error) {
+                app.log.error(error);
+            }
+
+            const reviewComments = reviewPullRequest(repo, files);
 
             if (reviewComments.length) {
                 resolveComments(reviewComments);
@@ -90,15 +94,7 @@ async function addPullRequestSenderAsAssignee(context, repo, payload) {
     await addAssignees(context, repo, [pullRequestOwner]);
 }
 
-async function reviewPullRequest(app, context, repo) {
-    let files = null;
-
-    try {
-        files = await getFiles(context, repo);
-    } catch (error) {
-        app.log.error(error);
-    }
-
+function reviewPullRequest(repo, files) {
     let reviewComments = [];
 
     for (let i = 0; i < files.length; i++) {
@@ -109,10 +105,7 @@ async function reviewPullRequest(app, context, repo) {
         reviewComments = [...reviewComments, ...comments];
     }
 
-    return {
-        files,
-        reviewComments,
-    };
+    return reviewComments;
 }
 
 async function resolveComments(app, context, reviewComments) {
