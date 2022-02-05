@@ -11,6 +11,10 @@
  * @param {string} payload.position number of lines to take into review (counted from line after '@@')
  * @param {string} payload.path relative path to the file (tl;dr; - filename)
  * @param {string} payload.commit_id
+ *
+ * @link
+ * https://octokit.github.io/rest.js/v18#pulls-create-review-comment
+ *
  * @returns {object} request response
  */
 module.exports = async (context, payload) => {
