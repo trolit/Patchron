@@ -5,6 +5,9 @@ require('dotenv').config({
 });
 
 module.exports = {
+    settings: {
+        isGetFilesRequestPaginated: false,
+    },
     env: {},
     rules: {
         js: [
