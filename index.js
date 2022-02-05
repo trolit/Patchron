@@ -24,7 +24,7 @@
  */
 
 const Pepega = require('./pepega/Pepega');
-const { rules } = require('./pepega/config');
+const { rules, settings } = require('./pepega/config');
 const timer = require('./pepega/helpers/loopTimer');
 const getFiles = require('./pepega/requests/getFiles');
 const printBotName = require('./pepega/helpers/printBotName');
@@ -88,7 +88,9 @@ module.exports = (app) => {
                     }
                 }
 
-                await timer(3000);
+                await timer(
+                    settings.delayBetweenCommentRequestsInSeconds * 1000
+                );
             }
         }
     );

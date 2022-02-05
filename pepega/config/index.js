@@ -7,6 +7,7 @@ require('dotenv').config({
 module.exports = {
     settings: {
         isGetFilesRequestPaginated: false,
+        delayBetweenCommentRequestsInSeconds: 3,
     },
     env: {},
     rules: {
