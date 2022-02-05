@@ -4,14 +4,21 @@
 // *: https://github.com/trolit/Pepega
 // **************************************************
 
-// Deployments API example (learn more)
-// See: https://developer.github.com/v3/repos/deployments/
-
-// For more information on building apps:
-// https://probot.github.io/docs/
-
-// To get your app running against GitHub, see:
-// https://probot.github.io/docs/development/
+/**
+ *
+ * ?: Deployments API example (learn more)
+ * https://developer.github.com/v3/repos/deployments/
+ *
+ * ?: For more information on building apps:
+ * https://probot.github.io/docs/
+ *
+ * ?: To get your app running against GitHub, see:
+ * https://probot.github.io/docs/development/
+ *
+ * ?: GitHub API - best practices
+ * https://docs.github.com/en/rest/guides/best-practices-for-integrators
+ *
+ */
 
 const { rules } = require('./pepega/config');
 const Pepega = require('./pepega/Pepega');
