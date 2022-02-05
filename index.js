@@ -152,11 +152,13 @@ async function addSummaryComment(context, files, reviewComments) {
         sumOfChanges += changes;
     });
 
-    const commentBody = `:frog:.js pull request reviewed
+    const commentBody = `:frog:.js
+    <em>pull request review completed</em>
+
     :speech_balloon: ${
         reviewComments.length
-            ? `${reviewComments.length} comment(s) require attention`
-            : `:zero: :star:`
+            ? `${reviewComments.length} comment(s) require attention.`
+            : `0 comments added :star:`
     } 
     :heavy_plus_sign: ${sumOfAdditions} (additions)
     :heavy_minus_sign: ${sumOfDeletions} (deletions)
