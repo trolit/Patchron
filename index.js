@@ -58,18 +58,18 @@ module.exports = (app) => {
 
             try {
                 files = await getFiles(context, repo);
+
+                const reviewComments = reviewPullRequest(repo, files);
+
+                if (reviewComments.length) {
+                    resolveComments(reviewComments);
+                }
+
+                if (isReviewSummaryEnabled) {
+                    addSummaryComment(context, files, reviewComments);
+                }
             } catch (error) {
                 app.log.error(error);
-            }
-
-            const reviewComments = reviewPullRequest(repo, files);
-
-            if (reviewComments.length) {
-                resolveComments(reviewComments);
-            }
-
-            if (isReviewSummaryEnabled) {
-                addSummaryComment(context, files, reviewComments);
             }
         }
     );
