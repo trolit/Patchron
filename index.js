@@ -1,7 +1,7 @@
 // **************************************************
-// Pepega-The-Detective
-// made with Probot framework
-// https://github.com/trolit/Pepega
+// *: Pepega-The-Detective
+// *: made with Probot framework
+// *: https://github.com/trolit/Pepega
 // **************************************************
 
 // Deployments API example (learn more)
