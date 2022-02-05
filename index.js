@@ -18,6 +18,9 @@
  * ?: GitHub API - best practices
  * https://docs.github.com/en/rest/guides/best-practices-for-integrators
  *
+ * ?: GitHub API - rate limits
+ * https://docs.github.com/en/developers/apps/building-github-apps/rate-limits-for-github-apps
+ *
  */
 
 const Pepega = require('./pepega/Pepega');
