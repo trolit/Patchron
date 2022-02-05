@@ -20,8 +20,9 @@
  *
  */
 
-const { rules } = require('./pepega/config');
 const Pepega = require('./pepega/Pepega');
+const { rules } = require('./pepega/config');
+const timer = require('./pepega/helpers/loopTimer');
 const getFiles = require('./pepega/requests/getFiles');
 const printBotName = require('./pepega/helpers/printBotName');
 const addMultiLineReviewComment = require('./pepega/requests/addMultiLineReviewComment');
@@ -83,6 +84,8 @@ module.exports = (app) => {
                         app.log.error(error);
                     }
                 }
+
+                await timer(3000);
             }
         }
     );
