@@ -1,3 +1,4 @@
+/** Class representing review comment builder. */
 class ReviewCommentBuilder {
     constructor(file) {
         const { owner, repo, pull_number, path, commit_id } = file;

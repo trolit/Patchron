@@ -6,8 +6,8 @@ class ReviewLoader {
     }
 
     /**
-     * @param {Array<string>} rules Rules that will be tested against file.
-     * @return {Array<string>} comments related to the reviewed file
+     * @param {Array<object>} rules rules that will be tested against file.
+     * @return {Array<object>} comments related to the reviewed file
      */
     against(rules) {
         if (!rules) {

@@ -8,8 +8,8 @@ module.exports = {
     settings: {
         isGetFilesRequestPaginated: false,
         delayBetweenCommentRequestsInSeconds: 3,
-        isOwnerAssigningEnabled: false,
-        isReviewSummaryEnabled: false,
+        isOwnerAssigningEnabled: true,
+        isReviewSummaryEnabled: true,
     },
     env: {},
     rules: {
