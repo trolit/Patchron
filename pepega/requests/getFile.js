@@ -6,19 +6,23 @@
  * @param {string} payload.owner repository owner's name
  * @param {string} payload.repo repository name
  * @param {string} payload.pull_number pull request Id
+ *
+ * @link
+ * https://octokit.github.io/rest.js/v18#custom-requests
+ *
+ * @example
+ * contentsUrlPath = '/repos/<username>/<repoName>/contents/<filename>?ref=<commitId>'
+ *
  * @returns {object} file details and it's content encoded in base64.
  */
 module.exports = async (context, contents_url, payload) => {
     let result = null;
 
-    const contents_url_path = contents_url.replace(
-        'https://api.github.com',
-        ''
-    );
+    const contentsUrlPath = contents_url.replace('https://api.github.com', '');
 
     try {
         result = await context.octokit.request(
-            `GET ${contents_url_path}`,
+            `GET ${contentsUrlPath}`,
             payload
         );
     } catch (error) {
