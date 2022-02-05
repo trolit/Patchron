@@ -39,6 +39,8 @@ const addSingleLineReviewComment = require('./pepega/requests/addSingleLineRevie
 module.exports = (app) => {
     printBotName();
 
+    const { isOwnerAssigningEnabled, isReviewSummaryEnabled } = settings;
+
     global.probotInstance = app;
 
     app.on(
@@ -46,7 +48,7 @@ module.exports = (app) => {
         async (context) => {
             const { payload, repo } = setup(context);
 
-            if (settings.isOwnerAssigningEnabled) {
+            if (isOwnerAssigningEnabled) {
                 addPullRequestSenderAsAssignee(context, repo, payload);
             }
 
@@ -54,6 +56,10 @@ module.exports = (app) => {
 
             if (reviewComments.length) {
                 resolveComments(reviewComments);
+            }
+
+            if (isReviewSummaryEnabled) {
+                // review
             }
         }
     );
