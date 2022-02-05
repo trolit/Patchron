@@ -2,6 +2,9 @@
  * creates comment under PR
  * @param {object} context WebhookEvent instance.
  * @param {string} body text of the comment.
+ *
+ * @link
+ * https://octokit.github.io/rest.js/v18#issues-create-comment
  */
 module.exports = async (context, body) => {
     const comment = context.issue({
