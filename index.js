@@ -28,6 +28,7 @@ const { rules, settings } = require('./pepega/config');
 const timer = require('./pepega/helpers/loopTimer');
 const getFiles = require('./pepega/requests/getFiles');
 const printBotName = require('./pepega/helpers/printBotName');
+const addAssignees = require('./pepega/requests/addAssignees');
 const addMultiLineReviewComment = require('./pepega/requests/addMultiLineReviewComment');
 const addSingleLineReviewComment = require('./pepega/requests/addSingleLineReviewComment');
 
@@ -43,55 +44,84 @@ module.exports = (app) => {
     app.on(
         ['pull_request.opened', 'pull_request.synchronize'],
         async (context) => {
-            const payload = context.payload;
+            const { payload, repo } = setup(context);
 
-            const repo = context.repo();
-
-            repo.pull_number = payload.number;
-
-            let files = null;
-
-            try {
-                files = await getFiles(context, repo);
-            } catch (error) {
-                app.log.error(error);
+            if (settings.isOwnerAssigningEnabled) {
+                addPullRequestSenderAsAssignee(context, repo, payload);
             }
 
-            let reviewComments = [];
+            const reviewComments = await reviewPullRequest(app, context, repo);
 
-            for (let i = 0; i < files.length; i++) {
-                const file = { ...files[i], ...repo };
-
-                const comments = Pepega.investigate(file).against(rules);
-
-                reviewComments = [...reviewComments, ...comments];
-            }
-
-            for (let i = 0; i < reviewComments.length; i++) {
-                const reviewComment = reviewComments[i];
-
-                if (reviewComment.start_line) {
-                    try {
-                        await addMultiLineReviewComment(context, {
-                            ...reviewComment,
-                        });
-                    } catch (error) {
-                        app.log.error(error);
-                    }
-                } else if (reviewComment.line) {
-                    try {
-                        await addSingleLineReviewComment(context, {
-                            ...reviewComment,
-                        });
-                    } catch (error) {
-                        app.log.error(error);
-                    }
-                }
-
-                await timer(
-                    settings.delayBetweenCommentRequestsInSeconds * 1000
-                );
+            if (reviewComments.length) {
+                resolveComments(reviewComments);
             }
         }
     );
 };
+
+function setup(context) {
+    const payload = context.payload;
+
+    const repo = context.repo();
+
+    repo.pull_number = payload.number;
+
+    return {
+        payload,
+        repo,
+    };
+}
+
+async function addPullRequestSenderAsAssignee(context, repo, payload) {
+    const { login: pullRequestOwner } = payload.sender;
+
+    await addAssignees(context, repo, [pullRequestOwner]);
+}
+
+async function reviewPullRequest(app, context, repo) {
+    let files = null;
+
+    try {
+        files = await getFiles(context, repo);
+    } catch (error) {
+        app.log.error(error);
+    }
+
+    let reviewComments = [];
+
+    for (let i = 0; i < files.length; i++) {
+        const file = { ...files[i], ...repo };
+
+        const comments = Pepega.investigate(file).against(rules);
+
+        reviewComments = [...reviewComments, ...comments];
+    }
+
+    return reviewComments;
+}
+
+async function resolveComments(app, context, reviewComments) {
+    for (let i = 0; i < reviewComments.length; i++) {
+        const reviewComment = reviewComments[i];
+
+        if (reviewComment.start_line) {
+            try {
+                await addMultiLineReviewComment(context, {
+                    ...reviewComment,
+                });
+            } catch (error) {
+                app.log.error(error);
+            }
+        } else if (reviewComment.line) {
+            try {
+                await addSingleLineReviewComment(context, {
+                    ...reviewComment,
+                });
+            } catch (error) {
+                app.log.error(error);
+            }
+        }
+
+        await timer(settings.delayBetweenCommentRequestsInSeconds * 1000);
+    }
+}
