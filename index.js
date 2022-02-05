@@ -23,10 +23,12 @@
  *
  */
 
+const dedent = require('dedent-js');
 const Pepega = require('./pepega/Pepega');
-const { rules, settings } = require('./pepega/config');
 const timer = require('./pepega/helpers/loopTimer');
 const getFiles = require('./pepega/requests/getFiles');
+const { rules, settings } = require('./pepega/config');
+const addComment = require('./pepega/requests/addComment');
 const printBotName = require('./pepega/helpers/printBotName');
 const addAssignees = require('./pepega/requests/addAssignees');
 const addMultiLineReviewComment = require('./pepega/requests/addMultiLineReviewComment');
@@ -52,14 +54,18 @@ module.exports = (app) => {
                 addPullRequestSenderAsAssignee(context, repo, payload);
             }
 
-            const reviewComments = await reviewPullRequest(app, context, repo);
+            const { files, reviewComments } = await reviewPullRequest(
+                app,
+                context,
+                repo
+            );
 
             if (reviewComments.length) {
                 resolveComments(reviewComments);
             }
 
             if (isReviewSummaryEnabled) {
-                // review
+                addSummaryComment(context, files, reviewComments);
             }
         }
     );
@@ -103,7 +109,10 @@ async function reviewPullRequest(app, context, repo) {
         reviewComments = [...reviewComments, ...comments];
     }
 
-    return reviewComments;
+    return {
+        files,
+        reviewComments,
+    };
 }
 
 async function resolveComments(app, context, reviewComments) {
@@ -129,5 +138,34 @@ async function resolveComments(app, context, reviewComments) {
         }
 
         await timer(settings.delayBetweenCommentRequestsInSeconds * 1000);
+    }
+}
+
+async function addSummaryComment(context, files, reviewComments) {
+    let sumOfAdditions = 0;
+    let sumOfDeletions = 0;
+    let sumOfChanges = 0;
+
+    files.map(({ additions, deletions, changes }) => {
+        sumOfAdditions += additions;
+        sumOfDeletions += deletions;
+        sumOfChanges += changes;
+    });
+
+    const commentBody = `:frog:.js pull request reviewed
+    :speech_balloon: ${
+        reviewComments.length
+            ? `${reviewComments.length} comment(s) require attention`
+            : `:zero: :star:`
+    } 
+    :heavy_plus_sign: ${sumOfAdditions} (additions)
+    :heavy_minus_sign: ${sumOfDeletions} (deletions)
+    :heavy_division_sign: ${sumOfChanges} (changes)
+    `;
+
+    try {
+        await addComment(context, dedent(commentBody));
+    } catch (error) {
+        probotInstance.log.error(error);
     }
 }
