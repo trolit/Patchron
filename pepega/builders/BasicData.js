@@ -9,18 +9,13 @@ class BasicDataBuilder {
      * @param {string} file.split_patch changes made to file (split by newline)
      * @param {string} file.path relative path to the file
      * @param {string} file.commit_id
-     * @example
-     * + other params returned by GitHub API (01.2022)
-     * - sha,
-     * - status,
-     * - additions,
-     * - deletions,
-     * - changes,
-     * - blob_url,
-     * - raw_url,
-     * - contents_url
+     *
+     * @link full response can be found here:
+     * https://docs.github.com/en/rest/reference/pulls#list-pull-requests-files
+     *
      * @summary
-     * due to **GitHub API** snake_case keys naming convention, some props share that convention
+     * due to **GitHub API** snake_case naming convention, some props in Pepega
+     * share that convention.
      */
     constructor(file) {
         const { filename, contents_url, patch } = file;
