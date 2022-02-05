@@ -158,7 +158,7 @@ async function addSummaryComment(context, files, reviewComments) {
     :speech_balloon: ${
         reviewComments.length
             ? `${reviewComments.length} comment(s) require attention.`
-            : `0 comments added :star:`
+            : `0 comments added :star: :star:`
     } 
     :heavy_plus_sign: ${sumOfAdditions} (additions)
     :heavy_minus_sign: ${sumOfDeletions} (deletions)
