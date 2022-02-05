@@ -5,9 +5,9 @@ const { decode } = require('js-base64');
  * @returns {object} object expanded with decoded file's content
  */
 module.exports = (file) => {
-    const decoded_content = decode(file.content);
+    const decodedContent = decode(file.content);
 
-    file = { ...file, decoded_content };
+    file = { ...file, decodedContent };
 
     return file;
 };

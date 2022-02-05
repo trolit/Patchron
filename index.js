@@ -1,21 +1,33 @@
 // **************************************************
-// Pepega-The-Detective
-// made with Probot framework
-// https://github.com/trolit/Pepega
+// *: Pepega-The-Detective
+// *: made with Probot framework
+// *: https://github.com/trolit/Pepega
 // **************************************************
 
-// Deployments API example (learn more)
-// See: https://developer.github.com/v3/repos/deployments/
+/**
+ *
+ * ?: Deployments API example (learn more)
+ * https://developer.github.com/v3/repos/deployments/
+ *
+ * ?: For more information on building apps:
+ * https://probot.github.io/docs/
+ *
+ * ?: To get your app running against GitHub, see:
+ * https://probot.github.io/docs/development/
+ *
+ * ?: GitHub API - best practices
+ * https://docs.github.com/en/rest/guides/best-practices-for-integrators
+ *
+ * ?: GitHub API - rate limits
+ * https://docs.github.com/en/developers/apps/building-github-apps/rate-limits-for-github-apps
+ *
+ */
 
-// For more information on building apps:
-// https://probot.github.io/docs/
-
-// To get your app running against GitHub, see:
-// https://probot.github.io/docs/development/
-
-const rules = require('./pepega/config');
 const Pepega = require('./pepega/Pepega');
+const { rules } = require('./pepega/config');
+const timer = require('./pepega/helpers/loopTimer');
 const getFiles = require('./pepega/requests/getFiles');
+const printBotName = require('./pepega/helpers/printBotName');
 const addMultiLineReviewComment = require('./pepega/requests/addMultiLineReviewComment');
 const addSingleLineReviewComment = require('./pepega/requests/addSingleLineReviewComment');
 
@@ -24,7 +36,7 @@ const addSingleLineReviewComment = require('./pepega/requests/addSingleLineRevie
  * @param {import('probot').Probot} app
  */
 module.exports = (app) => {
-    app.log.info('Pepega loaded ^_____^');
+    printBotName();
 
     global.probotInstance = app;
 
@@ -48,9 +60,9 @@ module.exports = (app) => {
             let reviewComments = [];
 
             for (let i = 0; i < files.length; i++) {
-                const file = files[i];
+                const file = { ...files[i], ...repo };
 
-                const comments = Pepega.investigate(file, repo).against(rules);
+                const comments = Pepega.investigate(file).against(rules);
 
                 reviewComments = [...reviewComments, ...comments];
             }
@@ -75,6 +87,8 @@ module.exports = (app) => {
                         app.log.error(error);
                     }
                 }
+
+                await timer(3000);
             }
         }
     );

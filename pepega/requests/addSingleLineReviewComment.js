@@ -10,6 +10,10 @@
  * @param {string} payload.side which side line refers to (LEFT=deletion, RIGHT=addition)
  * @param {string} payload.path relative path to the file (tl;dr; - filename)
  * @param {string} payload.commit_id
+ *
+ * @link
+ * https://octokit.github.io/rest.js/v18#pulls-create-review-comment
+ *
  * @returns {object} request response
  */
 module.exports = async (context, payload) => {

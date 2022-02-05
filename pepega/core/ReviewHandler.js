@@ -1,7 +1,7 @@
 const Js = require('../rules/js');
 const BasicDataBuilder = require('../builders/BasicData');
 
-class Review {
+class ReviewHandler {
     constructor(file, rules) {
         this.file = {
             ...file,
@@ -21,10 +21,11 @@ class Review {
 
         switch (this.file.extension) {
             case 'vue':
-                comments = [...Js.review(this.file, this.rules.js)];
+                // TODO:
+                comments = [...Js.review(this.file, this.rules)];
                 break;
             case 'js':
-                comments = Js.review(basicData, this.rules.js);
+                comments = Js.review(basicData, this.rules);
                 break;
             default:
                 probotInstance.log.warn(
@@ -37,4 +38,4 @@ class Review {
     }
 }
 
-module.exports = Review;
+module.exports = ReviewHandler;
