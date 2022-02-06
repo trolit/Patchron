@@ -73,13 +73,15 @@ module.exports = (app) => {
             let files = null;
 
             try {
-                files = await getFiles(context, repo);
+                // files = await getFiles(context, repo);
 
-                const reviewComments = reviewPullRequest(repo, files);
+                // const reviewComments = reviewPullRequest(repo, files);
 
-                if (reviewComments.length) {
-                    resolveComments(reviewComments);
-                }
+                // if (reviewComments.length) {
+                //     resolveComments(reviewComments);
+                // }
+
+                let reviewComments = [];
 
                 if (isReviewSummaryEnabled) {
                     addSummaryComment(context, reviewComments, payload);
@@ -186,10 +188,10 @@ async function addSummaryComment(context, reviewComments, payload) {
             ? `${reviewComments.length} comment(s) require attention.`
             : `0 comments added :star: :star:`
     } 
-    :hammer: ${commits} (commits)
-    :heavy_plus_sign: ${additions} (additions)
-    :heavy_minus_sign: ${deletions} (deletions)
-    :heavy_division_sign: ${changed_files} (changed files)
+    :hammer: ${commits} commit(s)
+    :heavy_plus_sign: ${additions} additions
+    :heavy_minus_sign: ${deletions} deletions
+    :heavy_division_sign: ${changed_files} changed files
     `;
 
     try {
