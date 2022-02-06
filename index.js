@@ -178,8 +178,7 @@ async function addSummaryComment(context, reviewComments, payload) {
     const { commits, additions, deletions, changed_files } =
         payload.pull_request;
 
-    const commentBody = `:frog:.js
-    <em>pull request review completed</em>
+    const commentBody = `<em>pull request review completed</em>
 
     :speech_balloon: ${
         reviewComments.length
