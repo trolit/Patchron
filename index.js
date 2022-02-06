@@ -44,7 +44,8 @@ const addSingleLineReviewComment = require('./pepega/requests/addSingleLineRevie
 module.exports = (app) => {
     printBotName();
 
-    const { isOwnerAssigningEnabled, isReviewSummaryEnabled } = settings;
+    const { isOwnerAssigningEnabled, isReviewSummaryEnabled, strictWorkflow } =
+        settings;
 
     global.probotInstance = app;
 
@@ -52,6 +53,18 @@ module.exports = (app) => {
         ['pull_request.opened', 'pull_request.synchronize'],
         async (context) => {
             const { payload, repo } = setup(context);
+
+            if (strictWorkflow.enabled) {
+                const isReviewAborted = resolveStrictWorkflow(
+                    context,
+                    payload,
+                    strictWorkflow
+                );
+
+                if (isReviewAborted) {
+                    return;
+                }
+            }
 
             if (isOwnerAssigningEnabled) {
                 addPullRequestSenderAsAssignee(context, repo, payload);
@@ -91,10 +104,34 @@ function setup(context) {
     };
 }
 
+async function resolveStrictWorkflow(context, payload, strictWorkflow) {
+    const comment = rules.pull['strictWorkflow'].invoke(payload);
+
+    let isReviewAborted = false;
+
+    if (comment.reason === 'prefix') {
+        isReviewAborted = strictWorkflow.abortReviewOnInvalidBranchPrefix;
+    } else if (comment.reason === 'flow') {
+        isReviewAborted = strictWorkflow.abortReviewOnInvalidFlow;
+    }
+
+    try {
+        await addComment(context, dedent(comment.body));
+    } catch (error) {
+        probotInstance.log.error(error);
+    }
+
+    return isReviewAborted;
+}
+
 async function addPullRequestSenderAsAssignee(context, repo, payload) {
     const { login: pullRequestOwner } = payload.sender;
 
-    await addAssignees(context, repo, [pullRequestOwner]);
+    try {
+        await addAssignees(context, repo, [pullRequestOwner]);
+    } catch (error) {
+        probotInstance.log.error(error);
+    }
 }
 
 function reviewPullRequest(repo, files) {
