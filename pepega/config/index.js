@@ -13,9 +13,9 @@ module.exports = {
         isOwnerAssigningEnabled: true,
         isReviewSummaryEnabled: true,
         strictWorkflow: {
-            enabled: true,
+            enabled: false,
             abortReviewOnInvalidBranchPrefix: false,
-            abortReviewOnInvalidFlow: true,
+            abortReviewOnInvalidFlow: false,
         },
     },
     rules: {
