@@ -82,7 +82,7 @@ module.exports = (app) => {
                 }
 
                 if (isReviewSummaryEnabled) {
-                    addSummaryComment(context, files, reviewComments);
+                    addSummaryComment(context, reviewComments, payload);
                 }
             } catch (error) {
                 app.log.error(error);
@@ -174,16 +174,9 @@ async function resolveComments(app, context, reviewComments) {
     }
 }
 
-async function addSummaryComment(context, files, reviewComments) {
-    let sumOfAdditions = 0;
-    let sumOfDeletions = 0;
-    let sumOfChanges = 0;
-
-    files.map(({ additions, deletions, changes }) => {
-        sumOfAdditions += additions;
-        sumOfDeletions += deletions;
-        sumOfChanges += changes;
-    });
+async function addSummaryComment(context, reviewComments, payload) {
+    const { commits, additions, deletions, changed_files } =
+        payload.pull_request;
 
     const commentBody = `:frog:.js
     <em>pull request review completed</em>
@@ -193,9 +186,10 @@ async function addSummaryComment(context, files, reviewComments) {
             ? `${reviewComments.length} comment(s) require attention.`
             : `0 comments added :star: :star:`
     } 
-    :heavy_plus_sign: ${sumOfAdditions} (additions)
-    :heavy_minus_sign: ${sumOfDeletions} (deletions)
-    :heavy_division_sign: ${sumOfChanges} (changes)
+    :hammer: ${commits} (commits)
+    :heavy_plus_sign: ${additions} (additions)
+    :heavy_minus_sign: ${deletions} (deletions)
+    :heavy_division_sign: ${changed_files} (changed files)
     `;
 
     try {
