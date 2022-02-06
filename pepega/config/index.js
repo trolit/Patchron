@@ -15,7 +15,7 @@ module.exports = {
         strictWorkflow: {
             enabled: false,
             abortReviewOnInvalidBranchPrefix: false,
-            abortReviewOnInvalidFlow: false,
+            abortReviewOnInvalidFlow: true,
         },
     },
     rules: {

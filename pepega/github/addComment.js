@@ -1,6 +1,6 @@
 /**
  * creates comment under PR
- * @param {object} context WebhookEvent instance.
+ * @param {WebhookEvent<EventPayloads.WebhookPayloadPullRequest>} context WebhookEvent instance.
  * @param {string} body text of the comment.
  *
  * @link

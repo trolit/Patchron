@@ -1,4 +1,5 @@
 const dedent = require('dedent-js');
+const { settings } = require('../../config');
 
 class StrictWorkflowRule {
     constructor(config) {
@@ -8,7 +9,9 @@ class StrictWorkflowRule {
     }
 
     invoke(payload) {
-        if (this.workflowArray.length === 0) {
+        const { strictWorkflow } = settings;
+
+        if (strictWorkflow.enabled && this.workflowArray.length === 0) {
             probotInstance.log.error(
                 `Couldn't run rule ${__filename}. Empty workflow.`
             );
@@ -37,15 +40,15 @@ class StrictWorkflowRule {
         let comment = null;
 
         if (!hasMergeFromValidPrefx) {
-            comment = this._getCommentBody(mergeFrom, mergeTo, 'prefix');
+            comment = this._getComment(mergeFrom, mergeTo, 'prefix');
         } else if (!isMergeToValid) {
-            comment = this._getCommentBody(mergeFrom, mergeTo, 'flow');
+            comment = this._getComment(mergeFrom, mergeTo, 'flow');
         }
 
         return comment;
     }
 
-    _getCommentBody(mergeFrom, mergeTo, reason) {
+    _getComment(mergeFrom, mergeTo, reason) {
         let formattedWorkflow = '';
 
         this.workflowArray.forEach((workflowItem) => {
