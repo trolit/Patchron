@@ -1,7 +1,7 @@
 // **************************************************
-// *: Pepega-The-Detective
+// *: Pepega.js
 // *: made with Probot framework
-// *: https://github.com/trolit/Pepega
+// *: source: https://github.com/trolit/Pepega
 // **************************************************
 
 /**
