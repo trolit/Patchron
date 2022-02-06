@@ -1,7 +1,7 @@
 // **************************************************
-// *: Pepega-The-Detective
+// *: Pepega.js
 // *: made with Probot framework
-// *: https://github.com/trolit/Pepega
+// *: source: https://github.com/trolit/Pepega
 // **************************************************
 
 /**
@@ -44,7 +44,8 @@ const addSingleLineReviewComment = require('./pepega/requests/addSingleLineRevie
 module.exports = (app) => {
     printBotName();
 
-    const { isOwnerAssigningEnabled, isReviewSummaryEnabled } = settings;
+    const { isOwnerAssigningEnabled, isReviewSummaryEnabled, strictWorkflow } =
+        settings;
 
     global.probotInstance = app;
 
@@ -52,6 +53,18 @@ module.exports = (app) => {
         ['pull_request.opened', 'pull_request.synchronize'],
         async (context) => {
             const { payload, repo } = setup(context);
+
+            if (strictWorkflow.enabled) {
+                const isReviewAborted = resolveStrictWorkflow(
+                    context,
+                    payload,
+                    strictWorkflow
+                );
+
+                if (isReviewAborted) {
+                    return;
+                }
+            }
 
             if (isOwnerAssigningEnabled) {
                 addPullRequestSenderAsAssignee(context, repo, payload);
@@ -69,7 +82,7 @@ module.exports = (app) => {
                 }
 
                 if (isReviewSummaryEnabled) {
-                    addSummaryComment(context, files, reviewComments);
+                    addSummaryComment(context, reviewComments, payload);
                 }
             } catch (error) {
                 app.log.error(error);
@@ -91,10 +104,34 @@ function setup(context) {
     };
 }
 
+async function resolveStrictWorkflow(context, payload, strictWorkflow) {
+    const comment = rules.pull['strictWorkflow'].invoke(payload);
+
+    let isReviewAborted = false;
+
+    if (comment.reason === 'prefix') {
+        isReviewAborted = strictWorkflow.abortReviewOnInvalidBranchPrefix;
+    } else if (comment.reason === 'flow') {
+        isReviewAborted = strictWorkflow.abortReviewOnInvalidFlow;
+    }
+
+    try {
+        await addComment(context, dedent(comment.body));
+    } catch (error) {
+        probotInstance.log.error(error);
+    }
+
+    return isReviewAborted;
+}
+
 async function addPullRequestSenderAsAssignee(context, repo, payload) {
     const { login: pullRequestOwner } = payload.sender;
 
-    await addAssignees(context, repo, [pullRequestOwner]);
+    try {
+        await addAssignees(context, repo, [pullRequestOwner]);
+    } catch (error) {
+        probotInstance.log.error(error);
+    }
 }
 
 function reviewPullRequest(repo, files) {
@@ -137,16 +174,9 @@ async function resolveComments(app, context, reviewComments) {
     }
 }
 
-async function addSummaryComment(context, files, reviewComments) {
-    let sumOfAdditions = 0;
-    let sumOfDeletions = 0;
-    let sumOfChanges = 0;
-
-    files.map(({ additions, deletions, changes }) => {
-        sumOfAdditions += additions;
-        sumOfDeletions += deletions;
-        sumOfChanges += changes;
-    });
+async function addSummaryComment(context, reviewComments, payload) {
+    const { commits, additions, deletions, changed_files } =
+        payload.pull_request;
 
     const commentBody = `:frog:.js
     <em>pull request review completed</em>
@@ -156,9 +186,10 @@ async function addSummaryComment(context, files, reviewComments) {
             ? `${reviewComments.length} comment(s) require attention.`
             : `0 comments added :star: :star:`
     } 
-    :heavy_plus_sign: ${sumOfAdditions} (additions)
-    :heavy_minus_sign: ${sumOfDeletions} (deletions)
-    :heavy_division_sign: ${sumOfChanges} (changes)
+    :hammer: ${commits} commit(s)
+    :heavy_plus_sign: ${additions} additions
+    :heavy_minus_sign: ${deletions} deletions
+    :heavy_division_sign: ${changed_files} changed files
     `;
 
     try {

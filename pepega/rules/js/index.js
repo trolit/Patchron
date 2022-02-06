@@ -10,7 +10,7 @@ class Js {
             return [];
         }
 
-        const comments = review(file, rules.js);
+        const comments = review(file, rules.files.js);
 
         return comments;
     }
