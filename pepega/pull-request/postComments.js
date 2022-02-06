@@ -3,7 +3,7 @@ const addMultiLineReviewComment = require('../requests/addMultiLineReviewComment
 const addSingleLineReviewComment = require('../requests/addSingleLineReviewComment');
 
 /**
- * POST review comments to pull request
+ * **POST** review comments
  * @param {WebhookEvent<EventPayloads.WebhookPayloadPullRequest>} context WebhookEvent instance.
  * @param {Array<object>} reviewComments
  * @param {number} delayBetweenCommentRequestsInSeconds
