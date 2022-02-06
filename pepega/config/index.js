@@ -23,6 +23,10 @@ module.exports = {
             strictWorkflow: new strictWorkflow({
                 workflow: [
                     {
+                        base: 'master',
+                        head: 'release',
+                    },
+                    {
                         base: 'develop',
                         head: 'release',
                     },
@@ -36,6 +40,10 @@ module.exports = {
                     },
                     {
                         base: 'master',
+                        head: 'hotfix',
+                    },
+                    {
+                        base: 'develop',
                         head: 'hotfix',
                     },
                 ],
