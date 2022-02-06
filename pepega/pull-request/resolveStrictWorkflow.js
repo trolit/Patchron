@@ -1,4 +1,4 @@
-const addComment = require('../requests/addComment');
+const addComment = require('../github/addComment');
 
 /**
  * validates pull requested branch against strict workflow rule and posts comment (if needed).

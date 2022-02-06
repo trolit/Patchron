@@ -1,4 +1,4 @@
-const addAssignees = require('../requests/addAssignees');
+const addAssignees = require('../github/addAssignees');
 
 /**
  * adds pull request sender as assignee

@@ -26,7 +26,7 @@
  *
  */
 
-const getFiles = require('./pepega/requests/getFiles');
+const getFiles = require('./pepega/github/getFiles');
 const { rules, settings } = require('./pepega/config');
 const printBotName = require('./pepega/helpers/printBotName');
 const postSummary = require('./pepega/pull-request/postSummary');

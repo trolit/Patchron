@@ -1,6 +1,6 @@
 const timer = require('../helpers/loopTimer');
-const addMultiLineReviewComment = require('../requests/addMultiLineReviewComment');
-const addSingleLineReviewComment = require('../requests/addSingleLineReviewComment');
+const addMultiLineReviewComment = require('../github/addMultiLineReviewComment');
+const addSingleLineReviewComment = require('../github/addSingleLineReviewComment');
 
 /**
  * **POST** review comments to GitHub
