@@ -73,15 +73,13 @@ module.exports = (app) => {
             let files = null;
 
             try {
-                // files = await getFiles(context, repo);
+                files = await getFiles(context, repo);
 
-                // const reviewComments = reviewPullRequest(repo, files);
+                const reviewComments = reviewPullRequest(repo, files);
 
-                // if (reviewComments.length) {
-                //     resolveComments(reviewComments);
-                // }
-
-                let reviewComments = [];
+                if (reviewComments.length) {
+                    resolveComments(reviewComments);
+                }
 
                 if (isReviewSummaryEnabled) {
                     addSummaryComment(context, reviewComments, payload);
