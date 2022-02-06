@@ -16,7 +16,7 @@ class StrictWorkflowRule {
             return [];
         }
 
-        const { head, base } = payload;
+        const { head, base } = payload.pull_request;
 
         const { ref: mergeTo } = base;
         const { ref: mergeFrom } = head;
@@ -24,7 +24,7 @@ class StrictWorkflowRule {
         let hasMergeFromValidPrefx = false;
         let isMergeToValid = false;
 
-        for (const workflowItem in this.workflowArray) {
+        for (const workflowItem of this.workflowArray) {
             if (mergeFrom.startsWith(`${workflowItem.head}/`)) {
                 hasMergeFromValidPrefx = true;
 
@@ -50,23 +50,30 @@ class StrictWorkflowRule {
 
         this.workflowArray.forEach((workflowItem) => {
             formattedWorkflow = `${formattedWorkflow}
-            - ${workflowItem.base} <--- (${workflowItem.head}/)`;
+            - \` ${workflowItem.base} \` <--- \` ${workflowItem.head} \``;
         });
 
         const description =
             reason === 'prefix'
-                ? `Invalid branch prefix :worried: (\`${mergeFrom}\`)`
-                : `Invalid flow (\`${mergeTo}\` <- \`${mergeFrom}\`)`;
+                ? `Invalid branch prefix :worried: (\`${mergeFrom}\`). Please, fix branch name and create new PR.`
+                : `Invalid flow (\`${mergeTo}\` <- \`${mergeFrom}\`). Either change base branch (recommended) or create new PR.`;
 
-        const commentBody = `${description} 
-         
-        <details>
-            <summary> Current workflow </summary> \n\n${dedent(
+        let commentBody = `${description}`;
+
+        if (reason === 'flow') {
+            const workflowSnippet = `<details>
+            <summary> Current allowed workflow </summary> \n\n${dedent(
                 formattedWorkflow
             )}
-        </details>`;
+            </details>`;
 
-        return dedent(commentBody);
+            commentBody = commentBody.concat('\n', workflowSnippet);
+        }
+
+        return {
+            body: dedent(commentBody),
+            reason,
+        };
     }
 }
 
