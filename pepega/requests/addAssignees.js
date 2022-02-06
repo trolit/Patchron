@@ -4,6 +4,7 @@
  * @param {object} repo
  * @param {string} repo.owner repository owner's name
  * @param {object} repo.repo repository name
+ * @param {object} repo.pull_number pull request Id
  * @param {Array<string>} assignees usernames of people to assign
  *
  * @link
