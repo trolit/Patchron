@@ -3,7 +3,7 @@ const { settings } = require('../config');
 /**
  * fetches files from pull request. Unpaginated response includes a maximum of 3000 files
  * so **it's not recommended** to overload GitHub API by multiple small requests in 99% cases.
- * @param {object} context WebhookEvent instance.
+ * @param {WebhookEvent<EventPayloads.WebhookPayloadPullRequest>} context WebhookEvent instance.
  * @param {object} payload repository data.
  * @param {string} payload.owner repository owner's name
  * @param {string} payload.repo repository name

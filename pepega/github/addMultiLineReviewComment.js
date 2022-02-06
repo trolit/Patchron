@@ -1,6 +1,6 @@
 /**
  * sends request to add multi line review comment.
- * @param {object} context WebhookEvent instance.
+ * @param {WebhookEvent<EventPayloads.WebhookPayloadPullRequest>} context WebhookEvent instance.
  * @param {object} payload review details.
  * @param {string} payload.owner repository owner's name
  * @param {string} payload.repo repository name
