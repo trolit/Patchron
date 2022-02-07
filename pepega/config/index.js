@@ -1,5 +1,6 @@
 const strictWorkflow = require('../rules/pull/StrictWorkflow');
 const noUnmarkedComments = require('../rules/common/NoUnmarkedComments');
+const keywordsOrderedByLength = require('../rules/common/KeywordsOrderedByLength');
 
 require('dotenv').config({
     path: '../../.env',
@@ -79,6 +80,18 @@ module.exports = {
                         isAppliedToSingleLineComments: true,
                         isAppliedToMultiLineComments: true,
                         isAppliedToInlineComments: true,
+                    }),
+                },
+                {
+                    instance: new keywordsOrderedByLength({
+                        keywords: [
+                            {
+                                name: 'import',
+                                regex: '/import(?<=import).*(?=;);/g',
+                                order: 'ascending',
+                                ignoreNewline: true,
+                            },
+                        ],
                     }),
                 },
             ],
