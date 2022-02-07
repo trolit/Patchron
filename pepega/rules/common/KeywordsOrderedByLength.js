@@ -24,7 +24,9 @@ class KeywordsOrderedByLengthRule {
 
         const { split_patch: splitPatch } = file;
 
-        for (let rowIndex = 0; rowIndex < splitPatch.length; rowIndex++) {}
+        for (let rowIndex = 0; rowIndex < splitPatch.length; rowIndex++) {
+            // TODO:
+        }
 
         let comments = [];
 
