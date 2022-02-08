@@ -87,7 +87,7 @@ module.exports = {
                         keywords: [
                             {
                                 name: 'import',
-                                regex: '/import(?<=import).*(?=;);/g',
+                                regex: '/import.*/',
                                 order: 'ascending',
                                 ignoreNewline: true,
                             },
