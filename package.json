@@ -15,7 +15,8 @@
     "start": "nodemon --exec probot run ./index.js",
     "test": "jest",
     "lint:check": "eslint .",
-    "lint:fix": "eslint --fix ."
+    "lint:fix": "eslint --fix .",
+    "trace-warnings": "node --trace-warnings index.js"
   },
   "dependencies": {
     "dedent-js": "^1.0.1",
