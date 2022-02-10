@@ -2,7 +2,7 @@ const review = require('../review');
 
 class Js {
     static review(file, rules) {
-        if (!rules.js.length) {
+        if (!rules.files.js.length) {
             probotInstance.log.warn(
                 `Attempted to review file against js rules but no rules were provided: ${__filename}`
             );

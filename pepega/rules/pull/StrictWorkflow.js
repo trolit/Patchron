@@ -1,5 +1,4 @@
 const dedent = require('dedent-js');
-const { settings } = require('../../config');
 
 class StrictWorkflowRule {
     constructor(config) {
@@ -9,9 +8,7 @@ class StrictWorkflowRule {
     }
 
     invoke(payload) {
-        const { strictWorkflow } = settings;
-
-        if (strictWorkflow.enabled && this.workflowArray.length === 0) {
+        if (this.workflowArray.length === 0) {
             probotInstance.log.error(
                 `Couldn't run rule ${__filename}. Empty workflow.`
             );
