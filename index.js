@@ -82,7 +82,7 @@ module.exports = (app) => {
                 const reviewComments = reviewPullRequest(repo, files, rules);
 
                 if (reviewComments.length) {
-                    postComments(
+                    await postComments(
                         context,
                         reviewComments,
                         delayBetweenCommentRequestsInSeconds
