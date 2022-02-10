@@ -33,7 +33,7 @@ module.exports = [
         }),
     },
     {
-        enabled: true,
+        enabled: false,
         instance: new keywordsOrderedByLength({
             keywords: [
                 {
