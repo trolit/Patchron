@@ -1,21 +1,57 @@
+const removeWhitespaces = require('./removeWhitespaces');
+const getNearestHunkHeader = require('./getNearestHunkHeader');
+
 /**
- * returns line number of current row according to hunk header
- * @param {string} startLine startLine of **source_file** or **modified_file** hunk header
- * @param {number} row
+ * returns line number in GitHub according to the provided information
+ * @param {Array<string>} content file content split by \n
+ * @param {string} side left | right
+ * @param {number} rowIndex index of row to get GitHub line number
  *
  * @example
- * e.g. to get line number for row 2:
- * ┌─────────┬───────────────────────────────┐
- * │ (index) │            Values             │
- * ├─────────┼───────────────────────────────┤
- * │    0    │  '(a)(a) -0,0 +15,33 (a)(a)'  │
- * │    1    │     '+// SIMPLE TESTS'        │
- * │    2    │          '+// RR'             │
- * └─────────┴───────────────────────────────┘
- * => 15 (startLine) + 2 (row) - 1 = 16
+ *  * getLineNumber(content, 'right', 5) => 29
+ *  * getLineNumber(content, 'left', 2) => 26
+ * ┌─────────┬─────────────────────────┐
+ * │ (index) │          Values         │
+ * ├─────────┼─────────────────────────┤
+ * │    0    │  '@@ -26,15 +26,16...'  │
+ * │    1    │         '+...'          │
+ * │    2    │         '-...'          │
+ * │    3    │         ' ...'          │
+ * │    4    │         ' ...'          │
+ * │    5    │         '+...'          │
+ * │    6    │         '-...'          │
+ * └─────────┴─────────────────────────┘
  *
  * @returns {number}
  */
-module.exports = (startLine, row) => {
-    return parseInt(startLine) + row - 1;
+module.exports = (content, side = 'right', rowIndex) => {
+    const {
+        index: nearestHunkHeaderIndex,
+        modifiedFile,
+        sourceFile,
+    } = getNearestHunkHeader(content, rowIndex);
+
+    let counter = parseInt(
+        side === 'right' ? modifiedFile.line : sourceFile.line
+    );
+
+    const prefixToIgnore = side === 'right' ? '-' : '+';
+
+    for (
+        let index = nearestHunkHeaderIndex + 1;
+        index < content.length;
+        index++
+    ) {
+        if (index == rowIndex) {
+            break;
+        }
+
+        const minifiedRow = removeWhitespaces(content[index]);
+
+        if (!minifiedRow.startsWith(prefixToIgnore)) {
+            counter++;
+        }
+    }
+
+    return counter;
 };
