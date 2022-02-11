@@ -2,7 +2,7 @@ const removeWhitespaces = require('./removeWhitespaces');
 const getNearestHunkHeader = require('./getNearestHunkHeader');
 
 /**
- * returns line number in GitHub according to the provided information
+ * translates row index into GitHub line number
  * @param {Array<string>} content file content split by \n
  * @param {string} side left | right
  * @param {number} rowIndex index of row to get GitHub line number
