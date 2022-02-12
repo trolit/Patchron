@@ -7,12 +7,15 @@ const addSingleLineReviewComment = require('../github/addSingleLineReviewComment
  * @param {WebhookEvent<EventPayloads.WebhookPayloadPullRequest>} context WebhookEvent instance.
  * @param {Array<object>} reviewComments
  * @param {number} delayBetweenCommentRequestsInSeconds
+ * @returns {number} number of comments successfully posted to the GitHub
  */
 module.exports = async (
     context,
     reviewComments,
     delayBetweenCommentRequestsInSeconds
 ) => {
+    let numberOfPostedComments = 0;
+
     for (let i = 0; i < reviewComments.length; i++) {
         const reviewComment = reviewComments[i];
 
@@ -21,6 +24,8 @@ module.exports = async (
                 await addMultiLineReviewComment(context, {
                     ...reviewComment,
                 });
+
+                numberOfPostedComments++;
             } catch (error) {
                 probotInstance.log.error(error);
             }
@@ -29,6 +34,8 @@ module.exports = async (
                 await addSingleLineReviewComment(context, {
                     ...reviewComment,
                 });
+
+                numberOfPostedComments++;
             } catch (error) {
                 probotInstance.log.error(error);
             }
@@ -36,4 +43,6 @@ module.exports = async (
 
         await timer(delayBetweenCommentRequestsInSeconds * 1000);
     }
+
+    return numberOfPostedComments;
 };
