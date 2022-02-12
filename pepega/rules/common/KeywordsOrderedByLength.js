@@ -184,6 +184,7 @@ class KeywordsOrderedByLengthRule {
         return reviewComments;
     }
 
+    /** checks if group consists of more than {length} elements that aren't empty spaces or deleted content */
     _isValidGroup(group, length = 0) {
         const filteredGroup = group.filter(
             (element) =>
@@ -204,6 +205,7 @@ class KeywordsOrderedByLengthRule {
         );
     }
 
+    /** checks if group includes unchanged row */
     _tryToGetIndexOfUnchangedRow(startFrom, group, unchangedRows) {
         let indexOfUnchangedRow = -1;
 
@@ -219,6 +221,7 @@ class KeywordsOrderedByLengthRule {
         return indexOfUnchangedRow;
     }
 
+    /** handles comment rendering depending on group structure  */
     _reviewGroup(file, keyword, group, unchangedRows) {
         let reviewComments = [];
         let indexOfUnchangedRow = 0;
@@ -287,6 +290,7 @@ class KeywordsOrderedByLengthRule {
         return reviewComments;
     }
 
+    /** checks if group is sorted as intended to keyword config  */
     _isGroupProperlyOrdered(keyword, group, slicedGroup = null) {
         let isProperlyOrdered = true;
 
