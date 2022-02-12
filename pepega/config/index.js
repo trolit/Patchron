@@ -11,7 +11,7 @@ module.exports = {
         isGetFilesRequestPaginated: false,
         delayBetweenCommentRequestsInSeconds: 3,
         isOwnerAssigningEnabled: true,
-        isReviewSummaryEnabled: true,
+        isReviewSummaryEnabled: false,
         strictWorkflow: {
             enabled: false,
             abortReviewOnInvalidBranchPrefix: false,
