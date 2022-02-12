@@ -81,8 +81,10 @@ module.exports = (app) => {
 
                 const reviewComments = reviewPullRequest(repo, files, rules);
 
+                let successfullyPostedComments = 0;
+
                 if (reviewComments.length) {
-                    await postComments(
+                    successfullyPostedComments = await postComments(
                         context,
                         reviewComments,
                         delayBetweenCommentRequestsInSeconds
@@ -90,7 +92,12 @@ module.exports = (app) => {
                 }
 
                 if (isReviewSummaryEnabled) {
-                    postSummary(context, reviewComments, payload);
+                    postSummary(
+                        context,
+                        successfullyPostedComments,
+                        reviewComments,
+                        payload
+                    );
                 }
             } catch (error) {
                 app.log.error(error);
