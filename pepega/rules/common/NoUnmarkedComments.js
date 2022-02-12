@@ -2,7 +2,6 @@ const dedent = require('dedent-js');
 const getLineNumber = require('../../helpers/getLineNumber');
 const removeWhitespaces = require('../../helpers/removeWhitespaces');
 const ReviewCommentBuilder = require('../../builders/ReviewComment');
-const getNearestHunkHeader = require('../../helpers/getNearestHunkHeader');
 
 class NoUnmarkedCommentsRule {
     constructor(config) {
@@ -206,13 +205,7 @@ class NoUnmarkedCommentsRule {
     _getSingleLineComment(file, rowIndex) {
         const { split_patch: splitPatch } = file;
 
-        const { modifiedFile } = getNearestHunkHeader(splitPatch, rowIndex);
-
-        if (!modifiedFile) {
-            return null;
-        }
-
-        const line = getLineNumber(modifiedFile.line, rowIndex);
+        const line = getLineNumber(splitPatch, 'right', rowIndex);
 
         const reviewCommentBuilder = new ReviewCommentBuilder(file);
 
@@ -228,13 +221,7 @@ class NoUnmarkedCommentsRule {
     _getMultiLineComment(file, rowIndex) {
         const { split_patch: splitPatch } = file;
 
-        const { modifiedFile } = getNearestHunkHeader(splitPatch, rowIndex);
-
-        if (!modifiedFile) {
-            return null;
-        }
-
-        const start_line = getLineNumber(modifiedFile.line, rowIndex);
+        const start_line = getLineNumber(splitPatch, 'right', rowIndex);
 
         let position = 0;
         let index = 0;
