@@ -1,10 +1,13 @@
+const BaseRule = require('../Base');
 const dedent = require('dedent-js');
 const getLineNumber = require('../../helpers/getLineNumber');
 const removeWhitespaces = require('../../helpers/removeWhitespaces');
 const ReviewCommentBuilder = require('../../builders/ReviewComment');
 
-class NoUnmarkedCommentsRule {
+class NoUnmarkedCommentsRule extends BaseRule {
     constructor(config) {
+        super();
+
         const {
             prefixes,
             isAppliedToSingleLineComments,
@@ -42,8 +45,10 @@ class NoUnmarkedCommentsRule {
                 this.isAppliedToSingleLineComments &&
                 this._isInvalidSingleLineComment(minifiedRowContent)
             ) {
+                const body = this._getCommentBody();
+
                 unmarkedComments.push(
-                    this._getSingleLineComment(file, rowIndex)
+                    this.getSingleLineComment(file, body, rowIndex)
                 );
 
                 continue;
@@ -72,8 +77,10 @@ class NoUnmarkedCommentsRule {
                     rowIndex = lastIndex;
                 } else {
                     if (!this._isValidMultiLineComment(minifiedRowContent)) {
+                        const body = this._getCommentBody();
+
                         unmarkedComments.push(
-                            this._getSingleLineComment(file, rowIndex)
+                            this.getSingleLineComment(file, body, rowIndex)
                         );
                     }
                 }
@@ -85,8 +92,10 @@ class NoUnmarkedCommentsRule {
                 this.isAppliedToInlineComments &&
                 this._isInvalidInlineComment(minifiedRowContent)
             ) {
+                const body = this._getCommentBody();
+
                 unmarkedComments.push(
-                    this._getSingleLineComment(file, rowIndex)
+                    this.getSingleLineComment(file, body, rowIndex)
                 );
 
                 continue;
@@ -200,22 +209,6 @@ class NoUnmarkedCommentsRule {
         }
 
         return isWithPrefix;
-    }
-
-    _getSingleLineComment(file, rowIndex) {
-        const { split_patch: splitPatch } = file;
-
-        const line = getLineNumber(splitPatch, 'right', rowIndex);
-
-        const reviewCommentBuilder = new ReviewCommentBuilder(file);
-
-        const comment = reviewCommentBuilder.buildSingleLineComment({
-            body: this._getCommentBody(),
-            line,
-            side: 'RIGHT',
-        });
-
-        return comment;
     }
 
     _getMultiLineComment(file, rowIndex) {
