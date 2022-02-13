@@ -48,6 +48,7 @@ module.exports = (app) => {
         isReviewSummaryEnabled,
         strictWorkflow,
         delayBetweenCommentRequestsInSeconds,
+        maxCommentsPerReview,
     } = settings;
 
     global.probotInstance = app;
@@ -83,22 +84,25 @@ module.exports = (app) => {
 
                 let successfullyPostedComments = 0;
 
-                if (reviewComments.length) {
-                    successfullyPostedComments = await postComments(
-                        context,
-                        reviewComments,
-                        delayBetweenCommentRequestsInSeconds
-                    );
-                }
+                console.log({ reviewComments });
 
-                if (isReviewSummaryEnabled) {
-                    postSummary(
-                        context,
-                        successfullyPostedComments,
-                        reviewComments,
-                        payload
-                    );
-                }
+                // if (reviewComments.length) {
+                //     successfullyPostedComments = await postComments(
+                //         context,
+                //         reviewComments,
+                //         delayBetweenCommentRequestsInSeconds,
+                //         maxCommentsPerReview
+                //     );
+                // }
+
+                // if (isReviewSummaryEnabled) {
+                //     postSummary(
+                //         context,
+                //         successfullyPostedComments,
+                //         reviewComments,
+                //         payload
+                //     );
+                // }
             } catch (error) {
                 app.log.error(error);
             }
