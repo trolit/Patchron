@@ -12,6 +12,7 @@ module.exports = {
         delayBetweenCommentRequestsInSeconds: 3,
         isOwnerAssigningEnabled: true,
         isReviewSummaryEnabled: false,
+        maxCommentsPerReview: 50,
         strictWorkflow: {
             enabled: false,
             abortReviewOnInvalidBranchPrefix: false,

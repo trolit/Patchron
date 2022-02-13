@@ -7,16 +7,34 @@ const addSingleLineReviewComment = require('../github/addSingleLineReviewComment
  * @param {WebhookEvent<EventPayloads.WebhookPayloadPullRequest>} context WebhookEvent instance.
  * @param {Array<object>} reviewComments
  * @param {number} delayBetweenCommentRequestsInSeconds
+ * @param {number} maxCommentsPerReview
  * @returns {number} number of comments successfully posted to the GitHub
  */
 module.exports = async (
     context,
     reviewComments,
-    delayBetweenCommentRequestsInSeconds
+    delayBetweenCommentRequestsInSeconds,
+    maxCommentsPerReview
 ) => {
     let numberOfPostedComments = 0;
 
+    if (maxCommentsPerReview <= 0) {
+        probotInstance.log.warn(
+            'Invalid value set on maxCommentsPerReview setting. No comments posted.'
+        );
+
+        return numberOfPostedComments;
+    }
+
     for (let i = 0; i < reviewComments.length; i++) {
+        if (numberOfPostedComments >= maxCommentsPerReview) {
+            probotInstance.log.warn(
+                'Did not post more comments due to limit reach.'
+            );
+
+            break;
+        }
+
         const reviewComment = reviewComments[i];
 
         if (reviewComment.start_line) {
