@@ -4,6 +4,8 @@ const getPosition = require('../../helpers/getPosition');
 const getLineNumber = require('../../helpers/getLineNumber');
 const ReviewCommentBuilder = require('../../builders/ReviewComment');
 
+const customLines = ['<<< new line >>>', '<<< merge >>>'];
+
 class KeywordsOrderedByLengthRule extends BaseRule {
     /**
      * @param {object} config
@@ -126,9 +128,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
             const sortedElement = sortedArray[index];
 
             if (
-                !['<<< new line >>>', '<<< merge >>>'].includes(
-                    baseElement.matchedContent
-                ) &&
+                this._hasCode(baseElement) &&
                 baseElement.rowIndex !== sortedElement.rowIndex
             ) {
                 const body = this._getCommentBody(keyword);
@@ -187,12 +187,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
 
     /** checks if group consists of more than {length} elements that aren't empty spaces or deleted content */
     _isValidGroup(group, length = 0) {
-        const filteredGroup = group.filter(
-            (element) =>
-                !['<<< new line >>>', '<<< merge >>>'].includes(
-                    element.matchedContent
-                )
-        );
+        const filteredGroup = group.filter((element) => this._hasCode(element));
 
         return filteredGroup && filteredGroup.length > length;
     }
@@ -226,7 +221,6 @@ class KeywordsOrderedByLengthRule extends BaseRule {
     _reviewGroup(file, keyword, group, unchangedRows) {
         let reviewComments = [];
         let indexOfUnchangedRow = 0;
-
         let wasUnchangedRowFound = false;
 
         for (let index = 0; index < group.length; index++) {
@@ -245,11 +239,8 @@ class KeywordsOrderedByLengthRule extends BaseRule {
                     slicedGroup.length &&
                     !this._isGroupProperlyOrdered(keyword, group, slicedGroup)
                 ) {
-                    const element = slicedGroup.filter(
-                        (element) =>
-                            !['<<< new line >>>', '<<< merge >>>'].includes(
-                                element.matchedContent
-                            )
+                    const element = slicedGroup.filter((element) =>
+                        this._hasCode(element)
                     );
 
                     if (element.length === 1) {
@@ -297,19 +288,13 @@ class KeywordsOrderedByLengthRule extends BaseRule {
     _isGroupProperlyOrdered(keyword, group, slicedGroup = null) {
         let isProperlyOrdered = true;
 
-        const sortedGroup = this._sortArray(keyword, group).filter(
-            (element) =>
-                !['<<< merge >>>', '<<< new line >>>'].includes(
-                    element.matchedContent
-                )
+        const sortedGroup = this._sortArray(keyword, group).filter((element) =>
+            this._hasCode(element)
         );
 
         if (slicedGroup) {
-            slicedGroup = slicedGroup.filter(
-                (element) =>
-                    !['<<< merge >>>', '<<< new line >>>'].includes(
-                        element.matchedContent
-                    )
+            slicedGroup = slicedGroup.filter((element) =>
+                this._hasCode(element)
             );
 
             const indexOfFirstOccurence = sortedGroup.findIndex(
@@ -353,12 +338,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
 
         const { rowIndex: lastRowIndex } = group
             .reverse()
-            .find(
-                (element) =>
-                    !['<<< new line >>>', '<<< merge >>>'].includes(
-                        element.matchedContent
-                    )
-            );
+            .find((element) => this._hasCode(element));
 
         const { split_patch: splitPatch } = file;
 
@@ -376,6 +356,10 @@ class KeywordsOrderedByLengthRule extends BaseRule {
         });
 
         return comment;
+    }
+
+    _hasCode(element) {
+        return !customLines.includes(element.matchedContent);
     }
 
     _getCommentBody(keyword) {
