@@ -1,9 +1,10 @@
+const BaseRule = require('../Base');
 const dedent = require('dedent-js');
 const getPosition = require('../../helpers/getPosition');
 const getLineNumber = require('../../helpers/getLineNumber');
 const ReviewCommentBuilder = require('../../builders/ReviewComment');
 
-class KeywordsOrderedByLengthRule {
+class KeywordsOrderedByLengthRule extends BaseRule {
     /**
      * @param {object} config
      * @param {Array<{name: string, regex: object, order: 'ascending'|'descending', ignoreNewline: boolean }>} config.keywords
@@ -17,6 +18,8 @@ class KeywordsOrderedByLengthRule {
      * [0, 1, 2] and [5, 6]).
      */
     constructor(config) {
+        super();
+
         const { keywords } = config;
 
         this.keywords = keywords;
@@ -128,12 +131,10 @@ class KeywordsOrderedByLengthRule {
                 ) &&
                 baseElement.rowIndex !== sortedElement.rowIndex
             ) {
+                const body = this._getCommentBody(keyword);
+
                 reviewComments.push(
-                    this._getSingleLineComment(
-                        file,
-                        keyword,
-                        baseElement.rowIndex
-                    )
+                    this.getSingleLineComment(file, body, baseElement.rowIndex)
                 );
             }
         }
@@ -252,10 +253,12 @@ class KeywordsOrderedByLengthRule {
                     );
 
                     if (element.length === 1) {
+                        const body = this._getCommentBody(keyword);
+
                         reviewComments.push(
-                            this._getSingleLineComment(
+                            this.getSingleLineComment(
                                 file,
-                                keyword,
+                                body,
                                 element.rowIndex
                             )
                         );
@@ -341,22 +344,6 @@ class KeywordsOrderedByLengthRule {
         }
 
         return isProperlyOrdered;
-    }
-
-    _getSingleLineComment(file, keyword, rowIndex) {
-        const { split_patch: splitPatch } = file;
-
-        const line = getLineNumber(splitPatch, 'right', rowIndex);
-
-        const reviewCommentBuilder = new ReviewCommentBuilder(file);
-
-        const comment = reviewCommentBuilder.buildSingleLineComment({
-            body: this._getCommentBody(keyword),
-            line,
-            side: 'RIGHT',
-        });
-
-        return comment;
     }
 
     _getMultiLineComment(file, keyword, group) {
