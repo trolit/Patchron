@@ -19,6 +19,8 @@ class NoUnmarkedCommentsRule extends BaseRule {
         this.isAppliedToSingleLineComments = isAppliedToSingleLineComments;
         this.isAppliedToMultiLineComments = isAppliedToMultiLineComments;
         this.isAppliedToInlineComments = isAppliedToInlineComments;
+
+        this.body = this._getCommentBody();
     }
 
     invoke(file) {
@@ -45,10 +47,8 @@ class NoUnmarkedCommentsRule extends BaseRule {
                 this.isAppliedToSingleLineComments &&
                 this._isInvalidSingleLineComment(minifiedRowContent)
             ) {
-                const body = this._getCommentBody();
-
                 unmarkedComments.push(
-                    this.getSingleLineComment(file, body, rowIndex)
+                    this.getSingleLineComment(file, this.body, rowIndex)
                 );
 
                 continue;
@@ -77,10 +77,8 @@ class NoUnmarkedCommentsRule extends BaseRule {
                     rowIndex = lastIndex;
                 } else {
                     if (!this._isValidMultiLineComment(minifiedRowContent)) {
-                        const body = this._getCommentBody();
-
                         unmarkedComments.push(
-                            this.getSingleLineComment(file, body, rowIndex)
+                            this.getSingleLineComment(file, this.body, rowIndex)
                         );
                     }
                 }
@@ -92,10 +90,8 @@ class NoUnmarkedCommentsRule extends BaseRule {
                 this.isAppliedToInlineComments &&
                 this._isInvalidInlineComment(minifiedRowContent)
             ) {
-                const body = this._getCommentBody();
-
                 unmarkedComments.push(
-                    this.getSingleLineComment(file, body, rowIndex)
+                    this.getSingleLineComment(file, this.body, rowIndex)
                 );
 
                 continue;
@@ -232,7 +228,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
         const reviewCommentBuilder = new ReviewCommentBuilder(file);
 
         const comment = reviewCommentBuilder.buildMultiLineComment({
-            body: this._getCommentBody(),
+            body: this.body,
             start_line,
             start_side: 'RIGHT',
             position,
