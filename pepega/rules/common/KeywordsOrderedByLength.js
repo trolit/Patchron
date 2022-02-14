@@ -4,7 +4,9 @@ const getPosition = require('../../helpers/getPosition');
 const getLineNumber = require('../../helpers/getLineNumber');
 const ReviewCommentBuilder = require('../../builders/ReviewComment');
 
-const customLines = ['<<< new line >>>', '<<< merge >>>'];
+const merge = '<<< merge >>>';
+const newLine = '<<< new line >>>';
+const customLines = [newLine, merge];
 
 class KeywordsOrderedByLengthRule extends BaseRule {
     /**
@@ -85,14 +87,14 @@ class KeywordsOrderedByLengthRule extends BaseRule {
             if (rowContent.trim().length === 0 || rowContent === '+') {
                 matchedRows.push({
                     rowIndex,
-                    matchedContent: '<<< new line >>>',
+                    matchedContent: newLine,
                 });
 
                 continue;
             } else if (rowContent.startsWith('-')) {
                 matchedRows.push({
                     rowIndex,
-                    matchedContent: '<<< merge >>>',
+                    matchedContent: merge,
                 });
 
                 continue;
@@ -185,7 +187,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
                 baseArray[index];
 
             if (previousRowIndex + 1 === currentRowIndex) {
-                if (content === '<<< new line >>>') {
+                if (content === newLine) {
                     isEndOfGroup = true;
                 } else {
                     group.push(baseArray[index]);
@@ -193,7 +195,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
                     isEndOfGroup = index === baseArray.length - 1;
                 }
             } else {
-                if (group.length > 1 || content === '<<< new line >>>') {
+                if (group.length > 1 || content === newLine) {
                     isEndOfGroup = true;
                 }
             }
@@ -264,7 +266,11 @@ class KeywordsOrderedByLengthRule extends BaseRule {
 
                 if (
                     slicedGroup.length &&
-                    !this._isGroupProperlyOrdered(keyword, group, slicedGroup)
+                    !this._isSlicedGroupProperlyOrdered(
+                        keyword,
+                        group,
+                        slicedGroup
+                    )
                 ) {
                     const element = slicedGroup.filter((element) =>
                         this._hasCode(element)
@@ -311,45 +317,51 @@ class KeywordsOrderedByLengthRule extends BaseRule {
         return reviewComments;
     }
 
-    /** checks if group is sorted as intended to keyword config  */
-    _isGroupProperlyOrdered(keyword, group, slicedGroup = null) {
+    /** checks if group is sorted according to keyword config  */
+    _isGroupProperlyOrdered(keyword, group) {
         let isProperlyOrdered = true;
 
         const sortedGroup = this._sortArray(keyword, group).filter((element) =>
             this._hasCode(element)
         );
 
-        if (slicedGroup) {
-            slicedGroup = slicedGroup.filter((element) =>
-                this._hasCode(element)
-            );
+        for (let index = 0; index < group.length; index++) {
+            if (group[index].rowIndex !== sortedGroup[index].rowIndex) {
+                isProperlyOrdered = false;
 
-            const indexOfFirstOccurence = sortedGroup.findIndex(
-                (element) => element.rowIndex === slicedGroup[0].rowIndex
-            );
-
-            if (indexOfFirstOccurence >= 0) {
-                for (
-                    let sortedGroupIndex = indexOfFirstOccurence,
-                        slicedGroupIndex = 0;
-                    sortedGroupIndex <
-                    indexOfFirstOccurence + slicedGroup.length;
-                    sortedGroupIndex++, slicedGroupIndex++
-                ) {
-                    if (
-                        slicedGroup[slicedGroupIndex].rowIndex !==
-                        sortedGroup[sortedGroupIndex].rowIndex
-                    ) {
-                        isProperlyOrdered = false;
-                        break;
-                    }
-                }
+                break;
             }
-        } else {
-            for (let index = 0; index < group.length; index++) {
-                if (group[index].rowIndex !== sortedGroup[index].rowIndex) {
-                    isProperlyOrdered = false;
+        }
 
+        return isProperlyOrdered;
+    }
+
+    /** checks if sliced group is sorted as intended according to keyword config and part of group array */
+    _isSlicedGroupProperlyOrdered(keyword, group, slicedGroup) {
+        let isProperlyOrdered = true;
+
+        const sortedGroup = this._sortArray(keyword, group).filter((element) =>
+            this._hasCode(element)
+        );
+
+        slicedGroup = slicedGroup.filter((element) => this._hasCode(element));
+
+        const indexOfFirstOccurence = sortedGroup.findIndex(
+            (element) => element.rowIndex === slicedGroup[0].rowIndex
+        );
+
+        if (indexOfFirstOccurence >= 0) {
+            for (
+                let sortedGroupIndex = indexOfFirstOccurence,
+                    slicedGroupIndex = 0;
+                sortedGroupIndex < indexOfFirstOccurence + slicedGroup.length;
+                sortedGroupIndex++, slicedGroupIndex++
+            ) {
+                if (
+                    slicedGroup[slicedGroupIndex].rowIndex !==
+                    sortedGroup[sortedGroupIndex].rowIndex
+                ) {
+                    isProperlyOrdered = false;
                     break;
                 }
             }
@@ -360,7 +372,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
 
     _getMultiLineComment(file, keyword, group) {
         const { rowIndex: firstRowIndex } = group.find(
-            (element) => element.matchedContent !== '<<< new line >>>'
+            (element) => element.matchedContent !== newLine
         );
 
         const { rowIndex: lastRowIndex } = group
