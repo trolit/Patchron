@@ -123,19 +123,46 @@ class KeywordsOrderedByLengthRule extends BaseRule {
 
         const sortedArray = this._sortArray(keyword, baseArray);
 
-        for (let index = 0; index < sortedArray.length; index++) {
-            const baseElement = baseArray[index];
-            const sortedElement = sortedArray[index];
+        for (
+            let baseArrayIndex = 0, sortedArrayIndex = 0;
+            baseArrayIndex < sortedArray.length;
+            baseArrayIndex++
+        ) {
+            const baseElement = baseArray[baseArrayIndex];
 
-            if (
-                this._hasCode(baseElement) &&
-                baseElement.rowIndex !== sortedElement.rowIndex
-            ) {
-                const body = this._getCommentBody(keyword);
+            if (this._hasCode(baseElement)) {
+                for (
+                    ;
+                    sortedArrayIndex < sortedArray.length;
+                    sortedArrayIndex++
+                ) {
+                    const sortedElement = sortedArray[sortedArrayIndex];
 
-                reviewComments.push(
-                    this.getSingleLineComment(file, body, baseElement.rowIndex)
-                );
+                    if (baseElement.rowIndex === sortedElement.rowIndex) {
+                        sortedArrayIndex++;
+
+                        break;
+                    }
+
+                    if (
+                        this._hasCode(sortedElement) &&
+                        baseElement.rowIndex !== sortedElement.rowIndex
+                    ) {
+                        const body = this._getCommentBody(keyword);
+
+                        reviewComments.push(
+                            this.getSingleLineComment(
+                                file,
+                                body,
+                                baseElement.rowIndex
+                            )
+                        );
+
+                        sortedArrayIndex++;
+
+                        break;
+                    }
+                }
             }
         }
 
