@@ -265,7 +265,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
                 const slicedGroup = group.slice(index, indexOfUnchangedRow + 1);
 
                 if (
-                    slicedGroup.length &&
+                    slicedGroup?.length &&
                     !this._isSlicedGroupProperlyOrdered(
                         keyword,
                         group,
