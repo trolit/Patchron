@@ -7,12 +7,9 @@ const addAssignees = require('../github/addAssignees');
  * @param {string} repo.owner repository owner's name
  * @param {string} repo.repo repository name
  * @param {number} repo.pull_number pull request Id
- * @param {object} payload
- * @param {string} payload.sender login of user who created pull request
+ * @param {string} pullRequestOwner login of PR owner
  */
-module.exports = async (context, repo, payload) => {
-    const { login: pullRequestOwner } = payload.sender;
-
+module.exports = async (context, repo, pullRequestOwner) => {
     try {
         await addAssignees(context, repo, [pullRequestOwner]);
     } catch (error) {
