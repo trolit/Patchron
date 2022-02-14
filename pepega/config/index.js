@@ -13,6 +13,7 @@ module.exports = {
         isOwnerAssigningEnabled: true,
         isReviewSummaryEnabled: false,
         maxCommentsPerReview: 50,
+        senders: [],
         strictWorkflow: {
             enabled: false,
             abortReviewOnInvalidBranchPrefix: false,
