@@ -49,6 +49,7 @@ module.exports = (app) => {
         strictWorkflow,
         delayBetweenCommentRequestsInSeconds,
         maxCommentsPerReview,
+        senders,
     } = settings;
 
     global.probotInstance = app;
@@ -56,7 +57,11 @@ module.exports = (app) => {
     app.on(
         ['pull_request.opened', 'pull_request.synchronize'],
         async (context) => {
-            const { payload, repo } = initializeData(context);
+            const { pullRequestOwner, payload, repo } = initializeData(context);
+
+            if (senders && !senders.includes(pullRequestOwner)) {
+                return;
+            }
 
             if (strictWorkflow.enabled) {
                 const isReviewAborted = resolveStrictWorkflow(
@@ -72,7 +77,7 @@ module.exports = (app) => {
             }
 
             if (isOwnerAssigningEnabled) {
-                addPullSenderAsAssignee(context, repo, payload);
+                addPullSenderAsAssignee(context, repo, pullRequestOwner);
             }
 
             let files = null;
