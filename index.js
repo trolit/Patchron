@@ -59,7 +59,7 @@ module.exports = (app) => {
         async (context) => {
             const { pullRequestOwner, payload, repo } = initializeData(context);
 
-            if (senders && !senders.includes(pullRequestOwner)) {
+            if (senders.length && !senders.includes(pullRequestOwner)) {
                 return;
             }
 
