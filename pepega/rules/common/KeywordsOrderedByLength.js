@@ -13,7 +13,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
      * @param {object} config
      * @param {Array<{name: string, regex: object, order: 'ascending'|'descending', ignoreNewline: boolean }>} config.keywords
      * @param {string} config.keywords[].name - readable name
-     * @param {object} config.keywords[].regex - regular expression to match keyword
+     * @param {object} config.keywords[].regex - regular expression to match line with keyword
      * @param {string} config.keywords[].order - ascending/descending
      * @param {string} config.keywords[].ignoreNewline - when set to 'true' **(not recommended)**, rule is tested against all keywords
      * matched in file and when 'false' **(recommended)**, only adjacent ones.
