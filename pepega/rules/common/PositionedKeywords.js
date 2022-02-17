@@ -10,17 +10,21 @@ class KeywordsOrderedByLengthRule extends BaseRule {
      * Rule is tested against **patch** which means that if you set e.g. BOF and reviewed file won't contain first
      * line, review will be skipped since patch simply does not contain beginning of pull requested file.
      * @param {object} config
-     * @param {Array<{name: string, regex: object, position: { regex: object, direction: 'up'|'down' }, BOF: boolean, EOF: boolean, ignoreNewline: boolean }>} config.keywords
+     * @param {Array<{name: string, regex: object, position: { regex: object, direction: 'below'|'above' }, BOF: boolean, EOF: boolean, ignoreNewline: boolean }>} config.keywords
      * @param {string} config.keywords[].name - readable name
      * @param {object} config.keywords[].regex - matches line(s) that should be validated against rule
+     * ---------------------
+     * #### Defining position
+     *
      * @param {object} config.keywords[].position - **[option 1]**
-     * defines keyword expected position via custom regex and direction (up/down)
+     * defines keyword expected position via custom regex and direction (below/above)
      * @param {object} config.keywords[].position.regex - matches position via regex
      * @param {object} config.keywords[].position.direction - whether lines should be positioned above or below position matched via regex
      * @param {boolean} config.keywords[].BOF - **[option 2]**
      * when set to true, beginning of file is claimed position
      * @param {boolean} config.keywords[].EOF - **[option 3]**
      * when set to true, end of file is keyword's position
+     * ---------------------
      * @param {boolean} config.keywords[].ignoreNewline - when true, spaces between matched line(s) are not counted as rule break
      *
      * @example
