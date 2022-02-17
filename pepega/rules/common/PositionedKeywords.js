@@ -4,28 +4,36 @@ const merge = '<<< merge >>>';
 const newLine = '<<< new line >>>';
 const customLines = [newLine, merge];
 
-// <script>
-//
-// export default {
-//
-// }
-// </script>
-
 class KeywordsOrderedByLengthRule extends BaseRule {
     /**
+     * **Important:** configure each keyword with **only** one way of finding position (custom regex, BOF or EOF).
+     * Rule is tested against **patch** which means that if you set e.g. BOF and reviewed file won't contain first
+     * line, review will be skipped since patch simply does not contain beginning of pull requested file.
      * @param {object} config
-     * @param {Array<{name: string, regex: object, position: { after: object, before: object, BOF: boolean, EOF: boolean}, allowLineBreaks: boolean }>} config.keywords
+     * @param {Array<{name: string, regex: object, position: { regex: object, direction: 'up'|'down' }, BOF: boolean, EOF: boolean, ignoreNewline: boolean }>} config.keywords
      * @param {string} config.keywords[].name - readable name
      * @param {object} config.keywords[].regex - matches line(s) that should be validated against rule
-     * @param {object} config.keywords[].position - defines keyword expected position. Set only one of provided options:
-     * - **BOF** (boolean),
-     * - **EOF** (boolean),
-     * - **after** combined with **before** (regular expressions)
-     * @param {object} config.keywords[].position.after - expression that matches start of the position
-     * @param {object} config.keywords[].position.before - expression that matches end of the position
-     * @param {boolean} config.keywords[].position.BOF - when set to true, beginning of file is claimed position.
-     * @param {boolean} config.keywords[].position.EOF - when set to true, end of file is keyword's position.
-     * @param {boolean} config.keywords[].allowLineBreaks
+     * @param {object} config.keywords[].position - **[option 1]**
+     * defines keyword expected position via custom regex and direction (up/down)
+     * @param {object} config.keywords[].position.regex - matches position via regex
+     * @param {object} config.keywords[].position.direction - whether lines should be positioned above or below position matched via regex
+     * @param {boolean} config.keywords[].BOF - **[option 2]**
+     * when set to true, beginning of file is claimed position
+     * @param {boolean} config.keywords[].EOF - **[option 3]**
+     * when set to true, end of file is keyword's position
+     * @param {boolean} config.keywords[].ignoreNewline - when true, spaces between matched line(s) are not counted as rule break
+     *
+     * @example
+     * ```js
+     * {
+     *    name: '',
+     *    regex: //,
+     *    position: null,
+     *    BOF: true,
+     *    EOF: false,
+     *    ignoreNewline: false
+     * }
+     * ```
      */
     constructor(config) {
         super();
@@ -51,6 +59,28 @@ class KeywordsOrderedByLengthRule extends BaseRule {
         let reviewComments = [];
 
         for (const keyword of keywords) {
+            if (!this._hasKeywordValidConfig(keyword)) {
+                probotInstance.log.error(
+                    `Keyword ${keyword} skipped due to invalid config - ${__filename}.`
+                );
+
+                continue;
+            }
+
+            if (keyword.position !== null) {
+                // handle custom regex positioning
+            }
+
+            if (keyword.BOF) {
+                // handle BOF positioning
+                // check if patch hunk header starts from BOF
+            }
+
+            if (keyword.EOF) {
+                // handle EOF positioning
+                // check if patch hunk header ends on EOF
+            }
+
             // const matchResult = rowContent.match(keyword.locationRegex);
 
             const indexOfLocationLine = this._getPositionIndex(
@@ -79,6 +109,14 @@ class KeywordsOrderedByLengthRule extends BaseRule {
         }
 
         return reviewComments;
+    }
+
+    _hasKeywordValidConfig(keyword) {
+        const isPositionSet = !!keyword.position;
+
+        const { BOF, EOF } = keyword;
+
+        return [isPositionSet, BOF, EOF].filter((value) => value).length === 1;
     }
 
     _getPositionIndex(splitPatch, keyword) {
