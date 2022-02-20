@@ -48,12 +48,12 @@ module.exports = (splitContent, row) => {
             result = {
                 index: i,
                 sourceFile: {
-                    line: sourceFile[1],
-                    length: sourceFile[2],
+                    line: parseInt(sourceFile[1]),
+                    length: parseInt(sourceFile[2]),
                 },
                 modifiedFile: {
-                    line: modifiedFile[1],
-                    length: modifiedFile[2],
+                    line: parseInt(modifiedFile[1]),
+                    length: parseInt(modifiedFile[2]),
                 },
             };
 
