@@ -4,7 +4,6 @@
   </div>
 <template>
 
-import test1 from 'test1/test2/test3';
 <script>
 import test1 from 'test1/test2/test3';
 import test5 from 'test5';
