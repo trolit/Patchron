@@ -31,9 +31,7 @@ module.exports = (content, side = 'right', rowIndex) => {
         sourceFile,
     } = getNearestHunkHeader(content, rowIndex);
 
-    let counter = parseInt(
-        side === 'right' ? modifiedFile.line : sourceFile.line
-    );
+    let counter = side === 'right' ? modifiedFile.line : sourceFile.line;
 
     const prefixToIgnore = side === 'right' ? '-' : '+';
 
