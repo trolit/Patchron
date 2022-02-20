@@ -14,7 +14,7 @@ module.exports = [
                     },
                     BOF: false,
                     EOF: false,
-                    allowNewline: false,
+                    maxLineBreaks: 1,
                     enforced: false,
                     breakOnFirstOccurence: false,
                 },
