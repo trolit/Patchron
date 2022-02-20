@@ -267,9 +267,6 @@ class PositionedKeywordsRule extends BaseRule {
         // above: let index = indexOfCustomPosition - 1; index > 0; index--
         // below: let index = indexOfCustomPosition + 1; index < matchedRows.length; index++
 
-        console.log(direction);
-        console.table(matchedRows);
-
         const { split_patch: splitPatch } = file;
         let matchedRowIndex = 0;
 
@@ -277,11 +274,24 @@ class PositionedKeywordsRule extends BaseRule {
             (matchedRow) => !customLines.includes(matchedRow.content)
         );
 
+        let index =
+            direction === 'above'
+                ? indexOfCustomPosition - 1
+                : indexOfCustomPosition + 1;
+
+        console.log('TESTING');
+        console.log(index);
+        console.log(matchedRows[0].index);
+        console.log('----------------');
+
+        if (direction === 'below' && index > matchedRows[0].index) {
+            console.log('deleting!');
+
+            matchedRows.splice(0, 1);
+        }
+
         for (
-            let index =
-                direction === 'above'
-                    ? indexOfCustomPosition - 1
-                    : indexOfCustomPosition + 1;
+            ;
             direction === 'above' ? index > 0 : index < splitPatch.length;
             direction === 'above' ? index-- : index++
         ) {
@@ -292,30 +302,43 @@ class PositionedKeywordsRule extends BaseRule {
             const row = splitPatch[index];
             const matchedRow = matchedRows[matchedRowIndex];
 
+            console.log('index: ', index);
+            console.log('splitRow: ', row);
+            console.log('matchedRow: ', matchedRow.content);
+
             if (lineBreakCounter > maxLineBreaks) {
-                const rowIndex = index - lineBreakCounter;
+                console.log('LINEBREAK OVERLOADED!!!!');
+                console.log(`${lineBreakCounter} > ${maxLineBreaks}`);
 
                 reviewComments.push(
                     this.getSingleLineComment(
                         file,
                         this._getCommentBody(keyword),
-                        rowIndex
+                        index
                     )
                 );
+
+                lineBreakCounter = 0;
+                matchedRowIndex++;
+
+                if (keyword.breakOnFirstOccurence) {
+                    break;
+                }
 
                 continue;
             }
 
             if (maxLineBreaks && (row.trim().length === 0 || row === '+')) {
+                console.log(`found linebreak at: ${index}`);
+
                 lineBreakCounter++;
 
                 continue;
             }
 
-            console.log('row - ', row);
-            console.log('matchedRow.content - ', matchedRow);
-
             if (!row.includes(matchedRow.content)) {
+                console.log('comment to: ', matchedRow.index);
+
                 reviewComments.push(
                     this.getSingleLineComment(
                         file,
@@ -323,6 +346,10 @@ class PositionedKeywordsRule extends BaseRule {
                         matchedRow.index
                     )
                 );
+
+                if (keyword.breakOnFirstOccurence) {
+                    break;
+                }
             }
 
             lineBreakCounter = 0;

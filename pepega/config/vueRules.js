@@ -10,11 +10,11 @@ module.exports = [
                     regex: /import.*/,
                     position: {
                         regex: /<script>/,
-                        direction: 'below',
+                        direction: 'above',
                     },
                     BOF: false,
                     EOF: false,
-                    maxLineBreaks: 1,
+                    maxLineBreaks: 2,
                     enforced: false,
                     breakOnFirstOccurence: false,
                 },
