@@ -1,4 +1,5 @@
 const js = require('./jsRules');
+const vue = require('./vueRules');
 const strictWorkflow = require('../rules/pull/StrictWorkflow');
 
 require('dotenv').config({
@@ -54,6 +55,7 @@ module.exports = {
         files: {
             common: [],
             js,
+            vue,
         },
     },
 };
