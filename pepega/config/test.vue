@@ -3,7 +3,10 @@
       test
   </div>
 <template>
+  
+import test133 from 'test1/test2/tes44t3';
 
+import test1 from 'test1/test2/test3';
 <script>
 import test1 from 'test1/test2/test3';
 import test5 from 'test5';
