@@ -6,7 +6,7 @@ const customLines = [newLine, merge];
 
 const getNearestHunkHeader = require('../../helpers/getNearestHunkHeader');
 
-class KeywordsOrderedByLengthRule extends BaseRule {
+class PositionedKeywordsRule extends BaseRule {
     /**
      * @param {object} config
      * @param {Array<{name: string, regex: object, position: { regex: object, direction: 'below'|'above' }, BOF: boolean,
@@ -80,6 +80,8 @@ class KeywordsOrderedByLengthRule extends BaseRule {
                     keyword
                 );
 
+                console.table(splitPatch);
+
                 if (indexOfCustomPosition < 0) {
                     probotInstance.log.warn(
                         `${__filename}\nKeyword review skipped due to undefined position.`
@@ -143,7 +145,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
         }
 
         if (matchResult) {
-            rowIndex = splitPatch.indexOf(matchResult[0]);
+            rowIndex = splitPatch.indexOf(matchResult);
         }
 
         return rowIndex;
@@ -264,15 +266,31 @@ class KeywordsOrderedByLengthRule extends BaseRule {
 
         // above: let index = indexOfCustomPosition - 1; index > 0; index--
         // below: let index = indexOfCustomPosition + 1; index < matchedRows.length; index++
+
+        console.log(direction);
+        console.table(matchedRows);
+
+        const { split_patch: splitPatch } = file;
+        let matchedRowIndex = 0;
+
+        matchedRows = matchedRows.filter(
+            (matchedRow) => !customLines.includes(matchedRow.content)
+        );
+
         for (
             let index =
                 direction === 'above'
                     ? indexOfCustomPosition - 1
                     : indexOfCustomPosition + 1;
-            direction === 'above' ? index > 0 : index < matchedRows.length;
+            direction === 'above' ? index > 0 : index < splitPatch.length;
             direction === 'above' ? index-- : index++
         ) {
-            const matchedRow = matchedRows[index];
+            if (matchedRowIndex >= matchedRows.length) {
+                break;
+            }
+
+            const row = splitPatch[index];
+            const matchedRow = matchedRows[matchedRowIndex];
 
             if (lineBreakCounter > maxLineBreaks) {
                 const rowIndex = index - lineBreakCounter;
@@ -288,13 +306,16 @@ class KeywordsOrderedByLengthRule extends BaseRule {
                 continue;
             }
 
-            if (maxLineBreaks && matchedRow.content === newLine) {
+            if (maxLineBreaks && (row.trim().length === 0 || row === '+')) {
                 lineBreakCounter++;
 
                 continue;
             }
 
-            if (matchedRow.index !== index) {
+            console.log('row - ', row);
+            console.log('matchedRow.content - ', matchedRow);
+
+            if (!row.includes(matchedRow.content)) {
                 reviewComments.push(
                     this.getSingleLineComment(
                         file,
@@ -303,6 +324,9 @@ class KeywordsOrderedByLengthRule extends BaseRule {
                     )
                 );
             }
+
+            lineBreakCounter = 0;
+            matchedRowIndex++;
         }
 
         return reviewComments;
@@ -356,4 +380,4 @@ class KeywordsOrderedByLengthRule extends BaseRule {
     }
 }
 
-module.exports = KeywordsOrderedByLengthRule;
+module.exports = PositionedKeywordsRule;

@@ -1,4 +1,5 @@
 const Js = require('../rules/js');
+const Vue = require('../rules/vue');
 const BasicDataBuilder = require('../builders/BasicData');
 
 class ReviewHandler {
@@ -22,7 +23,7 @@ class ReviewHandler {
         switch (this.file.extension) {
             case 'vue':
                 // TODO:
-                comments = [...Js.review(this.file, this.rules)];
+                comments = Vue.review(basicData, this.rules);
                 break;
             case 'js':
                 comments = Js.review(basicData, this.rules);
