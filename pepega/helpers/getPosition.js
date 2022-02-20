@@ -25,6 +25,8 @@ module.exports = (content, rowIndex) => {
         rowIndex
     );
 
+    // TODO: REFACTOR!!
+
     let counter = 0;
 
     for (let index = nearestHunkHeaderIndex; index < content.length; index++) {
