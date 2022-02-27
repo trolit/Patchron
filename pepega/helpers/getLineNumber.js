@@ -35,6 +35,10 @@ module.exports = (content, side = 'right', rowIndex) => {
 
     const prefixToIgnore = side === 'right' ? '-' : '+';
 
+    if (nearestHunkHeaderIndex === rowIndex) {
+        return counter;
+    }
+
     for (
         let index = nearestHunkHeaderIndex + 1;
         index < content.length;
