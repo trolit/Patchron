@@ -1,10 +1,10 @@
 const BaseRule = require('../Base');
+const removeWhitespaces = require('../../helpers/removeWhitespaces');
+const getNearestHunkHeader = require('../../helpers/getNearestHunkHeader');
 
 const merge = '<<< merge >>>';
 const newLine = '<<< new line >>>';
 const customLines = [newLine, merge];
-
-const getNearestHunkHeader = require('../../helpers/getNearestHunkHeader');
 
 class PositionedKeywordsRule extends BaseRule {
     /**
@@ -79,8 +79,6 @@ class PositionedKeywordsRule extends BaseRule {
                     splitPatch,
                     keyword
                 );
-
-                console.table(splitPatch);
 
                 if (indexOfCustomPosition < 0) {
                     probotInstance.log.warn(
@@ -171,22 +169,26 @@ class PositionedKeywordsRule extends BaseRule {
             return reviewComments;
         }
 
-        const { split_patch: splitPatch } = file;
+        if (!BOFIndex && keywordsWithBOF.length) {
+            BOFIndex =
+                BOFIndex + this._correctBOFIndexPosition(file, keywordsWithBOF);
+        }
 
-        let matchedRowIndex = 0;
+        let recentRow = null;
 
-        for (let index = BOFIndex; index < splitPatch.length; index++) {
-            const row = splitPatch[index];
-            const matchedRow = matchedRows[matchedRowIndex];
+        for (let index = 0; index < matchedRows.length; index++) {
+            const row = matchedRows[index];
+
+            if (row.content !== newLine) {
+                recentRow = row;
+            }
 
             if (lineBreakCounter > maxLineBreaks) {
-                const rowIndex = index - lineBreakCounter;
-
                 reviewComments.push(
                     this.getSingleLineComment(
                         file,
                         this._getCommentBody(keyword),
-                        rowIndex
+                        recentRow.index
                     )
                 );
 
@@ -199,43 +201,59 @@ class PositionedKeywordsRule extends BaseRule {
                 continue;
             }
 
-            if (
-                keywordsWithBOF.filter(
-                    (keywordWithBOF) => row.match(keywordWithBOF.regex).length
-                )
-            ) {
-                continue;
-            }
-
-            if (row.trim().length === 0 || row === '+') {
+            if (row.content === newLine) {
                 lineBreakCounter++;
 
                 continue;
             }
 
-            if (row !== matchedRow.content) {
+            if (row.index !== BOFIndex) {
+                BOFIndex++;
+
+                lineBreakCounter++;
+
+                lineBreakCounter = 0;
+
                 reviewComments.push(
                     this.getSingleLineComment(
                         file,
                         this._getCommentBody(keyword),
-                        index
+                        row.index
                     )
                 );
 
                 if (keyword.breakOnFirstOccurence) {
                     break;
                 }
-            }
 
-            lineBreakCounter = 0;
-            matchedRowIndex++;
-
-            if (matchedRowIndex >= matchedRows.length) {
-                break;
+                continue;
             }
         }
 
         return reviewComments;
+    }
+
+    _correctBOFIndexPosition(file, keywordsWithBOF) {
+        const { split_patch: splitPatch } = file;
+        let counter = 0;
+
+        for (let index = 1; index < splitPatch.length; index++) {
+            const row = splitPatch[index];
+            const isNewLine = removeWhitespaces(row) === '+';
+            const isMatched = keywordsWithBOF.some((keywordWithBOF) =>
+                row.match(keywordWithBOF.regex)
+            );
+
+            if (isNewLine || isMatched) {
+                counter++;
+
+                continue;
+            }
+
+            break;
+        }
+
+        return counter;
     }
 
     _reviewKeywordWithCustomPosition(
@@ -279,20 +297,11 @@ class PositionedKeywordsRule extends BaseRule {
                 ? indexOfCustomPosition - 1
                 : indexOfCustomPosition + 1;
 
-        console.log('TESTING');
-        console.log(index);
-        console.log(matchedRows[0].index);
-        console.log('----------------');
-
-        if (direction === 'below' && index > matchedRows[0].index) {
-            console.log('deleting!');
-
-            matchedRows.splice(0, 1);
-        }
+        let wasAnyRowAtDifferentDirection = false;
 
         for (
             ;
-            direction === 'above' ? index > 0 : index < splitPatch.length;
+            direction === 'above' ? index >= 0 : index < splitPatch.length;
             direction === 'above' ? index-- : index++
         ) {
             if (matchedRowIndex >= matchedRows.length) {
@@ -302,14 +311,47 @@ class PositionedKeywordsRule extends BaseRule {
             const row = splitPatch[index];
             const matchedRow = matchedRows[matchedRowIndex];
 
-            console.log('index: ', index);
-            console.log('splitRow: ', row);
-            console.log('matchedRow: ', matchedRow.content);
+            if (
+                direction === 'below' &&
+                matchedRow.index < indexOfCustomPosition
+            ) {
+                reviewComments.push(
+                    this.getSingleLineComment(
+                        file,
+                        this._getCommentBody(keyword),
+                        matchedRow.index
+                    )
+                );
+
+                matchedRowIndex++;
+
+                wasAnyRowAtDifferentDirection = true;
+
+                continue;
+            } else if (
+                direction === 'above' &&
+                matchedRow.index > indexOfCustomPosition
+            ) {
+                reviewComments.push(
+                    this.getSingleLineComment(
+                        file,
+                        this._getCommentBody(keyword),
+                        matchedRow.index
+                    )
+                );
+
+                matchedRowIndex++;
+
+                wasAnyRowAtDifferentDirection = true;
+
+                continue;
+            }
+
+            if (wasAnyRowAtDifferentDirection) {
+                break;
+            }
 
             if (lineBreakCounter > maxLineBreaks) {
-                console.log('LINEBREAK OVERLOADED!!!!');
-                console.log(`${lineBreakCounter} > ${maxLineBreaks}`);
-
                 reviewComments.push(
                     this.getSingleLineComment(
                         file,
@@ -329,16 +371,12 @@ class PositionedKeywordsRule extends BaseRule {
             }
 
             if (maxLineBreaks && (row.trim().length === 0 || row === '+')) {
-                console.log(`found linebreak at: ${index}`);
-
                 lineBreakCounter++;
 
                 continue;
             }
 
             if (!row.includes(matchedRow.content)) {
-                console.log('comment to: ', matchedRow.index);
-
                 reviewComments.push(
                     this.getSingleLineComment(
                         file,
@@ -356,6 +394,23 @@ class PositionedKeywordsRule extends BaseRule {
             matchedRowIndex++;
         }
 
+        if (
+            matchedRowIndex < matchedRows.length &&
+            !wasAnyRowAtDifferentDirection
+        ) {
+            while (matchedRowIndex < matchedRows.length) {
+                reviewComments.push(
+                    this.getSingleLineComment(
+                        file,
+                        this._getCommentBody(keyword),
+                        matchedRows[matchedRowIndex].index
+                    )
+                );
+
+                matchedRowIndex++;
+            }
+        }
+
         return reviewComments;
     }
 
@@ -366,21 +421,21 @@ class PositionedKeywordsRule extends BaseRule {
         for (let index = 0; index < splitPatch.length; index++) {
             const row = splitPatch[index];
 
-            if (row.trim().length === 0 || row === '+') {
+            if (matchedRows.length && removeWhitespaces(row) === '+') {
                 matchedRows.push({
                     index,
                     content: newLine,
                 });
 
                 continue;
-            } else if (row.startsWith('-')) {
+            } else if (matchedRows.length && row.startsWith('-')) {
                 matchedRows.push({
                     index,
                     content: merge,
                 });
 
                 continue;
-            } else if (row.startsWith(' ')) {
+            } else if (matchedRows.length && row.startsWith(' ')) {
                 unchangedRows.push(index);
             }
 
