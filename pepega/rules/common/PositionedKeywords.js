@@ -14,33 +14,19 @@ class PositionedKeywordsRule extends BaseRule {
      * @param {string} config.keywords[].name - readable name
      * @param {object} config.keywords[].regex - matches line(s) that should be validated against rule
      * ---------------------
-     * #### Defining position
-     * Configure each keyword with **only** one way of finding position (custom regex, BOF or EOF).
-     * @param {object} config.keywords[].position - **[option 1]**
-     * defines keyword expected position via custom regex and direction (below/above)
+     * Configure each keyword with **only** one way of finding position:
+     * @param {object} config.keywords[].position - defines custom keyword expected position
      * @param {object} config.keywords[].position.regex - matches position via regex
-     * @param {object} config.keywords[].position.direction - whether lines should be positioned above or below position matched
-     * via regex
-     * @param {boolean} config.keywords[].BOF - **[option 2]**
-     * when set to true, beginning of file is claimed position
-     * @param {boolean} config.keywords[].EOF - **[option 3]**
-     * when set to true, end of file is keyword's position
+     * @param {object} config.keywords[].position.direction - defines whether keyword should appear above or below expected position
+     * @param {boolean} config.keywords[].BOF - sets expected position to beginning of file
+     * @param {boolean} config.keywords[].EOF - sets expected position to end of file
      * ---------------------
-     * #### Flags
-     *
-     * @param {number} config.keywords[].maxLineBreaks - when 0, spaces between matched line(s) are counted as rule break
-     * @param {boolean} config.keywords[].enforced - when true, if file's patch contains matched keyword but does not
-     * include position, most upper keyword that was matched will act as position
-     * @param {boolean} config.keywords[].breakOnFirstOccurence - when true, stops keyword review on first wrong occurence
-     *
-     * @example
-     * ```js
-     * {
-     *  name: '',
-     *  regex: //,
-     *
-     * }
-     * ```
+     * @param {number} config.keywords[].maxLineBreaks - defines maximum allowed line breaks between each keyword. When 0, spaces between
+     * matched line(s) are counted as rule break
+     * @param {boolean} config.keywords[].enforced - if **true**, forces to count first matched keyword occurence as expected position when
+     * primary one was not found in given file's patch
+     * @param {boolean} config.keywords[].breakOnFirstOccurence - when
+     * **true**, stops keyword review on first invalid occurence
      */
     constructor(config) {
         super();
