@@ -32,6 +32,15 @@ class PositionedKeywordsRule extends BaseRule {
      * @param {boolean} config.keywords[].enforced - when true, if file's patch contains matched keyword but does not
      * include position, most upper keyword that was matched will act as position
      * @param {boolean} config.keywords[].breakOnFirstOccurence - when true, stops keyword review on first wrong occurence
+     *
+     * @example
+     * ```js
+     * {
+     *  name: '',
+     *  regex: //,
+     *
+     * }
+     * ```
      */
     constructor(config) {
         super();
@@ -273,7 +282,7 @@ class PositionedKeywordsRule extends BaseRule {
                 continue;
             }
 
-            if (maxLineBreaks && (row.trim().length === 0 || row === '+')) {
+            if (maxLineBreaks && removeWhitespaces(row) === '+') {
                 lineBreakCounter++;
 
                 continue;
@@ -323,9 +332,7 @@ class PositionedKeywordsRule extends BaseRule {
         const topHunkHeader = getNearestHunkHeader(splitPatch, 0);
         const { line } = topHunkHeader.modifiedFile;
         let BOFIndex = line === 1 ? 0 : -1;
-        const { maxLineBreaks } = keyword;
         let wasPositionEnforced = false;
-        let lineBreakCounter = 0;
         let reviewComments = [];
 
         if (BOFIndex === -1 && keyword.enforced) {
@@ -343,92 +350,22 @@ class PositionedKeywordsRule extends BaseRule {
         }
 
         if (!wasPositionEnforced && keywordsWithBOF.length) {
-            BOFIndex = this._correctBOFIndexPosition(
+            BOFIndex = this._correctPositionIndex(
                 BOFIndex,
+                keyword,
                 splitPatch,
                 keywordsWithBOF
             );
         }
 
-        let recentRow = null;
-
-        for (let index = 0; index < matchedRows.length; index++) {
-            const row = matchedRows[index];
-
-            if (row.content !== newLine) {
-                recentRow = row;
-            }
-
-            if (lineBreakCounter > maxLineBreaks) {
-                reviewComments.push(
-                    this.getSingleLineComment(
-                        file,
-                        this._getCommentBody(keyword),
-                        recentRow.index
-                    )
-                );
-
-                if (keyword.breakOnFirstOccurence) {
-                    break;
-                }
-
-                lineBreakCounter = 0;
-
-                continue;
-            }
-
-            if (row.content === newLine) {
-                lineBreakCounter++;
-
-                continue;
-            }
-
-            if (row.index !== BOFIndex) {
-                BOFIndex++;
-
-                lineBreakCounter++;
-
-                lineBreakCounter = 0;
-
-                reviewComments.push(
-                    this.getSingleLineComment(
-                        file,
-                        this._getCommentBody(keyword),
-                        row.index
-                    )
-                );
-
-                if (keyword.breakOnFirstOccurence) {
-                    break;
-                }
-
-                continue;
-            }
-        }
+        reviewComments = this._reviewExactPosition(
+            file,
+            keyword,
+            matchedRows,
+            BOFIndex
+        );
 
         return reviewComments;
-    }
-
-    _correctBOFIndexPosition(BOFIndex, splitPatch, keywordsWithBOF) {
-        let counter = 0;
-
-        for (let index = 1; index < splitPatch.length; index++) {
-            const row = splitPatch[index];
-            const isNewLine = removeWhitespaces(row) === '+';
-            const isMatched = keywordsWithBOF.some((keywordWithBOF) =>
-                row.match(keywordWithBOF.regex)
-            );
-
-            if (isNewLine || isMatched) {
-                counter++;
-
-                continue;
-            }
-
-            break;
-        }
-
-        return BOFIndex + counter;
     }
 
     _reviewKeywordWithEOF(file, matchedRows, keyword, keywordsWithEOF) {
@@ -438,9 +375,7 @@ class PositionedKeywordsRule extends BaseRule {
         const topHunkHeader = getNearestHunkHeader(splitPatch, 0);
         const { length } = topHunkHeader.modifiedFile;
         let EOFIndex = length === splitPatch.length - 1 ? length : -1;
-        const { maxLineBreaks } = keyword;
         let wasPositionEnforced = false;
-        let lineBreakCounter = 0;
         let reviewComments = [];
 
         if (EOFIndex === -1 && keyword.enforced) {
@@ -458,13 +393,56 @@ class PositionedKeywordsRule extends BaseRule {
         }
 
         if (!wasPositionEnforced && keywordsWithEOF.length) {
-            EOFIndex = this._correctEOFIndexPosition(
+            EOFIndex = this._correctPositionIndex(
                 EOFIndex,
+                keyword,
                 splitPatch,
                 keywordsWithEOF
             );
         }
 
+        reviewComments = this._reviewExactPosition(
+            file,
+            keyword,
+            matchedRows,
+            EOFIndex
+        );
+
+        return reviewComments;
+    }
+
+    _correctPositionIndex(indexOfPosition, keyword, splitPatch, otherKeywords) {
+        const { BOF } = keyword;
+
+        for (
+            let index = indexOfPosition;
+            BOF ? index < splitPatch.length : index >= 0;
+            BOF ? index++ : index--
+        ) {
+            const row = splitPatch[index];
+
+            const isNewLine = removeWhitespaces(row) === '+';
+
+            const isMatched = otherKeywords.some((otherKeyword) =>
+                row.match(otherKeyword.regex)
+            );
+
+            if (isNewLine || isMatched) {
+                BOF ? indexOfPosition++ : indexOfPosition--;
+
+                continue;
+            }
+
+            break;
+        }
+
+        return indexOfPosition;
+    }
+
+    _reviewExactPosition(file, keyword, matchedRows, positionIndex) {
+        const { maxLineBreaks } = keyword;
+        let lineBreakCounter = 0;
+        let reviewComments = [];
         let recentRow = null;
 
         for (let index = 0; index < matchedRows.length; index++) {
@@ -492,14 +470,14 @@ class PositionedKeywordsRule extends BaseRule {
                 continue;
             }
 
-            if (row.content === newLine) {
+            if (maxLineBreaks && row.content === newLine) {
                 lineBreakCounter++;
 
                 continue;
             }
 
-            if (row.index !== EOFIndex) {
-                EOFIndex--;
+            if (row.index !== positionIndex) {
+                keyword.BOF ? positionIndex++ : positionIndex--;
 
                 lineBreakCounter++;
 
@@ -522,28 +500,6 @@ class PositionedKeywordsRule extends BaseRule {
         }
 
         return reviewComments;
-    }
-
-    _correctEOFIndexPosition(EOFIndex, splitPatch, keywordsWithEOF) {
-        for (let index = EOFIndex; index >= 0; index--) {
-            const row = splitPatch[index];
-
-            const isNewLine = removeWhitespaces(row) === '+';
-
-            const isMatched = keywordsWithEOF.some((keywordWithEOF) =>
-                row.match(keywordWithEOF.regex)
-            );
-
-            if (isNewLine || isMatched) {
-                EOFIndex--;
-
-                continue;
-            }
-
-            break;
-        }
-
-        return EOFIndex;
     }
 
     _initializeRegexBasedData(splitPatch, keyword) {
