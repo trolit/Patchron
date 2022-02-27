@@ -114,8 +114,18 @@ class PositionedKeywordsRule extends BaseRule {
             }
 
             if (keyword.EOF) {
-                // handle EOF positioning
-                // check if patch hunk header ends on EOF
+                const keywordsWithEOF = keywords.filter(
+                    (element) => element.EOF && element.regex !== keyword.regex
+                );
+
+                reviewComments.push(
+                    ...this._reviewKeywordWithEOF(
+                        file,
+                        matchedRows,
+                        keyword,
+                        keywordsWithEOF
+                    )
+                );
             }
         }
 
@@ -147,113 +157,6 @@ class PositionedKeywordsRule extends BaseRule {
         }
 
         return rowIndex;
-    }
-
-    _reviewKeywordWithBOF(file, matchedRows, keyword, keywordsWithBOF) {
-        const topHunkHeader = getNearestHunkHeader(file.split_patch, 0);
-        const { line } = topHunkHeader.modifiedFile;
-        let BOFIndex = line === 1 ? 0 : -1;
-        const { maxLineBreaks } = keyword;
-        let lineBreakCounter = 0;
-        let reviewComments = [];
-
-        if (BOFIndex === -1 && keyword.enforced) {
-            const row = matchedRows.find((row) =>
-                row.content.match(keyword.regex)
-            );
-
-            BOFIndex = row ? row.index : -1;
-        }
-
-        if (BOFIndex === -1) {
-            return reviewComments;
-        }
-
-        if (!BOFIndex && keywordsWithBOF.length) {
-            BOFIndex =
-                BOFIndex + this._correctBOFIndexPosition(file, keywordsWithBOF);
-        }
-
-        let recentRow = null;
-
-        for (let index = 0; index < matchedRows.length; index++) {
-            const row = matchedRows[index];
-
-            if (row.content !== newLine) {
-                recentRow = row;
-            }
-
-            if (lineBreakCounter > maxLineBreaks) {
-                reviewComments.push(
-                    this.getSingleLineComment(
-                        file,
-                        this._getCommentBody(keyword),
-                        recentRow.index
-                    )
-                );
-
-                if (keyword.breakOnFirstOccurence) {
-                    break;
-                }
-
-                lineBreakCounter = 0;
-
-                continue;
-            }
-
-            if (row.content === newLine) {
-                lineBreakCounter++;
-
-                continue;
-            }
-
-            if (row.index !== BOFIndex) {
-                BOFIndex++;
-
-                lineBreakCounter++;
-
-                lineBreakCounter = 0;
-
-                reviewComments.push(
-                    this.getSingleLineComment(
-                        file,
-                        this._getCommentBody(keyword),
-                        row.index
-                    )
-                );
-
-                if (keyword.breakOnFirstOccurence) {
-                    break;
-                }
-
-                continue;
-            }
-        }
-
-        return reviewComments;
-    }
-
-    _correctBOFIndexPosition(file, keywordsWithBOF) {
-        const { split_patch: splitPatch } = file;
-        let counter = 0;
-
-        for (let index = 1; index < splitPatch.length; index++) {
-            const row = splitPatch[index];
-            const isNewLine = removeWhitespaces(row) === '+';
-            const isMatched = keywordsWithBOF.some((keywordWithBOF) =>
-                row.match(keywordWithBOF.regex)
-            );
-
-            if (isNewLine || isMatched) {
-                counter++;
-
-                continue;
-            }
-
-            break;
-        }
-
-        return counter;
     }
 
     _reviewKeywordWithCustomPosition(
@@ -412,6 +315,235 @@ class PositionedKeywordsRule extends BaseRule {
         }
 
         return reviewComments;
+    }
+
+    _reviewKeywordWithBOF(file, matchedRows, keyword, keywordsWithBOF) {
+        const { split_patch: splitPatch } = file;
+
+        const topHunkHeader = getNearestHunkHeader(splitPatch, 0);
+        const { line } = topHunkHeader.modifiedFile;
+        let BOFIndex = line === 1 ? 0 : -1;
+        const { maxLineBreaks } = keyword;
+        let wasPositionEnforced = false;
+        let lineBreakCounter = 0;
+        let reviewComments = [];
+
+        if (BOFIndex === -1 && keyword.enforced) {
+            const row = matchedRows.find(
+                (row) => !customLines.includes(row.content)
+            );
+
+            BOFIndex = row ? row.index + 1 : -1;
+
+            wasPositionEnforced = true;
+        }
+
+        if (BOFIndex === -1) {
+            return reviewComments;
+        }
+
+        if (!wasPositionEnforced && keywordsWithBOF.length) {
+            BOFIndex = this._correctBOFIndexPosition(
+                BOFIndex,
+                splitPatch,
+                keywordsWithBOF
+            );
+        }
+
+        let recentRow = null;
+
+        for (let index = 0; index < matchedRows.length; index++) {
+            const row = matchedRows[index];
+
+            if (row.content !== newLine) {
+                recentRow = row;
+            }
+
+            if (lineBreakCounter > maxLineBreaks) {
+                reviewComments.push(
+                    this.getSingleLineComment(
+                        file,
+                        this._getCommentBody(keyword),
+                        recentRow.index
+                    )
+                );
+
+                if (keyword.breakOnFirstOccurence) {
+                    break;
+                }
+
+                lineBreakCounter = 0;
+
+                continue;
+            }
+
+            if (row.content === newLine) {
+                lineBreakCounter++;
+
+                continue;
+            }
+
+            if (row.index !== BOFIndex) {
+                BOFIndex++;
+
+                lineBreakCounter++;
+
+                lineBreakCounter = 0;
+
+                reviewComments.push(
+                    this.getSingleLineComment(
+                        file,
+                        this._getCommentBody(keyword),
+                        row.index
+                    )
+                );
+
+                if (keyword.breakOnFirstOccurence) {
+                    break;
+                }
+
+                continue;
+            }
+        }
+
+        return reviewComments;
+    }
+
+    _correctBOFIndexPosition(BOFIndex, splitPatch, keywordsWithBOF) {
+        let counter = 0;
+
+        for (let index = 1; index < splitPatch.length; index++) {
+            const row = splitPatch[index];
+            const isNewLine = removeWhitespaces(row) === '+';
+            const isMatched = keywordsWithBOF.some((keywordWithBOF) =>
+                row.match(keywordWithBOF.regex)
+            );
+
+            if (isNewLine || isMatched) {
+                counter++;
+
+                continue;
+            }
+
+            break;
+        }
+
+        return BOFIndex + counter;
+    }
+
+    _reviewKeywordWithEOF(file, matchedRows, keyword, keywordsWithEOF) {
+        const { split_patch: splitPatch } = file;
+        matchedRows.reverse();
+
+        const topHunkHeader = getNearestHunkHeader(splitPatch, 0);
+        const { length } = topHunkHeader.modifiedFile;
+        let EOFIndex = length === splitPatch.length - 1 ? length : -1;
+        const { maxLineBreaks } = keyword;
+        let wasPositionEnforced = false;
+        let lineBreakCounter = 0;
+        let reviewComments = [];
+
+        if (EOFIndex === -1 && keyword.enforced) {
+            const row = matchedRows.find(
+                (row) => !customLines.includes(row.content)
+            );
+
+            EOFIndex = row ? row.index - 1 : -1;
+
+            wasPositionEnforced = true;
+        }
+
+        if (EOFIndex === -1) {
+            return reviewComments;
+        }
+
+        if (!wasPositionEnforced && keywordsWithEOF.length) {
+            EOFIndex = this._correctEOFIndexPosition(
+                EOFIndex,
+                splitPatch,
+                keywordsWithEOF
+            );
+        }
+
+        let recentRow = null;
+
+        for (let index = 0; index < matchedRows.length; index++) {
+            const row = matchedRows[index];
+
+            if (row.content !== newLine) {
+                recentRow = row;
+            }
+
+            if (lineBreakCounter > maxLineBreaks) {
+                reviewComments.push(
+                    this.getSingleLineComment(
+                        file,
+                        this._getCommentBody(keyword),
+                        recentRow.index
+                    )
+                );
+
+                if (keyword.breakOnFirstOccurence) {
+                    break;
+                }
+
+                lineBreakCounter = 0;
+
+                continue;
+            }
+
+            if (row.content === newLine) {
+                lineBreakCounter++;
+
+                continue;
+            }
+
+            if (row.index !== EOFIndex) {
+                EOFIndex--;
+
+                lineBreakCounter++;
+
+                lineBreakCounter = 0;
+
+                reviewComments.push(
+                    this.getSingleLineComment(
+                        file,
+                        this._getCommentBody(keyword),
+                        row.index
+                    )
+                );
+
+                if (keyword.breakOnFirstOccurence) {
+                    break;
+                }
+
+                continue;
+            }
+        }
+
+        return reviewComments;
+    }
+
+    _correctEOFIndexPosition(EOFIndex, splitPatch, keywordsWithEOF) {
+        for (let index = EOFIndex; index >= 0; index--) {
+            const row = splitPatch[index];
+
+            const isNewLine = removeWhitespaces(row) === '+';
+
+            const isMatched = keywordsWithEOF.some((keywordWithEOF) =>
+                row.match(keywordWithEOF.regex)
+            );
+
+            if (isNewLine || isMatched) {
+                EOFIndex--;
+
+                continue;
+            }
+
+            break;
+        }
+
+        return EOFIndex;
     }
 
     _initializeRegexBasedData(splitPatch, keyword) {
