@@ -24,7 +24,7 @@
 module.exports = (splitContent, row) => {
     let result = null;
 
-    if (!Array.isArray(splitContent) || !row) {
+    if (!Array.isArray(splitContent) || !Number.isInteger(row)) {
         probotInstance.log.warn(
             `Invalid data passed to the function -> ${__filename}`
         );
