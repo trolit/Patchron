@@ -6,6 +6,7 @@ const merge = '<<< merge >>>';
 const newLine = '<<< new line >>>';
 const customLines = [newLine, merge];
 
+// TODO: handle multiline keyword
 class PositionedKeywordsRule extends BaseRule {
     /**
      * @param {object} config
@@ -14,12 +15,14 @@ class PositionedKeywordsRule extends BaseRule {
      * @param {string} config.keywords[].name - readable name
      * @param {object} config.keywords[].regex - matches line(s) that should be validated against rule
      * ---------------------
+     *
      * Configure each keyword with **only** one way of finding position:
      * @param {object} config.keywords[].position - defines custom keyword expected position
-     * @param {object} config.keywords[].position.regex - matches position via regex
-     * @param {object} config.keywords[].position.direction - defines whether keyword should appear above or below expected position
+     * @param {object} config.keywords[].position.regex - expected position regex
+     * @param {string} config.keywords[].position.direction - defines whether keyword should appear above or below expected position
      * @param {boolean} config.keywords[].BOF - sets expected position to beginning of file
      * @param {boolean} config.keywords[].EOF - sets expected position to end of file
+     *
      * ---------------------
      * @param {number} config.keywords[].maxLineBreaks - defines maximum allowed line breaks between each keyword. When 0, spaces between
      * matched line(s) are counted as rule break
