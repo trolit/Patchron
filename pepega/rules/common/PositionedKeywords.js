@@ -189,6 +189,7 @@ class PositionedKeywordsRule extends BaseRule {
         indexOfCustomPosition,
         wasPositionEnforced
     ) {
+        const initialIndexPosition = indexOfCustomPosition;
         const { direction } = keyword.position;
         const { maxLineBreaks } = keyword;
         const reviewComments = [];
@@ -197,9 +198,6 @@ class PositionedKeywordsRule extends BaseRule {
         if (direction === 'above') {
             matchedRows.reverse();
         }
-
-        // above: let index = indexOfCustomPosition - 1; index > 0; index--
-        // below: let index = indexOfCustomPosition + 1; index < matchedRows.length; index++
 
         const { split_patch: splitPatch } = file;
         let matchedRowIndex = 0;
@@ -237,7 +235,7 @@ class PositionedKeywordsRule extends BaseRule {
                         this._getCommentBody(keyword, {
                             source: matchedRow,
                             cause: 'wrongDirection',
-                            position: indexOfCustomPosition,
+                            position: initialIndexPosition,
                             enforced: wasPositionEnforced,
                         }),
                         matchedRow.index
@@ -259,7 +257,7 @@ class PositionedKeywordsRule extends BaseRule {
                         this._getCommentBody(keyword, {
                             source: matchedRow,
                             cause: 'wrongDirection',
-                            position: indexOfCustomPosition,
+                            position: initialIndexPosition,
                             enforced: wasPositionEnforced,
                         }),
                         matchedRow.index
@@ -284,7 +282,7 @@ class PositionedKeywordsRule extends BaseRule {
                         this._getCommentBody(keyword, {
                             source: matchedRow,
                             cause: 'maxLineBreaks',
-                            position: indexOfCustomPosition,
+                            position: initialIndexPosition,
                             enforced: wasPositionEnforced,
                         }),
                         index
@@ -314,7 +312,7 @@ class PositionedKeywordsRule extends BaseRule {
                         this._getCommentBody(keyword, {
                             source: matchedRow,
                             cause: 'maxLineBreaks',
-                            position: indexOfCustomPosition,
+                            position: initialIndexPosition,
                             enforced: wasPositionEnforced,
                         }),
                         matchedRow.index
@@ -343,7 +341,7 @@ class PositionedKeywordsRule extends BaseRule {
                         this._getCommentBody(keyword, {
                             source: row,
                             cause: 'position',
-                            position: indexOfCustomPosition,
+                            position: initialIndexPosition,
                             enforced: wasPositionEnforced,
                         }),
                         row.index
@@ -407,6 +405,7 @@ class PositionedKeywordsRule extends BaseRule {
         const topHunkHeader = getNearestHunkHeader(splitPatch, 0);
         const { length } = topHunkHeader.modifiedFile;
         let EOFIndex = length === splitPatch.length - 1 ? length : -1;
+
         let wasPositionEnforced = false;
         let reviewComments = [];
 
@@ -479,6 +478,7 @@ class PositionedKeywordsRule extends BaseRule {
         positionIndex,
         wasPositionEnforced
     ) {
+        const initialIndexPosition = positionIndex;
         const { maxLineBreaks } = keyword;
         let lineBreakCounter = 0;
         let reviewComments = [];
@@ -498,7 +498,7 @@ class PositionedKeywordsRule extends BaseRule {
                         this._getCommentBody(keyword, {
                             source: recentRow,
                             cause: 'maxLineBreaks',
-                            position: positionIndex,
+                            position: initialIndexPosition,
                             enforced: wasPositionEnforced,
                         }),
                         recentRow.index
@@ -533,7 +533,7 @@ class PositionedKeywordsRule extends BaseRule {
                         this._getCommentBody(keyword, {
                             source: row,
                             cause: 'position',
-                            position: positionIndex,
+                            position: initialIndexPosition,
                             enforced: wasPositionEnforced,
                         }),
                         row.index
