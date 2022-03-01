@@ -1,15 +1,19 @@
+const BaseRule = require('../Base');
 const dedent = require('dedent-js');
+const getPosition = require('../../helpers/getPosition');
 const getLineNumber = require('../../helpers/getLineNumber');
-const removeWhitespaces = require('../../helpers/removeWhitespaces');
 const ReviewCommentBuilder = require('../../builders/ReviewComment');
-const getNearestHunkHeader = require('../../helpers/getNearestHunkHeader');
 
-class KeywordsOrderedByLengthRule {
+const merge = '<<< merge >>>';
+const newLine = '<<< new line >>>';
+const customLines = [newLine, merge];
+
+class KeywordsOrderedByLengthRule extends BaseRule {
     /**
      * @param {object} config
      * @param {Array<{name: string, regex: object, order: 'ascending'|'descending', ignoreNewline: boolean }>} config.keywords
      * @param {string} config.keywords[].name - readable name
-     * @param {object} config.keywords[].regex - regular expression to match keyword
+     * @param {object} config.keywords[].regex - regular expression to match line with keyword
      * @param {string} config.keywords[].order - ascending/descending
      * @param {string} config.keywords[].ignoreNewline - when set to 'true' **(not recommended)**, rule is tested against all keywords
      * matched in file and when 'false' **(recommended)**, only adjacent ones.
@@ -18,6 +22,8 @@ class KeywordsOrderedByLengthRule {
      * [0, 1, 2] and [5, 6]).
      */
     constructor(config) {
+        super();
+
         const { keywords } = config;
 
         this.keywords = keywords;
@@ -35,34 +41,14 @@ class KeywordsOrderedByLengthRule {
         }
 
         const { split_patch: splitPatch } = file;
+
         let reviewComments = [];
 
         for (const keyword of keywords) {
-            let matchedRows = [];
-
-            // match rows (unchanged/added) with keyword
-            for (let rowIndex = 0; rowIndex < splitPatch.length; rowIndex++) {
-                const rowContent = splitPatch[rowIndex];
-                const minifiedRowContent = removeWhitespaces(rowContent);
-
-                if (
-                    !minifiedRowContent.startsWith('+') &&
-                    !rowContent.startsWith(' ')
-                ) {
-                    continue;
-                }
-
-                const matchResult = rowContent.match(keyword.regex);
-
-                if (!matchResult) {
-                    continue;
-                }
-
-                matchedRows.push({
-                    rowIndex,
-                    matchedContent: matchResult[0].trim(),
-                });
-            }
+            const { matchedRows, unchangedRows } = this._setupData(
+                splitPatch,
+                keyword
+            );
 
             if (matchedRows.length <= 1) {
                 continue;
@@ -78,26 +64,11 @@ class KeywordsOrderedByLengthRule {
                 );
             } else {
                 reviewComments.push(
-                    ...this._reviewLinesOrder(file, keyword, matchedRows)
-                );
-            }
-        }
-
-        return reviewComments;
-    }
-
-    _reviewLinesOrderIgnoringNewline(file, keyword, baseArray) {
-        let reviewComments = [];
-
-        const sortedArray = this._sortArray(keyword, baseArray);
-
-        for (let index = 0; index < sortedArray.length; index++) {
-            if (baseArray[index].rowIndex !== sortedArray[index].rowIndex) {
-                reviewComments.push(
-                    this._getSingleLineComment(
+                    ...this._reviewLinesOrder(
                         file,
                         keyword,
-                        baseArray[index].rowIndex
+                        matchedRows,
+                        unchangedRows
                     )
                 );
             }
@@ -106,51 +77,148 @@ class KeywordsOrderedByLengthRule {
         return reviewComments;
     }
 
-    _reviewLinesOrder(file, keyword, baseArray) {
+    _setupData(splitPatch, keyword) {
+        let matchedRows = [];
+        let unchangedRows = [];
+
+        for (let rowIndex = 0; rowIndex < splitPatch.length; rowIndex++) {
+            const rowContent = splitPatch[rowIndex];
+
+            if (rowContent.trim().length === 0 || rowContent === '+') {
+                matchedRows.push({
+                    rowIndex,
+                    matchedContent: newLine,
+                });
+
+                continue;
+            } else if (rowContent.startsWith('-')) {
+                matchedRows.push({
+                    rowIndex,
+                    matchedContent: merge,
+                });
+
+                continue;
+            } else if (rowContent.startsWith(' ')) {
+                unchangedRows.push(rowIndex);
+            }
+
+            const matchResult = rowContent.match(keyword.regex);
+
+            if (!matchResult) {
+                continue;
+            }
+
+            matchedRows.push({
+                rowIndex,
+                matchedContent: matchResult[0].trim(),
+            });
+        }
+
+        return {
+            matchedRows,
+            unchangedRows,
+        };
+    }
+
+    _reviewLinesOrderIgnoringNewline(file, keyword, baseArray) {
         let reviewComments = [];
 
-        const sortedArray = [...baseArray].sort(
-            (a, b) => a.rowIndex - b.rowIndex
-        );
+        const sortedArray = this._sortArray(keyword, baseArray);
 
-        const firstElementOfSortedArray = sortedArray[0];
+        for (
+            let baseArrayIndex = 0, sortedArrayIndex = 0;
+            baseArrayIndex < sortedArray.length;
+            baseArrayIndex++
+        ) {
+            const baseElement = baseArray[baseArrayIndex];
 
-        let previousRowIndex = firstElementOfSortedArray.rowIndex;
+            if (this._hasCode(baseElement)) {
+                for (
+                    ;
+                    sortedArrayIndex < sortedArray.length;
+                    sortedArrayIndex++
+                ) {
+                    const sortedElement = sortedArray[sortedArrayIndex];
 
-        let group = [firstElementOfSortedArray];
+                    if (baseElement.rowIndex === sortedElement.rowIndex) {
+                        sortedArrayIndex++;
+
+                        break;
+                    }
+
+                    if (
+                        this._hasCode(sortedElement) &&
+                        baseElement.rowIndex !== sortedElement.rowIndex
+                    ) {
+                        const body = this._getCommentBody(keyword);
+
+                        reviewComments.push(
+                            this.getSingleLineComment(
+                                file,
+                                body,
+                                baseElement.rowIndex
+                            )
+                        );
+
+                        sortedArrayIndex++;
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        return reviewComments;
+    }
+
+    _reviewLinesOrder(file, keyword, baseArray, unchangedRows) {
+        let reviewComments = [];
+
+        const firstElement = baseArray[0];
+
+        let previousRowIndex = firstElement.rowIndex;
+
+        let group = [firstElement];
 
         let isEndOfGroup = false;
 
         for (let index = 1; index < baseArray.length; index++) {
-            const { rowIndex: currentRowIndex } = sortedArray[index];
+            const { rowIndex: currentRowIndex, matchedContent: content } =
+                baseArray[index];
 
             if (previousRowIndex + 1 === currentRowIndex) {
-                group.push(sortedArray[index]);
+                if (content === newLine) {
+                    isEndOfGroup = true;
+                } else {
+                    group.push(baseArray[index]);
 
-                isEndOfGroup = index === baseArray.length - 1;
+                    isEndOfGroup = index === baseArray.length - 1;
+                }
             } else {
-                if (group.length > 1) {
+                if (group.length > 1 || content === newLine) {
                     isEndOfGroup = true;
                 }
             }
 
-            if (isEndOfGroup && group.length > 1) {
-                const isKeywordGroupProperlyOrdered =
-                    this._isKeywordGroupProperlyOrdered(keyword, group);
+            if (isEndOfGroup && this._isValidGroup(group, 1)) {
+                reviewComments.push(
+                    ...this._reviewGroup(file, keyword, group, unchangedRows)
+                );
 
-                if (!isKeywordGroupProperlyOrdered) {
-                    reviewComments.push(
-                        this._getMultiLineComment(file, keyword, group)
-                    );
-                }
-
-                group = [sortedArray[index]];
+                group = [baseArray[index]];
             }
 
             previousRowIndex = currentRowIndex;
         }
 
         return reviewComments;
+    }
+
+    /** checks if group consists of more than {length} elements that aren't empty spaces or deleted content */
+    _isValidGroup(group, length = 0) {
+        const filteredGroup = group.filter((element) => this._hasCode(element));
+
+        return filteredGroup && filteredGroup.length > length;
     }
 
     _sortArray(keyword, array) {
@@ -162,10 +230,100 @@ class KeywordsOrderedByLengthRule {
         );
     }
 
-    _isKeywordGroupProperlyOrdered(keyword, group) {
+    /** checks if group includes unchanged row */
+    _tryToGetIndexOfUnchangedRow(startFrom, group, unchangedRows) {
+        let indexOfUnchangedRow = -1;
+
+        for (let index = startFrom; index < group.length; index++) {
+            const groupElement = group[index];
+
+            if (unchangedRows.includes(groupElement.rowIndex)) {
+                indexOfUnchangedRow = index;
+                break;
+            }
+        }
+
+        return indexOfUnchangedRow;
+    }
+
+    /** handles comment rendering depending on group structure  */
+    _reviewGroup(file, keyword, group, unchangedRows) {
+        let reviewComments = [];
+        let indexOfUnchangedRow = 0;
+        let wasUnchangedRowFound = false;
+
+        for (let index = 0; index < group.length; index++) {
+            indexOfUnchangedRow = this._tryToGetIndexOfUnchangedRow(
+                indexOfUnchangedRow,
+                group,
+                unchangedRows
+            );
+
+            if (indexOfUnchangedRow >= 0) {
+                wasUnchangedRowFound = true;
+
+                const slicedGroup = group.slice(index, indexOfUnchangedRow + 1);
+
+                if (
+                    slicedGroup?.length &&
+                    !this._isSlicedGroupProperlyOrdered(
+                        keyword,
+                        group,
+                        slicedGroup
+                    )
+                ) {
+                    const element = slicedGroup.filter((element) =>
+                        this._hasCode(element)
+                    );
+
+                    if (element.length === 1) {
+                        const body = this._getCommentBody(keyword);
+
+                        reviewComments.push(
+                            this.getSingleLineComment(
+                                file,
+                                body,
+                                element.rowIndex
+                            )
+                        );
+                    } else {
+                        reviewComments.push(
+                            this._getMultiLineComment(
+                                file,
+                                keyword,
+                                slicedGroup
+                            )
+                        );
+                    }
+                }
+
+                index = indexOfUnchangedRow;
+                indexOfUnchangedRow++;
+            } else {
+                if (
+                    !this._isGroupProperlyOrdered(keyword, group) &&
+                    this._isValidGroup(group) &&
+                    !wasUnchangedRowFound
+                ) {
+                    reviewComments.push(
+                        this._getMultiLineComment(file, keyword, group)
+                    );
+                }
+
+                break;
+            }
+        }
+
+        return reviewComments;
+    }
+
+    /** checks if group is sorted according to keyword config  */
+    _isGroupProperlyOrdered(keyword, group) {
         let isProperlyOrdered = true;
 
-        const sortedGroup = this._sortArray(keyword, group);
+        const sortedGroup = this._sortArray(keyword, group).filter((element) =>
+            this._hasCode(element)
+        );
 
         for (let index = 0; index < group.length; index++) {
             if (group[index].rowIndex !== sortedGroup[index].rowIndex) {
@@ -178,55 +336,59 @@ class KeywordsOrderedByLengthRule {
         return isProperlyOrdered;
     }
 
-    _getSingleLineComment(file, keyword, rowIndex) {
-        const { split_patch: splitPatch } = file;
+    /** checks if sliced group is sorted as intended according to keyword config and part of group array */
+    _isSlicedGroupProperlyOrdered(keyword, group, slicedGroup) {
+        let isProperlyOrdered = true;
 
-        const { modifiedFile } = getNearestHunkHeader(splitPatch, rowIndex);
+        const sortedGroup = this._sortArray(keyword, group).filter((element) =>
+            this._hasCode(element)
+        );
 
-        if (!modifiedFile) {
-            return null;
+        slicedGroup = slicedGroup.filter((element) => this._hasCode(element));
+
+        const indexOfFirstOccurence = sortedGroup.findIndex(
+            (element) => element.rowIndex === slicedGroup[0].rowIndex
+        );
+
+        if (indexOfFirstOccurence >= 0) {
+            for (
+                let sortedGroupIndex = indexOfFirstOccurence,
+                    slicedGroupIndex = 0;
+                sortedGroupIndex < indexOfFirstOccurence + slicedGroup.length;
+                sortedGroupIndex++, slicedGroupIndex++
+            ) {
+                if (
+                    slicedGroup[slicedGroupIndex].rowIndex !==
+                    sortedGroup[sortedGroupIndex].rowIndex
+                ) {
+                    isProperlyOrdered = false;
+                    break;
+                }
+            }
         }
 
-        const line = getLineNumber(modifiedFile.line, rowIndex);
-
-        const reviewCommentBuilder = new ReviewCommentBuilder(file);
-
-        const comment = reviewCommentBuilder.buildSingleLineComment({
-            body: this._getCommentBody(keyword, line),
-            line,
-            side: 'RIGHT',
-        });
-
-        return comment;
+        return isProperlyOrdered;
     }
 
     _getMultiLineComment(file, keyword, group) {
-        const firstRowIndex = group[0].rowIndex;
-        const lastRowIndex = group.pop().rowIndex;
+        const { rowIndex: firstRowIndex } = group.find(
+            (element) => element.matchedContent !== newLine
+        );
+
+        const { rowIndex: lastRowIndex } = group
+            .reverse()
+            .find((element) => this._hasCode(element));
 
         const { split_patch: splitPatch } = file;
 
-        const { modifiedFile } = getNearestHunkHeader(
-            splitPatch,
-            firstRowIndex
-        );
+        const start_line = getLineNumber(splitPatch, 'right', firstRowIndex);
 
-        if (!modifiedFile) {
-            return null;
-        }
-
-        const start_line = getLineNumber(modifiedFile.line, firstRowIndex);
-
-        const position = getLineNumber(modifiedFile.line, lastRowIndex);
+        const position = getPosition(splitPatch, lastRowIndex);
 
         const reviewCommentBuilder = new ReviewCommentBuilder(file);
 
         const comment = reviewCommentBuilder.buildMultiLineComment({
-            body: this._getCommentBody(
-                keyword,
-                start_line,
-                start_line + position - 1
-            ),
+            body: this._getCommentBody(keyword),
             start_line,
             start_side: 'RIGHT',
             position,
@@ -235,10 +397,12 @@ class KeywordsOrderedByLengthRule {
         return comment;
     }
 
-    _getCommentBody(keyword, start, end = 0) {
-        const commentBody = `Keep \`${keyword.order}\` order for keyword: \`${
-            keyword.name
-        }\` (${end ? `lines: ${start}-${end}` : `line: ${start}`})`;
+    _hasCode(element) {
+        return !customLines.includes(element.matchedContent);
+    }
+
+    _getCommentBody(keyword) {
+        const commentBody = `Keep \`${keyword.order}\` order for keyword: \`${keyword.name}\``;
 
         return dedent(commentBody);
     }

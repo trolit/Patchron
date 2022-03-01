@@ -1,11 +1,13 @@
+const BaseRule = require('../Base');
 const dedent = require('dedent-js');
 const getLineNumber = require('../../helpers/getLineNumber');
 const removeWhitespaces = require('../../helpers/removeWhitespaces');
 const ReviewCommentBuilder = require('../../builders/ReviewComment');
-const getNearestHunkHeader = require('../../helpers/getNearestHunkHeader');
 
-class NoUnmarkedCommentsRule {
+class NoUnmarkedCommentsRule extends BaseRule {
     constructor(config) {
+        super();
+
         const {
             prefixes,
             isAppliedToSingleLineComments,
@@ -17,6 +19,8 @@ class NoUnmarkedCommentsRule {
         this.isAppliedToSingleLineComments = isAppliedToSingleLineComments;
         this.isAppliedToMultiLineComments = isAppliedToMultiLineComments;
         this.isAppliedToInlineComments = isAppliedToInlineComments;
+
+        this.body = this._getCommentBody();
     }
 
     invoke(file) {
@@ -44,7 +48,7 @@ class NoUnmarkedCommentsRule {
                 this._isInvalidSingleLineComment(minifiedRowContent)
             ) {
                 unmarkedComments.push(
-                    this._getSingleLineComment(file, rowIndex)
+                    this.getSingleLineComment(file, this.body, rowIndex)
                 );
 
                 continue;
@@ -74,7 +78,7 @@ class NoUnmarkedCommentsRule {
                 } else {
                     if (!this._isValidMultiLineComment(minifiedRowContent)) {
                         unmarkedComments.push(
-                            this._getSingleLineComment(file, rowIndex)
+                            this.getSingleLineComment(file, this.body, rowIndex)
                         );
                     }
                 }
@@ -87,7 +91,7 @@ class NoUnmarkedCommentsRule {
                 this._isInvalidInlineComment(minifiedRowContent)
             ) {
                 unmarkedComments.push(
-                    this._getSingleLineComment(file, rowIndex)
+                    this.getSingleLineComment(file, this.body, rowIndex)
                 );
 
                 continue;
@@ -203,38 +207,10 @@ class NoUnmarkedCommentsRule {
         return isWithPrefix;
     }
 
-    _getSingleLineComment(file, rowIndex) {
-        const { split_patch: splitPatch } = file;
-
-        const { modifiedFile } = getNearestHunkHeader(splitPatch, rowIndex);
-
-        if (!modifiedFile) {
-            return null;
-        }
-
-        const line = getLineNumber(modifiedFile.line, rowIndex);
-
-        const reviewCommentBuilder = new ReviewCommentBuilder(file);
-
-        const comment = reviewCommentBuilder.buildSingleLineComment({
-            body: this._getCommentBody(),
-            line,
-            side: 'RIGHT',
-        });
-
-        return comment;
-    }
-
     _getMultiLineComment(file, rowIndex) {
         const { split_patch: splitPatch } = file;
 
-        const { modifiedFile } = getNearestHunkHeader(splitPatch, rowIndex);
-
-        if (!modifiedFile) {
-            return null;
-        }
-
-        const start_line = getLineNumber(modifiedFile.line, rowIndex);
+        const start_line = getLineNumber(splitPatch, 'right', rowIndex);
 
         let position = 0;
         let index = 0;
@@ -252,7 +228,7 @@ class NoUnmarkedCommentsRule {
         const reviewCommentBuilder = new ReviewCommentBuilder(file);
 
         const comment = reviewCommentBuilder.buildMultiLineComment({
-            body: this._getCommentBody(),
+            body: this.body,
             start_line,
             start_side: 'RIGHT',
             position,

@@ -1,3 +1,4 @@
+const PositionedKeywords = require('../rules/common/PositionedKeywords');
 const noUnmarkedComments = require('../rules/common/NoUnmarkedComments');
 const keywordsOrderedByLength = require('../rules/common/KeywordsOrderedByLength');
 
@@ -47,6 +48,23 @@ module.exports = [
                     regex: /const.*/,
                     order: 'ascending',
                     ignoreNewline: false,
+                },
+            ],
+        }),
+    },
+    {
+        enabled: true,
+        instance: new PositionedKeywords({
+            keywords: [
+                {
+                    name: 'const',
+                    regex: /const.*/,
+                    position: null,
+                    BOF: true,
+                    EOF: false,
+                    maxLineBreaks: 1,
+                    enforced: false,
+                    breakOnFirstOccurence: false,
                 },
             ],
         }),

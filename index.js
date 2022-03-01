@@ -48,6 +48,8 @@ module.exports = (app) => {
         isReviewSummaryEnabled,
         strictWorkflow,
         delayBetweenCommentRequestsInSeconds,
+        maxCommentsPerReview,
+        senders,
     } = settings;
 
     global.probotInstance = app;
@@ -55,7 +57,11 @@ module.exports = (app) => {
     app.on(
         ['pull_request.opened', 'pull_request.synchronize'],
         async (context) => {
-            const { payload, repo } = initializeData(context);
+            const { pullRequestOwner, payload, repo } = initializeData(context);
+
+            if (senders.length && !senders.includes(pullRequestOwner)) {
+                return;
+            }
 
             if (strictWorkflow.enabled) {
                 const isReviewAborted = resolveStrictWorkflow(
@@ -71,7 +77,7 @@ module.exports = (app) => {
             }
 
             if (isOwnerAssigningEnabled) {
-                addPullSenderAsAssignee(context, repo, payload);
+                addPullSenderAsAssignee(context, repo, pullRequestOwner);
             }
 
             let files = null;
@@ -81,17 +87,27 @@ module.exports = (app) => {
 
                 const reviewComments = reviewPullRequest(repo, files, rules);
 
-                if (reviewComments.length) {
-                    await postComments(
-                        context,
-                        reviewComments,
-                        delayBetweenCommentRequestsInSeconds
-                    );
-                }
+                let successfullyPostedComments = 0;
 
-                if (isReviewSummaryEnabled) {
-                    postSummary(context, reviewComments, payload);
-                }
+                console.log({ reviewComments });
+
+                // if (reviewComments.length) {
+                //     successfullyPostedComments = await postComments(
+                //         context,
+                //         reviewComments,
+                //         delayBetweenCommentRequestsInSeconds,
+                //         maxCommentsPerReview
+                //     );
+                // }
+
+                // if (isReviewSummaryEnabled) {
+                //     postSummary(
+                //         context,
+                //         successfullyPostedComments,
+                //         reviewComments,
+                //         payload
+                //     );
+                // }
             } catch (error) {
                 app.log.error(error);
             }

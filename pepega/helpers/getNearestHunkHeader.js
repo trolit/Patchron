@@ -24,7 +24,7 @@
 module.exports = (splitContent, row) => {
     let result = null;
 
-    if (!Array.isArray(splitContent) || !row) {
+    if (!Array.isArray(splitContent) || !Number.isInteger(row)) {
         probotInstance.log.warn(
             `Invalid data passed to the function -> ${__filename}`
         );
@@ -48,12 +48,12 @@ module.exports = (splitContent, row) => {
             result = {
                 index: i,
                 sourceFile: {
-                    line: sourceFile[1],
-                    length: sourceFile[2],
+                    line: parseInt(sourceFile[1]),
+                    length: parseInt(sourceFile[2]),
                 },
                 modifiedFile: {
-                    line: modifiedFile[1],
-                    length: modifiedFile[2],
+                    line: parseInt(modifiedFile[1]),
+                    length: parseInt(modifiedFile[2]),
                 },
             };
 
