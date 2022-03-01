@@ -1,3 +1,4 @@
+const dedent = require('dedent-js');
 const BaseRule = require('../Base');
 const removeWhitespaces = require('../../helpers/removeWhitespaces');
 const getNearestHunkHeader = require('../../helpers/getNearestHunkHeader');
@@ -18,6 +19,7 @@ class PositionedKeywordsRule extends BaseRule {
      *
      * Configure each keyword with **only** one way of finding position:
      * @param {object} config.keywords[].position - defines custom keyword expected position
+     * @param {object} config.keywords[].position.name - readable name
      * @param {object} config.keywords[].position.regex - expected position regex
      * @param {string} config.keywords[].position.direction - defines whether keyword should appear above or below expected position
      * @param {boolean} config.keywords[].BOF - sets expected position to beginning of file
@@ -73,10 +75,8 @@ class PositionedKeywordsRule extends BaseRule {
             }
 
             if (keyword.position !== null) {
-                const indexOfCustomPosition = this._findIndexOfCustomPosition(
-                    splitPatch,
-                    keyword
-                );
+                const { rowIndex: indexOfCustomPosition, wasPositionEnforced } =
+                    this._findIndexOfCustomPosition(splitPatch, keyword);
 
                 if (indexOfCustomPosition < 0) {
                     probotInstance.log.warn(
@@ -91,7 +91,8 @@ class PositionedKeywordsRule extends BaseRule {
                         file,
                         matchedRows,
                         keyword,
-                        indexOfCustomPosition
+                        indexOfCustomPosition,
+                        wasPositionEnforced
                     )
                 );
             }
@@ -141,6 +142,7 @@ class PositionedKeywordsRule extends BaseRule {
     _findIndexOfCustomPosition(splitPatch, keyword) {
         let rowIndex = -1;
         let matchResult = null;
+        let wasPositionEnforced = false;
 
         matchResult = splitPatch.find((row) =>
             row.match(keyword.position.regex)
@@ -148,32 +150,45 @@ class PositionedKeywordsRule extends BaseRule {
 
         if (!matchResult && keyword.enforced) {
             matchResult = splitPatch.find((row) => row.match(keyword.regex));
+
+            wasPositionEnforced = true;
         }
 
         if (matchResult) {
             rowIndex = splitPatch.indexOf(matchResult);
         }
 
-        return rowIndex;
+        return {
+            rowIndex,
+            wasPositionEnforced,
+        };
     }
 
     _reviewKeywordWithCustomPosition(
         file,
         matchedRows,
         keyword,
-        indexOfCustomPosition
+        indexOfCustomPosition,
+        wasPositionEnforced
     ) {
         const reviewComments = this._reviewCustomPosition(
             file,
             matchedRows,
             keyword,
-            indexOfCustomPosition
+            indexOfCustomPosition,
+            wasPositionEnforced
         );
 
         return reviewComments;
     }
 
-    _reviewCustomPosition(file, matchedRows, keyword, indexOfCustomPosition) {
+    _reviewCustomPosition(
+        file,
+        matchedRows,
+        keyword,
+        indexOfCustomPosition,
+        wasPositionEnforced
+    ) {
         const { direction } = keyword.position;
         const { maxLineBreaks } = keyword;
         const reviewComments = [];
@@ -219,7 +234,12 @@ class PositionedKeywordsRule extends BaseRule {
                 reviewComments.push(
                     this.getSingleLineComment(
                         file,
-                        this._getCommentBody(keyword),
+                        this._getCommentBody(keyword, {
+                            source: matchedRow,
+                            cause: 'wrongDirection',
+                            position: indexOfCustomPosition,
+                            enforced: wasPositionEnforced,
+                        }),
                         matchedRow.index
                     )
                 );
@@ -236,7 +256,12 @@ class PositionedKeywordsRule extends BaseRule {
                 reviewComments.push(
                     this.getSingleLineComment(
                         file,
-                        this._getCommentBody(keyword),
+                        this._getCommentBody(keyword, {
+                            source: matchedRow,
+                            cause: 'wrongDirection',
+                            position: indexOfCustomPosition,
+                            enforced: wasPositionEnforced,
+                        }),
                         matchedRow.index
                     )
                 );
@@ -256,7 +281,12 @@ class PositionedKeywordsRule extends BaseRule {
                 reviewComments.push(
                     this.getSingleLineComment(
                         file,
-                        this._getCommentBody(keyword),
+                        this._getCommentBody(keyword, {
+                            source: matchedRow,
+                            cause: 'maxLineBreaks',
+                            position: indexOfCustomPosition,
+                            enforced: wasPositionEnforced,
+                        }),
                         index
                     )
                 );
@@ -281,7 +311,12 @@ class PositionedKeywordsRule extends BaseRule {
                 reviewComments.push(
                     this.getSingleLineComment(
                         file,
-                        this._getCommentBody(keyword),
+                        this._getCommentBody(keyword, {
+                            source: matchedRow,
+                            cause: 'maxLineBreaks',
+                            position: indexOfCustomPosition,
+                            enforced: wasPositionEnforced,
+                        }),
                         matchedRow.index
                     )
                 );
@@ -300,11 +335,18 @@ class PositionedKeywordsRule extends BaseRule {
             !wasAnyRowAtDifferentDirection
         ) {
             while (matchedRowIndex < matchedRows.length) {
+                const row = matchedRows[matchedRowIndex];
+
                 reviewComments.push(
                     this.getSingleLineComment(
                         file,
-                        this._getCommentBody(keyword),
-                        matchedRows[matchedRowIndex].index
+                        this._getCommentBody(keyword, {
+                            source: row,
+                            cause: 'position',
+                            position: indexOfCustomPosition,
+                            enforced: wasPositionEnforced,
+                        }),
+                        row.index
                     )
                 );
 
@@ -351,7 +393,8 @@ class PositionedKeywordsRule extends BaseRule {
             file,
             keyword,
             matchedRows,
-            BOFIndex
+            BOFIndex,
+            wasPositionEnforced
         );
 
         return reviewComments;
@@ -394,7 +437,8 @@ class PositionedKeywordsRule extends BaseRule {
             file,
             keyword,
             matchedRows,
-            EOFIndex
+            EOFIndex,
+            wasPositionEnforced
         );
 
         return reviewComments;
@@ -428,7 +472,13 @@ class PositionedKeywordsRule extends BaseRule {
         return indexOfPosition;
     }
 
-    _reviewExactPosition(file, keyword, matchedRows, positionIndex) {
+    _reviewExactPosition(
+        file,
+        keyword,
+        matchedRows,
+        positionIndex,
+        wasPositionEnforced
+    ) {
         const { maxLineBreaks } = keyword;
         let lineBreakCounter = 0;
         let reviewComments = [];
@@ -445,7 +495,12 @@ class PositionedKeywordsRule extends BaseRule {
                 reviewComments.push(
                     this.getSingleLineComment(
                         file,
-                        this._getCommentBody(keyword),
+                        this._getCommentBody(keyword, {
+                            source: recentRow,
+                            cause: 'maxLineBreaks',
+                            position: positionIndex,
+                            enforced: wasPositionEnforced,
+                        }),
                         recentRow.index
                     )
                 );
@@ -475,7 +530,12 @@ class PositionedKeywordsRule extends BaseRule {
                 reviewComments.push(
                     this.getSingleLineComment(
                         file,
-                        this._getCommentBody(keyword),
+                        this._getCommentBody(keyword, {
+                            source: row,
+                            cause: 'position',
+                            position: positionIndex,
+                            enforced: wasPositionEnforced,
+                        }),
                         row.index
                     )
                 );
@@ -534,8 +594,71 @@ class PositionedKeywordsRule extends BaseRule {
         };
     }
 
-    _getCommentBody(keyword) {
-        // TODO:
+    _getCommentBody(keyword, data) {
+        const { cause, position, enforced } = data;
+        const {
+            name: keywordName,
+            position: customKeyword,
+            BOF,
+            maxLineBreaks,
+        } = keyword;
+
+        let reason = '/ undefined /';
+
+        switch (cause) {
+            case 'maxLineBreaks':
+                if (maxLineBreaks) {
+                    reason = `\`${keywordName}\` exceeded allowed spacing (${maxLineBreaks}) in relation to line:\`${position}\` ${
+                        enforced ? `(enforced)` : ``
+                    }`;
+                } else {
+                    reason = `No spacing allowed between \`${keywordName}\` and line:\`${position}\` ${
+                        enforced ? `(enforced)` : ``
+                    }`;
+                }
+
+                break;
+
+            case 'position':
+            case 'wrongDirection':
+                if (customKeyword) {
+                    const expectedPosition = customKeyword.name?.length
+                        ? customKeyword.name
+                        : customKeyword.regex;
+
+                    reason = `\`${keywordName}\` should appear \`${
+                        customKeyword.direction
+                    }\` ${
+                        enforced
+                            ? `line:\`${position}\` (enforced)`
+                            : `\`${expectedPosition}\``
+                    }`;
+                } else {
+                    reason = `\`${keywordName}\` should appear ${
+                        enforced
+                            ? `below line:\`${position}\` (enforced)`
+                            : `at ${
+                                  BOF
+                                      ? `beginning (below line:\`${position}\`)`
+                                      : `end (under line:\`${position}\`)`
+                              } of file`
+                    }`;
+                }
+
+                break;
+        }
+
+        const commentBodyWithExplanation = `${reason} 
+         
+        <details>
+            <summary> What enforced means? </summary> \n\n<em>When keyword has \`enforced\` flag enabled, 
+            it basically means that when pull requested file does not have expected position that was
+            provided within configuration but it has at least two keywords, first occurence will be 
+            counted as expected position which means remaining ones must be positioned corrently in
+            relation to first one.</em> 
+        </details>`;
+
+        return enforced ? reason : dedent(commentBodyWithExplanation);
     }
 }
 
