@@ -5,6 +5,16 @@ module.exports = [
         enabled: true,
         instance: new PositionedKeywords({
             keywords: [
+                // {
+                //     name: 'import',
+                //     regex: /import.*/,
+                //     position: null,
+                //     BOF: false,
+                //     EOF: true,
+                //     maxLineBreaks: 2,
+                //     enforced: false,
+                //     breakOnFirstOccurence: false,
+                // },
                 {
                     name: 'import',
                     regex: /import.*/,
