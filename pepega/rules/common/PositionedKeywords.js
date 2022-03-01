@@ -658,7 +658,7 @@ class PositionedKeywordsRule extends BaseRule {
             relation to first one.</em> 
         </details>`;
 
-        return enforced ? reason : dedent(commentBodyWithExplanation);
+        return enforced ? dedent(reason) : dedent(commentBodyWithExplanation);
     }
 }
 
