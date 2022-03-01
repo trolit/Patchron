@@ -189,7 +189,6 @@ class PositionedKeywordsRule extends BaseRule {
         indexOfCustomPosition,
         wasPositionEnforced
     ) {
-        const initialIndexPosition = indexOfCustomPosition;
         const { direction } = keyword.position;
         const { maxLineBreaks } = keyword;
         const reviewComments = [];
@@ -235,8 +234,8 @@ class PositionedKeywordsRule extends BaseRule {
                         this._getCommentBody(keyword, {
                             source: matchedRow,
                             cause: 'wrongDirection',
-                            position: initialIndexPosition,
-                            enforced: wasPositionEnforced,
+                            position: matchedRow.index,
+                            enforced: true,
                         }),
                         matchedRow.index
                     )
@@ -257,8 +256,8 @@ class PositionedKeywordsRule extends BaseRule {
                         this._getCommentBody(keyword, {
                             source: matchedRow,
                             cause: 'wrongDirection',
-                            position: initialIndexPosition,
-                            enforced: wasPositionEnforced,
+                            position: matchedRow.index,
+                            enforced: true,
                         }),
                         matchedRow.index
                     )
@@ -282,7 +281,10 @@ class PositionedKeywordsRule extends BaseRule {
                         this._getCommentBody(keyword, {
                             source: matchedRow,
                             cause: 'maxLineBreaks',
-                            position: initialIndexPosition,
+                            position:
+                                direction === 'below'
+                                    ? matchedRow.index - lineBreakCounter
+                                    : matchedRow.index + lineBreakCounter,
                             enforced: wasPositionEnforced,
                         }),
                         index
@@ -312,7 +314,7 @@ class PositionedKeywordsRule extends BaseRule {
                         this._getCommentBody(keyword, {
                             source: matchedRow,
                             cause: 'maxLineBreaks',
-                            position: initialIndexPosition,
+                            position: index,
                             enforced: wasPositionEnforced,
                         }),
                         matchedRow.index
@@ -341,7 +343,7 @@ class PositionedKeywordsRule extends BaseRule {
                         this._getCommentBody(keyword, {
                             source: row,
                             cause: 'position',
-                            position: initialIndexPosition,
+                            position: row.index,
                             enforced: wasPositionEnforced,
                         }),
                         row.index
@@ -658,7 +660,7 @@ class PositionedKeywordsRule extends BaseRule {
             relation to first one.</em> 
         </details>`;
 
-        return enforced ? dedent(reason) : dedent(commentBodyWithExplanation);
+        return enforced ? dedent(commentBodyWithExplanation) : dedent(reason);
     }
 }
 
