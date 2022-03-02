@@ -19,6 +19,7 @@ module.exports = [
                     name: 'import',
                     regex: /import.*/,
                     position: {
+                        name: '<script>',
                         regex: /<script>/,
                         direction: 'below',
                     },
