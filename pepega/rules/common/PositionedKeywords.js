@@ -15,13 +15,19 @@ class PositionedKeywordsRule extends BaseRule {
      * EOF: boolean, ignoreNewline: boolean, enforced: boolean }>} config.keywords
      * @param {string} config.keywords[].name - readable name
      * @param {object} config.keywords[].regex - matches line(s) that should be validated against rule
+     * @param {object|string} config.keywords[].multilineIndicator - text or regex that allows to support multiline keyword
+     * @example
+     * ```js
+     *  // for import keyword multiLineIndicator could be text value -> 'from'
+     *  import {
+     *    a,
+     *    b
+     *  } from '';
+     * ```
      * ---------------------
      *
      * Configure each keyword with **only** one way of finding position:
-     * @param {object} config.keywords[].position - defines custom keyword expected position
-     * @param {object} config.keywords[].position.name - readable name
-     * @param {object} config.keywords[].position.regex - expected position regex
-     * @param {string} config.keywords[].position.direction - defines whether keyword should appear above or below expected position
+     * @param {object} config.keywords[].position - defines custom keyword expected position based on regex and direction (above/below)
      * @param {boolean} config.keywords[].BOF - sets expected position to beginning of file
      * @param {boolean} config.keywords[].EOF - sets expected position to end of file
      *
