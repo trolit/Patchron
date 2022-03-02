@@ -217,7 +217,7 @@ class PositionedKeywordsRule extends BaseRule {
         ) {
             const matchedRow = matchedRows[index];
 
-            if (maxLineBreaks && customLines.includes(matchedRow.content)) {
+            if (customLines.includes(matchedRow.content)) {
                 lineBreakCounter++;
 
                 continue;
@@ -249,7 +249,32 @@ class PositionedKeywordsRule extends BaseRule {
                 continue;
             }
 
-            if (lineBreakCounter > maxLineBreaks) {
+            if (maxLineBreaks && lineBreakCounter > maxLineBreaks) {
+                reviewComments.push(
+                    this.getSingleLineComment(
+                        file,
+                        this._getCommentBody(keyword, {
+                            source: matchedRow,
+                            cause: 'maxLineBreaks',
+                            position: lastRowWithCode.index,
+                            enforced: wasPositionEnforced,
+                        }),
+                        matchedRow.index
+                    )
+                );
+
+                if (keyword.breakOnFirstOccurence) {
+                    break;
+                }
+
+                lineBreakCounter = 0;
+
+                lastRowWithCode = matchedRow;
+
+                continue;
+            }
+
+            if (lineBreakCounter) {
                 reviewComments.push(
                     this.getSingleLineComment(
                         file,
