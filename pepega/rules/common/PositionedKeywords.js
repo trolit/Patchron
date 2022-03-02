@@ -566,11 +566,11 @@ class PositionedKeywordsRule extends BaseRule {
         switch (cause) {
             case 'maxLineBreaks':
                 if (maxLineBreaks) {
-                    reason = `\`${keywordName}\` exceeded allowed spacing (${maxLineBreaks}) in relation to line:\`${position}\` ${
+                    reason = `\`${keywordName}\` exceeded allowed spacing (${maxLineBreaks}) in relation to line: \`${position}\` ${
                         enforced ? `(enforced)` : ``
                     }`;
                 } else {
-                    reason = `No spacing allowed between \`${keywordName}\` and line:\`${position}\` ${
+                    reason = `No spacing allowed between \`${keywordName}\` and line: \`${position}\` ${
                         enforced ? `(enforced)` : ``
                     }`;
                 }
@@ -609,11 +609,7 @@ class PositionedKeywordsRule extends BaseRule {
         const commentBodyWithExplanation = `${reason} 
          
         <details>
-            <summary> What enforced means? </summary> \n\n<em>When keyword has \`enforced\` flag enabled, 
-            it basically means that when pull requested file does not have expected position that was
-            provided within configuration but it has at least two keywords, first occurence will be 
-            counted as expected position which means remaining ones must be positioned corrently in
-            relation to first one.</em> 
+            <summary> What enforced means? </summary> \n\n<em>When keyword has \`enforced\` flag enabled, it basically means that when pull requested file does not have expected position that was provided within configuration, but it has at least two keywords, first occurence will be counted as expected position, which means, remaining ones must be positioned in relation to first one.</em> 
         </details>`;
 
         return enforced ? dedent(commentBodyWithExplanation) : dedent(reason);
