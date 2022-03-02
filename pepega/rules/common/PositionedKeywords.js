@@ -274,7 +274,7 @@ class PositionedKeywordsRule extends BaseRule {
                 continue;
             }
 
-            if (lineBreakCounter) {
+            if (!maxLineBreaks && lineBreakCounter) {
                 reviewComments.push(
                     this.getSingleLineComment(
                         file,
