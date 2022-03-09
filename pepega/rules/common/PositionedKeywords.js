@@ -8,6 +8,8 @@ const newLine = '<<< new line >>>';
 const customLines = [newLine, merge];
 
 // TODO: handle multiline keyword
+// TODO: handle endsAt (customPosition)
+// TODO: apply  merge/newLine/customLines from Base.js
 class PositionedKeywordsRule extends BaseRule {
     /**
      * @param {object} config
