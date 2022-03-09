@@ -8,6 +8,8 @@ const newLine = '<<< new line >>>';
 const customLines = [newLine, merge];
 
 // TODO: handle multiline keyword
+// TODO: handle endsAt (customPosition)
+// TODO: apply  merge/newLine/customLines from Base.js
 class PositionedKeywordsRule extends BaseRule {
     /**
      * @param {object} config
@@ -15,13 +17,19 @@ class PositionedKeywordsRule extends BaseRule {
      * EOF: boolean, ignoreNewline: boolean, enforced: boolean }>} config.keywords
      * @param {string} config.keywords[].name - readable name
      * @param {object} config.keywords[].regex - matches line(s) that should be validated against rule
+     * @param {object|string} config.keywords[].multilineIndicator - text or regex that allows to support multiline keyword
+     * @example
+     * ```js
+     *  // for import keyword multiLineIndicator could be text value -> 'from'
+     *  import {
+     *    a,
+     *    b
+     *  } from '';
+     * ```
      * ---------------------
      *
      * Configure each keyword with **only** one way of finding position:
-     * @param {object} config.keywords[].position - defines custom keyword expected position
-     * @param {object} config.keywords[].position.name - readable name
-     * @param {object} config.keywords[].position.regex - expected position regex
-     * @param {string} config.keywords[].position.direction - defines whether keyword should appear above or below expected position
+     * @param {object} config.keywords[].position - defines custom keyword expected position based on regex and direction (above/below)
      * @param {boolean} config.keywords[].BOF - sets expected position to beginning of file
      * @param {boolean} config.keywords[].EOF - sets expected position to end of file
      *
@@ -198,123 +206,125 @@ class PositionedKeywordsRule extends BaseRule {
             matchedRows.reverse();
         }
 
-        const { split_patch: splitPatch } = file;
-        let matchedRowIndex = 0;
-
         matchedRows = matchedRows.filter(
-            (matchedRow) => !customLines.includes(matchedRow.content)
+            (matchedRow) => matchedRow.index !== indexOfCustomPosition
         );
 
-        let index =
+        indexOfCustomPosition =
             direction === 'above'
                 ? indexOfCustomPosition - 1
                 : indexOfCustomPosition + 1;
 
-        let wasAnyRowAtDifferentDirection = false;
+        let currentCustomPosition = indexOfCustomPosition;
+        let lastRowWithCode = null;
 
         for (
-            ;
-            direction === 'above' ? index >= 0 : index < splitPatch.length;
-            direction === 'above' ? index-- : index++
+            let index = 0;
+            index < matchedRows.length;
+            index++, currentCustomPosition++
         ) {
-            if (matchedRowIndex >= matchedRows.length) {
-                break;
-            }
+            const matchedRow = matchedRows[index];
 
-            const row = splitPatch[index];
-            const matchedRow = matchedRows[matchedRowIndex];
-
-            if (
-                direction === 'below' &&
-                matchedRow.index < indexOfCustomPosition
-            ) {
-                reviewComments.push(
-                    this.getSingleLineComment(
-                        file,
-                        this._getCommentBody(keyword, {
-                            source: matchedRow,
-                            cause: 'wrongDirection',
-                            position: matchedRow.index,
-                            enforced: true,
-                        }),
-                        matchedRow.index
-                    )
-                );
-
-                matchedRowIndex++;
-
-                wasAnyRowAtDifferentDirection = true;
-
-                continue;
-            } else if (
-                direction === 'above' &&
-                matchedRow.index > indexOfCustomPosition
-            ) {
-                reviewComments.push(
-                    this.getSingleLineComment(
-                        file,
-                        this._getCommentBody(keyword, {
-                            source: matchedRow,
-                            cause: 'wrongDirection',
-                            position: matchedRow.index,
-                            enforced: true,
-                        }),
-                        matchedRow.index
-                    )
-                );
-
-                matchedRowIndex++;
-
-                wasAnyRowAtDifferentDirection = true;
-
-                continue;
-            }
-
-            if (wasAnyRowAtDifferentDirection) {
-                break;
-            }
-
-            if (lineBreakCounter > maxLineBreaks) {
-                reviewComments.push(
-                    this.getSingleLineComment(
-                        file,
-                        this._getCommentBody(keyword, {
-                            source: matchedRow,
-                            cause: 'maxLineBreaks',
-                            position:
-                                direction === 'below'
-                                    ? matchedRow.index - lineBreakCounter
-                                    : matchedRow.index + lineBreakCounter,
-                            enforced: wasPositionEnforced,
-                        }),
-                        index
-                    )
-                );
-
-                lineBreakCounter = 0;
-                matchedRowIndex++;
-
-                if (keyword.breakOnFirstOccurence) {
-                    break;
-                }
-
-                continue;
-            }
-
-            if (maxLineBreaks && removeWhitespaces(row) === '+') {
+            if (customLines.includes(matchedRow.content)) {
                 lineBreakCounter++;
 
                 continue;
             }
 
-            if (!row.includes(matchedRow.content)) {
+            if (
+                (direction === 'below' &&
+                    matchedRow.index < indexOfCustomPosition) ||
+                (direction === 'above' &&
+                    matchedRow.index > indexOfCustomPosition)
+            ) {
+                reviewComments.push(
+                    this.getSingleLineComment(
+                        file,
+                        this._getCommentBody(keyword, {
+                            source: matchedRow,
+                            cause: 'wrongDirection',
+                            position: matchedRow.index,
+                            enforced: wasPositionEnforced,
+                        }),
+                        matchedRow.index
+                    )
+                );
+
+                if (keyword.breakOnFirstOccurence) {
+                    break;
+                }
+
+                continue;
+            }
+
+            if (maxLineBreaks && lineBreakCounter > maxLineBreaks) {
                 reviewComments.push(
                     this.getSingleLineComment(
                         file,
                         this._getCommentBody(keyword, {
                             source: matchedRow,
                             cause: 'maxLineBreaks',
-                            position: index,
+                            position: lastRowWithCode.index,
+                            enforced: wasPositionEnforced,
+                        }),
+                        matchedRow.index
+                    )
+                );
+
+                if (keyword.breakOnFirstOccurence) {
+                    break;
+                }
+
+                lineBreakCounter = 0;
+
+                lastRowWithCode = matchedRow;
+
+                continue;
+            }
+
+            if (!maxLineBreaks && lineBreakCounter) {
+                reviewComments.push(
+                    this.getSingleLineComment(
+                        file,
+                        this._getCommentBody(keyword, {
+                            source: matchedRow,
+                            cause: 'maxLineBreaks',
+                            position: lastRowWithCode.index,
+                            enforced: wasPositionEnforced,
+                        }),
+                        matchedRow.index
+                    )
+                );
+
+                if (keyword.breakOnFirstOccurence) {
+                    break;
+                }
+
+                lineBreakCounter = 0;
+
+                lastRowWithCode = matchedRow;
+
+                continue;
+            }
+
+            const isInValidPosition =
+                lastRowWithCode &&
+                (direction === 'below'
+                    ? matchedRow.index - 1 - lineBreakCounter
+                    : matchedRow.index + 1 + lineBreakCounter) ===
+                    lastRowWithCode.index;
+
+            if (
+                (index === 0 && currentCustomPosition !== matchedRow.index) ||
+                (lastRowWithCode && !isInValidPosition)
+            ) {
+                reviewComments.push(
+                    this.getSingleLineComment(
+                        file,
+                        this._getCommentBody(keyword, {
+                            source: matchedRow,
+                            cause: 'position',
+                            position: matchedRow.index,
                             enforced: wasPositionEnforced,
                         }),
                         matchedRow.index
@@ -326,32 +336,11 @@ class PositionedKeywordsRule extends BaseRule {
                 }
             }
 
-            lineBreakCounter = 0;
-            matchedRowIndex++;
-        }
-
-        if (
-            matchedRowIndex < matchedRows.length &&
-            !wasAnyRowAtDifferentDirection
-        ) {
-            while (matchedRowIndex < matchedRows.length) {
-                const row = matchedRows[matchedRowIndex];
-
-                reviewComments.push(
-                    this.getSingleLineComment(
-                        file,
-                        this._getCommentBody(keyword, {
-                            source: row,
-                            cause: 'position',
-                            position: row.index,
-                            enforced: wasPositionEnforced,
-                        }),
-                        row.index
-                    )
-                );
-
-                matchedRowIndex++;
+            if (!customLines.includes(matchedRow.content)) {
+                lastRowWithCode = matchedRow;
             }
+
+            lineBreakCounter = 0;
         }
 
         return reviewComments;
@@ -610,11 +599,11 @@ class PositionedKeywordsRule extends BaseRule {
         switch (cause) {
             case 'maxLineBreaks':
                 if (maxLineBreaks) {
-                    reason = `\`${keywordName}\` exceeded allowed spacing (${maxLineBreaks}) in relation to line:\`${position}\` ${
+                    reason = `\`${keywordName}\` exceeded allowed spacing (${maxLineBreaks}) in relation to line: \`${position}\` ${
                         enforced ? `(enforced)` : ``
                     }`;
                 } else {
-                    reason = `No spacing allowed between \`${keywordName}\` and line:\`${position}\` ${
+                    reason = `No spacing allowed between \`${keywordName}\` and line: \`${position}\` ${
                         enforced ? `(enforced)` : ``
                     }`;
                 }
@@ -633,7 +622,7 @@ class PositionedKeywordsRule extends BaseRule {
                     }\` ${
                         enforced
                             ? `line:\`${position}\` (enforced)`
-                            : `\`${expectedPosition}\``
+                            : `\`${expectedPosition}\` (line:\`${position}\`)`
                     }`;
                 } else {
                     reason = `\`${keywordName}\` should appear ${
@@ -653,11 +642,7 @@ class PositionedKeywordsRule extends BaseRule {
         const commentBodyWithExplanation = `${reason} 
          
         <details>
-            <summary> What enforced means? </summary> \n\n<em>When keyword has \`enforced\` flag enabled, 
-            it basically means that when pull requested file does not have expected position that was
-            provided within configuration but it has at least two keywords, first occurence will be 
-            counted as expected position which means remaining ones must be positioned corrently in
-            relation to first one.</em> 
+            <summary> What enforced means? </summary> \n\n<em>When keyword has \`enforced\` flag enabled, it basically means that when pull requested file does not have expected position that was provided within configuration, but it has at least two keywords, first occurence will be counted as expected position, which means, remaining ones must be positioned in relation to first one.</em> 
         </details>`;
 
         return enforced ? dedent(commentBodyWithExplanation) : dedent(reason);
