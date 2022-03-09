@@ -3,13 +3,8 @@ const BaseRule = require('../Base');
 const removeWhitespaces = require('../../helpers/removeWhitespaces');
 const getNearestHunkHeader = require('../../helpers/getNearestHunkHeader');
 
-const merge = '<<< merge >>>';
-const newLine = '<<< new line >>>';
-const customLines = [newLine, merge];
-
 // TODO: handle multiline keyword
 // TODO: handle endsAt (customPosition)
-// TODO: apply  merge/newLine/customLines from Base.js
 class PositionedKeywordsRule extends BaseRule {
     /**
      * @param {object} config
@@ -225,7 +220,7 @@ class PositionedKeywordsRule extends BaseRule {
         ) {
             const matchedRow = matchedRows[index];
 
-            if (customLines.includes(matchedRow.content)) {
+            if (this.customLines.includes(matchedRow.content)) {
                 lineBreakCounter++;
 
                 continue;
@@ -336,7 +331,7 @@ class PositionedKeywordsRule extends BaseRule {
                 }
             }
 
-            if (!customLines.includes(matchedRow.content)) {
+            if (!this.customLines.includes(matchedRow.content)) {
                 lastRowWithCode = matchedRow;
             }
 
@@ -357,7 +352,7 @@ class PositionedKeywordsRule extends BaseRule {
 
         if (BOFIndex === -1 && keyword.enforced) {
             const row = matchedRows.find(
-                (row) => !customLines.includes(row.content)
+                (row) => !this.customLines.includes(row.content)
             );
 
             BOFIndex = row ? row.index + 1 : -1;
@@ -402,7 +397,7 @@ class PositionedKeywordsRule extends BaseRule {
 
         if (EOFIndex === -1 && keyword.enforced) {
             const row = matchedRows.find(
-                (row) => !customLines.includes(row.content)
+                (row) => !this.customLines.includes(row.content)
             );
 
             EOFIndex = row ? row.index - 1 : -1;
@@ -478,7 +473,7 @@ class PositionedKeywordsRule extends BaseRule {
         for (let index = 0; index < matchedRows.length; index++) {
             const row = matchedRows[index];
 
-            if (row.content !== newLine) {
+            if (row.content !== this.newLine) {
                 recentRow = row;
             }
 
@@ -505,7 +500,7 @@ class PositionedKeywordsRule extends BaseRule {
                 continue;
             }
 
-            if (maxLineBreaks && row.content === newLine) {
+            if (maxLineBreaks && row.content === this.newLine) {
                 lineBreakCounter++;
 
                 continue;
@@ -552,14 +547,14 @@ class PositionedKeywordsRule extends BaseRule {
             if (matchedRows.length && removeWhitespaces(row) === '+') {
                 matchedRows.push({
                     index,
-                    content: newLine,
+                    content: this.newLine,
                 });
 
                 continue;
             } else if (matchedRows.length && row.startsWith('-')) {
                 matchedRows.push({
                     index,
-                    content: merge,
+                    content: this.merge,
                 });
 
                 continue;
