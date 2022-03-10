@@ -3,38 +3,17 @@ const BaseRule = require('../Base');
 const removeWhitespaces = require('../../helpers/removeWhitespaces');
 const getNearestHunkHeader = require('../../helpers/getNearestHunkHeader');
 
-// TODO: handle multiline keyword
-// TODO: handle endsAt (customPosition)
 class PositionedKeywordsRule extends BaseRule {
     /**
      * @param {object} config
-     * @param {Array<{name: string, regex: object, position: { regex: object, direction: 'below'|'above' }, BOF: boolean,
-     * EOF: boolean, ignoreNewline: boolean, enforced: boolean }>} config.keywords
+     * @param {Array<{name: string, regex: object, position: { custom: { name: string, expression: string|object, direction: string, }, BOF: boolean, EOF:boolean }, ignoreNewline: boolean, enforced: boolean }>} config.keywords
      * @param {string} config.keywords[].name - readable name
      * @param {object} config.keywords[].regex - matches line(s) that should be validated against rule
-     * @param {object|string} config.keywords[].multilineIndicator - text or regex that allows to support multiline keyword
-     * @example
-     * ```js
-     *  // for import keyword multiLineIndicator could be text value -> 'from'
-     *  import {
-     *    a,
-     *    b
-     *  } from '';
-     * ```
-     * ---------------------
-     *
-     * Configure each keyword with **only** one way of finding position:
-     * @param {object} config.keywords[].position - defines custom keyword expected position based on regex and direction (above/below)
-     * @param {boolean} config.keywords[].BOF - sets expected position to beginning of file
-     * @param {boolean} config.keywords[].EOF - sets expected position to end of file
-     *
-     * ---------------------
-     * @param {number} config.keywords[].maxLineBreaks - defines maximum allowed line breaks between each keyword. When 0, spaces between
-     * matched line(s) are counted as rule break
-     * @param {boolean} config.keywords[].enforced - if **true**, forces to count first matched keyword occurence as expected position when
-     * primary one was not found in given file's patch
-     * @param {boolean} config.keywords[].breakOnFirstOccurence - when
-     * **true**, stops keyword review on first invalid occurence
+     * @param {Array<string>} config.keywords[].multilineOptions - if none of them will be included in matched line, line will be treated as multiline.
+     * @param {object} config.keywords[].position - defines keyword expected position (custom, BOF or EOF). Configure each keyword with **only** one way of determining position.
+     * @param {number} config.keywords[].maxLineBreaks - defines maximum allowed line breaks between each keyword. When 0, spaces between matched line(s) are counted as rule break
+     * @param {boolean} config.keywords[].enforced - if **true**, forces to count first matched keyword occurence as expected position when primary one was not found in given file's patch
+     * @param {boolean} config.keywords[].breakOnFirstOccurence - when **true**, stops keyword review on first invalid occurence
      */
     constructor(config) {
         super();
@@ -77,8 +56,10 @@ class PositionedKeywordsRule extends BaseRule {
                 continue;
             }
 
-            if (keyword.position !== null) {
-                const { rowIndex: indexOfCustomPosition, wasPositionEnforced } =
+            const { position } = keyword;
+
+            if (position.custom !== null) {
+                const { indexOfCustomPosition, wasPositionEnforced } =
                     this._findIndexOfCustomPosition(splitPatch, keyword);
 
                 if (indexOfCustomPosition < 0) {
@@ -100,9 +81,10 @@ class PositionedKeywordsRule extends BaseRule {
                 );
             }
 
-            if (keyword.BOF) {
+            if (position.BOF) {
                 const keywordsWithBOF = keywords.filter(
-                    (element) => element.BOF && element.regex !== keyword.regex
+                    (element) =>
+                        element.position.BOF && element.regex !== keyword.regex
                 );
 
                 reviewComments.push(
@@ -115,9 +97,10 @@ class PositionedKeywordsRule extends BaseRule {
                 );
             }
 
-            if (keyword.EOF) {
+            if (position.EOF) {
                 const keywordsWithEOF = keywords.filter(
-                    (element) => element.EOF && element.regex !== keyword.regex
+                    (element) =>
+                        element.position.EOF && element.regex !== keyword.regex
                 );
 
                 reviewComments.push(
@@ -135,20 +118,25 @@ class PositionedKeywordsRule extends BaseRule {
     }
 
     _hasKeywordValidConfig(keyword) {
-        const isPositionSet = !!keyword.position;
+        const isCustomPosition = !!keyword.position.custom;
+        const { BOF, EOF } = keyword.position;
 
-        const { BOF, EOF } = keyword;
-
-        return [isPositionSet, BOF, EOF].filter((value) => value).length === 1;
+        return (
+            [isCustomPosition, BOF, EOF].filter((value) => value).length === 1
+        );
     }
 
     _findIndexOfCustomPosition(splitPatch, keyword) {
-        let rowIndex = -1;
-        let matchResult = null;
         let wasPositionEnforced = false;
+        let indexOfCustomPosition = -1;
+        let matchResult = null;
+
+        const { expression } = keyword.position.custom;
 
         matchResult = splitPatch.find((row) =>
-            row.match(keyword.position.regex)
+            typeof expression === 'object'
+                ? row.match(expression)
+                : row.includes(expression)
         );
 
         if (!matchResult && keyword.enforced) {
@@ -158,11 +146,11 @@ class PositionedKeywordsRule extends BaseRule {
         }
 
         if (matchResult) {
-            rowIndex = splitPatch.indexOf(matchResult);
+            indexOfCustomPosition = splitPatch.indexOf(matchResult);
         }
 
         return {
-            rowIndex,
+            indexOfCustomPosition,
             wasPositionEnforced,
         };
     }
@@ -192,7 +180,7 @@ class PositionedKeywordsRule extends BaseRule {
         indexOfCustomPosition,
         wasPositionEnforced
     ) {
-        const { direction } = keyword.position;
+        const { direction } = keyword.position.custom;
         const { maxLineBreaks } = keyword;
         const reviewComments = [];
         let lineBreakCounter = 0;
@@ -224,6 +212,12 @@ class PositionedKeywordsRule extends BaseRule {
                 lineBreakCounter++;
 
                 continue;
+            }
+
+            if (matchedRow?.length) {
+                direction === 'above'
+                    ? (currentCustomPosition += matchedRow.length)
+                    : (currentCustomPosition -= matchedRow.length);
             }
 
             if (
@@ -430,7 +424,7 @@ class PositionedKeywordsRule extends BaseRule {
     }
 
     _correctPositionIndex(indexOfPosition, keyword, splitPatch, otherKeywords) {
-        const { BOF } = keyword;
+        const { BOF } = keyword.position;
 
         for (
             let index = indexOfPosition;
@@ -477,6 +471,12 @@ class PositionedKeywordsRule extends BaseRule {
                 recentRow = row;
             }
 
+            if (row?.length) {
+                keyword.position.BOF
+                    ? (positionIndex += row.length)
+                    : (positionIndex -= row.length);
+            }
+
             if (lineBreakCounter > maxLineBreaks) {
                 reviewComments.push(
                     this.getSingleLineComment(
@@ -507,7 +507,7 @@ class PositionedKeywordsRule extends BaseRule {
             }
 
             if (row.index !== positionIndex) {
-                keyword.BOF ? positionIndex++ : positionIndex--;
+                keyword.position.BOF ? positionIndex++ : positionIndex--;
 
                 lineBreakCounter++;
 
@@ -568,9 +568,32 @@ class PositionedKeywordsRule extends BaseRule {
                 continue;
             }
 
+            const content = matchResult[0].trim();
+
+            if (
+                keyword.multilineOptions?.length &&
+                this._isMultiline(keyword, content)
+            ) {
+                const multilineEndIndex = this._resolveMultilineMatch(
+                    keyword,
+                    splitPatch,
+                    index
+                );
+
+                matchedRows.push({
+                    index,
+                    content: splitPatch[multilineEndIndex].trim(),
+                    length: multilineEndIndex - index,
+                });
+
+                index = index + multilineEndIndex - 1;
+
+                continue;
+            }
+
             matchedRows.push({
                 index,
-                content: matchResult[0].trim(),
+                content,
             });
         }
 
@@ -580,25 +603,51 @@ class PositionedKeywordsRule extends BaseRule {
         };
     }
 
+    _isMultiline(keyword, line) {
+        const { multilineOptions } = keyword;
+
+        return !multilineOptions.some((option) => line.includes(option));
+    }
+
+    _getEndOfMultiline(keyword, splitPatch, currentIndex) {
+        let multilineEndIndex = -1;
+
+        for (let index = currentIndex + 1; index < splitPatch.length; index++) {
+            const row = splitPatch[index];
+
+            if (
+                !row.startsWith('-') &&
+                removeWhitespaces(row) !== '+' &&
+                !this._isMultiline(keyword, row)
+            ) {
+                multilineEndIndex = index;
+
+                break;
+            }
+        }
+
+        return multilineEndIndex;
+    }
+
     _getCommentBody(keyword, data) {
-        const { cause, position, enforced } = data;
+        const { cause, position: lineNumber, enforced } = data;
+
         const {
             name: keywordName,
-            position: customKeyword,
-            BOF,
+            position: keywordPosition,
             maxLineBreaks,
         } = keyword;
 
-        let reason = '/ undefined /';
+        let reason = '++ undefined ++';
 
         switch (cause) {
             case 'maxLineBreaks':
                 if (maxLineBreaks) {
-                    reason = `\`${keywordName}\` exceeded allowed spacing (${maxLineBreaks}) in relation to line: \`${position}\` ${
+                    reason = `\`${keywordName}\` exceeded allowed spacing (${maxLineBreaks}) in relation to line: \`${lineNumber}\` ${
                         enforced ? `(enforced)` : ``
                     }`;
                 } else {
-                    reason = `No spacing allowed between \`${keywordName}\` and line: \`${position}\` ${
+                    reason = `No spacing allowed between \`${keywordName}\` and line: \`${lineNumber}\` ${
                         enforced ? `(enforced)` : ``
                     }`;
                 }
@@ -607,26 +656,28 @@ class PositionedKeywordsRule extends BaseRule {
 
             case 'position':
             case 'wrongDirection':
-                if (customKeyword) {
+                if (keywordPosition.custom) {
+                    const customKeyword = keywordPosition.custom;
+
                     const expectedPosition = customKeyword.name?.length
                         ? customKeyword.name
-                        : customKeyword.regex;
+                        : customKeyword.expression;
 
                     reason = `\`${keywordName}\` should appear \`${
                         customKeyword.direction
                     }\` ${
                         enforced
-                            ? `line:\`${position}\` (enforced)`
-                            : `\`${expectedPosition}\` (line:\`${position}\`)`
+                            ? `line:\`${lineNumber}\` (enforced)`
+                            : `\`${expectedPosition}\` (line:\`${lineNumber}\`)`
                     }`;
                 } else {
                     reason = `\`${keywordName}\` should appear ${
                         enforced
-                            ? `below line:\`${position}\` (enforced)`
+                            ? `below line:\`${lineNumber}\` (enforced)`
                             : `at ${
-                                  BOF
-                                      ? `beginning (below line:\`${position}\`)`
-                                      : `end (under line:\`${position}\`)`
+                                  keywordPosition.BOF
+                                      ? `beginning (below line:\`${lineNumber}\`)`
+                                      : `end (under line:\`${lineNumber}\`)`
                               } of file`
                     }`;
                 }
