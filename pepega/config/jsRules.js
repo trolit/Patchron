@@ -43,12 +43,6 @@ module.exports = [
                     order: 'ascending',
                     ignoreNewline: false,
                 },
-                {
-                    name: 'const',
-                    regex: /const.*/,
-                    order: 'ascending',
-                    ignoreNewline: false,
-                },
             ],
         }),
     },
