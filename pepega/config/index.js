@@ -11,7 +11,7 @@ module.exports = {
     settings: {
         isGetFilesRequestPaginated: false,
         delayBetweenCommentRequestsInSeconds: 3,
-        isOwnerAssigningEnabled: true,
+        isOwnerAssigningEnabled: false,
         isReviewSummaryEnabled: false,
         maxCommentsPerReview: 50,
         senders: [],
