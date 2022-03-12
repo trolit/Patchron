@@ -53,6 +53,7 @@ module.exports = {
             }),
         },
         files: {
+            // TODO: applied across all files
             common: [],
             js,
             vue,
