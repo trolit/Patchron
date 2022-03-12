@@ -10,12 +10,20 @@ import test5 from 'test5';
 
 
 import test99 from 'test5';
-import test11 from 'test15';
+import 
+ { 
+  test11 
+ }
+from 'test15';
 
 import test4 from 'test53';
 
 
-
+import 
+ { 
+  test233
+ }
+from 'test15555';
 import test555 from 'test5333';
 
 export default() {
