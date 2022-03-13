@@ -33,7 +33,7 @@ const reviewPullRequest = require('./pepega/pull-request/review');
 const addPullSenderAsAssignee = require('./pepega/pull-request/addSenderAsAssignee');
 const { rules, settings } = require('./pepega/config');
 
-const postSummary = require('./pepega/pull-request/postSummary');
+const postSummary = require('./pepega/pull-request/postSummdwary');
 const printBotName = require('./pepega/helpers/printBotName');
 const postComments = require('./pepega/pull-request/postComments');
 
