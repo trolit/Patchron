@@ -40,6 +40,7 @@ module.exports = [
                 {
                     name: 'import',
                     regex: /import.*/,
+                    multilineOptions: ['from'],
                     order: 'ascending',
                     ignoreNewline: false,
                 },
@@ -59,7 +60,7 @@ module.exports = [
                         EOF: false,
                     },
                     maxLineBreaks: 1,
-                    enforced: false,
+                    enforced: true,
                     breakOnFirstOccurence: false,
                 },
             ],
