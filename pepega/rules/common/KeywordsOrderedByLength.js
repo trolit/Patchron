@@ -4,10 +4,6 @@ const getPosition = require('../../helpers/getPosition');
 const getLineNumber = require('../../helpers/getLineNumber');
 const ReviewCommentBuilder = require('../../builders/ReviewComment');
 
-const merge = '<<< merge >>>';
-const newLine = '<<< new line >>>';
-const customLines = [newLine, merge];
-
 class KeywordsOrderedByLengthRule extends BaseRule {
     /**
      * @param {object} config
@@ -45,10 +41,8 @@ class KeywordsOrderedByLengthRule extends BaseRule {
         let reviewComments = [];
 
         for (const keyword of keywords) {
-            const { matchedRows, unchangedRows } = this._setupData(
-                splitPatch,
-                keyword
-            );
+            const { matchedRows, unchangedRows } =
+                this.initializeRegexBasedData(splitPatch, keyword);
 
             if (matchedRows.length <= 1) {
                 continue;
@@ -77,49 +71,6 @@ class KeywordsOrderedByLengthRule extends BaseRule {
         return reviewComments;
     }
 
-    _setupData(splitPatch, keyword) {
-        let matchedRows = [];
-        let unchangedRows = [];
-
-        for (let rowIndex = 0; rowIndex < splitPatch.length; rowIndex++) {
-            const rowContent = splitPatch[rowIndex];
-
-            if (rowContent.trim().length === 0 || rowContent === '+') {
-                matchedRows.push({
-                    rowIndex,
-                    matchedContent: newLine,
-                });
-
-                continue;
-            } else if (rowContent.startsWith('-')) {
-                matchedRows.push({
-                    rowIndex,
-                    matchedContent: merge,
-                });
-
-                continue;
-            } else if (rowContent.startsWith(' ')) {
-                unchangedRows.push(rowIndex);
-            }
-
-            const matchResult = rowContent.match(keyword.regex);
-
-            if (!matchResult) {
-                continue;
-            }
-
-            matchedRows.push({
-                rowIndex,
-                matchedContent: matchResult[0].trim(),
-            });
-        }
-
-        return {
-            matchedRows,
-            unchangedRows,
-        };
-    }
-
     _reviewLinesOrderIgnoringNewline(file, keyword, baseArray) {
         let reviewComments = [];
 
@@ -140,7 +91,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
                 ) {
                     const sortedElement = sortedArray[sortedArrayIndex];
 
-                    if (baseElement.rowIndex === sortedElement.rowIndex) {
+                    if (baseElement.index === sortedElement.index) {
                         sortedArrayIndex++;
 
                         break;
@@ -148,7 +99,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
 
                     if (
                         this._hasCode(sortedElement) &&
-                        baseElement.rowIndex !== sortedElement.rowIndex
+                        baseElement.index !== sortedElement.index
                     ) {
                         const body = this._getCommentBody(keyword);
 
@@ -156,7 +107,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
                             this.getSingleLineComment(
                                 file,
                                 body,
-                                baseElement.rowIndex
+                                baseElement.index
                             )
                         );
 
@@ -176,18 +127,17 @@ class KeywordsOrderedByLengthRule extends BaseRule {
 
         const firstElement = baseArray[0];
 
-        let previousRowIndex = firstElement.rowIndex;
+        let previousIndex = firstElement.index;
 
         let group = [firstElement];
 
         let isEndOfGroup = false;
 
         for (let index = 1; index < baseArray.length; index++) {
-            const { rowIndex: currentRowIndex, matchedContent: content } =
-                baseArray[index];
+            const { index: currentIndex, content } = baseArray[index];
 
-            if (previousRowIndex + 1 === currentRowIndex) {
-                if (content === newLine) {
+            if (previousIndex + 1 === currentIndex) {
+                if (content === this.newLine) {
                     isEndOfGroup = true;
                 } else {
                     group.push(baseArray[index]);
@@ -195,7 +145,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
                     isEndOfGroup = index === baseArray.length - 1;
                 }
             } else {
-                if (group.length > 1 || content === newLine) {
+                if (group.length > 1 || content === this.newLine) {
                     isEndOfGroup = true;
                 }
             }
@@ -208,7 +158,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
                 group = [baseArray[index]];
             }
 
-            previousRowIndex = currentRowIndex;
+            previousIndex = currentIndex;
         }
 
         return reviewComments;
@@ -222,11 +172,10 @@ class KeywordsOrderedByLengthRule extends BaseRule {
     }
 
     _sortArray(keyword, array) {
-        return [...array].sort(
-            ({ matchedContent: element1 }, { matchedContent: element2 }) =>
-                keyword.order === 'ascending'
-                    ? element1.length - element2.length
-                    : element2.length - element1.length
+        return [...array].sort(({ content: element1 }, { content: element2 }) =>
+            keyword.order === 'ascending'
+                ? element1.length - element2.length
+                : element2.length - element1.length
         );
     }
 
@@ -237,7 +186,11 @@ class KeywordsOrderedByLengthRule extends BaseRule {
         for (let index = startFrom; index < group.length; index++) {
             const groupElement = group[index];
 
-            if (unchangedRows.includes(groupElement.rowIndex)) {
+            if (
+                unchangedRows.some(
+                    (unchangedRow) => unchangedRow.index === groupElement.index
+                )
+            ) {
                 indexOfUnchangedRow = index;
                 break;
             }
@@ -280,11 +233,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
                         const body = this._getCommentBody(keyword);
 
                         reviewComments.push(
-                            this.getSingleLineComment(
-                                file,
-                                body,
-                                element.rowIndex
-                            )
+                            this.getSingleLineComment(file, body, element.index)
                         );
                     } else {
                         reviewComments.push(
@@ -326,7 +275,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
         );
 
         for (let index = 0; index < group.length; index++) {
-            if (group[index].rowIndex !== sortedGroup[index].rowIndex) {
+            if (group[index].index !== sortedGroup[index].index) {
                 isProperlyOrdered = false;
 
                 break;
@@ -347,7 +296,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
         slicedGroup = slicedGroup.filter((element) => this._hasCode(element));
 
         const indexOfFirstOccurence = sortedGroup.findIndex(
-            (element) => element.rowIndex === slicedGroup[0].rowIndex
+            (element) => element.index === slicedGroup[0].index
         );
 
         if (indexOfFirstOccurence >= 0) {
@@ -358,8 +307,8 @@ class KeywordsOrderedByLengthRule extends BaseRule {
                 sortedGroupIndex++, slicedGroupIndex++
             ) {
                 if (
-                    slicedGroup[slicedGroupIndex].rowIndex !==
-                    sortedGroup[sortedGroupIndex].rowIndex
+                    slicedGroup[slicedGroupIndex].index !==
+                    sortedGroup[sortedGroupIndex].index
                 ) {
                     isProperlyOrdered = false;
                     break;
@@ -371,19 +320,19 @@ class KeywordsOrderedByLengthRule extends BaseRule {
     }
 
     _getMultiLineComment(file, keyword, group) {
-        const { rowIndex: firstRowIndex } = group.find(
-            (element) => element.matchedContent !== newLine
+        const { index: firstIndex } = group.find(
+            (element) => element.content !== this.newLine
         );
 
-        const { rowIndex: lastRowIndex } = group
+        const { index: lastIndex } = group
             .reverse()
             .find((element) => this._hasCode(element));
 
         const { split_patch: splitPatch } = file;
 
-        const start_line = getLineNumber(splitPatch, 'right', firstRowIndex);
+        const start_line = getLineNumber(splitPatch, 'right', firstIndex);
 
-        const position = getPosition(splitPatch, lastRowIndex);
+        const position = getPosition(splitPatch, lastIndex);
 
         const reviewCommentBuilder = new ReviewCommentBuilder(file);
 
@@ -398,7 +347,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
     }
 
     _hasCode(element) {
-        return !customLines.includes(element.matchedContent);
+        return !this.customLines.includes(element.content);
     }
 
     _getCommentBody(keyword) {
