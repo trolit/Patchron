@@ -34,7 +34,7 @@ module.exports = [
         }),
     },
     {
-        enabled: false,
+        enabled: true,
         instance: new keywordsOrderedByLength({
             keywords: [
                 {
@@ -47,15 +47,17 @@ module.exports = [
         }),
     },
     {
-        enabled: true,
+        enabled: false,
         instance: new PositionedKeywords({
             keywords: [
                 {
                     name: 'const',
                     regex: /const.*/,
-                    position: null,
-                    BOF: true,
-                    EOF: false,
+                    position: {
+                        custom: null,
+                        BOF: true,
+                        EOF: false,
+                    },
                     maxLineBreaks: 1,
                     enforced: false,
                     breakOnFirstOccurence: false,
