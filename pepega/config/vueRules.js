@@ -5,28 +5,21 @@ module.exports = [
         enabled: true,
         instance: new PositionedKeywords({
             keywords: [
-                // {
-                //     name: 'import',
-                //     regex: /import.*/,
-                //     position: null,
-                //     BOF: false,
-                //     EOF: true,
-                //     maxLineBreaks: 2,
-                //     enforced: false,
-                //     breakOnFirstOccurence: false,
-                // },
                 {
                     name: 'import',
                     regex: /import.*/,
+                    multilineOptions: ['from'],
                     position: {
-                        name: '<script>',
-                        regex: /<script>/,
-                        direction: 'below',
+                        custom: {
+                            name: '<script>',
+                            expression: /<script>/,
+                            direction: 'below',
+                        },
+                        BOF: false,
+                        EOF: false,
                     },
-                    BOF: false,
-                    EOF: false,
-                    maxLineBreaks: 2,
-                    enforced: false,
+                    maxLineBreaks: 0,
+                    enforced: true,
                     breakOnFirstOccurence: false,
                 },
             ],

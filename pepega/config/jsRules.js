@@ -34,18 +34,13 @@ module.exports = [
         }),
     },
     {
-        enabled: false,
+        enabled: true,
         instance: new keywordsOrderedByLength({
             keywords: [
                 {
                     name: 'import',
                     regex: /import.*/,
-                    order: 'ascending',
-                    ignoreNewline: false,
-                },
-                {
-                    name: 'const',
-                    regex: /const.*/,
+                    multilineOptions: ['from'],
                     order: 'ascending',
                     ignoreNewline: false,
                 },
@@ -53,17 +48,20 @@ module.exports = [
         }),
     },
     {
-        enabled: true,
+        enabled: false,
         instance: new PositionedKeywords({
             keywords: [
                 {
                     name: 'const',
-                    regex: /const.*/,
-                    position: null,
-                    BOF: true,
-                    EOF: false,
+                    regex: /const.*require.*/,
+                    multilineOptions: ['require'],
+                    position: {
+                        custom: null,
+                        BOF: true,
+                        EOF: false,
+                    },
                     maxLineBreaks: 1,
-                    enforced: false,
+                    enforced: true,
                     breakOnFirstOccurence: false,
                 },
             ],

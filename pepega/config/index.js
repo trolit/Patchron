@@ -11,7 +11,7 @@ module.exports = {
     settings: {
         isGetFilesRequestPaginated: false,
         delayBetweenCommentRequestsInSeconds: 3,
-        isOwnerAssigningEnabled: true,
+        isOwnerAssigningEnabled: false,
         isReviewSummaryEnabled: false,
         maxCommentsPerReview: 50,
         senders: [],
@@ -53,6 +53,7 @@ module.exports = {
             }),
         },
         files: {
+            // TODO: applied across all files
             common: [],
             js,
             vue,

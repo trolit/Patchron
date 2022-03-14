@@ -100,14 +100,14 @@ module.exports = (app) => {
                 //     );
                 // }
 
-                // if (isReviewSummaryEnabled) {
-                //     postSummary(
-                //         context,
-                //         successfullyPostedComments,
-                //         reviewComments,
-                //         payload
-                //     );
-                // }
+                if (isReviewSummaryEnabled) {
+                    postSummary(
+                        context,
+                        successfullyPostedComments,
+                        reviewComments,
+                        payload
+                    );
+                }
             } catch (error) {
                 app.log.error(error);
             }
