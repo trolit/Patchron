@@ -155,6 +155,10 @@ class KeywordsOrderedByLengthRule extends BaseRule {
                     ...this._reviewGroup(file, keyword, group, unchangedRows)
                 );
 
+                while (this.customLines.includes(baseArray[index].content)) {
+                    index++;
+                }
+
                 group = [baseArray[index]];
             }
 
