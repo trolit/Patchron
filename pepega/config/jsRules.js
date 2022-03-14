@@ -53,7 +53,8 @@ module.exports = [
             keywords: [
                 {
                     name: 'const',
-                    regex: /const.*/,
+                    regex: /const.*require.*/,
+                    multilineOptions: ['require'],
                     position: {
                         custom: null,
                         BOF: true,
