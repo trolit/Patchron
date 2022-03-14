@@ -80,9 +80,15 @@ class BaseRule {
                     index
                 );
 
+                let content = splitPatch[multilineEndIndex].trim();
+
+                if (content.startsWith('+')) {
+                    content = content.slice(1);
+                }
+
                 matchedRows.push({
                     index,
-                    content: splitPatch[multilineEndIndex].trim(),
+                    content,
                     length: multilineEndIndex - index,
                 });
 
