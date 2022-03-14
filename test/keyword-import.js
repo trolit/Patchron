@@ -7,7 +7,10 @@ import something3 from '@/test/folder1/mySomething';
 
 import something4 from '@/wpw/foaa/eeee';
 
-import something555 from 'test1/wrz/teeeeeeee';
+import { 
+    somethi22ng2,
+    233
+} from '@/3test/folder2/mySomething155';
 
 module.exports = () => {
     // TODO: some code1
