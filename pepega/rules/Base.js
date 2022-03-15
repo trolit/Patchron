@@ -1,3 +1,4 @@
+const getPosition = require('../helpers/getPosition');
 const getLineNumber = require('../helpers/getLineNumber');
 const ReviewCommentBuilder = require('../builders/ReviewComment');
 const removeWhitespaces = require('../helpers/removeWhitespaces');
@@ -15,10 +16,10 @@ class BaseRule {
     /**
      * @returns {object}
      */
-    getSingleLineComment(file, body, rowIndex, side = 'RIGHT') {
+    getSingleLineComment(file, body, index, side = 'RIGHT') {
         const { split_patch: splitPatch } = file;
 
-        const line = getLineNumber(splitPatch, 'right', rowIndex);
+        const line = getLineNumber(splitPatch, side, index);
 
         const reviewCommentBuilder = new ReviewCommentBuilder(file);
 
@@ -32,7 +33,30 @@ class BaseRule {
     }
 
     /**
-     * dad
+     * @returns {object}
+     */
+    getMultilineComment({ file, body, from, to, side = 'RIGHT' }) {
+        const { split_patch: splitPatch } = file;
+
+        const start_line = getLineNumber(splitPatch, side, from);
+
+        const position = getPosition(splitPatch, to);
+
+        const reviewCommentBuilder = new ReviewCommentBuilder(file);
+
+        const comment = reviewCommentBuilder.buildMultiLineComment({
+            body,
+            start_line,
+            start_side: side,
+            position,
+        });
+
+        return comment;
+    }
+
+    /**
+     * Prepares data for keyword that makes use of regular expression.
+     * Translates line breaks into "newLine" and deleted lines into "merge".
      */
     initializeRegexBasedData(splitPatch, keyword) {
         let matchedRows = [];
@@ -71,7 +95,7 @@ class BaseRule {
             const content = matchResult[0].trim();
 
             if (
-                keyword?.multilineOptions?.length &&
+                keyword?.multilineOptions &&
                 this._isMultiline(keyword, content)
             ) {
                 const multilineEndIndex = this._resolveMultilineMatch(
