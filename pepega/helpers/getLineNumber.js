@@ -24,16 +24,16 @@ const getNearestHunkHeader = require('./getNearestHunkHeader');
  *
  * @returns {number}
  */
-module.exports = (content, side = 'right', rowIndex) => {
+module.exports = (content, side = 'RIGHT', rowIndex) => {
     const {
         index: nearestHunkHeaderIndex,
         modifiedFile,
         sourceFile,
     } = getNearestHunkHeader(content, rowIndex);
 
-    let counter = side === 'right' ? modifiedFile.line : sourceFile.line;
+    let counter = side === 'RIGHT' ? modifiedFile.line : sourceFile.line;
 
-    const prefixToIgnore = side === 'right' ? '-' : '+';
+    const prefixToIgnore = side === 'RIGHT' ? '-' : '+';
 
     if (nearestHunkHeaderIndex === rowIndex) {
         return counter;
