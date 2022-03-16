@@ -160,8 +160,8 @@ class KeywordsOrderedByLengthRule extends BaseRule {
     }
 
     _sortMatchedRows(matchedRows, keyword) {
-        const customLines = this.customLines;
         const { order } = keyword;
+        const customLines = this.customLines;
 
         return [...matchedRows].sort((firstRow, secondRow) => {
             const { content: firstRowContent } = firstRow;
@@ -193,8 +193,8 @@ class KeywordsOrderedByLengthRule extends BaseRule {
     }
 
     _splitMatchedRowsIntoGroups(matchedRows) {
-        let result = [];
         let index = 0;
+        let result = [];
 
         while (index < matchedRows.length) {
             let group = [];
