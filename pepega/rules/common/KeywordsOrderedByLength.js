@@ -9,10 +9,10 @@ class KeywordsOrderedByLengthRule extends BaseRule {
      * @param {object} config.keywords[].regex - regular expression to match line with keyword
      * @param {string} config.keywords[].order - ascending/descending
      * @param {string} config.keywords[].ignoreNewline - when set to 'true' **(not recommended)**, rule is tested against all keywords
-     * matched in file and when 'false' **(recommended)**, only adjacent ones.
+     * matched in given data and when 'false' **(recommended)**, only adjacent ones.
      *
      * e.g. when keywords are at lines: 0, 1, 2, 5, 6, 10, 'false' makes that rule apply only across group:
-     * [0, 1, 2] and [5, 6]).
+     * [0, 1, 2] and [5, 6].
      */
     constructor(config) {
         super();
