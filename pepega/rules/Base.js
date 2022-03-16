@@ -16,7 +16,7 @@ class BaseRule {
     /**
      * @returns {object}
      */
-    getSingleLineComment(file, body, index, side = 'RIGHT') {
+    getSingleLineComment({ file, body, index, side = 'RIGHT' }) {
         const { split_patch: splitPatch } = file;
 
         const line = getLineNumber(splitPatch, side, index);
