@@ -35,7 +35,7 @@ class BaseRule {
     /**
      * @returns {object}
      */
-    getMultilineComment({ file, body, from, to, side = 'RIGHT' }) {
+    getMultiLineComment({ file, body, from, to, side = 'RIGHT' }) {
         const { split_patch: splitPatch } = file;
 
         const start_line = getLineNumber(splitPatch, side, from);

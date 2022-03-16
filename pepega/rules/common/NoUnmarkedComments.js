@@ -236,7 +236,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
             }
         }
 
-        const comment = this.getMultilineComment({
+        const comment = this.getMultiLineComment({
             file,
             body: this.body,
             from: start_line,

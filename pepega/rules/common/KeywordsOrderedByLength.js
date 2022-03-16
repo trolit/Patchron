@@ -137,7 +137,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
                     const { index: lastElementIndex } = rowsWithCode.pop();
 
                     reviewComments.push(
-                        this.getMultilineComment({
+                        this.getMultiLineComment({
                             ...data,
                             body: this._getCommentBody(keyword),
                             from: firstElementIndex,
