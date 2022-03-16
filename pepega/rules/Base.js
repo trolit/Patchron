@@ -55,8 +55,8 @@ class BaseRule {
     }
 
     /**
-     * Prepares data for keyword that makes use of regular expression.
-     * Translates line breaks into "newLine" and deleted lines into "merge".
+     * Prepares data for keyword that makes use of regular expression to match
+     * rows. Translates line breaks into "newLine" and deleted lines into "merge".
      */
     initializeRegexBasedData(splitPatch, keyword) {
         let matchedRows = [];
