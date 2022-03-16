@@ -29,7 +29,7 @@ module.exports = async (
     for (let i = 0; i < reviewComments.length; i++) {
         if (numberOfPostedComments >= maxCommentsPerReview) {
             probotInstance.log.warn(
-                'Did not post more comments due to limit reach.'
+                `Did not post more comments due to limit reach (${maxCommentsPerReview}).`
             );
 
             break;
