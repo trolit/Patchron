@@ -130,7 +130,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
 
                 if (sortedGroupElement.index !== groupElement.index) {
                     const rowsWithCode = group.filter(
-                        (element) => element.content !== this.merge
+                        ({ content }) => content !== this.merge
                     );
 
                     const { index: firstElementIndex } = rowsWithCode[0];
@@ -229,7 +229,9 @@ class KeywordsOrderedByLengthRule extends BaseRule {
     }
 
     _getCommentBody(keyword) {
-        const commentBody = `Keep \`${keyword.order}\` order for keyword: \`${keyword.name}\``;
+        const { order, name } = keyword;
+
+        const commentBody = `Keep \`${order}\` order for keyword: \`${name}\``;
 
         return dedent(commentBody);
     }
