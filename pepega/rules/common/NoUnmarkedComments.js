@@ -2,7 +2,6 @@ const BaseRule = require('../Base');
 const dedent = require('dedent-js');
 const getLineNumber = require('../../helpers/getLineNumber');
 const removeWhitespaces = require('../../helpers/removeWhitespaces');
-const ReviewCommentBuilder = require('../../builders/ReviewComment');
 
 class NoUnmarkedCommentsRule extends BaseRule {
     constructor(config) {
@@ -48,7 +47,11 @@ class NoUnmarkedCommentsRule extends BaseRule {
                 this._isInvalidSingleLineComment(minifiedRowContent)
             ) {
                 unmarkedComments.push(
-                    this.getSingleLineComment(file, this.body, rowIndex)
+                    this.getSingleLineComment({
+                        file,
+                        body: this.body,
+                        index: rowIndex,
+                    })
                 );
 
                 continue;
@@ -78,7 +81,11 @@ class NoUnmarkedCommentsRule extends BaseRule {
                 } else {
                     if (!this._isValidMultiLineComment(minifiedRowContent)) {
                         unmarkedComments.push(
-                            this.getSingleLineComment(file, this.body, rowIndex)
+                            this.getSingleLineComment({
+                                file,
+                                body: this.body,
+                                index: rowIndex,
+                            })
                         );
                     }
                 }
@@ -91,7 +98,11 @@ class NoUnmarkedCommentsRule extends BaseRule {
                 this._isInvalidInlineComment(minifiedRowContent)
             ) {
                 unmarkedComments.push(
-                    this.getSingleLineComment(file, this.body, rowIndex)
+                    this.getSingleLineComment({
+                        file,
+                        body: this.body,
+                        index: rowIndex,
+                    })
                 );
 
                 continue;
@@ -225,13 +236,11 @@ class NoUnmarkedCommentsRule extends BaseRule {
             }
         }
 
-        const reviewCommentBuilder = new ReviewCommentBuilder(file);
-
-        const comment = reviewCommentBuilder.buildMultiLineComment({
+        const comment = this.getMultilineComment({
+            file,
             body: this.body,
-            start_line,
-            start_side: 'RIGHT',
-            position,
+            from: start_line,
+            to: position,
         });
 
         return {
