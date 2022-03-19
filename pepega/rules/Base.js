@@ -11,6 +11,14 @@ class BaseRule {
         this.merge = merge;
         this.newLine = newLine;
         this.customLines = [newLine, merge];
+
+        const added = '+';
+        const deleted = '-';
+        const unchanged = ' ';
+
+        this.added = added;
+        this.deleted = deleted;
+        this.unchanged = unchanged;
     }
 
     /**
@@ -131,6 +139,14 @@ class BaseRule {
             matchedRows,
             unchangedRows,
         };
+    }
+
+    getRawContent(content) {
+        if (content.startsWith(this.unchanged)) {
+            return content.trim();
+        }
+
+        return content.slice(1).trim();
     }
 
     _isMultiline(keyword, line) {
