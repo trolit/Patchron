@@ -11,6 +11,14 @@ class BaseRule {
         this.merge = merge;
         this.newLine = newLine;
         this.customLines = [newLine, merge];
+
+        const added = '+';
+        const deleted = '-';
+        const unchanged = ' ';
+
+        this.added = added;
+        this.deleted = deleted;
+        this.unchanged = unchanged;
     }
 
     /**
@@ -104,15 +112,13 @@ class BaseRule {
                     index
                 );
 
-                let content = splitPatch[multilineEndIndex].trim();
-
-                if (content.startsWith('+')) {
-                    content = content.slice(1);
-                }
+                const rawContent = this.getRawContent(
+                    splitPatch[multilineEndIndex]
+                );
 
                 matchedRows.push({
                     index,
-                    content,
+                    content: rawContent,
                     length: multilineEndIndex - index,
                 });
 
@@ -131,6 +137,17 @@ class BaseRule {
             matchedRows,
             unchangedRows,
         };
+    }
+
+    /**
+     * Removes from row character that indicates line state (added, deleted, unchanged)
+     */
+    getRawContent(content) {
+        if (content.startsWith(this.unchanged)) {
+            return content.trim();
+        }
+
+        return content.slice(1).trim();
     }
 
     _isMultiline(keyword, line) {
