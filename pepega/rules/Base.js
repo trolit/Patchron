@@ -141,6 +141,9 @@ class BaseRule {
         };
     }
 
+    /**
+     * Removes from row character that indicates line state (added, deleted, unchanged)
+     */
     getRawContent(content) {
         if (content.startsWith(this.unchanged)) {
             return content.trim();
