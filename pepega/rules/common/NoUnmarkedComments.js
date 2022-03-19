@@ -1,6 +1,5 @@
 const BaseRule = require('../Base');
 const dedent = require('dedent-js');
-const removeWhitespaces = require('../../helpers/removeWhitespaces');
 
 class NoUnmarkedCommentsRule extends BaseRule {
     constructor(config) {
@@ -17,8 +16,6 @@ class NoUnmarkedCommentsRule extends BaseRule {
         this.isAppliedToSingleLineComments = isAppliedToSingleLineComments;
         this.isAppliedToMultiLineComments = isAppliedToMultiLineComments;
         this.isAppliedToInlineComments = isAppliedToInlineComments;
-
-        this.body = this._getCommentBody();
     }
 
     invoke(file) {
@@ -47,7 +44,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
                     unmarkedComments.push(
                         this.getSingleLineComment({
                             file,
-                            body: this.body,
+                            body: this._getCommentBody(),
                             index,
                         })
                     );
@@ -61,7 +58,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
                     unmarkedComments.push(
                         this.getSingleLineComment({
                             file,
-                            body: this.body,
+                            body: this._getCommentBody(),
                             index,
                         })
                     );
@@ -75,7 +72,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
                     unmarkedComments.push(
                         this.getMultiLineComment({
                             file,
-                            body: this.body,
+                            body: this._getCommentBody(true),
                             from: index,
                             to: result.endIndex,
                         })
@@ -126,7 +123,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
         ) {
             comment = this.getSingleLineComment({
                 file,
-                body: this.body,
+                body: this._getCommentBody(),
                 index,
             });
         } else if (!this._startsWithPrefix(result)) {
@@ -135,7 +132,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
             if (!result.hasValidPrefix) {
                 comment = this.getMultiLineComment({
                     file,
-                    body: this.body,
+                    body: this._getCommentBody(true),
                     from: index,
                     to: result.endIndex,
                 });
@@ -207,7 +204,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
         );
     }
 
-    _getCommentBody() {
+    _getCommentBody(isMultiLine = false) {
         let formattedPrefixes = '';
 
         this.prefixes.forEach((prefix) => {
@@ -215,7 +212,9 @@ class NoUnmarkedCommentsRule extends BaseRule {
             - \` ${prefix.value} \` (${prefix.meaning})`;
         });
 
-        const commentBody = `Comment should have at least one occurence of the predefined prefixes.
+        const reason = isMultiLine ? 'start with one' : 'contain one';
+
+        const commentBody = `Comment should ${reason} of the predefined prefixes.
          
         <details>
             <summary> List of allowed prefixes </summary> \n\n${dedent(
