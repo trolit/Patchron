@@ -215,7 +215,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
             - \` ${prefix.value} \` (${prefix.meaning})`;
         });
 
-        const commentBody = `Comment should have at least one of predefined prefixes.
+        const commentBody = `Comment should have at least one occurence of the predefined prefixes.
          
         <details>
             <summary> List of allowed prefixes </summary> \n\n${dedent(
@@ -224,53 +224,6 @@ class NoUnmarkedCommentsRule extends BaseRule {
         </details>`;
 
         return dedent(commentBody);
-    }
-
-    _resolveMultiLineComment(rowIndex, splitPatch) {
-        let isValid = false;
-        let wasAnyInvalidLineFound = false;
-        let lastIndex = rowIndex;
-
-        for (let i = rowIndex; i < splitPatch.length; i++) {
-            const minifiedRowContent = removeWhitespaces(splitPatch[i]);
-
-            if (
-                !wasAnyInvalidLineFound &&
-                minifiedRowContent.startsWith('+*/') &&
-                minifiedRowContent.length > 4
-            ) {
-                isValid = this._isValidMultiLineComment(minifiedRowContent);
-
-                if (!isValid) {
-                    wasAnyInvalidLineFound = true;
-                }
-            } else if (minifiedRowContent.startsWith('+*/')) {
-                lastIndex = i;
-
-                break;
-            } else if (
-                !wasAnyInvalidLineFound &&
-                i === rowIndex &&
-                minifiedRowContent.length > 4
-            ) {
-                isValid = this._isValidMultiLineComment(minifiedRowContent);
-
-                if (!isValid) {
-                    wasAnyInvalidLineFound = true;
-                }
-            } else if (minifiedRowContent.startsWith('+*')) {
-                isValid = this._isValidMultiLineComment(minifiedRowContent);
-
-                if (!isValid) {
-                    wasAnyInvalidLineFound = true;
-                }
-            }
-        }
-
-        return {
-            lastIndex,
-            wasAnyInvalidLineFound,
-        };
     }
 }
 
