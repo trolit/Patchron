@@ -112,11 +112,9 @@ class BaseRule {
                     index
                 );
 
-                let content = splitPatch[multilineEndIndex].trim();
-
-                if (content.startsWith('+')) {
-                    content = content.slice(1);
-                }
+                const content = this.getRawContent(
+                    splitPatch[multilineEndIndex]
+                );
 
                 matchedRows.push({
                     index,
