@@ -118,7 +118,7 @@ class BaseRule {
 
                 matchedRows.push({
                     index,
-                    rawContent,
+                    content: rawContent,
                     length: multilineEndIndex - index,
                 });
 
