@@ -167,7 +167,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
         let endIndex = null;
 
         for (
-            let index = multiLineStartIndex + 1;
+            let index = multiLineStartIndex;
             index < splitPatch.length;
             index++
         ) {
