@@ -1,6 +1,5 @@
 const BaseRule = require('../Base');
 const dedent = require('dedent-js');
-const getLineNumber = require('../../helpers/getLineNumber');
 const removeWhitespaces = require('../../helpers/removeWhitespaces');
 
 class NoUnmarkedCommentsRule extends BaseRule {
@@ -34,60 +33,55 @@ class NoUnmarkedCommentsRule extends BaseRule {
         const { split_patch: splitPatch } = file;
         let unmarkedComments = [];
 
-        for (let rowIndex = 0; rowIndex < splitPatch.length; rowIndex++) {
-            const rowContent = splitPatch[rowIndex];
-            const minifiedRowContent = removeWhitespaces(rowContent);
+        for (let index = 0; index < splitPatch.length; index++) {
+            const row = splitPatch[index];
 
-            if (!minifiedRowContent.startsWith('+')) {
+            if (row.startsWith(this.deleted)) {
                 continue;
             }
 
-            if (
-                this.isAppliedToSingleLineComments &&
-                this._isInvalidSingleLineComment(minifiedRowContent)
-            ) {
-                unmarkedComments.push(
-                    this.getSingleLineComment({
-                        file,
-                        body: this.body,
-                        index: rowIndex,
-                    })
-                );
+            const rawRow = this.getRawContent(row);
 
-                continue;
-            }
-
-            if (
-                this.isAppliedToMultiLineComments &&
-                this._isMultiLineComment(minifiedRowContent)
-            ) {
-                if (
-                    minifiedRowContent.startsWith('+/*') &&
-                    !minifiedRowContent.endsWith('*/')
-                ) {
-                    const { wasAnyInvalidLineFound, lastIndex } =
-                        this._resolveMultiLineComment(rowIndex, splitPatch);
-
-                    if (wasAnyInvalidLineFound) {
-                        const multiLineComment = this._getMultiLineComment(
+            if (this.isAppliedToSingleLineComments && rawRow.startsWith('//')) {
+                if (!this._startsWithPrefix(rawRow)) {
+                    unmarkedComments.push(
+                        this.getSingleLineComment({
                             file,
-                            rowIndex
-                        );
+                            body: this.body,
+                            index,
+                        })
+                    );
+                }
 
-                        unmarkedComments.push(multiLineComment.comment);
-                    }
+                continue;
+            }
 
-                    rowIndex = lastIndex;
-                } else {
-                    if (!this._isValidMultiLineComment(minifiedRowContent)) {
-                        unmarkedComments.push(
-                            this.getSingleLineComment({
-                                file,
-                                body: this.body,
-                                index: rowIndex,
-                            })
-                        );
-                    }
+            if (this.isAppliedToMultiLineComments && rawRow.startsWith('/*')) {
+                if (rawRow.includes('*/') && !this._startsWithPrefix(rawRow)) {
+                    unmarkedComments.push(
+                        this.getSingleLineComment({
+                            file,
+                            body: this.body,
+                            index,
+                        })
+                    );
+
+                    continue;
+                }
+
+                const result = this._verifyMultiLineComment(splitPatch, index);
+
+                if (!result.hasValidPrefix) {
+                    unmarkedComments.push(
+                        this.getMultiLineComment({
+                            file,
+                            body: this.body,
+                            from: index,
+                            to: result.endIndex,
+                        })
+                    );
+
+                    index = result.endIndex;
                 }
 
                 continue;
@@ -95,21 +89,123 @@ class NoUnmarkedCommentsRule extends BaseRule {
 
             if (
                 this.isAppliedToInlineComments &&
-                this._isInvalidInlineComment(minifiedRowContent)
+                (rawRow.includes('//') || rawRow.includes('/*'))
             ) {
-                unmarkedComments.push(
-                    this.getSingleLineComment({
-                        file,
-                        body: this.body,
-                        index: rowIndex,
-                    })
-                );
+                const comment = this._resolveInlineComment(file, index, rawRow);
 
-                continue;
+                if (comment) {
+                    unmarkedComments.push(comment);
+
+                    comment?.to ? (index = comment.to) : null;
+                }
             }
         }
 
         return unmarkedComments;
+    }
+
+    _resolveInlineComment(file, index, rawRow) {
+        const commentInString = this._findCommentInString(rawRow);
+        const { split_patch: splitPatch } = file;
+        let clearedRow = rawRow;
+        let comment = null;
+
+        if (commentInString) {
+            clearedRow = clearedRow.replace(commentInString, '');
+        }
+
+        const result = this._matchInlineComment(clearedRow);
+
+        if (!result) {
+            return comment;
+        }
+
+        console.log('INLINE!!!');
+        console.log(result);
+
+        if (
+            (result.startsWith('//') || result.endsWith('*/')) &&
+            !this._startsWithPrefix(result)
+        ) {
+            comment = this.getSingleLineComment({
+                file,
+                body: this.body,
+                index,
+            });
+        } else if (!this._startsWithPrefix(result)) {
+            const result = this._verifyMultiLineComment(splitPatch, index);
+
+            if (!result.hasValidPrefix) {
+                comment = this.getMultiLineComment({
+                    file,
+                    body: this.body,
+                    from: index,
+                    to: result.endIndex,
+                });
+            }
+        }
+
+        return comment;
+    }
+
+    _verifyMultiLineComment(splitPatch, multiLineStartIndex) {
+        let hasValidPrefix = false;
+        let endIndex = null;
+
+        console.log('multiline verification');
+        console.log('start -> ', multiLineStartIndex);
+
+        for (
+            let index = multiLineStartIndex + 1;
+            index < splitPatch.length;
+            index++
+        ) {
+            const row = splitPatch[index];
+
+            const result = this._matchMultiLineComment(row);
+
+            if (result && !hasValidPrefix && this._startsWithPrefix(result)) {
+                hasValidPrefix = true;
+            }
+
+            if (row.includes('*/')) {
+                endIndex = index;
+
+                break;
+            }
+        }
+
+        console.log('result!');
+        console.log(endIndex);
+
+        return {
+            hasValidPrefix,
+            endIndex,
+        };
+    }
+
+    _startsWithPrefix(row) {
+        const fixedRow = row.replace(/\/\/|\*|\/\*/, '').trim();
+
+        return this.prefixes.some(({ value }) => fixedRow.startsWith(value));
+    }
+
+    _findCommentInString(row) {
+        const result = row.match(/["|'|`].*[(//)|(/*)].*["|'|`]/);
+
+        return result ? result[0] : null;
+    }
+
+    _matchInlineComment(row) {
+        const result = row.match(/[//|/*].*/);
+
+        return result ? result[0].trim() : null;
+    }
+
+    _matchMultiLineComment(row) {
+        const result = row.match(/[*|/*|].*/);
+
+        return result ? result[0].trim() : null;
     }
 
     _hasInvalidConfig() {
@@ -120,135 +216,6 @@ class NoUnmarkedCommentsRule extends BaseRule {
         );
     }
 
-    _isInvalidSingleLineComment(minifiedRowContent) {
-        return (
-            this._isSingleLineComment(minifiedRowContent) &&
-            !this._isValidSingleLineComment(minifiedRowContent)
-        );
-    }
-
-    _isInvalidInlineComment(minifiedRowContent) {
-        return (
-            this._isInlineComment(minifiedRowContent) &&
-            !this._isValidInlineComment(minifiedRowContent)
-        );
-    }
-
-    _isSingleLineComment(minifiedRowContent) {
-        return minifiedRowContent.startsWith('+//');
-    }
-
-    _isInlineComment(minifiedRowContent) {
-        return (
-            minifiedRowContent.includes('//') ||
-            minifiedRowContent.includes('/*')
-        );
-    }
-
-    _isMultiLineComment(minifiedRowContent) {
-        return (
-            minifiedRowContent.startsWith('+/*') ||
-            minifiedRowContent.startsWith('+*')
-        );
-    }
-
-    _isValidSingleLineComment(minifiedRowContent) {
-        let isWithPrefix = false;
-
-        for (const prefix in this.prefixes) {
-            const prefixValue = this.prefixes[prefix].value;
-
-            if (minifiedRowContent.startsWith(`+//${prefixValue}`)) {
-                isWithPrefix = true;
-                break;
-            }
-        }
-
-        return isWithPrefix;
-    }
-
-    _isValidInlineComment(rowContent) {
-        const splitRowContent = rowContent.split(/"|'|`/);
-
-        const lastRow = splitRowContent[splitRowContent.length - 1];
-
-        const nearestCommentSymbolMatch = lastRow.match(/(\/\/|\/\*)/);
-
-        let isWithPrefix = false;
-
-        if (!nearestCommentSymbolMatch) {
-            return isWithPrefix;
-        }
-
-        const lastRowFragment = removeWhitespaces(
-            lastRow.substring(nearestCommentSymbolMatch.index)
-        );
-
-        for (const prefix in this.prefixes) {
-            const prefixValue = this.prefixes[prefix].value;
-
-            if (
-                lastRowFragment.startsWith(`//${prefixValue}`) ||
-                lastRowFragment.startsWith(`/*${prefixValue}`)
-            ) {
-                isWithPrefix = true;
-
-                break;
-            }
-        }
-
-        return isWithPrefix;
-    }
-
-    _isValidMultiLineComment(minifiedRowContent) {
-        let isWithPrefix = false;
-
-        for (const prefix in this.prefixes) {
-            const prefixValue = this.prefixes[prefix].value;
-
-            if (
-                minifiedRowContent.startsWith(`+/*${prefixValue}`) ||
-                minifiedRowContent.startsWith(`+*${prefixValue}`)
-            ) {
-                isWithPrefix = true;
-                break;
-            }
-        }
-
-        return isWithPrefix;
-    }
-
-    _getMultiLineComment(file, rowIndex) {
-        const { split_patch: splitPatch } = file;
-
-        const start_line = getLineNumber(splitPatch, 'right', rowIndex);
-
-        let position = 0;
-        let index = 0;
-
-        for (index = rowIndex; index < splitPatch.length; index++) {
-            position++;
-
-            const minifiedSplitPatchRow = removeWhitespaces(splitPatch[index]);
-
-            if (minifiedSplitPatchRow.startsWith('+*/')) {
-                break;
-            }
-        }
-
-        const comment = this.getMultiLineComment({
-            file,
-            body: this.body,
-            from: start_line,
-            to: position,
-        });
-
-        return {
-            comment,
-            newRowIndex: index,
-        };
-    }
-
     _getCommentBody() {
         let formattedPrefixes = '';
 
@@ -257,7 +224,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
             - \` ${prefix.value} \` (${prefix.meaning})`;
         });
 
-        const commentBody = `Prefix comments with one of the predefined values 
+        const commentBody = `Comment should have at least one of predefined prefixes.
          
         <details>
             <summary> List of allowed prefixes </summary> \n\n${dedent(
