@@ -232,9 +232,9 @@ class NoUnmarkedCommentsRule extends BaseRule {
             - \` ${prefix.value} \` (${prefix.meaning})`;
         });
 
-        const reason = isMultiLine ? 'contain one' : 'start with one';
+        const start = isMultiLine ? 'At least one line' : 'Comment';
 
-        const commentBody = `Comment should ${reason} of the predefined prefixes.
+        const commentBody = `${start} should start with one of the predefined prefixes.
          
         <details>
             <summary> List of allowed prefixes </summary> \n\n${dedent(
