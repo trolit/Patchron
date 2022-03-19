@@ -120,9 +120,6 @@ class NoUnmarkedCommentsRule extends BaseRule {
             return comment;
         }
 
-        console.log('INLINE!!!');
-        console.log(result);
-
         if (
             (result.startsWith('//') || result.endsWith('*/')) &&
             !this._startsWithPrefix(result)
@@ -152,9 +149,6 @@ class NoUnmarkedCommentsRule extends BaseRule {
         let hasValidPrefix = false;
         let endIndex = null;
 
-        console.log('multiline verification');
-        console.log('start -> ', multiLineStartIndex);
-
         for (
             let index = multiLineStartIndex + 1;
             index < splitPatch.length;
@@ -174,9 +168,6 @@ class NoUnmarkedCommentsRule extends BaseRule {
                 break;
             }
         }
-
-        console.log('result!');
-        console.log(endIndex);
 
         return {
             hasValidPrefix,
