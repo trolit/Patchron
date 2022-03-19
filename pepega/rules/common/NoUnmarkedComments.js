@@ -2,6 +2,13 @@ const BaseRule = require('../Base');
 const dedent = require('dedent-js');
 
 class NoUnmarkedCommentsRule extends BaseRule {
+    /**
+     * @param {Array<{prefixes: Array<object>, isAppliedToSingleLineComments: boolean, isAppliedToMultiLineComments: boolean, isAppliedToInlineComments: boolean }>} config
+     * @param {Array<object>} config.prefixes - array of prefixes that should be used in comments
+     * @param {boolean} config.isAppliedToSingleLineComments
+     * @param {boolean} config.isAppliedToMultiLineComments
+     * @param {boolean} config.isAppliedToInlineComments
+     */
     constructor(config) {
         super();
 
