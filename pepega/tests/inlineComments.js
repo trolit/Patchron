@@ -5,7 +5,9 @@ module.exports = () => {
         const result = x * 5; // TODO: fix it!
 
         console.log(result); // TMP: ok?
-    }
+    } /* ok?
+    * ee
+    */
 
     console.log('egg'); // this is deprecated!
 };
