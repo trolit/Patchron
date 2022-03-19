@@ -61,31 +61,16 @@ class NoUnmarkedCommentsRule extends BaseRule {
             }
 
             if (this.isAppliedToMultiLineComments && rawRow.startsWith('/*')) {
-                if (rawRow.includes('*/') && !this._startsWithPrefix(rawRow)) {
-                    unmarkedComments.push(
-                        this.getSingleLineComment({
-                            file,
-                            body: this._getCommentBody(),
-                            index,
-                        })
-                    );
+                const comment = this._resolveMultiLineComment(
+                    file,
+                    index,
+                    rawRow
+                );
 
-                    continue;
-                }
+                if (comment) {
+                    unmarkedComments.push(comment);
 
-                const result = this._verifyMultiLineComment(splitPatch, index);
-
-                if (!result.hasValidPrefix) {
-                    unmarkedComments.push(
-                        this.getMultiLineComment({
-                            file,
-                            body: this._getCommentBody(true),
-                            from: index,
-                            to: result.endIndex,
-                        })
-                    );
-
-                    index = result.endIndex;
+                    comment?.to ? (index = comment.to) : null;
                 }
 
                 continue;
@@ -106,6 +91,34 @@ class NoUnmarkedCommentsRule extends BaseRule {
         }
 
         return unmarkedComments;
+    }
+
+    _resolveMultiLineComment(file, index, rawRow) {
+        const { split_patch: splitPatch } = file;
+        let comment = null;
+
+        if (rawRow.includes('*/') && !this._startsWithPrefix(rawRow)) {
+            comment = this.getSingleLineComment({
+                file,
+                body: this._getCommentBody(),
+                index,
+            });
+
+            return comment;
+        }
+
+        const result = this._verifyMultiLineComment(splitPatch, index);
+
+        if (!result.hasValidPrefix) {
+            comment = this.getMultiLineComment({
+                file,
+                body: this._getCommentBody(true),
+                from: index,
+                to: result.endIndex,
+            });
+        }
+
+        return comment;
     }
 
     _resolveInlineComment(file, index, rawRow) {
