@@ -112,13 +112,13 @@ class BaseRule {
                     index
                 );
 
-                const content = this.getRawContent(
+                const rawContent = this.getRawContent(
                     splitPatch[multilineEndIndex]
                 );
 
                 matchedRows.push({
                     index,
-                    content,
+                    rawContent,
                     length: multilineEndIndex - index,
                 });
 
