@@ -109,7 +109,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
 
         const result = this._verifyMultiLineComment(splitPatch, index);
 
-        if (!result.hasValidPrefix) {
+        if (!result.hasValidPrefix && result?.endIndex) {
             comment = this.getMultiLineComment({
                 file,
                 body: this._getCommentBody(true),
@@ -149,7 +149,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
         } else if (!this._startsWithPrefix(result)) {
             const result = this._verifyMultiLineComment(splitPatch, index);
 
-            if (!result.hasValidPrefix) {
+            if (!result.hasValidPrefix && result?.endIndex) {
                 comment = this.getMultiLineComment({
                     file,
                     body: this._getCommentBody(true),
