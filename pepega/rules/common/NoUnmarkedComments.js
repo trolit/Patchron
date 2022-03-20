@@ -217,10 +217,13 @@ class NoUnmarkedCommentsRule extends BaseRule {
     }
 
     _hasInvalidConfig() {
-        return !(
-            this.isAppliedToSingleLineComments &&
-            this.isAppliedToMultiLineComments &&
-            this.isAppliedToInlineComments
+        return (
+            !this.prefixes?.length ||
+            !(
+                this.isAppliedToSingleLineComments &&
+                this.isAppliedToMultiLineComments &&
+                this.isAppliedToInlineComments
+            )
         );
     }
 
