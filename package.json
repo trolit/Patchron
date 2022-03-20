@@ -13,7 +13,8 @@
   ],
   "scripts": {
     "start": "nodemon --exec probot run ./index.js",
-    "test": "jest",
+    "test": "jest --verbose --silent",
+    "test:logs": "jest --verbose",
     "lint:check": "eslint .",
     "lint:fix": "eslint --fix .",
     "trace-warnings": "node --trace-warnings index.js"
