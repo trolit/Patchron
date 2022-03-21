@@ -193,7 +193,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
     }
 
     _startsWithPrefix(row) {
-        const fixedRow = row.replace(/(\/\/|\*|\/\*)[* ]*/, '').trim();
+        const fixedRow = row.replace(/(\/\/|\*|\/\*)[* ]/, '').trim();
 
         return this.prefixes.some(({ value }) => fixedRow.startsWith(value));
     }
