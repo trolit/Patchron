@@ -19,19 +19,24 @@ const getNearestHunkHeader = require('./getNearestHunkHeader');
  *
  * @returns {number}
  */
-module.exports = (splitPatch, rowIndex) => {
+module.exports = (splitPatch, rowIndex, side = 'RIGHT') => {
     const { index: nearestHunkHeaderIndex } = getNearestHunkHeader(
         splitPatch,
         rowIndex
     );
 
     let counter = 0;
+    const ignoreCharacter = side === 'RIGHT' ? '-' : '+';
 
     for (
         let index = nearestHunkHeaderIndex;
         index < splitPatch.length;
         index++
     ) {
+        if (splitPatch[index].startsWith(ignoreCharacter)) {
+            continue;
+        }
+
         if (index == rowIndex) {
             break;
         }
