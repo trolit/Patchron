@@ -202,7 +202,7 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
-    it('returns review with correct position on invalid multi-line comments', () => {
+    it('returns review with correct range on invalid multi-line comments', () => {
         const result = noUnmarkedCommentsRule.invoke({
             filename: '...',
             split_patch: [
