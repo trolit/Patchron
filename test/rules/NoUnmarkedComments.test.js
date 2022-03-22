@@ -55,7 +55,6 @@ describe('invoke function', () => {
             logLevel: 'fatal',
         });
 
-        // Load our app into probot
         probot.load(PepegaJs);
 
         noUnmarkedCommentsRule = new NoUnmarkedCommentsRule(validConfig);
