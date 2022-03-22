@@ -48,7 +48,7 @@ class BaseRule {
 
         const start_line = getLineNumber(splitPatch, side, from);
 
-        const position = getPosition(splitPatch, to);
+        const position = getPosition(splitPatch, to, side);
 
         const reviewCommentBuilder = new ReviewCommentBuilder(file);
 
