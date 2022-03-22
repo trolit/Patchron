@@ -202,4 +202,24 @@ describe('invoke function', () => {
 
         expect(result).toEqual([]);
     });
+
+    it('returns review with correct position on invalid mutli-line comment', () => {
+        const result = noUnmarkedCommentsRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +2,15 @@\n`,
+                ` /* \n`,
+                ` * line -> 1 (unchanged)\n`,
+                `+ * line -> 2 (added)\n`,
+                `- * line -> 3 (removed)\n`,
+                ` */`,
+                `+ const payload = require('./fixtures/pull_request.opened');`,
+                `+ const fs = require('fs'); /* !: inline comment 2 */\n`,
+                `+ \n`,
+            ],
+        });
+
+        expect(result).toHaveLength(1);
+        expect(result[0]).toHaveProperty('position', 4);
+    });
 });
