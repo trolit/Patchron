@@ -4,34 +4,22 @@ const nock = require('nock');
 const PepegaJs = require('../../..');
 const { Probot, ProbotOctokit } = require('probot');
 const { describe, expect, it, beforeEach } = require('@jest/globals');
-const NoUnmarkedCommentsRule = require('../../../pepega/rules/common/NoUnmarkedComments');
+const KeywordsOrderedByLength = require('../../../pepega/rules/common/KeywordsOrderedByLength');
+
+const importKeywordConfig = {
+    name: 'import',
+    regex: /import.*/,
+    multilineOptions: ['from'],
+    order: 'ascending',
+    ignoreNewline: false,
+};
 
 const validConfig = {
-    prefixes: [
+    keywords: [
         {
-            value: 'TODO:',
-            meaning: 'needs to be implemented',
-        },
-        {
-            value: '*:',
-            meaning: 'important note',
-        },
-        {
-            value: '!:',
-            meaning: 'to be removed',
-        },
-        {
-            value: '?:',
-            meaning: 'suggestion',
-        },
-        {
-            value: 'TMP:',
-            meaning: 'temporary solution',
+            ...importKeywordConfig,
         },
     ],
-    isAppliedToSingleLineComments: true,
-    isAppliedToMultiLineComments: true,
-    isAppliedToInlineComments: true,
 };
 
 const privateKey = fs.readFileSync(
@@ -41,7 +29,7 @@ const privateKey = fs.readFileSync(
 
 describe('invoke function', () => {
     let probot;
-    let noUnmarkedCommentsRule;
+    let keywordsOrderedByLengthRule;
 
     beforeEach(() => {
         nock.disableNetConnect();
@@ -57,19 +45,116 @@ describe('invoke function', () => {
 
         probot.load(PepegaJs);
 
-        noUnmarkedCommentsRule = new NoUnmarkedCommentsRule(validConfig);
+        keywordsOrderedByLengthRule = new KeywordsOrderedByLength(validConfig);
     });
 
-    it('returns empty array on invalid flags config', () => {
-        noUnmarkedCommentsRule = new NoUnmarkedCommentsRule({
-            ...validConfig,
-            isAppliedToSingleLineComments: false,
-            isAppliedToMultiLineComments: false,
-            isAppliedToInlineComments: false,
+    it('returns empty array on empty keywords', () => {
+        keywordsOrderedByLengthRule = new KeywordsOrderedByLength({
+            keywords: [],
         });
 
-        const result = noUnmarkedCommentsRule.invoke({
+        const result = keywordsOrderedByLengthRule.invoke({
             filename: '...',
+        });
+
+        expect(result).toEqual([]);
+    });
+
+    it('returns review on invalid `import` group order', () => {
+        const result = keywordsOrderedByLengthRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +5,7 @@`,
+                `+ import getLastNumber from '../helpers/getLastNumber'\n`,
+                `+ import usersController from '../controllers/UsersController'\n`,
+                ` import dedent from 'dedent-js'\n`,
+                `+ import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'\n`,
+                `+ \n`,
+                `+ import baseHelper from 'helpers/base'\n`,
+                `+ \n`,
+                `+ import staticFiles from '../../assets'`,
+            ],
+        });
+
+        expect(result).toHaveLength(1);
+
+        expect(result[0]).toHaveProperty('start_line', 5);
+        expect(result[0]).toHaveProperty('position', 4);
+    });
+
+    it('returns empty array on valid ascending `import` group order', () => {
+        const result = keywordsOrderedByLengthRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +5,7 @@`,
+                ` import dedent from 'dedent-js'\n`,
+                `+ import getLastNumber from '../helpers/getLastNumber'\n`,
+                `+ import usersController from '../controllers/UsersController'\n`,
+                `+ import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'\n`,
+                `+ \n`,
+                `+ import baseHelper from 'helpers/base'\n`,
+                `+ \n`,
+                `+ import staticFiles from '../../assets'`,
+            ],
+        });
+
+        expect(result).toEqual([]);
+    });
+
+    it('returns review on invalid descending `import` group order', () => {
+        keywordsOrderedByLengthRule = new KeywordsOrderedByLength({
+            keywords: [
+                {
+                    ...importKeywordConfig,
+                    order: 'descending',
+                },
+            ],
+        });
+
+        const result = keywordsOrderedByLengthRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +5,7 @@`,
+                `+ import usersController from '../controllers/UsersController'\n`,
+                `+ import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'\n`,
+                ` import dedent from 'dedent-js'\n`,
+                `+ import getLastNumber from '../helpers/getLastNumber'\n`,
+                `+ \n`,
+                `+ import baseHelper from 'helpers/base'\n`,
+                `+ \n`,
+                `+ import staticFiles from '../../assets'`,
+            ],
+        });
+
+        expect(result).toHaveLength(1);
+
+        expect(result[0]).toHaveProperty('start_line', 5);
+        expect(result[0]).toHaveProperty('position', 4);
+    });
+
+    it('returns empty array on valid descending `import` group order', () => {
+        keywordsOrderedByLengthRule = new KeywordsOrderedByLength({
+            keywords: [
+                {
+                    ...importKeywordConfig,
+                    order: 'descending',
+                },
+            ],
+        });
+
+        const result = keywordsOrderedByLengthRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +5,7 @@`,
+                `+ import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'\n`,
+                `+ import usersController from '../controllers/UsersController'\n`,
+                `+ import getLastNumber from '../helpers/getLastNumber'\n`,
+                ` import dedent from 'dedent-js'\n`,
+                `+ \n`,
+                `+ import baseHelper from 'helpers/base'\n`,
+                `+ \n`,
+                `+ import staticFiles from '../../assets'`,
+            ],
         });
 
         expect(result).toEqual([]);
