@@ -46,6 +46,10 @@ class NoUnmarkedCommentsRule extends BaseRule {
 
             const rawRow = this.getRawContent(row);
 
+            if (rawRow.startsWith('@@')) {
+                continue;
+            }
+
             if (this.isAppliedToSingleLineComments && rawRow.startsWith('//')) {
                 if (!this._startsWithPrefix(rawRow)) {
                     unmarkedComments.push(
