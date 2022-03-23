@@ -48,7 +48,7 @@ class BaseRule {
 
         const start_line = getLineNumber(splitPatch, side, from);
 
-        const position = getPosition(splitPatch, to);
+        const position = getPosition(splitPatch, to, side);
 
         const reviewCommentBuilder = new ReviewCommentBuilder(file);
 
@@ -140,14 +140,18 @@ class BaseRule {
     }
 
     /**
-     * Removes from row character that indicates line state (added, deleted, unchanged)
+     * Removes from row indicators added by Git (added, deleted, unchanged) and hunk header (if occured)
      */
-    getRawContent(content) {
-        if (content.startsWith(this.unchanged)) {
-            return content.trim();
+    getRawContent(row) {
+        let rawContent = row;
+
+        if (row.startsWith(this.unchanged)) {
+            rawContent = row.trim();
+        } else if (row.startsWith(this.added) || row.startsWith(this.deleted)) {
+            rawContent = row.slice(1).trim();
         }
 
-        return content.slice(1).trim();
+        return rawContent;
     }
 
     _isMultiline(keyword, line) {

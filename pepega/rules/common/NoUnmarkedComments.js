@@ -46,6 +46,10 @@ class NoUnmarkedCommentsRule extends BaseRule {
 
             const rawRow = this.getRawContent(row);
 
+            if (rawRow.startsWith('@@')) {
+                continue;
+            }
+
             if (this.isAppliedToSingleLineComments && rawRow.startsWith('//')) {
                 if (!this._startsWithPrefix(rawRow)) {
                     unmarkedComments.push(
@@ -193,7 +197,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
     }
 
     _startsWithPrefix(row) {
-        const fixedRow = row.replace(/(\/\/|\*|\/\*)[* ]*/, '').trim();
+        const fixedRow = row.replace(/(\/\/|\*|\/\*)/, '').trim();
 
         return this.prefixes.some(({ value }) => fixedRow.startsWith(value));
     }
@@ -217,10 +221,13 @@ class NoUnmarkedCommentsRule extends BaseRule {
     }
 
     _hasInvalidConfig() {
-        return !(
-            this.isAppliedToSingleLineComments &&
-            this.isAppliedToMultiLineComments &&
-            this.isAppliedToInlineComments
+        return (
+            !this.prefixes?.length ||
+            !(
+                this.isAppliedToSingleLineComments &&
+                this.isAppliedToMultiLineComments &&
+                this.isAppliedToInlineComments
+            )
         );
     }
 
