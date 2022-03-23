@@ -151,14 +151,6 @@ class BaseRule {
             rawContent = row.slice(1).trim();
         }
 
-        if (rawContent.startsWith('@@')) {
-            const hunkHeader = rawContent.match(/(@@).*?(@@)/);
-
-            if (hunkHeader) {
-                rawContent = rawContent.replace(hunkHeader[0], '');
-            }
-        }
-
         return rawContent;
     }
 
