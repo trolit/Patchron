@@ -1,10 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 const nock = require('nock');
-const PepegaJs = require('../..');
+const PepegaJs = require('../../..');
 const { Probot, ProbotOctokit } = require('probot');
 const { describe, expect, it, beforeEach } = require('@jest/globals');
-const NoUnmarkedCommentsRule = require('../../pepega/rules/common/NoUnmarkedComments');
+const NoUnmarkedCommentsRule = require('../../../pepega/rules/common/NoUnmarkedComments');
 
 const validConfig = {
     prefixes: [
@@ -35,7 +35,7 @@ const validConfig = {
 };
 
 const privateKey = fs.readFileSync(
-    path.join(__dirname, '../fixtures/mock-cert.pem'),
+    path.join(__dirname, '../../fixtures/mock-cert.pem'),
     'utf-8'
 );
 
