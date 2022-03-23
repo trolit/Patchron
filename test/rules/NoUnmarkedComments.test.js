@@ -92,7 +92,7 @@ describe('invoke function', () => {
         const result = noUnmarkedCommentsRule.invoke({
             filename: '...',
             split_patch: [
-                `@@ -10,13 +10,7 @@        // my imports`,
+                `@@ -10,13 +10,7 @@ // this comment shouldn't be counted as it's only hunk header in patch`,
                 `+ const payload = require('./fixtures/pull_request.opened');\n`,
                 `+ const fs = require('fs');\n`,
                 `        // unchanged line comment \n`,
@@ -103,7 +103,9 @@ describe('invoke function', () => {
             ],
         });
 
-        expect(result).toHaveLength(2);
+        expect(result).toHaveLength(1);
+
+        expect(result[0]).toHaveProperty('line', 12);
     });
 
     it('returns empty array on valid single line comments', () => {
@@ -136,14 +138,19 @@ describe('invoke function', () => {
                 `+ /******another one-liner*****/`,
                 `+ const fs = require('fs');\n`,
                 `+ \n`,
-                `+ const { expect, test, beforeEach, afterEach } = require('@jest/globals'); /* multi-line comment\n`,
-                `+ * in inline flavour`,
-                `+ */`,
+                `+ const { expect, test, beforeEach, afterEach } = require('@jest/globals');`,
                 `- /* removed comment */\n`,
             ],
         });
 
-        expect(result).toHaveLength(4);
+        expect(result).toHaveLength(3);
+
+        expect(result[0]).toHaveProperty('start_line', 5);
+        expect(result[0]).toHaveProperty('position', 4);
+
+        expect(result[1]).toHaveProperty('line', 10);
+
+        expect(result[2]).toHaveProperty('line', 11);
     });
 
     it('returns empty array on valid multi-line comments', () => {
@@ -160,7 +167,7 @@ describe('invoke function', () => {
                 `+ /**: multi-line comment as one-liner */`,
                 `+ const fs = require('fs');\n`,
                 `+ \n`,
-                `+ const { expect, test, beforeEach, afterEach } = require('@jest/globals'); /* multi-line comment\n`,
+                `+ const { expect, test, beforeEach, afterEach } = require('@jest/globals');\n`,
                 `+ * !: in inline flavour`,
                 `+ */`,
                 `- /* removed comment */\n`,
@@ -178,12 +185,21 @@ describe('invoke function', () => {
                 `+ const payload = require('./fixtures/pull_request.opened'); // inline comment 1\n`,
                 `+ const fs = require('fs'); /* inline comment 2 */\n`,
                 `+ \n`,
-                `+ const { expect, test, beforeEach, afterEach } = require('@jest/globals'); // inline comment 3\n`,
+                `+ const { expect, test, beforeEach, afterEach } = require('@jest/globals'); /*\n`,
+                `+ * inline comment 3\n`,
+                `+ */`,
                 `- /* removed comment */\n`,
             ],
         });
 
         expect(result).toHaveLength(3);
+
+        expect(result[0]).toHaveProperty('line', 2);
+
+        expect(result[1]).toHaveProperty('line', 3);
+
+        expect(result[2]).toHaveProperty('start_line', 5);
+        expect(result[2]).toHaveProperty('position', 6);
     });
 
     it('returns empty array on valid inline comments', () => {
@@ -194,7 +210,9 @@ describe('invoke function', () => {
                 `+ const payload = require('./fixtures/pull_request.opened'); // *: inline comment 1\n`,
                 `+ const fs = require('fs'); /* !: inline comment 2 */\n`,
                 `+ \n`,
-                `+ const { expect, test, beforeEach, afterEach } = require('@jest/globals'); // TODO: inline comment 3\n`,
+                `+ const { expect, test, beforeEach, afterEach } = require('@jest/globals'); /* \n`,
+                `+ * !: inline comment 3\n`,
+                `+ */`,
                 `- /* removed comment */\n`,
             ],
         });
