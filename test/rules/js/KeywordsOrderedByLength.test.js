@@ -101,6 +101,45 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
+    it('returns review on invalid ascending `import` groups order', () => {
+        const result = keywordsOrderedByLengthRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +5,7 @@`,
+                ` import dedent from 'dedent-js'\n`,
+                `+ import usersController from '../controllers/UsersController'\n`,
+                `- import getLastNumber from '../helpers/getLastNumber'\n`,
+                `+ import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'\n`,
+                `+ \n`,
+                `+ import staticFiles from '../../assets'\n`,
+                `+ import baseHelper from 'helpers/base'`,
+            ],
+        });
+
+        expect(result).toHaveLength(1);
+
+        expect(result[0]).toHaveProperty('start_line', 9);
+        expect(result[0]).toHaveProperty('position', 6);
+    });
+
+    it('returns empty array on valid ascending `import` groups order', () => {
+        const result = keywordsOrderedByLengthRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +5,7 @@`,
+                ` import dedent from 'dedent-js'\n`,
+                `+ import getLastNumber from '../helpers/getLastNumber'\n`,
+                `+ import usersController from '../controllers/UsersController'\n`,
+                `+ import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'\n`,
+                `+ \n`,
+                `+ import baseHelper from 'helpers/base'\n`,
+                `+ import staticFiles from '../../assets'`,
+            ],
+        });
+
+        expect(result).toEqual([]);
+    });
+
     it('returns review on invalid descending `import` group order', () => {
         keywordsOrderedByLengthRule = new KeywordsOrderedByLength({
             keywords: [
@@ -149,11 +188,84 @@ describe('invoke function', () => {
                 `+ import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'\n`,
                 `+ import usersController from '../controllers/UsersController'\n`,
                 `+ import getLastNumber from '../helpers/getLastNumber'\n`,
-                ` import dedent from 'dedent-js'\n`,
+                `+ import {\n`,
+                `+  dedent,\n`,
+                `+  dedent2\n`,
+                `+ } from 'dedent-js'\n`,
                 `+ \n`,
                 `+ import baseHelper from 'helpers/base'\n`,
                 `+ \n`,
                 `+ import staticFiles from '../../assets'`,
+            ],
+        });
+
+        expect(result).toEqual([]);
+    });
+
+    it('returns review on invalid `import` order with ignoreNewline enabled', () => {
+        keywordsOrderedByLengthRule = new KeywordsOrderedByLength({
+            keywords: [
+                {
+                    ...importKeywordConfig,
+                    order: 'ascending',
+                    ignoreNewline: true,
+                },
+            ],
+        });
+
+        const result = keywordsOrderedByLengthRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +5,7 @@`,
+                `+ import {\n`,
+                `+  dedent,\n`,
+                `+  dedent2\n`,
+                `+ } from 'dedent-js'\n`,
+                `+ import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'\n`,
+                `+ import usersController from '../controllers/UsersController'\n`,
+                `+ import getLastNumber from '../helpers/getLastNumber'\n`,
+                `+ \n`,
+                `+ import baseHelper from 'helpers/base'\n`,
+                `+ \n`,
+                `+ import staticFiles from '../../assets'`,
+            ],
+        });
+
+        expect(result).toHaveLength(4);
+
+        expect(result[0]).toHaveProperty('line', 9);
+
+        expect(result[1]).toHaveProperty('line', 10);
+
+        expect(result[2]).toHaveProperty('line', 13);
+
+        expect(result[3]).toHaveProperty('line', 15);
+    });
+
+    it('returns empty array on valid `import` order with ignoreNewline enabled', () => {
+        keywordsOrderedByLengthRule = new KeywordsOrderedByLength({
+            keywords: [
+                {
+                    ...importKeywordConfig,
+                    order: 'ascending',
+                    ignoreNewline: true,
+                },
+            ],
+        });
+
+        const result = keywordsOrderedByLengthRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +5,7 @@`,
+                `+ import {\n`,
+                `+  dedent,\n`,
+                `+  dedent2\n`,
+                `+ } from 'dedent-js'\n`,
+                `+ import baseHelper from 'helpers/base'\n`,
+                `+ import staticFiles from '../../assets'`,
+                `+ import getLastNumber from '../helpers/getLastNumber'\n`,
+                `+ import usersController from '../controllers/UsersController'\n`,
+                `+ import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`,
             ],
         });
 
