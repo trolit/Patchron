@@ -69,4 +69,29 @@ describe('invoke function', () => {
 
         expect(result).toEqual([]);
     });
+
+    it('returns empty array on invalid keyword config', () => {
+        positionedKeywordsRule = new PositionedKeywords({
+            keywords: [
+                {
+                    ...importKeywordConfig,
+                    position: {
+                        custom: {
+                            name: '<script>',
+                            expression: /<script>/,
+                            direction: 'below',
+                        },
+                        BOF: true,
+                        EOF: true,
+                    },
+                },
+            ],
+        });
+
+        const result = positionedKeywordsRule.invoke({
+            filename: '...',
+        });
+
+        expect(result).toEqual([]);
+    });
 });
