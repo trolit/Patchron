@@ -77,7 +77,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
 
         const baseArray = this._removeCustomLinesFromArray(matchedRows);
 
-        const expectedArray = this._sortMatchedRows(baseArray, keyword);
+        const expectedArray = this._sortArray(baseArray, keyword);
 
         for (let index = 0; index < baseArray.length; index++) {
             const baseRow = baseArray[index];
@@ -103,12 +103,16 @@ class KeywordsOrderedByLengthRule extends BaseRule {
     _reviewLinesOrder(data) {
         const { matchedRows, keyword } = data;
 
-        const sortedMatchedRows = this._sortMatchedRows(matchedRows, keyword);
+        const splitMatchedRows = this._splitRowsIntoGroups(
+            matchedRows,
+            keyword
+        );
 
-        const splitMatchedRows = this._splitMatchedRowsIntoGroups(matchedRows);
-
-        const splitSortedMatchedRows =
-            this._splitMatchedRowsIntoGroups(sortedMatchedRows);
+        const splitSortedMatchedRows = this._splitRowsIntoGroups(
+            matchedRows,
+            keyword,
+            true
+        );
 
         let reviewComments = [];
 
@@ -159,11 +163,11 @@ class KeywordsOrderedByLengthRule extends BaseRule {
         );
     }
 
-    _sortMatchedRows(matchedRows, keyword) {
+    _sortArray(array, keyword) {
         const { order } = keyword;
         const customLines = this.customLines;
 
-        return [...matchedRows].sort((firstRow, secondRow) => {
+        return [...array].sort((firstRow, secondRow) => {
             const { content: firstRowContent } = firstRow;
             const { content: secondRowContent } = secondRow;
 
@@ -192,7 +196,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
         });
     }
 
-    _splitMatchedRowsIntoGroups(matchedRows) {
+    _splitRowsIntoGroups(matchedRows, keyword, withSort = false) {
         let index = 0;
         let result = [];
 
@@ -215,7 +219,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
                 continue;
             }
 
-            result.push(group);
+            result.push(withSort ? this._sortArray(group, keyword) : group);
         }
 
         return result;
