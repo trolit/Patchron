@@ -69,14 +69,14 @@ class PositionedKeywordsRule extends BaseRule {
                 }
 
                 reviewComments.push(
-                    ...this._reviewCustomPosition(
+                    ...this._reviewCustomPosition({
                         file,
                         matchedRows,
                         keyword,
                         indexOfCustomPosition,
                         wasPositionEnforced,
-                        unchangedRows
-                    )
+                        unchangedRows,
+                    })
                 );
             }
 
@@ -87,13 +87,13 @@ class PositionedKeywordsRule extends BaseRule {
                 );
 
                 reviewComments.push(
-                    ...this._reviewKeywordWithBOF(
+                    ...this._reviewKeywordWithBOF({
                         file,
                         matchedRows,
                         keyword,
                         keywordsWithBOF,
-                        unchangedRows
-                    )
+                        unchangedRows,
+                    })
                 );
             }
 
