@@ -1,12 +1,13 @@
 const dedent = require('dedent-js');
 const BaseRule = require('../Base');
+const getLineNumber = require('../../helpers/getLineNumber');
 const removeWhitespaces = require('../../helpers/removeWhitespaces');
 const getNearestHunkHeader = require('../../helpers/getNearestHunkHeader');
 
 class PositionedKeywordsRule extends BaseRule {
     /**
      * @param {object} config
-     * @param {Array<{name: string, regex: object, position: { custom: { name: string, expression: string|object, direction: string, }, BOF: boolean, EOF:boolean }, ignoreNewline: boolean, enforced: boolean }>} config.keywords
+     * @param {Array<{name: string, regex: object, position: { custom: { name: string, expression: string|object }, BOF: boolean, EOF:boolean }, ignoreNewline: boolean, enforced: boolean }>} config.keywords
      * @param {string} config.keywords[].name - readable name
      * @param {object} config.keywords[].regex - matches line(s) that should be validated against rule
      * @param {Array<string>} config.keywords[].multilineOptions - if none of them will be included in matched line, line will be treated as multiline.
@@ -47,8 +48,10 @@ class PositionedKeywordsRule extends BaseRule {
                 continue;
             }
 
-            const { matchedRows, unchangedRows } =
-                this.initializeRegexBasedData(splitPatch, keyword);
+            const { matchedRows } = this.initializeRegexBasedData(
+                splitPatch,
+                keyword
+            );
 
             if (matchedRows.length <= 1) {
                 continue;
@@ -57,10 +60,10 @@ class PositionedKeywordsRule extends BaseRule {
             const { position } = keyword;
 
             if (position.custom !== null) {
-                const { indexOfCustomPosition, wasPositionEnforced } =
+                const { customPositionIndex, wasPositionEnforced } =
                     this._findIndexOfCustomPosition(splitPatch, keyword);
 
-                if (indexOfCustomPosition < 0) {
+                if (customPositionIndex < 0) {
                     probotInstance.log.warn(
                         `${__filename}\nKeyword review skipped due to undefined position.`
                     );
@@ -73,9 +76,8 @@ class PositionedKeywordsRule extends BaseRule {
                         file,
                         matchedRows,
                         keyword,
-                        indexOfCustomPosition,
+                        customPositionIndex,
                         wasPositionEnforced,
-                        unchangedRows,
                     })
                 );
             }
@@ -92,7 +94,6 @@ class PositionedKeywordsRule extends BaseRule {
                         matchedRows,
                         keyword,
                         keywordsWithBOF,
-                        unchangedRows,
                     })
                 );
             }
@@ -108,8 +109,7 @@ class PositionedKeywordsRule extends BaseRule {
                         file,
                         matchedRows,
                         keyword,
-                        keywordsWithEOF,
-                        unchangedRows
+                        keywordsWithEOF
                     )
                 );
             }
@@ -129,7 +129,7 @@ class PositionedKeywordsRule extends BaseRule {
 
     _findIndexOfCustomPosition(splitPatch, keyword) {
         let wasPositionEnforced = false;
-        let indexOfCustomPosition = -1;
+        let customPositionIndex = -1;
         let matchResult = null;
 
         const { expression } = keyword.position.custom;
@@ -147,91 +147,82 @@ class PositionedKeywordsRule extends BaseRule {
         }
 
         if (matchResult) {
-            indexOfCustomPosition = splitPatch.indexOf(matchResult);
+            customPositionIndex = splitPatch.indexOf(matchResult);
         }
 
         return {
-            indexOfCustomPosition,
+            customPositionIndex,
             wasPositionEnforced,
         };
     }
 
     /**
-     * @param {{ file: object, keyword: object, matchedRows: Array<object>, unchangedRows: Array<object>, indexOfCustomPosition: number, wasPositionEnforced: boolean }} data
+     * @param {{ file: object, keyword: object, matchedRows: Array<object>, indexOfCustomPosition: number, wasPositionEnforced: boolean }} data
      */
     _reviewCustomPosition(data) {
         const {
+            file,
             matchedRows,
             keyword,
-            indexOfCustomPosition,
+            customPositionIndex,
             wasPositionEnforced,
-            unchangedRows,
         } = data;
 
-        const { direction } = keyword.position.custom;
-        const { maxLineBreaks } = keyword;
-        const reviewComments = [];
-        let lineBreakCounter = 0;
-
-        if (direction === 'above') {
-            matchedRows.reverse();
+        if (wasPositionEnforced) {
+            matchedRows.splice(
+                matchedRows.findIndex(
+                    (matchedRow) => matchedRow.index === customPositionIndex
+                ),
+                1
+            );
         }
 
-        matchedRows.splice(
-            matchedRows.findIndex(
-                (matchedRow) => matchedRow.index === indexOfCustomPosition
-            ),
-            1
-        );
-
-        let currentCustomPosition =
-            direction === 'above'
-                ? indexOfCustomPosition - 1
-                : indexOfCustomPosition + 1;
-        let lastRowWithCode = null;
+        const reviewComments = [];
+        const { split_patch: splitPatch } = file;
+        const { maxLineBreaks, breakOnFirstOccurence } = keyword;
 
         for (
-            let index = 0;
+            let index = 0,
+                recentRow = null,
+                lineBreakCounter = 0,
+                expectedIndex = customPositionIndex + 1;
             index < matchedRows.length;
-            index++, currentCustomPosition++
+            index++, expectedIndex++
         ) {
             const matchedRow = matchedRows[index];
 
-            if (this._isUnchangedRow(unchangedRows, matchedRow)) {
-                currentCustomPosition++;
-
-                continue;
-            }
-
-            if (this.customLines.includes(matchedRow.content)) {
-                lineBreakCounter++;
-
-                continue;
-            }
-
-            if (
-                (direction === 'below' &&
-                    matchedRow.index < indexOfCustomPosition) ||
-                (direction === 'above' &&
-                    matchedRow.index > indexOfCustomPosition)
-            ) {
+            if (matchedRow.index < expectedIndex) {
                 reviewComments.push(
                     this.getSingleLineComment({
                         ...data,
                         body: this._getCommentBody(keyword, {
                             source: matchedRow,
-                            cause: 'wrongDirection',
-                            position: matchedRow.index,
+                            cause: 'position',
+                            position: getLineNumber(
+                                splitPatch,
+                                'RIGHT',
+                                matchedRow.index
+                            ),
                             enforced: wasPositionEnforced,
                         }),
                         index: matchedRow.index,
                     })
                 );
 
-                if (keyword.breakOnFirstOccurence) {
+                if (breakOnFirstOccurence) {
                     break;
                 }
 
+                continue;
+            }
+
+            if (matchedRow.content === this.newLine) {
+                lineBreakCounter++;
+
+                continue;
+            }
+
+            if (matchedRow.content === this.merge) {
                 continue;
             }
 
@@ -242,90 +233,59 @@ class PositionedKeywordsRule extends BaseRule {
                         body: this._getCommentBody(keyword, {
                             source: matchedRow,
                             cause: 'maxLineBreaks',
-                            position: lastRowWithCode.index,
+                            position: getLineNumber(
+                                splitPatch,
+                                'RIGHT',
+                                recentRow.index
+                            ),
                             enforced: wasPositionEnforced,
                         }),
                         index: matchedRow.index,
                     })
                 );
 
-                if (keyword.breakOnFirstOccurence) {
-                    break;
-                }
-
                 lineBreakCounter = 0;
 
-                lastRowWithCode = matchedRow;
+                if (breakOnFirstOccurence) {
+                    break;
+                }
 
                 continue;
             }
 
-            if (!maxLineBreaks && lineBreakCounter) {
-                reviewComments.push(
-                    this.getSingleLineComment({
-                        ...data,
-                        body: this._getCommentBody(keyword, {
-                            source: matchedRow,
-                            cause: 'maxLineBreaks',
-                            position: lastRowWithCode.index,
-                            enforced: wasPositionEnforced,
-                        }),
-                        index: matchedRow.index,
-                    })
-                );
-
-                if (keyword.breakOnFirstOccurence) {
-                    break;
-                }
-
-                lineBreakCounter = 0;
-
-                lastRowWithCode = matchedRow;
-
-                continue;
-            }
-
-            const isInValidPosition =
-                lastRowWithCode &&
-                (direction === 'below'
-                    ? matchedRow.index - 1 - lineBreakCounter
-                    : matchedRow.index + 1 + lineBreakCounter) ===
-                    lastRowWithCode.index;
-
-            if (
-                (index === 0 && currentCustomPosition !== matchedRow.index) ||
-                (lastRowWithCode && !isInValidPosition)
-            ) {
+            if (matchedRow.index !== expectedIndex) {
                 reviewComments.push(
                     this.getSingleLineComment({
                         ...data,
                         body: this._getCommentBody(keyword, {
                             source: matchedRow,
                             cause: 'position',
-                            position: currentCustomPosition,
+                            position: getLineNumber(
+                                splitPatch,
+                                'RIGHT',
+                                recentRow.index
+                            ),
                             enforced: wasPositionEnforced,
                         }),
                         index: matchedRow.index,
                     })
                 );
 
-                if (keyword.breakOnFirstOccurence) {
+                lineBreakCounter = 0;
+
+                if (breakOnFirstOccurence) {
                     break;
                 }
             }
 
-            if (!this.customLines.includes(matchedRow.content)) {
-                lastRowWithCode = matchedRow;
-            }
-
-            lineBreakCounter = 0;
+            recentRow = matchedRow;
         }
 
         return reviewComments;
     }
 
     /**
-     * @param {{ file: object, keyword: object, matchedRows: Array<object>, unchangedRows: Array<object>, keywordsWithBOF: Array<object> }} data
+     * @param {{ file: object, keyword: object, matchedRows: Array<object>, keywordsWithBOF: Array<object> }} data
      */
     _reviewKeywordWithBOF(data) {
         const { file, matchedRows, keyword, keywordsWithBOF } = data;
@@ -371,7 +331,7 @@ class PositionedKeywordsRule extends BaseRule {
     }
 
     /**
-     * @param {{ file: object, keyword: object, matchedRows: Array<object>, unchangedRows: Array<object>, keywordsWithBOF: Array<object> }} data
+     * @param {{ file: object, keyword: object, matchedRows: Array<object>, keywordsWithBOF: Array<object> }} data
      */
     _reviewKeywordWithEOF(data) {
         const { file, matchedRows, keyword, keywordsWithEOF } = data;
@@ -447,16 +407,11 @@ class PositionedKeywordsRule extends BaseRule {
     }
 
     /**
-     * @param {{ file: object, keyword: object, matchedRows: Array<object>, unchangedRows: Array<object>, positionIndex: number, wasPositionEnforced: boolean }} data
+     * @param {{ file: object, keyword: object, matchedRows: Array<object>, positionIndex: number, wasPositionEnforced: boolean }} data
      */
     _reviewExactPosition(data) {
-        const {
-            keyword,
-            matchedRows,
-            unchangedRows,
-            positionIndex,
-            wasPositionEnforced,
-        } = data;
+        const { keyword, matchedRows, positionIndex, wasPositionEnforced } =
+            data;
 
         let currentPositionIndex = positionIndex;
 
@@ -467,14 +422,6 @@ class PositionedKeywordsRule extends BaseRule {
 
         for (let index = 0; index < matchedRows.length; index++) {
             const row = matchedRows[index];
-
-            if (this._isUnchangedRow(unchangedRows, row)) {
-                keyword.position.BOF
-                    ? currentPositionIndex++
-                    : currentPositionIndex--;
-
-                continue;
-            }
 
             if (row.content !== this.newLine) {
                 recentRow = row;
@@ -545,12 +492,6 @@ class PositionedKeywordsRule extends BaseRule {
         return reviewComments;
     }
 
-    _isUnchangedRow(unchangedRows, row) {
-        return unchangedRows.some(
-            (unchangedRow) => unchangedRow.index === row.index
-        );
-    }
-
     _getCommentBody(keyword, data) {
         const { cause, position: lineNumber, enforced } = data;
 
@@ -577,20 +518,9 @@ class PositionedKeywordsRule extends BaseRule {
                 break;
 
             case 'position':
-            case 'wrongDirection':
                 if (keywordPosition.custom) {
-                    const customKeyword = keywordPosition.custom;
-
-                    const expectedPosition = customKeyword.name?.length
-                        ? customKeyword.name
-                        : customKeyword.expression;
-
-                    reason = `\`${keywordName}\` should appear \`${
-                        customKeyword.direction
-                    }\` ${
-                        enforced
-                            ? `line:\`${lineNumber}\` (enforced)`
-                            : `\`${expectedPosition}\` (line:\`${lineNumber}\`)`
+                    reason = `\`${keywordName}\` should appear under line: \`${lineNumber}\` ${
+                        enforced ? '(enforced)' : ''
                     }`;
                 } else {
                     reason = `\`${keywordName}\` should appear ${
