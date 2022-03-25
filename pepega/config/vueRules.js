@@ -13,7 +13,6 @@ module.exports = [
                         custom: {
                             name: '<script>',
                             expression: /<script>/,
-                            direction: 'below',
                         },
                         BOF: false,
                         EOF: false,
