@@ -216,8 +216,42 @@ class PositionedKeywordsRule extends BaseRule {
                 continue;
             }
 
-            if (matchedRow.content === this.newLine) {
+            if (maxLineBreaks && matchedRow.content === this.newLine) {
                 lineBreakCounter++;
+
+                continue;
+            } else if (!maxLineBreaks && matchedRow.content === this.newLine) {
+                const endIndex = this._getIndexOfLastLineBreak(
+                    matchedRows,
+                    index
+                );
+
+                if (endIndex === index) {
+                    reviewComments.push(
+                        this.getSingleLineComment({
+                            ...data,
+                            body: this._getCommentBody(keyword, {
+                                source: matchedRow,
+                                cause: 'noLineBreaks',
+                            }),
+                            index: matchedRow.index,
+                        })
+                    );
+                } else {
+                    reviewComments.push(
+                        this.getMultiLineComment({
+                            ...data,
+                            body: this._getCommentBody(keyword, {
+                                source: matchedRow,
+                                cause: 'noLineBreaks',
+                            }),
+                            from: matchedRow.index,
+                            to: matchedRows[endIndex].index,
+                        })
+                    );
+
+                    index = endIndex;
+                }
 
                 continue;
             }
@@ -282,6 +316,26 @@ class PositionedKeywordsRule extends BaseRule {
         }
 
         return reviewComments;
+    }
+
+    _getIndexOfLastLineBreak(matchedRows, firstLineBreakIndex) {
+        let endIndex = firstLineBreakIndex;
+
+        for (
+            let index = firstLineBreakIndex + 1;
+            index < matchedRows.length;
+            index++
+        ) {
+            if (matchedRows[index].content === this.newLine) {
+                endIndex = index;
+
+                continue;
+            }
+
+            break;
+        }
+
+        return endIndex;
     }
 
     /**
@@ -504,16 +558,15 @@ class PositionedKeywordsRule extends BaseRule {
         let reason = '++ undefined ++';
 
         switch (cause) {
+            case 'noLineBreaks':
+                reason = `There should not be any line breaks`;
+
+                break;
+
             case 'maxLineBreaks':
-                if (maxLineBreaks) {
-                    reason = `\`${keywordName}\` exceeded allowed spacing (${maxLineBreaks}) in relation to line: \`${lineNumber}\` ${
-                        enforced ? `(enforced)` : ``
-                    }`;
-                } else {
-                    reason = `No spacing allowed between \`${keywordName}\` and line: \`${lineNumber}\` ${
-                        enforced ? `(enforced)` : ``
-                    }`;
-                }
+                reason = `\`${keywordName}\` exceeded allowed spacing (${maxLineBreaks}) in relation to line: \`${lineNumber}\` ${
+                    enforced ? `(enforced)` : ``
+                }`;
 
                 break;
 
