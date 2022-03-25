@@ -148,10 +148,6 @@ class PositionedKeywordsRule extends BaseRule {
 
         if (matchResult) {
             indexOfCustomPosition = splitPatch.indexOf(matchResult);
-
-            keyword.direction === 'above'
-                ? indexOfCustomPosition--
-                : indexOfCustomPosition++;
         }
 
         return {
@@ -188,7 +184,10 @@ class PositionedKeywordsRule extends BaseRule {
             1
         );
 
-        let currentCustomPosition = indexOfCustomPosition;
+        let currentCustomPosition =
+            direction === 'above'
+                ? indexOfCustomPosition - 1
+                : indexOfCustomPosition + 1;
         let lastRowWithCode = null;
 
         for (
