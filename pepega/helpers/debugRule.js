@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-const PositionedKeywordsRule = require('../../pepega/rules/common/PositionedKeywords');
+const PositionedKeywordsRule = require('../rules/common/PositionedKeywords');
 
 const rules = {
     PositionedKeywordsRule,
