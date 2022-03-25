@@ -17,11 +17,11 @@ module.exports = (ruleName, config, file) => {
 
     const rule = new Rule(config);
 
-    const result = rule.invoke(file);
-
     console.log(`***************************************************`);
     console.log(`${ruleName} rule result`);
     console.log(`***************************************************`);
+
+    const result = rule.invoke(file);
 
     console.log(result);
 };
