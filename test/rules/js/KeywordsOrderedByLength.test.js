@@ -15,11 +15,7 @@ const importKeywordConfig = {
 };
 
 const validConfig = {
-    keywords: [
-        {
-            ...importKeywordConfig,
-        },
-    ],
+    keywords: [importKeywordConfig],
 };
 
 const privateKey = fs.readFileSync(
