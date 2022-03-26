@@ -14,7 +14,6 @@ const importKeywordConfig = {
         custom: {
             name: '<script>',
             expression: /<script>/,
-            direction: 'below',
         },
         BOF: false,
         EOF: false,
@@ -25,11 +24,7 @@ const importKeywordConfig = {
 };
 
 const validConfig = {
-    keywords: [
-        {
-            ...importKeywordConfig,
-        },
-    ],
+    keywords: [importKeywordConfig],
 };
 
 const privateKey = fs.readFileSync(
@@ -79,7 +74,6 @@ describe('invoke function', () => {
                         custom: {
                             name: '<script>',
                             expression: /<script>/,
-                            direction: 'below',
                         },
                         BOF: true,
                         EOF: true,
@@ -93,5 +87,41 @@ describe('invoke function', () => {
         });
 
         expect(result).toEqual([]);
+    });
+
+    it('returns empty array on valid custom positioning', () => {
+        const result = positionedKeywordsRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +5,7 @@`,
+                `+ <script>\n`,
+                `+ import method1 from '@/helpers/methods\n`,
+                `+ import method2 from '@/helpers/methods'\n`,
+                `+ import method3 from '@/helpers/methods'`,
+            ],
+        });
+
+        expect(result).toEqual([]);
+    });
+
+    it('returns two comments on invalid custom positioning (maxLineBreaks = 0)', () => {
+        const result = positionedKeywordsRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +5,7 @@`,
+                `+ <script>\n`,
+                `+ import method1 from '@/helpers/methods\n`,
+                `+ \n`,
+                `+ import method2 from '@/helpers/methods'\n`,
+                `+ \n`,
+                `+ import method3 from '@/helpers/methods'`,
+            ],
+        });
+
+        expect(result).toHaveLength(2);
+
+        expect(result[0]).toHaveProperty('line', 7);
+
+        expect(result[1]).toHaveProperty('line', 9);
     });
 });
