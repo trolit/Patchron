@@ -73,7 +73,10 @@ class BaseRule {
         for (let index = 0; index < splitPatch.length; index++) {
             const row = splitPatch[index];
 
-            if (matchedRows.length && removeWhitespaces(row) === '+') {
+            if (
+                matchedRows.length &&
+                ['+', ''].includes(removeWhitespaces(row))
+            ) {
                 matchedRows.push({
                     index,
                     content: this.newLine,
