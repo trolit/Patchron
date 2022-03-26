@@ -253,6 +253,10 @@ class PositionedKeywordsRule extends BaseRule {
                     index = endIndex;
                 }
 
+                if (breakOnFirstOccurence) {
+                    break;
+                }
+
                 continue;
             }
 
