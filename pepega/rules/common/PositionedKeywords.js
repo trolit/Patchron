@@ -320,6 +320,8 @@ class PositionedKeywordsRule extends BaseRule {
                 }
             }
 
+            lineBreakCounter = 0;
+
             recentRow = matchedRow;
         }
 
@@ -519,6 +521,8 @@ class PositionedKeywordsRule extends BaseRule {
 
                 continue;
             }
+
+            lineBreakCounter = 0;
 
             recentRow = matchedRow;
         }
