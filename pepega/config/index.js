@@ -15,6 +15,7 @@ module.exports = {
         isReviewSummaryEnabled: false,
         maxCommentsPerReview: 50,
         senders: [],
+        // TODO: move these to rule?
         strictWorkflow: {
             enabled: false,
             abortReviewOnInvalidBranchPrefix: false,
