@@ -107,9 +107,9 @@ class BaseRule {
 
             if (
                 keyword?.multilineOptions &&
-                this._isMultiline(keyword, content)
+                this.isMultiline(keyword, content)
             ) {
-                const multilineEndIndex = this._resolveMultilineMatch(
+                const multilineEndIndex = this.resolveMultilineMatch(
                     keyword,
                     splitPatch,
                     index
@@ -157,13 +157,26 @@ class BaseRule {
         return rawContent;
     }
 
-    _isMultiline(keyword, line) {
+    /**
+     * determines whether passed line is part of multi-line
+     * @param {object} keyword - keyword, **must** contain **multiLineOptions** array
+     * @param {string} line - text of line
+     * @returns {boolean}
+     */
+    isMultiline(keyword, line) {
         const { multilineOptions } = keyword;
+        const { EOF } = keyword.position;
 
-        return !multilineOptions.some((option) => line.includes(option));
+        const includesMultiLineOption = multilineOptions.some((option) =>
+            line.includes(option)
+        );
+
+        return EOF
+            ? includesMultiLineOption && !line.match(keyword.regex)
+            : !includesMultiLineOption;
     }
 
-    _resolveMultilineMatch(keyword, splitPatch, currentIndex) {
+    resolveMultilineMatch(keyword, splitPatch, currentIndex) {
         let multilineEndIndex = -1;
 
         for (let index = currentIndex + 1; index < splitPatch.length; index++) {
@@ -172,7 +185,7 @@ class BaseRule {
             if (
                 !row.startsWith('-') &&
                 removeWhitespaces(row) !== '+' &&
-                !this._isMultiline(keyword, row)
+                !this.isMultiline(keyword, row)
             ) {
                 multilineEndIndex = index;
 
