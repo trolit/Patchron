@@ -163,17 +163,16 @@ class BaseRule {
      * @param {string} line - text of line
      * @returns {boolean}
      */
-    isMultiline(keyword, line) {
+    isMultiline(keyword, line, direction = 'bottom') {
         const { multilineOptions } = keyword;
-        const { EOF } = keyword.position;
 
         const includesMultiLineOption = multilineOptions.some((option) =>
             line.includes(option)
         );
 
-        return EOF
-            ? includesMultiLineOption && !line.match(keyword.regex)
-            : !includesMultiLineOption;
+        return direction === 'bottom'
+            ? !includesMultiLineOption
+            : includesMultiLineOption && !line.match(keyword.regex);
     }
 
     resolveMultilineMatch(keyword, splitPatch, currentIndex) {
