@@ -22,6 +22,7 @@ class PositionedKeywordsRule extends BaseRule {
         const { keywords } = config;
 
         this.keywords = keywords;
+        this.differentKeyword = '<<< different keyword >>>';
     }
 
     invoke(file) {
@@ -36,7 +37,7 @@ class PositionedKeywordsRule extends BaseRule {
         }
 
         const { split_patch: splitPatch } = file;
-
+        const data = this._setupData(splitPatch);
         let reviewComments = [];
 
         for (const keyword of keywords) {
@@ -48,36 +49,24 @@ class PositionedKeywordsRule extends BaseRule {
                 continue;
             }
 
-            const { matchedRows } = this.initializeRegexBasedData(
+            const matchedData = this._matchKeywordData(
                 splitPatch,
+                data,
                 keyword
             );
 
-            if (matchedRows.length <= 1) {
+            if (matchedData.length <= 1) {
                 continue;
             }
 
             const { position } = keyword;
 
             if (position.custom !== null) {
-                const { customPositionIndex, wasPositionEnforced } =
-                    this._findIndexOfCustomPosition(splitPatch, keyword);
-
-                if (customPositionIndex < 0) {
-                    probotInstance.log.warn(
-                        `${__filename}\nKeyword review skipped due to undefined position.`
-                    );
-
-                    continue;
-                }
-
                 reviewComments.push(
                     ...this._reviewCustomPosition({
                         file,
-                        matchedRows,
+                        matchedData,
                         keyword,
-                        customPositionIndex,
-                        wasPositionEnforced,
                     })
                 );
             }
@@ -89,9 +78,10 @@ class PositionedKeywordsRule extends BaseRule {
                 );
 
                 reviewComments.push(
-                    ...this._reviewKeywordWithBOF({
+                    ...this._reviewBOFPosition({
                         file,
-                        matchedRows,
+                        data,
+                        matchedData,
                         keyword,
                         keywordsWithBOF,
                     })
@@ -105,9 +95,10 @@ class PositionedKeywordsRule extends BaseRule {
                 );
 
                 reviewComments.push(
-                    ...this._reviewKeywordWithEOF({
+                    ...this._reviewEOFPosition({
                         file,
-                        matchedRows,
+                        data,
+                        matchedData,
                         keyword,
                         keywordsWithEOF,
                     })
@@ -127,470 +118,389 @@ class PositionedKeywordsRule extends BaseRule {
         );
     }
 
-    _findIndexOfCustomPosition(splitPatch, keyword) {
-        let wasPositionEnforced = false;
-        let customPositionIndex = -1;
-        let matchResult = null;
+    _setupData(splitPatch) {
+        let data = [];
+
+        for (let index = 0; index < splitPatch.length; index++) {
+            const row = splitPatch[index];
+
+            if (['+', ''].includes(removeWhitespaces(row))) {
+                data.push({
+                    index,
+                    content: this.newLine,
+                });
+
+                continue;
+            }
+
+            if (row.startsWith('-')) {
+                data.push({
+                    index,
+                    content: this.merge,
+                });
+
+                continue;
+            }
+
+            const rawRow = this.getRawContent(row);
+
+            data.push({
+                index,
+                content: rawRow,
+            });
+        }
+
+        return data;
+    }
+
+    _matchKeywordData(splitPatch, data, keyword) {
+        let matchedData = [];
+
+        for (let index = 0; index < data.length; index++) {
+            const matchResult = data[index].content.match(keyword.regex);
+
+            if (matchResult) {
+                const content = matchResult[0];
+
+                const isMultiLine =
+                    keyword?.multilineOptions &&
+                    this.isMultiline(keyword, content);
+
+                if (isMultiLine) {
+                    const multilineEndIndex = this.resolveMultilineMatch(
+                        keyword,
+                        splitPatch,
+                        index
+                    );
+
+                    const rawContent = this.getRawContent(
+                        splitPatch[multilineEndIndex]
+                    );
+
+                    matchedData.push({
+                        index,
+                        content: rawContent,
+                        length: multilineEndIndex - index,
+                    });
+
+                    index = multilineEndIndex;
+                } else {
+                    matchedData.push({
+                        index,
+                        content: content,
+                    });
+                }
+            }
+        }
+
+        return matchedData;
+    }
+
+    _findCustomPosition(splitPatch, keyword) {
+        let wasEnforced = false;
+        let index = -1;
 
         const { expression } = keyword.position.custom;
 
-        matchResult = splitPatch.find((row) =>
+        index = splitPatch.findIndex((row) =>
             typeof expression === 'object'
                 ? row.match(expression)
                 : row.includes(expression)
         );
 
-        if (!matchResult && keyword.enforced) {
-            matchResult = splitPatch.find((row) => row.match(keyword.regex));
+        if (index === -1 && keyword.enforced) {
+            index = splitPatch.findIndex((row) => row.match(keyword.regex));
 
-            wasPositionEnforced = true;
+            wasEnforced = true;
         }
 
-        if (matchResult) {
-            customPositionIndex = splitPatch.indexOf(matchResult);
+        if (index === -1) {
+            return null;
         }
 
         return {
-            customPositionIndex,
-            wasPositionEnforced,
+            index,
+            wasEnforced,
         };
     }
 
     /**
-     * @param {{ file: object, keyword: object, matchedRows: Array<object>, customPositionIndex: number, wasPositionEnforced: boolean }} data
+     * @param {{ file: object, matchedData: Array<object>, keyword: object }} parameters
      */
-    _reviewCustomPosition(data) {
-        const {
-            file,
-            matchedRows,
+    _reviewCustomPosition(parameters) {
+        const { file, matchedData, keyword } = parameters;
+        const { split_patch: splitPatch } = file;
+
+        const customPosition = this._findCustomPosition(splitPatch, keyword);
+
+        if (!customPosition) {
+            return [];
+        }
+
+        return this._reviewPosition(file, matchedData, keyword, customPosition);
+    }
+
+    /**
+     * @param {{ file: object, data: Array<object>, matchedData: Array<object>, keyword: object, keywordsWithBOF: Array<object> }} parameters
+     */
+    _reviewBOFPosition(parameters) {
+        const { file, data, matchedData, keyword, keyworsWithBOF } = parameters;
+        const { split_patch: splitPatch } = file;
+
+        const position = this._findPosition(
+            splitPatch,
+            data,
+            matchedData,
             keyword,
-            customPositionIndex,
-            wasPositionEnforced,
-        } = data;
+            keyworsWithBOF
+        );
 
-        if (wasPositionEnforced) {
-            matchedRows.splice(
-                matchedRows.findIndex(
-                    (matchedRow) => matchedRow.index === customPositionIndex
-                ),
-                1
-            );
+        if (!position) {
+            return [];
         }
 
-        const reviewComments = [];
-        const { EOF } = keyword.position;
-        const { split_patch: splitPatch } = file;
-        const { maxLineBreaks, breakOnFirstOccurence } = keyword;
-
-        for (
-            let index = 0,
-                recentRow = null,
-                lineBreakCounter = 0,
-                expectedIndex = customPositionIndex + 1;
-            index < matchedRows.length;
-            index++, expectedIndex++
-        ) {
-            const matchedRow = matchedRows[index];
-
-            if (matchedRow.index < expectedIndex) {
-                reviewComments.push(
-                    this.getSingleLineComment({
-                        ...data,
-                        body: this._getCommentBody(keyword, {
-                            source: matchedRow,
-                            cause: 'position',
-                            position: getLineNumber(
-                                splitPatch,
-                                'RIGHT',
-                                matchedRow.index
-                            ),
-                            enforced: wasPositionEnforced,
-                        }),
-                        index: matchedRow.index,
-                    })
-                );
-
-                if (breakOnFirstOccurence) {
-                    break;
-                }
-
-                continue;
-            }
-
-            if (maxLineBreaks && matchedRow.content === this.newLine) {
-                lineBreakCounter++;
-
-                continue;
-            } else if (!maxLineBreaks && matchedRow.content === this.newLine) {
-                const endIndex = this._getIndexOfLastLineBreak(
-                    matchedRows,
-                    index
-                );
-
-                if (endIndex === index) {
-                    reviewComments.push(
-                        this.getSingleLineComment({
-                            ...data,
-                            body: this._getCommentBody(keyword, {
-                                source: matchedRow,
-                                cause: 'noLineBreaks',
-                            }),
-                            index: matchedRow.index,
-                        })
-                    );
-                } else {
-                    reviewComments.push(
-                        this.getMultiLineComment({
-                            ...data,
-                            body: this._getCommentBody(keyword, {
-                                source: matchedRow,
-                                cause: 'noLineBreaks',
-                            }),
-                            from: matchedRow.index,
-                            to: matchedRows[endIndex].index,
-                        })
-                    );
-
-                    index = endIndex;
-                }
-
-                if (breakOnFirstOccurence) {
-                    break;
-                }
-
-                continue;
-            }
-
-            if (matchedRow.content === this.merge) {
-                continue;
-            }
-
-            if (maxLineBreaks && lineBreakCounter > maxLineBreaks) {
-                reviewComments.push(
-                    this.getSingleLineComment({
-                        ...data,
-                        body: this._getCommentBody(keyword, {
-                            source: matchedRow,
-                            cause: 'maxLineBreaks',
-                            position: getLineNumber(
-                                splitPatch,
-                                'RIGHT',
-                                recentRow.index
-                            ),
-                            enforced: wasPositionEnforced,
-                        }),
-                        index: matchedRow.index,
-                    })
-                );
-
-                lineBreakCounter = 0;
-
-                if (breakOnFirstOccurence) {
-                    break;
-                }
-
-                continue;
-            }
-
-            if (
-                (!EOF && matchedRow.index !== expectedIndex) ||
-                (EOF && index !== expectedIndex)
-            ) {
-                reviewComments.push(
-                    this.getSingleLineComment({
-                        ...data,
-                        body: this._getCommentBody(keyword, {
-                            source: matchedRow,
-                            cause: 'position',
-                            position: getLineNumber(
-                                splitPatch,
-                                'RIGHT',
-                                recentRow.index
-                            ),
-                            enforced: wasPositionEnforced,
-                        }),
-                        index: matchedRow.index,
-                    })
-                );
-
-                lineBreakCounter = 0;
-
-                if (breakOnFirstOccurence) {
-                    break;
-                }
-            }
-
-            lineBreakCounter = 0;
-
-            recentRow = matchedRow;
-        }
-
-        return reviewComments;
+        return this._reviewPosition(file, matchedData, keyword, position);
     }
 
     /**
-     * @param {{ file: object, keyword: object, matchedRows: Array<object>, keywordsWithBOF: Array<object> }} data
+     * @param {{ file: object, data: Array<object>, matchedData: Array<object>, keyword: object, keywordsWithEOF: Array<object> }} parameters
      */
-    _reviewKeywordWithBOF(data) {
-        const { file, keyword, keywordsWithBOF } = data;
+    _reviewEOFPosition(parameters) {
+        const { file, data, matchedData, keyword, keywordsWithEOF } =
+            parameters;
 
-        const { split_patch: splitPatch } = file;
-        let reviewComments = [];
+        const position = this._findPosition(
+            file.split_patch,
+            data,
+            matchedData,
+            keyword,
+            keywordsWithEOF
+        );
 
-        if (this._includesBOF(splitPatch)) {
-            let BOFIndex = 1;
-
-            if (keywordsWithBOF?.length) {
-                BOFIndex = this._correctPositionIndex(
-                    BOFIndex,
-                    keyword,
-                    splitPatch,
-                    keywordsWithBOF
-                );
-            }
-
-            reviewComments = this._reviewExactPosition({
-                ...data,
-                positionIndex: BOFIndex,
-            });
-        } else if (keyword.enforced) {
-            const BOFIndex = splitPatch.findIndex((row) =>
-                row.match(keyword.regex)
-            );
-
-            reviewComments = this._reviewCustomPosition({
-                ...data,
-                customPositionIndex: BOFIndex,
-                wasPositionEnforced: true,
-            });
+        if (!position) {
+            return [];
         }
 
-        return reviewComments;
+        return this._reviewEOF(file, matchedData, keyword, position);
     }
 
-    /**
-     * @param {{ file: object, keyword: object, matchedRows: Array<object>, keywordsWithEOF: Array<object> }} data
-     */
-    _reviewKeywordWithEOF(data) {
-        const { file, matchedRows, keyword, keywordsWithEOF } = data;
+    _reviewPosition(file, matchedData, keyword, position) {
+        const { breakOnFirstOccurence, maxLineBreaks } = keyword;
+        const { index: positionIndex, wasEnforced } = position;
 
-        matchedRows.reverse();
-
-        const { split_patch: splitPatch } = file;
+        let recentRowIndex = positionIndex;
         let reviewComments = [];
-
-        if (this._includesEOF(splitPatch)) {
-            let EOFIndex = splitPatch.length - 1;
-
-            if (keywordsWithEOF?.length) {
-                EOFIndex = this._correctPositionIndex(
-                    EOFIndex,
-                    keyword,
-                    splitPatch,
-                    keywordsWithEOF
-                );
-            }
-
-            reviewComments = this._reviewExactPosition({
-                ...data,
-                positionIndex: EOFIndex,
-            });
-        } else if (keyword.enforced) {
-            const EOFIndex = splitPatch.lastIndexOf((matchedRow) =>
-                matchedRow.match(keyword.regex)
-            );
-
-            reviewComments = this._reviewCustomPosition({
-                ...data,
-                customPositionIndex: EOFIndex,
-                wasPositionEnforced: true,
-            });
-        }
-
-        return reviewComments;
-    }
-
-    /**
-     * @param {{ file: object, keyword: object, matchedRows: Array<object>, positionIndex: number }} data
-     */
-    _reviewExactPosition(data) {
-        const { keyword, matchedRows, positionIndex } = data;
-
-        let reviewComments = [];
-        const { BOF } = keyword.position;
-        const { maxLineBreaks, breakOnFirstOccurence } = keyword;
 
         for (
-            let index = 0,
-                recentRow = null,
-                lineBreakCounter = 0,
-                expectedIndex = positionIndex;
-            index < matchedRows.length;
-            index++, BOF ? expectedIndex++ : expectedIndex--
-        ) {
-            const matchedRow = matchedRows[index];
-
-            if (matchedRow.content === this.merge) {
-                continue;
-            }
-
-            if (maxLineBreaks && lineBreakCounter > maxLineBreaks) {
-                reviewComments.push(
-                    this.getSingleLineComment({
-                        ...data,
-                        body: this._getCommentBody(keyword, {
-                            source: recentRow,
-                            cause: 'maxLineBreaks',
-                            position: positionIndex,
-                        }),
-                        index: recentRow.index,
-                    })
-                );
-
-                if (breakOnFirstOccurence) {
-                    break;
-                }
-
-                lineBreakCounter = 0;
-
-                continue;
-            }
-
-            if (maxLineBreaks && matchedRow.content === this.newLine) {
-                lineBreakCounter++;
-
-                continue;
-            } else if (!maxLineBreaks && matchedRow.content === this.newLine) {
-                const endIndex = this._getIndexOfLastLineBreak(
-                    matchedRows,
-                    index
-                );
-
-                if (endIndex === index) {
-                    reviewComments.push(
-                        this.getSingleLineComment({
-                            ...data,
-                            body: this._getCommentBody(keyword, {
-                                source: matchedRow,
-                                cause: 'noLineBreaks',
-                            }),
-                            index: matchedRow.index,
-                        })
-                    );
-                } else {
-                    reviewComments.push(
-                        this.getMultiLineComment({
-                            ...data,
-                            body: this._getCommentBody(keyword, {
-                                source: matchedRow,
-                                cause: 'noLineBreaks',
-                            }),
-                            from: matchedRow.index,
-                            to: matchedRows[endIndex].index,
-                        })
-                    );
-
-                    index = endIndex;
-                }
-
-                if (breakOnFirstOccurence) {
-                    break;
-                }
-
-                continue;
-            }
-
-            if (matchedRow.index !== expectedIndex) {
-                reviewComments.push(
-                    this.getSingleLineComment({
-                        ...data,
-                        body: this._getCommentBody(keyword, {
-                            source: matchedRow,
-                            cause: 'position',
-                            position: positionIndex,
-                        }),
-                        index: matchedRow.index,
-                    })
-                );
-
-                lineBreakCounter = 0;
-
-                if (breakOnFirstOccurence) {
-                    break;
-                }
-
-                continue;
-            }
-
-            lineBreakCounter = 0;
-
-            recentRow = matchedRow;
-        }
-
-        return reviewComments;
-    }
-
-    _getIndexOfLastLineBreak(matchedRows, firstLineBreakIndex) {
-        let endIndex = firstLineBreakIndex;
-
-        for (
-            let index = firstLineBreakIndex + 1;
-            index < matchedRows.length;
+            let index = wasEnforced ? 1 : 0;
+            index < matchedData.length;
             index++
         ) {
-            if (matchedRows[index].content === this.newLine) {
-                endIndex = index;
+            const row = matchedData[index];
+            let isValid = false;
+            let distance = 0;
 
-                continue;
+            if (row?.length) {
+                distance = recentRowIndex - row.length - row.index;
+            } else {
+                distance = recentRowIndex - row.index - 1;
             }
 
-            break;
+            if (!maxLineBreaks) {
+                isValid = distance === 0;
+            } else {
+                isValid = distance <= maxLineBreaks;
+            }
+
+            if (!isValid) {
+                reviewComments.push(
+                    this.getMultiLineComment({
+                        file,
+                        body: this._getCommentBody(keyword, wasEnforced),
+                        from: recentRowIndex,
+                        to: row.index,
+                    })
+                );
+            }
+
+            recentRowIndex = row.index;
+
+            if (breakOnFirstOccurence) {
+                break;
+            }
         }
 
-        return endIndex;
+        return reviewComments;
     }
 
-    _includesBOF(splitPatch) {
-        const topHunkHeader = getNearestHunkHeader(splitPatch, 0);
-        const { line } = topHunkHeader.modifiedFile;
+    _reviewEOF(file, matchedData, keyword, position) {
+        const { breakOnFirstOccurence, maxLineBreaks } = keyword;
+        const { index: positionIndex, wasEnforced } = position;
 
-        return line === 1;
-    }
+        let recentRowIndex = positionIndex;
+        let reviewComments = [];
 
-    _includesEOF(splitPatch) {
-        const topHunkHeader = getNearestHunkHeader(splitPatch, 0);
-        const { length } = topHunkHeader.modifiedFile;
-
-        return length === splitPatch.length - 1;
-    }
-
-    _correctPositionIndex(indexOfPosition, keyword, splitPatch, otherKeywords) {
-        const { BOF } = keyword.position;
+        console.table(file.split_patch);
 
         for (
-            let index = indexOfPosition;
-            BOF ? index < splitPatch.length : index >= 0;
+            let index = wasEnforced
+                ? matchedData.length - 2
+                : matchedData.length - 1;
+            index >= 0;
+            index--
+        ) {
+            const row = matchedData[index];
+
+            console.log('---comparing---');
+            console.log(row);
+            console.log(recentRowIndex);
+
+            let isValid = false;
+            let distance = 0;
+
+            if (row?.length) {
+                distance = recentRowIndex - row.length - row.index;
+            } else {
+                distance = recentRowIndex - row.index - 1;
+            }
+
+            if (!maxLineBreaks) {
+                isValid = distance === 0;
+            } else {
+                isValid = distance <= maxLineBreaks;
+            }
+
+            if (!isValid) {
+                reviewComments.push(
+                    this.getMultiLineComment({
+                        file,
+                        body: this._getCommentBody(keyword, wasEnforced),
+                        from: row.index,
+                        to: recentRowIndex,
+                    })
+                );
+            }
+
+            recentRowIndex = row.index;
+
+            if (breakOnFirstOccurence) {
+                break;
+            }
+        }
+
+        return reviewComments;
+    }
+
+    _findPosition(splitPatch, data, matchedData, testedKeyword, otherKeywords) {
+        let index = -1;
+        let wasEnforced = false;
+        const { BOF, EOF } = testedKeyword.position;
+        const topHunkHeader = getNearestHunkHeader(splitPatch, 0);
+
+        if (BOF) {
+            const { line } = topHunkHeader.modifiedFile;
+
+            index = line === 1 ? 1 : -1;
+        } else if (EOF) {
+            const dataLength = this.countPatchLength(splitPatch);
+            const { length: fileLength } = topHunkHeader.modifiedFile;
+
+            index = fileLength === dataLength ? data.length - 1 : -1;
+        }
+
+        if (index === -1 && testedKeyword.enforced) {
+            index = BOF
+                ? matchedData[0].index
+                : matchedData[matchedData.length - 1].index;
+
+            wasEnforced = true;
+        }
+
+        if (index === -1) {
+            return null;
+        }
+
+        if (!wasEnforced && otherKeywords?.length) {
+            index = this._correctIndex(
+                data,
+                index,
+                testedKeyword,
+                otherKeywords
+            );
+        }
+
+        // skip merge lines
+        for (; ; BOF ? index++ : index--) {
+            const { content } = data[index];
+
+            if (content !== this.merge) {
+                break;
+            }
+        }
+
+        // if line is multiline
+        console.table(data);
+
+        if (data[index]?.length) {
+            console.log('koko');
+
+            const length = data[index]?.length;
+
+            index = EOF ? index - length : index + length;
+        }
+
+        console.log('was enforced? -> ', wasEnforced);
+
+        return {
+            index,
+            wasEnforced,
+        };
+    }
+
+    _correctIndex(data, currentIndex, testedKeyword, otherKeywords) {
+        const { BOF } = testedKeyword.position;
+        const { maxLineBreaks } = testedKeyword;
+
+        for (
+            let index = currentIndex, lineBreakCounter = 0;
+            BOF ? index < data.length : index > 0;
             BOF ? index++ : index--
         ) {
-            const row = splitPatch[index];
+            const { content } = data[index];
 
-            const isNewLine = removeWhitespaces(row) === '+';
-
-            const isMatched = otherKeywords.some((otherKeyword) =>
-                row.match(otherKeyword.regex)
-            );
-
-            if (isNewLine || isMatched) {
-                BOF ? indexOfPosition++ : indexOfPosition--;
-
+            if (content === this.merge) {
                 continue;
             }
 
-            break;
+            if (content === this.newLine) {
+                lineBreakCounter++;
+            }
+
+            if (lineBreakCounter > maxLineBreaks) {
+                return index;
+            }
+
+            const isMatched = otherKeywords.some((otherKeyword) =>
+                content.match(otherKeyword.regex)
+            );
+
+            if (!isMatched) {
+                return index;
+            }
         }
 
-        return indexOfPosition;
+        return currentIndex;
     }
+
+    countPatchLength(patch) {
+        const value = patch.filter(
+            (row) => !row.startsWith('-') && !row.startsWith('@@')
+        );
+
+        return value?.length || 0;
+    }
+
+    _getCommentBody(keyword, wasPositionEnforced) {}
 
     _getCommentBody(keyword, data) {
         const { cause, position: lineNumber, enforced } = data;
