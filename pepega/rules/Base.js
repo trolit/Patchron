@@ -203,6 +203,12 @@ class BaseRule {
 
         return multilineEndIndex;
     }
+
+    logError(filename, testedFile, message) {
+        probotInstance.log.error(
+            `${filename} >>> (${testedFile?.filename})\n${message}`
+        );
+    }
 }
 
 module.exports = BaseRule;
