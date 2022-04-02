@@ -158,6 +158,15 @@ class BaseRule {
     }
 
     /**
+     * tests if given text is new line
+     * @param {string} text to check
+     * @returns {boolean}
+     */
+    isNewLine(content) {
+        return ['+', ''].includes(removeWhitespaces(content));
+    }
+
+    /**
      * determines whether passed line is part of multi-line
      * @param {object} keyword - keyword, **must** contain **multiLineOptions** array
      * @param {string} line - text of line
