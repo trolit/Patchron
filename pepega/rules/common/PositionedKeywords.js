@@ -494,25 +494,16 @@ class PositionedKeywordsRule extends BaseRule {
 
     _correctIndex(data, currentIndex, testedKeyword, otherKeywords) {
         const { BOF } = testedKeyword.position;
-        const { maxLineBreaks } = testedKeyword;
 
         for (
-            let index = currentIndex, lineBreakCounter = 0;
+            let index = currentIndex;
             BOF ? index < data.length : index > 0;
             BOF ? index++ : index--
         ) {
             const { content } = data[index];
 
-            if (content === this.merge) {
+            if (this.customLines.includes(content)) {
                 continue;
-            }
-
-            if (content === this.newLine) {
-                lineBreakCounter++;
-            }
-
-            if (lineBreakCounter > maxLineBreaks) {
-                return index;
             }
 
             const isMatched = otherKeywords.some((otherKeyword) =>
