@@ -30,15 +30,21 @@ class PositionedKeywordsRule extends BaseRule {
         const keywords = this.keywords;
 
         if (!keywords.length) {
-            probotInstance.log.error(
-                `Couldn't run rule ${__filename} on ${file.filename}. No keywords defined.`
-            );
+            this.logError(__filename, file, 'No keywords defined');
 
             return [];
         }
 
         const { split_patch: splitPatch } = file;
+
+        if (!splitPatch) {
+            this.logError(__filename, file, 'Empty patch');
+
+            return [];
+        }
+
         const data = this._setupData(splitPatch);
+
         let reviewComments = [];
 
         for (const keyword of keywords) {
@@ -168,7 +174,7 @@ class PositionedKeywordsRule extends BaseRule {
                     this.isMultiline(keyword, content);
 
                 if (isMultiLine) {
-                    const multilineEndIndex = this.resolveMultilineMatch(
+                    const multilineEndIndex = this.getMultiLineEndIndex(
                         keyword,
                         splitPatch,
                         index
@@ -279,9 +285,22 @@ class PositionedKeywordsRule extends BaseRule {
             return null;
         }
 
+        let length = null;
+
+        if (this.isMultiline(keyword, splitPatch[index])) {
+            const multilineEndIndex = this.getMultiLineEndIndex(
+                keyword,
+                splitPatch,
+                index
+            );
+
+            length = multilineEndIndex - index;
+        }
+
         return {
             index,
             wasEnforced,
+            length,
         };
     }
 
@@ -332,9 +351,34 @@ class PositionedKeywordsRule extends BaseRule {
             }
         }
 
+        let length = null;
+        const isMultiLine = this.isMultiline(
+            testedKeyword,
+            data[index].content
+        );
+
+        if (!EOF && isMultiLine) {
+            const multilineEndIndex = this.getMultiLineEndIndex(
+                testedKeyword,
+                splitPatch,
+                index
+            );
+
+            length = multilineEndIndex - index;
+        } else if (EOF && isMultiLine) {
+            const multiLineStartIndex = this._getMultiLineStartIndex(
+                splitPatch,
+                testedKeyword,
+                index
+            );
+
+            length = index - multiLineStartIndex;
+        }
+
         return {
             index,
             wasEnforced,
+            length,
         };
     }
 
@@ -344,10 +388,11 @@ class PositionedKeywordsRule extends BaseRule {
             maxLineBreaks,
             countDifferentCodeAsLineBreak,
         } = keyword;
-        const { index: positionIndex, wasEnforced } = position;
-        const { split_patch: splitPatch } = file;
 
-        let recentRowIndex = positionIndex;
+        const { split_patch: splitPatch } = file;
+        const { wasEnforced } = position;
+
+        let recentRow = position;
         let reviewComments = [];
 
         for (
@@ -357,14 +402,18 @@ class PositionedKeywordsRule extends BaseRule {
         ) {
             let reason = 'tooManyLineBreaks';
             const row = matchedData[index];
+
             let isValid = false;
             let distance = 0;
 
-            if (row?.length) {
-                distance = recentRowIndex - row.length - row.index;
-            } else {
-                distance = recentRowIndex - row.index - 1;
+            let previousIndex = recentRow.index;
+            let currentIndex = row.index;
+
+            if (recentRow?.length) {
+                previousIndex += recentRow.length;
             }
+
+            distance = currentIndex - previousIndex - 1;
 
             if (!maxLineBreaks) {
                 isValid = distance === 0;
@@ -372,87 +421,20 @@ class PositionedKeywordsRule extends BaseRule {
                 isValid = distance <= maxLineBreaks;
             }
 
-            const from = recentRowIndex;
-            const to = row.index;
-
-            if (isValid && !countDifferentCodeAsLineBreak && !row?.length) {
-                isValid = !this._includesDifferentCode(splitPatch, from, to);
-
-                reason = isValid ? reason : 'differentCode';
-            }
-
-            if (!isValid) {
-                reviewComments.push(
-                    this.getMultiLineComment({
-                        file,
-                        body: this._getCommentBody(keyword, splitPatch, {
-                            from,
-                            to,
-                            distance,
-                        }),
-                        from,
-                        to,
-                    })
+            if (isValid && !countDifferentCodeAsLineBreak) {
+                isValid = !this._includesDifferentCode(
+                    splitPatch,
+                    previousIndex,
+                    currentIndex
                 );
-            }
-
-            recentRowIndex = row.index;
-
-            if (breakOnFirstOccurence) {
-                break;
-            }
-        }
-
-        return reviewComments;
-    }
-
-    _reviewEOF(file, matchedData, keyword, position) {
-        const {
-            breakOnFirstOccurence,
-            maxLineBreaks,
-            countDifferentCodeAsLineBreak,
-        } = keyword;
-        const { index: positionIndex, wasEnforced } = position;
-        const { split_patch: splitPatch } = file;
-
-        let recentRowIndex = positionIndex;
-        let reviewComments = [];
-
-        for (
-            let index = wasEnforced
-                ? matchedData.length - 2
-                : matchedData.length - 1;
-            index >= 0;
-            index--
-        ) {
-            let reason = 'tooManyLineBreaks';
-            const row = matchedData[index];
-
-            let isValid = false;
-            let distance = 0;
-
-            if (row?.length) {
-                distance = recentRowIndex - row.length - row.index;
-            } else {
-                distance = recentRowIndex - row.index - 1;
-            }
-
-            if (!maxLineBreaks) {
-                isValid = distance === 0;
-            } else {
-                isValid = distance <= maxLineBreaks;
-            }
-
-            const from = row.index;
-            const to = recentRowIndex;
-
-            if (isValid && !countDifferentCodeAsLineBreak && !row?.length) {
-                isValid = !this._includesDifferentCode(splitPatch, from, to);
 
                 reason = isValid ? reason : 'differentCode';
             }
 
             if (!isValid) {
+                const from = recentRow.index;
+                const to = row.index;
+
                 reviewComments.push(
                     this.getMultiLineComment({
                         file,
@@ -468,7 +450,7 @@ class PositionedKeywordsRule extends BaseRule {
                 );
             }
 
-            recentRowIndex = row.index;
+            recentRow = row;
 
             if (breakOnFirstOccurence) {
                 break;
@@ -476,6 +458,101 @@ class PositionedKeywordsRule extends BaseRule {
         }
 
         return reviewComments;
+    }
+
+    _reviewEOF(file, matchedData, keyword, position) {
+        const {
+            breakOnFirstOccurence,
+            maxLineBreaks,
+            countDifferentCodeAsLineBreak,
+        } = keyword;
+        const { wasEnforced } = position;
+        const { split_patch: splitPatch } = file;
+
+        let recentRow = position;
+        let reviewComments = [];
+
+        for (
+            let index = wasEnforced
+                ? matchedData.length - 2
+                : matchedData.length - 1;
+            index >= 0;
+            index--
+        ) {
+            let reason = 'tooManyLineBreaks';
+            const row = matchedData[index];
+
+            let isValid = false;
+            let distance = 0;
+
+            let previousIndex = recentRow.index;
+            let currentIndex = row.index;
+
+            if (row?.length) {
+                currentIndex += row.length;
+            }
+
+            distance = previousIndex - currentIndex - 1;
+
+            if (!maxLineBreaks) {
+                isValid = distance === 0;
+            } else {
+                isValid = distance <= maxLineBreaks;
+            }
+
+            if (isValid && !countDifferentCodeAsLineBreak) {
+                isValid = !this._includesDifferentCode(
+                    splitPatch,
+                    currentIndex,
+                    previousIndex
+                );
+
+                reason = isValid ? reason : 'differentCode';
+            }
+
+            if (!isValid) {
+                const from = row.index;
+                const to = recentRow.index;
+
+                reviewComments.push(
+                    this.getMultiLineComment({
+                        file,
+                        body: this._getCommentBody(keyword, splitPatch, {
+                            from,
+                            to,
+                            distance,
+                            reason,
+                        }),
+                        from,
+                        to,
+                    })
+                );
+            }
+
+            recentRow = row;
+
+            if (breakOnFirstOccurence) {
+                break;
+            }
+        }
+
+        return reviewComments;
+    }
+
+    _getMultiLineStartIndex(splitPatch, keyword, endIndex) {
+        let startIndex = -1;
+
+        for (let index = endIndex - 1; endIndex >= 0; endIndex--) {
+            const content = splitPatch[index];
+
+            if (content.match(keyword.regex)) {
+                startIndex = index;
+
+                break;
+            }
+        }
+
+        return startIndex;
     }
 
     _includesDifferentCode(splitPatch, from, to) {
@@ -533,7 +610,7 @@ class PositionedKeywordsRule extends BaseRule {
      */
     _getCommentBody(keyword, splitPatch, review) {
         const { from, to, distance, reason } = review;
-        const { maxLineBreaks } = keyword;
+        const { maxLineBreaks, name } = keyword;
 
         const fromLineNumber = getLineNumber(splitPatch, 'RIGHT', from);
         const toLineNumber = getLineNumber(splitPatch, 'RIGHT', to);
@@ -542,7 +619,7 @@ class PositionedKeywordsRule extends BaseRule {
 
         switch (reason) {
             case 'tooManyLineBreaks':
-                commentBody = `Found \`${distance}\` line(s) between \`line: ${fromLineNumber}\` and \`line: ${toLineNumber}\` but ${
+                commentBody = `Found \`${distance}\` line(s) between \`${name}\` at lines \`${fromLineNumber}\` and \`${toLineNumber}\` but ${
                     maxLineBreaks
                         ? `only \`${maxLineBreaks}\` are allowed`
                         : `there shouldn't be any`
