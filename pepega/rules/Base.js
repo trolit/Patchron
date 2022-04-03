@@ -109,7 +109,7 @@ class BaseRule {
                 keyword?.multilineOptions &&
                 this.isMultiline(keyword, content)
             ) {
-                const multilineEndIndex = this.resolveMultilineMatch(
+                const multilineEndIndex = this.getMultiLineEndIndex(
                     keyword,
                     splitPatch,
                     index
@@ -184,7 +184,7 @@ class BaseRule {
             : includesMultiLineOption && !line.match(keyword.regex);
     }
 
-    resolveMultilineMatch(keyword, splitPatch, currentIndex) {
+    getMultiLineEndIndex(keyword, splitPatch, currentIndex) {
         let multilineEndIndex = -1;
 
         for (let index = currentIndex + 1; index < splitPatch.length; index++) {
