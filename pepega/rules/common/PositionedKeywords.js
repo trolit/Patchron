@@ -245,6 +245,28 @@ class PositionedKeywordsRule extends BaseRule {
             return [];
         }
 
+        const { index, wasEnforced } = position;
+        const isPositionMatched = splitPatch[index].match(keyword.regex);
+
+        if (!wasEnforced && !isPositionMatched) {
+            const rawContent = this.getRawContent(splitPatch[index]);
+
+            const body =
+                dedent(`Expected \`${keyword.name}\` lines to start here but found
+                \`\`\`
+                ${rawContent}
+                \`\`\`
+                `);
+
+            return [
+                this.getSingleLineComment({
+                    file,
+                    body,
+                    index: position.index,
+                }),
+            ];
+        }
+
         return this._reviewPosition(file, data, matchedData, keyword, position);
     }
 
@@ -254,6 +276,7 @@ class PositionedKeywordsRule extends BaseRule {
     _reviewEOFPosition(parameters) {
         const { file, data, matchedData, keyword, keywordsWithEOF } =
             parameters;
+        const { split_patch: splitPatch } = file;
 
         const position = this._findPosition(
             file.split_patch,
@@ -265,6 +288,28 @@ class PositionedKeywordsRule extends BaseRule {
 
         if (!position) {
             return [];
+        }
+
+        const { index, wasEnforced } = position;
+        const isPositionMatched = splitPatch[index].match(keyword.regex);
+
+        if (!wasEnforced && !isPositionMatched) {
+            const rawContent = this.getRawContent(splitPatch[index]);
+
+            const body =
+                dedent(`Expected \`${keyword.name}\` lines to start here but found
+                \`\`\`
+                ${rawContent}
+                \`\`\`
+                `);
+
+            return [
+                this.getSingleLineComment({
+                    file,
+                    body,
+                    index: position.index,
+                }),
+            ];
         }
 
         return this._reviewEOF(file, data, matchedData, keyword, position);
@@ -364,6 +409,7 @@ class PositionedKeywordsRule extends BaseRule {
             data[index].content
         );
 
+        // TODO: simplify
         if (!EOF && isMultiLine) {
             const multilineEndIndex = this.getMultiLineEndIndex(
                 testedKeyword,
@@ -441,7 +487,6 @@ class PositionedKeywordsRule extends BaseRule {
             }
 
             if (!isValid) {
-                // TODO: index + endIndex
                 const from = recentRow.index;
                 const to = row.index;
 
