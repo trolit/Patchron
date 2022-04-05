@@ -480,7 +480,7 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
-    it('returns empty array on valid BOF positioning (maxLineBreaks = 2, countDifferentCodeAsLineBreak = true)', () => {
+    it('returns review on invalid BOF positioning', () => {
         positionedKeywordsRule = new PositionedKeywords({
             keywords: [
                 {
@@ -495,6 +495,7 @@ describe('invoke function', () => {
             filename: '...',
             split_patch: [
                 `@@ -10,13 +1,7 @@`,
+                `const abc = 5;`,
                 `  import {\n`,
                 `   method4,\n`,
                 `   method5,\n`,
@@ -516,7 +517,9 @@ describe('invoke function', () => {
             ],
         });
 
-        expect(result).toEqual([]);
+        expect(result).toHaveLength(1);
+
+        expect(result[0]).toHaveProperty('line', 1);
     });
 
     it('returns review on invalid BOF positioning (maxLineBreaks = 0)', () => {
