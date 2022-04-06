@@ -480,7 +480,46 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
-    it('returns review on invalid BOF positioning', () => {
+    it('returns empty array on valid BOF positioning (maxLineBreaks = 2, countDifferentCodeAsLineBreak = true)', () => {
+        positionedKeywordsRule = new PositionedKeywords({
+            keywords: [
+                {
+                    ...importKeywordBOFConfig,
+                    maxLineBreaks: 2,
+                    countDifferentCodeAsLineBreak: true,
+                },
+            ],
+        });
+
+        const result = positionedKeywordsRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +1,7 @@`,
+                `  import {\n`,
+                `   method4,\n`,
+                `   method5,\n`,
+                `  from '@/helpers/methods'\n`,
+                ` const x = 2;`,
+                `+ import method1 from '@/helpers/methods\n`,
+                `- \n`,
+                `  import {\n`,
+                `   method24,\n`,
+                `  from '@/helpers/methods'\n`,
+                `+ import method2 from '@/helpers/methods'\n`,
+                `+ const y = 3;`,
+                `+ import method3 from '@/helpers/methods'\n`,
+                `  import {\n`,
+                `   method34,\n`,
+                `  from '@/helpers/methods'\n`,
+                `- \n`,
+                `- import method6 from '@/helpers/methods'\n`,
+            ],
+        });
+
+        expect(result).toEqual([]);
+    });
+
+    it('returns review on invalid BOF position', () => {
         positionedKeywordsRule = new PositionedKeywords({
             keywords: [
                 {
@@ -598,7 +637,7 @@ describe('invoke function', () => {
         expect(result[1]).toHaveProperty('position', 14);
     });
 
-    it('returns review on invalid custom positioning (maxLineBreaks = 2, countDifferentCodeAsLineBreak = false)', () => {
+    it('returns review on invalid BOF positioning (maxLineBreaks = 2, countDifferentCodeAsLineBreak = false)', () => {
         positionedKeywordsRule = new PositionedKeywords({
             keywords: [
                 {
@@ -657,6 +696,255 @@ describe('invoke function', () => {
         const result = positionedKeywordsRule.invoke({
             filename: '...',
             split_patch: [
+                `@@ -10,13 +1,7 @@`,
+                `  import {\n`,
+                `   method4,\n`,
+                `   method5,\n`,
+                `  from '@/helpers/methods'\n`,
+                ` const x = 2;`,
+                `+ import method1 from '@/helpers/methods\n`,
+                `- \n`,
+                `  import {\n`,
+                `   method24,\n`,
+                `  from '@/helpers/methods'\n`,
+                `+ import method2 from '@/helpers/methods'\n`,
+                `+ const y = 3;`,
+                `+ import method3 from '@/helpers/methods'\n`,
+                `  import {\n`,
+                `   method34,\n`,
+                `  from '@/helpers/methods'\n`,
+                `- \n`,
+                `- import method6 from '@/helpers/methods'\n`,
+            ],
+        });
+
+        expect(result).toHaveLength(1);
+
+        expect(result[0]).toHaveProperty('start_line', 1);
+        expect(result[0]).toHaveProperty('position', 6);
+    });
+
+    /**
+     * ---------------------------------------------------
+     * EOF
+     * ---------------------------------------------------
+     */
+
+    it('returns empty array on missing EOF position', () => {
+        positionedKeywordsRule = new PositionedKeywords({
+            keywords: [
+                {
+                    ...importKeywordEOFConfig,
+                    enforced: false,
+                },
+            ],
+        });
+
+        const result = positionedKeywordsRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +5,5 @@`,
+                `+ <scwddwdwript>\n`,
+                `+ import method1 from '@/helpers/methods\n`,
+                `- \n`,
+                `+ \n`,
+                `+ import method2 from '@/helpers/methods'\n`,
+                `+ \n`,
+                `+ import method3 from '@/helpers/methods'`,
+            ],
+        });
+
+        expect(result).toEqual([]);
+    });
+
+    it('returns empty array on valid EOF positioning', () => {
+        positionedKeywordsRule = new PositionedKeywords({
+            keywords: [importKeywordEOFConfig],
+        });
+
+        const result = positionedKeywordsRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +1,13 @@`,
+                `  import {\n`,
+                `   method4,\n`,
+                `   method5,\n`,
+                `  from '@/helpers/methods'\n`,
+                `+ import method1 from '@/helpers/methods\n`,
+                `- \n`,
+                `  import {\n`,
+                `   method24,\n`,
+                `  from '@/helpers/methods'\n`,
+                `+ import method2 from '@/helpers/methods'\n`,
+                `+ import method3 from '@/helpers/methods'\n`,
+                `  import {\n`,
+                `   method34,\n`,
+                `  from '@/helpers/methods'\n`,
+                `- \n`,
+                `- import method6 from '@/helpers/methods'\n`,
+            ],
+        });
+
+        expect(result).toEqual([]);
+    });
+
+    it('returns empty array on valid EOF positioning (enforced)', () => {
+        positionedKeywordsRule = new PositionedKeywords({
+            keywords: [importKeywordEOFConfig],
+        });
+
+        const result = positionedKeywordsRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +4,2 @@`,
+                `+ <scrdwwddwdipt>\n`,
+                `  import {\n`,
+                `   method4,\n`,
+                `   method5,\n`,
+                `  from '@/helpers/methods'\n`,
+                `+ import method1 from '@/helpers/methods\n`,
+                `- \n`,
+                `  import {\n`,
+                `   method24,\n`,
+                `  from '@/helpers/methods'\n`,
+                `+ import method2 from '@/helpers/methods'\n`,
+                `+ import method3 from '@/helpers/methods'\n`,
+                `  import {\n`,
+                `   method34,\n`,
+                `  from '@/helpers/methods'\n`,
+                `- \n`,
+                `- import method6 from '@/helpers/methods'\n`,
+            ],
+        });
+
+        expect(result).toEqual([]);
+    });
+
+    it('returns empty array on valid EOF positioning (maxLineBreaks = 2, countDifferentCodeAsLineBreak = true)', () => {
+        positionedKeywordsRule = new PositionedKeywords({
+            keywords: [
+                {
+                    ...importKeywordEOFConfig,
+                    maxLineBreaks: 2,
+                    countDifferentCodeAsLineBreak: true,
+                },
+            ],
+        });
+
+        const result = positionedKeywordsRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +1,13 @@`,
+                `  import {\n`,
+                `   method4,\n`,
+                `   method5,\n`,
+                `  from '@/helpers/methods'\n`,
+                ` const x = 2;`,
+                `+ import method1 from '@/helpers/methods\n`,
+                `- \n`,
+                `  import {\n`,
+                `   method24,\n`,
+                `  from '@/helpers/methods'\n`,
+                `+ import method2 from '@/helpers/methods'\n`,
+                `+ const y = 3;`,
+                `+ import method3 from '@/helpers/methods'\n`,
+                `  import {\n`,
+                `   method34,\n`,
+                `  from '@/helpers/methods'\n`,
+                `- \n`,
+                `- import method6 from '@/helpers/methods'\n`,
+            ],
+        });
+
+        expect(result).toEqual([]);
+    });
+
+    it('returns review on invalid EOF position', () => {
+        positionedKeywordsRule = new PositionedKeywords({
+            keywords: [
+                {
+                    ...importKeywordEOFConfig,
+                    maxLineBreaks: 2,
+                    countDifferentCodeAsLineBreak: true,
+                },
+            ],
+        });
+
+        const result = positionedKeywordsRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +1,17 @@`,
+                `const abc = 5;`,
+                `  import {\n`,
+                `   method4,\n`,
+                `   method5,\n`,
+                `  from '@/helpers/methods'\n`,
+                ` const x = 2;`,
+                `+ import method1 from '@/helpers/methods\n`,
+                `- \n`,
+                `  import {\n`,
+                `   method24,\n`,
+                `  from '@/helpers/methods'\n`,
+                `+ import method2 from '@/helpers/methods'\n`,
+                `+ const y = 3;`,
+                `+ import method3 from '@/helpers/methods'\n`,
+                `  import {\n`,
+                `   method34,\n`,
+                `  from '@/helpers/methods'\n`,
+                ` const test123 = 555;`,
+                `- \n`,
+                `- import method6 from '@/helpers/methods'\n`,
+            ],
+        });
+
+        expect(result).toHaveLength(1);
+
+        expect(result[0]).toHaveProperty('line', 17);
+    });
+
+    it('returns review on invalid EOF positioning (maxLineBreaks = 0)', () => {
+        const result = positionedKeywordsRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +1,4 @@`,
+                `  import {\n`,
+                `   method4,\n`,
+                `   method5,\n`,
+                `  from '@/helpers/methods'\n`,
+                ` \n`,
+                `+ import method1 from '@/helpers/methods\n`,
+                `- \n`,
+                `  import {\n`,
+                `   method24,\n`,
+                `  from '@/helpers/methods'\n`,
+                `+ import method2 from '@/helpers/methods'\n`,
+                `+ \n`,
+                `+ import method3 from '@/helpers/methods'\n`,
+                `  import {\n`,
+                `   method34,\n`,
+                `  from '@/helpers/methods'\n`,
+                `- \n`,
+                `- import method6 from '@/helpers/methods'\n`,
+            ],
+        });
+
+        expect(result).toHaveLength(2);
+
+        expect(result[0]).toHaveProperty('start_line', 1);
+        expect(result[0]).toHaveProperty('position', 6);
+
+        expect(result[1]).toHaveProperty('start_line', 10);
+        expect(result[1]).toHaveProperty('position', 12);
+    });
+
+    it('returns review on invalid EOF positioning (enforced, maxLineBreaks = 0)', () => {
+        positionedKeywordsRule = new PositionedKeywords({
+            keywords: [importKeywordEOFConfig],
+        });
+
+        const result = positionedKeywordsRule.invoke({
+            filename: '...',
+            split_patch: [
                 `@@ -10,13 +5,7 @@`,
                 `+ const a = 2;\n`,
                 `+ const b = 6;\n`,
@@ -681,15 +969,99 @@ describe('invoke function', () => {
             ],
         });
 
-        expect(result).toHaveLength(1);
+        expect(result).toHaveLength(2);
 
-        expect(result[0]).toHaveProperty('start_line', 7);
-        expect(result[0]).toHaveProperty('position', 8);
+        expect(result[0]).toHaveProperty('start_line', 16);
+        expect(result[0]).toHaveProperty('position', 14);
+
+        expect(result[1]).toHaveProperty('start_line', 7);
+        expect(result[1]).toHaveProperty('position', 8);
     });
 
-    /**
-     * ---------------------------------------------------
-     * EOF
-     * ---------------------------------------------------
-     */
+    it('returns review on invalid EOF positioning (maxLineBreaks = 2, countDifferentCodeAsLineBreak = false)', () => {
+        positionedKeywordsRule = new PositionedKeywords({
+            keywords: [
+                {
+                    ...importKeywordEOFConfig,
+                    maxLineBreaks: 2,
+                },
+            ],
+        });
+
+        const result = positionedKeywordsRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +5,17 @@`,
+                `+ const a = 2;\n`,
+                `+ const b = 6;\n`,
+                `  import {\n`,
+                `   method4,\n`,
+                `   method5,\n`,
+                `  from '@/helpers/methods'\n`,
+                ` const x = 2;`,
+                `+ import method1 from '@/helpers/methods\n`,
+                `- \n`,
+                `  import {\n`,
+                `   method24,\n`,
+                `  from '@/helpers/methods'\n`,
+                `+ import method2 from '@/helpers/methods'\n`,
+                `+ const y = 3;`,
+                `+ import method3 from '@/helpers/methods'\n`,
+                `  import {\n`,
+                `   method34,\n`,
+                `  from '@/helpers/methods'\n`,
+                `- \n`,
+                `- import method6 from '@/helpers/methods'\n`,
+            ],
+        });
+
+        expect(result).toHaveLength(2);
+
+        expect(result[0]).toHaveProperty('start_line', 16);
+        expect(result[0]).toHaveProperty('position', 14);
+
+        expect(result[1]).toHaveProperty('start_line', 7);
+        expect(result[1]).toHaveProperty('position', 8);
+    });
+
+    it('returns single comment on invalid EOF positioning (breakOnFirstOccurence)', () => {
+        positionedKeywordsRule = new PositionedKeywords({
+            keywords: [
+                {
+                    ...importKeywordEOFConfig,
+                    breakOnFirstOccurence: true,
+                },
+            ],
+        });
+
+        const result = positionedKeywordsRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +1,15 @@`,
+                `  import {\n`,
+                `   method4,\n`,
+                `   method5,\n`,
+                `  from '@/helpers/methods'\n`,
+                ` const x = 2;`,
+                `+ import method1 from '@/helpers/methods\n`,
+                `- \n`,
+                `  import {\n`,
+                `   method24,\n`,
+                `  from '@/helpers/methods'\n`,
+                `+ import method2 from '@/helpers/methods'\n`,
+                `+ const y = 3;`,
+                `+ import method3 from '@/helpers/methods'\n`,
+                `  import {\n`,
+                `   method34,\n`,
+                `  from '@/helpers/methods'\n`,
+                `- \n`,
+                `- import method6 from '@/helpers/methods'\n`,
+            ],
+        });
+
+        expect(result).toHaveLength(1);
+
+        expect(result[0]).toHaveProperty('start_line', 10);
+        expect(result[0]).toHaveProperty('position', 12);
+    });
 });
