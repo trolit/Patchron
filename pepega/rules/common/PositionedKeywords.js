@@ -171,7 +171,7 @@ class PositionedKeywordsRule extends BaseRule {
                 const content = matchResult[0];
 
                 const isMultiLine =
-                    keyword?.multilineOptions &&
+                    keyword?.multilineOptions?.length &&
                     this.isMultiline(keyword, content);
 
                 if (isMultiLine) {
