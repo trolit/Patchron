@@ -291,9 +291,15 @@ class PositionedKeywordsRule extends BaseRule {
         }
 
         const { index, wasEnforced } = position;
-        const isPositionMatched = splitPatch[index].match(keyword.regex);
+        const content = splitPatch[index];
+        const isPositionMatched = content.match(keyword.regex);
+        const includesMultiLineOption = this.isMultiline(
+            keyword,
+            content,
+            'top'
+        );
 
-        if (!wasEnforced && !isPositionMatched) {
+        if (!wasEnforced && !isPositionMatched && !includesMultiLineOption) {
             const rawContent = this.getRawContent(splitPatch[index]);
 
             const body =
