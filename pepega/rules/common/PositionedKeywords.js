@@ -7,11 +7,11 @@ const getNearestHunkHeader = require('../../helpers/getNearestHunkHeader');
 class PositionedKeywordsRule extends BaseRule {
     /**
      * @param {object} config
-     * @param {Array<{name: string, regex: object, position: { custom: { name: string, expression: string|object }, BOF: boolean, EOF:boolean }, ignoreNewline: boolean, enforced: boolean }>} config.keywords
+     * @param {Array<{name: string, regex: object, position: { custom: { name: string, expression: string|object }, BOF: boolean }, ignoreNewline: boolean, enforced: boolean }>} config.keywords
      * @param {string} config.keywords[].name - readable name
      * @param {object} config.keywords[].regex - matches line(s) that should be validated against rule
      * @param {Array<string>} config.keywords[].multilineOptions - if none of them will be included in matched line, line will be treated as multiline.
-     * @param {object} config.keywords[].position - defines keyword expected position (custom, BOF or EOF). Configure each keyword with **only** one way of determining position.
+     * @param {object} config.keywords[].position - defines keyword expected position (custom or BOF). Configure each keyword with **only** one way of determining position.
      * @param {number} config.keywords[].maxLineBreaks - defines maximum allowed line breaks between each keyword. When 0, spaces between matched line(s) are counted as rule break
      * @param {boolean} config.keywords[].enforced - when **enabled**, it basically means that when patch does not have expected position that was provided within configuration - but it has at least two keywords - first occurence will be counted as expected position, which means, remaining ones must be positioned in relation to first one.
      * @param {boolean} config.keywords[].breakOnFirstOccurence - when **true**, stops keyword review on first invalid occurence
@@ -23,7 +23,6 @@ class PositionedKeywordsRule extends BaseRule {
         const { keywords } = config;
 
         this.keywords = keywords;
-        this.differentKeyword = '<<< different keyword >>>';
     }
 
     invoke(file) {
@@ -95,23 +94,6 @@ class PositionedKeywordsRule extends BaseRule {
                     })
                 );
             }
-
-            if (position.EOF) {
-                const keywordsWithEOF = keywords.filter(
-                    (element) =>
-                        element.position.EOF && element.regex !== keyword.regex
-                );
-
-                reviewComments.push(
-                    ...this._reviewEOFPosition({
-                        file,
-                        data,
-                        matchedData,
-                        keyword,
-                        keywordsWithEOF,
-                    })
-                );
-            }
         }
 
         return reviewComments;
@@ -119,11 +101,9 @@ class PositionedKeywordsRule extends BaseRule {
 
     _hasKeywordValidConfig(keyword) {
         const isCustomPosition = !!keyword.position.custom;
-        const { BOF, EOF } = keyword.position;
+        const { BOF } = keyword.position;
 
-        return (
-            [isCustomPosition, BOF, EOF].filter((value) => value).length === 1
-        );
+        return [isCustomPosition, BOF].filter((value) => value).length === 1;
     }
 
     _setupData(splitPatch) {
@@ -270,57 +250,6 @@ class PositionedKeywordsRule extends BaseRule {
         return this._reviewPosition(file, data, matchedData, keyword, position);
     }
 
-    /**
-     * @param {{ file: object, data: Array<object>, matchedData: Array<object>, keyword: object, keywordsWithEOF: Array<object> }} parameters
-     */
-    _reviewEOFPosition(parameters) {
-        const { file, data, matchedData, keyword, keywordsWithEOF } =
-            parameters;
-        const { split_patch: splitPatch } = file;
-
-        const position = this._findPosition(
-            file.split_patch,
-            data,
-            matchedData,
-            keyword,
-            keywordsWithEOF
-        );
-
-        if (!position) {
-            return [];
-        }
-
-        const { index, wasEnforced } = position;
-        const content = splitPatch[index];
-        const isPositionMatched = content.match(keyword.regex);
-        const includesMultiLineOption = this.isMultiline(
-            keyword,
-            content,
-            'top'
-        );
-
-        if (!wasEnforced && !isPositionMatched && !includesMultiLineOption) {
-            const rawContent = this.getRawContent(splitPatch[index]);
-
-            const body =
-                dedent(`Expected \`${keyword.name}\` lines to start here but found
-                \`\`\`
-                ${rawContent}
-                \`\`\`
-                `);
-
-            return [
-                this.getSingleLineComment({
-                    file,
-                    body,
-                    index: position.index,
-                }),
-            ];
-        }
-
-        return this._reviewEOF(file, data, matchedData, keyword, position);
-    }
-
     _findCustomPosition(splitPatch, keyword) {
         let wasEnforced = false;
         let index = -1;
@@ -365,24 +294,15 @@ class PositionedKeywordsRule extends BaseRule {
     _findPosition(splitPatch, data, matchedData, testedKeyword, otherKeywords) {
         let index = -1;
         let wasEnforced = false;
-        const { BOF, EOF } = testedKeyword.position;
+        const { BOF } = testedKeyword.position;
         const topHunkHeader = getNearestHunkHeader(splitPatch, 0);
 
-        if (BOF) {
-            const { line } = topHunkHeader.modifiedFile;
+        const { line } = topHunkHeader.modifiedFile;
 
-            index = line === 1 ? 1 : -1;
-        } else if (EOF) {
-            const dataLength = this._countPatchLength(splitPatch);
-            const { length: fileLength } = topHunkHeader.modifiedFile;
-
-            index = fileLength === dataLength ? data.length - 1 : -1;
-        }
+        index = line === 1 ? 1 : -1;
 
         if (index === -1 && testedKeyword.enforced) {
-            index = BOF
-                ? matchedData[0].index
-                : matchedData[matchedData.length - 1].index;
+            index = matchedData[0].index;
 
             wasEnforced = true;
         }
@@ -392,16 +312,11 @@ class PositionedKeywordsRule extends BaseRule {
         }
 
         if (!wasEnforced && otherKeywords?.length) {
-            index = this._correctIndex(
-                data,
-                index,
-                testedKeyword,
-                otherKeywords
-            );
+            index = this._correctIndex(data, index, otherKeywords);
         }
 
         // skip merge lines
-        for (; ; BOF ? index++ : index--) {
+        for (; ; index++) {
             const { content } = data[index];
 
             if (content !== this.merge) {
@@ -412,11 +327,11 @@ class PositionedKeywordsRule extends BaseRule {
         let length = null;
         const isMultiLine = this.isMultiline(
             testedKeyword,
-            data[index].content
+            data[index].content,
+            BOF ? 'bottom' : 'top'
         );
 
-        // TODO: simplify
-        if (!EOF && isMultiLine) {
+        if (isMultiLine) {
             const multilineEndIndex = this.getMultiLineEndIndex(
                 testedKeyword,
                 splitPatch,
@@ -424,14 +339,6 @@ class PositionedKeywordsRule extends BaseRule {
             );
 
             length = multilineEndIndex - index;
-        } else if (EOF && isMultiLine) {
-            const multiLineStartIndex = this._getMultiLineStartIndex(
-                splitPatch,
-                testedKeyword,
-                index
-            );
-
-            length = index - multiLineStartIndex;
         }
 
         return {
@@ -468,7 +375,6 @@ class PositionedKeywordsRule extends BaseRule {
             }
 
             const toReduce = this._reduceDistanceFromMergeLines(
-                keyword,
                 data,
                 previousIndex,
                 currentIndex
@@ -513,93 +419,7 @@ class PositionedKeywordsRule extends BaseRule {
 
             recentRow = row;
 
-            if (breakOnFirstOccurence) {
-                break;
-            }
-        }
-
-        return reviewComments;
-    }
-
-    _reviewEOF(file, data, matchedData, keyword, position) {
-        const {
-            breakOnFirstOccurence,
-            maxLineBreaks,
-            countDifferentCodeAsLineBreak,
-        } = keyword;
-        const { wasEnforced } = position;
-        const { split_patch: splitPatch } = file;
-
-        let recentRow = position;
-        let reviewComments = [];
-
-        for (
-            let index = wasEnforced
-                ? matchedData.length - 2
-                : matchedData.length - 1;
-            index >= 0;
-            index--
-        ) {
-            let reason = 'tooManyLineBreaks';
-            const row = matchedData[index];
-
-            let isValid = false;
-            let distance = 0;
-
-            let previousIndex = recentRow.index;
-            let currentIndex = row.index;
-
-            if (row?.length) {
-                currentIndex += row.length;
-            }
-
-            const toReduce = this._reduceDistanceFromMergeLines(
-                keyword,
-                data,
-                currentIndex,
-                previousIndex
-            );
-
-            distance = previousIndex - currentIndex - 1 - toReduce;
-
-            if (!maxLineBreaks) {
-                isValid = distance === 0;
-            } else {
-                isValid = distance <= maxLineBreaks;
-            }
-
-            if (isValid && !countDifferentCodeAsLineBreak) {
-                isValid = !this._includesDifferentCode(
-                    splitPatch,
-                    currentIndex,
-                    previousIndex
-                );
-
-                reason = isValid ? reason : 'differentCode';
-            }
-
-            if (!isValid) {
-                const from = row.index;
-                const to = recentRow.index;
-
-                reviewComments.push(
-                    this.getMultiLineComment({
-                        file,
-                        body: this._getCommentBody(keyword, splitPatch, {
-                            from,
-                            to,
-                            distance,
-                            reason,
-                        }),
-                        from,
-                        to,
-                    })
-                );
-            }
-
-            recentRow = row;
-
-            if (breakOnFirstOccurence) {
+            if (!isValid && breakOnFirstOccurence) {
                 break;
             }
         }
@@ -610,7 +430,7 @@ class PositionedKeywordsRule extends BaseRule {
     _getMultiLineStartIndex(splitPatch, keyword, endIndex) {
         let startIndex = -1;
 
-        for (let index = endIndex - 1; endIndex >= 0; endIndex--) {
+        for (let index = endIndex - 1; index >= 0; index--) {
             const content = splitPatch[index];
 
             if (content.match(keyword.regex)) {
@@ -623,25 +443,14 @@ class PositionedKeywordsRule extends BaseRule {
         return startIndex;
     }
 
-    _reduceDistanceFromMergeLines(keyword, data, startIndex, endIndex) {
+    _reduceDistanceFromMergeLines(data, startIndex, endIndex) {
         let toReduce = 0;
-        const { EOF } = keyword.position;
 
-        if (EOF) {
-            for (let index = endIndex - 1; index > startIndex; index--) {
-                const { content } = data[index];
+        for (let index = startIndex + 1; index < endIndex; index++) {
+            const { content } = data[index];
 
-                if (content === this.merge) {
-                    toReduce++;
-                }
-            }
-        } else {
-            for (let index = startIndex + 1; index < endIndex; index++) {
-                const { content } = data[index];
-
-                if (content === this.merge) {
-                    toReduce++;
-                }
+            if (content === this.merge) {
+                toReduce++;
             }
         }
 
@@ -666,14 +475,8 @@ class PositionedKeywordsRule extends BaseRule {
         return result;
     }
 
-    _correctIndex(data, currentIndex, testedKeyword, otherKeywords) {
-        const { BOF } = testedKeyword.position;
-
-        for (
-            let index = currentIndex;
-            BOF ? index < data.length : index > 0;
-            BOF ? index++ : index--
-        ) {
+    _correctIndex(data, currentIndex, otherKeywords) {
+        for (let index = currentIndex; index < data.length; index++) {
             const { content } = data[index];
 
             if (this.customLines.includes(content)) {
@@ -716,7 +519,7 @@ class PositionedKeywordsRule extends BaseRule {
 
         switch (reason) {
             case 'tooManyLineBreaks':
-                commentBody = `Found \`${distance}\` line(s) between \`${name}\` at lines \`${fromLineNumber}\` and \`${toLineNumber}\` but ${
+                commentBody = `Found \`${distance}\` line(s) between \`${name}\` lines \`${fromLineNumber}\` and \`${toLineNumber}\` but ${
                     maxLineBreaks
                         ? `only \`${maxLineBreaks}\` are allowed`
                         : `there shouldn't be any`
