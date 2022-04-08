@@ -244,7 +244,7 @@ class PositionedKeywordsRule extends BaseRule {
     }
 
     _findBOFPosition(parameters) {
-        const { splitPatch, data, matchedData, keyword, otherKeywords } =
+        const { splitPatch, data, matchedData, keyword, keywordsWithBOF } =
             parameters;
 
         let index = -1;
@@ -265,8 +265,8 @@ class PositionedKeywordsRule extends BaseRule {
             return null;
         }
 
-        if (!wasEnforced && otherKeywords?.length) {
-            index = this._correctIndex(data, index, otherKeywords);
+        if (!wasEnforced && keywordsWithBOF?.length) {
+            index = this._correctIndex(data, index, keywordsWithBOF);
         }
 
         // skip merge lines
