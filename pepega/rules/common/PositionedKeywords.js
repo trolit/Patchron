@@ -48,8 +48,10 @@ class PositionedKeywordsRule extends BaseRule {
 
         for (const keyword of keywords) {
             if (!this._hasKeywordValidConfig(keyword)) {
-                probotInstance.log.warn(
-                    `${__filename}\nKeyword review skipped due to invalid config (one position config per keyword).`
+                this.logError(
+                    __filename,
+                    file,
+                    'Keyword review skipped due to invalid position config'
                 );
 
                 continue;
@@ -210,7 +212,8 @@ class PositionedKeywordsRule extends BaseRule {
      * @param {{ file: object, data: Array<object>, matchedData: Array<object>, keyword: object, keywordsWithBOF: Array<object> }} parameters
      */
     _reviewBOFPosition(parameters) {
-        const { file, data, matchedData, keyword, keyworsWithBOF } = parameters;
+        const { file, data, matchedData, keyword, keywordsWithBOF } =
+            parameters;
         const { split_patch: splitPatch } = file;
 
         const position = this._findPosition(
@@ -218,7 +221,7 @@ class PositionedKeywordsRule extends BaseRule {
             data,
             matchedData,
             keyword,
-            keyworsWithBOF
+            keywordsWithBOF
         );
 
         if (!position) {
@@ -294,7 +297,6 @@ class PositionedKeywordsRule extends BaseRule {
     _findPosition(splitPatch, data, matchedData, testedKeyword, otherKeywords) {
         let index = -1;
         let wasEnforced = false;
-        const { BOF } = testedKeyword.position;
         const topHunkHeader = getNearestHunkHeader(splitPatch, 0);
 
         const { line } = topHunkHeader.modifiedFile;
@@ -325,20 +327,23 @@ class PositionedKeywordsRule extends BaseRule {
         }
 
         let length = null;
-        const isMultiLine = this.isMultiline(
-            testedKeyword,
-            data[index].content,
-            BOF ? 'bottom' : 'top'
-        );
 
-        if (isMultiLine) {
-            const multilineEndIndex = this.getMultiLineEndIndex(
+        if (testedKeyword.multilineOptions?.length) {
+            const isMultiLine = this.isMultiline(
                 testedKeyword,
-                splitPatch,
-                index
+                data[index].content,
+                'bottom'
             );
 
-            length = multilineEndIndex - index;
+            if (isMultiLine) {
+                const multilineEndIndex = this.getMultiLineEndIndex(
+                    testedKeyword,
+                    splitPatch,
+                    index
+                );
+
+                length = multilineEndIndex - index;
+            }
         }
 
         return {
