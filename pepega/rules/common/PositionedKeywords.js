@@ -67,35 +67,51 @@ class PositionedKeywordsRule extends BaseRule {
                 continue;
             }
 
-            const { position } = keyword;
+            const { position: keywordPosition } = keyword;
+            let position = null;
 
-            if (position.custom !== null) {
-                reviewComments.push(
-                    ...this._reviewCustomPosition({
-                        file,
-                        data,
-                        matchedData,
-                        keyword,
-                    })
-                );
+            if (keywordPosition.custom !== null) {
+                position = this._findCustomPosition(splitPatch, keyword);
             }
 
-            if (position.BOF) {
+            if (keywordPosition.BOF) {
                 const keywordsWithBOF = keywords.filter(
                     (element) =>
                         element.position.BOF && element.regex !== keyword.regex
                 );
 
-                reviewComments.push(
-                    ...this._reviewBOFPosition({
-                        file,
-                        data,
-                        matchedData,
-                        keyword,
-                        keywordsWithBOF,
-                    })
-                );
+                position = this._findBOFPosition({
+                    data,
+                    keyword,
+                    splitPatch,
+                    matchedData,
+                    keywordsWithBOF,
+                });
+
+                const { wasEnforced, isMatched } = position;
+
+                if (!wasEnforced && !isMatched && position) {
+                    reviewComments.push(
+                        this._getWrongPositionComment(file, keyword, position)
+                    );
+
+                    continue;
+                }
             }
+
+            if (!position) {
+                continue;
+            }
+
+            reviewComments.push(
+                ...this._reviewPosition({
+                    file,
+                    data,
+                    keyword,
+                    position,
+                    matchedData,
+                })
+            );
         }
 
         return reviewComments;
@@ -186,73 +202,6 @@ class PositionedKeywordsRule extends BaseRule {
         return matchedData;
     }
 
-    /**
-     * @param {{ file: object, matchedData: Array<object>, keyword: object }} parameters
-     */
-    _reviewCustomPosition(parameters) {
-        const { file, data, matchedData, keyword } = parameters;
-        const { split_patch: splitPatch } = file;
-
-        const customPosition = this._findCustomPosition(splitPatch, keyword);
-
-        if (!customPosition) {
-            return [];
-        }
-
-        return this._reviewPosition(
-            file,
-            data,
-            matchedData,
-            keyword,
-            customPosition
-        );
-    }
-
-    /**
-     * @param {{ file: object, data: Array<object>, matchedData: Array<object>, keyword: object, keywordsWithBOF: Array<object> }} parameters
-     */
-    _reviewBOFPosition(parameters) {
-        const { file, data, matchedData, keyword, keywordsWithBOF } =
-            parameters;
-        const { split_patch: splitPatch } = file;
-
-        const position = this._findPosition(
-            splitPatch,
-            data,
-            matchedData,
-            keyword,
-            keywordsWithBOF
-        );
-
-        if (!position) {
-            return [];
-        }
-
-        const { index, wasEnforced } = position;
-        const isPositionMatched = splitPatch[index].match(keyword.regex);
-
-        if (!wasEnforced && !isPositionMatched) {
-            const rawContent = this.getRawContent(splitPatch[index]);
-
-            const body =
-                dedent(`Expected \`${keyword.name}\` lines to start here but found
-                \`\`\`
-                ${rawContent}
-                \`\`\`
-                `);
-
-            return [
-                this.getSingleLineComment({
-                    file,
-                    body,
-                    index: position.index,
-                }),
-            ];
-        }
-
-        return this._reviewPosition(file, data, matchedData, keyword, position);
-    }
-
     _findCustomPosition(splitPatch, keyword) {
         let wasEnforced = false;
         let index = -1;
@@ -294,7 +243,10 @@ class PositionedKeywordsRule extends BaseRule {
         };
     }
 
-    _findPosition(splitPatch, data, matchedData, testedKeyword, otherKeywords) {
+    _findBOFPosition(parameters) {
+        const { splitPatch, data, matchedData, keyword, otherKeywords } =
+            parameters;
+
         let index = -1;
         let wasEnforced = false;
         const topHunkHeader = getNearestHunkHeader(splitPatch, 0);
@@ -303,7 +255,7 @@ class PositionedKeywordsRule extends BaseRule {
 
         index = line === 1 ? 1 : -1;
 
-        if (index === -1 && testedKeyword.enforced) {
+        if (index === -1 && keyword.enforced) {
             index = matchedData[0].index;
 
             wasEnforced = true;
@@ -328,16 +280,16 @@ class PositionedKeywordsRule extends BaseRule {
 
         let length = null;
 
-        if (testedKeyword.multilineOptions?.length) {
+        if (keyword.multilineOptions?.length) {
             const isMultiLine = this.isMultiline(
-                testedKeyword,
+                keyword,
                 data[index].content,
                 'bottom'
             );
 
             if (isMultiLine) {
                 const multilineEndIndex = this.getMultiLineEndIndex(
-                    testedKeyword,
+                    keyword,
                     splitPatch,
                     index
                 );
@@ -346,14 +298,23 @@ class PositionedKeywordsRule extends BaseRule {
             }
         }
 
+        const rawContent = this.getRawContent(splitPatch[index]);
+
         return {
             index,
-            wasEnforced,
             length,
+            rawContent,
+            wasEnforced,
+            isMatched: !!rawContent.match(keyword.regex),
         };
     }
 
-    _reviewPosition(file, data, matchedData, keyword, position) {
+    /**
+     * @param {{ file: object, data: Array<object>, matchedData: Array<object>, keyword: object, position: object }} parameters
+     */
+    _reviewPosition(parameters) {
+        const { file, data, matchedData, keyword, position } = parameters;
+
         const {
             breakOnFirstOccurence,
             maxLineBreaks,
@@ -430,6 +391,23 @@ class PositionedKeywordsRule extends BaseRule {
         }
 
         return reviewComments;
+    }
+
+    _getWrongPositionComment(file, keyword, position) {
+        const { rawContent, index } = position;
+
+        const body =
+            dedent(`Expected \`${keyword.name}\` lines to start here but found
+                \`\`\`
+                ${rawContent}
+                \`\`\`
+                `);
+
+        return this.getSingleLineComment({
+            file,
+            body,
+            index,
+        });
     }
 
     _getMultiLineStartIndex(splitPatch, keyword, endIndex) {
