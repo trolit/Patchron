@@ -88,9 +88,11 @@ class PositionedKeywordsRule extends BaseRule {
                     keywordsWithBOF,
                 });
 
-                const { wasEnforced, isMatched } = position;
-
-                if (!wasEnforced && !isMatched && position) {
+                if (
+                    position &&
+                    !position?.wasEnforced &&
+                    !position?.isMatched
+                ) {
                     reviewComments.push(
                         this._getWrongPositionComment(file, keyword, position)
                     );
