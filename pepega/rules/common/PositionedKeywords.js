@@ -97,6 +97,8 @@ class PositionedKeywordsRule extends BaseRule {
                         this._getWrongPositionComment(file, keyword, position)
                     );
 
+                    this._removeKeywords(keywords, keywordsWithBOF);
+
                     continue;
                 }
             }
@@ -410,6 +412,18 @@ class PositionedKeywordsRule extends BaseRule {
             body,
             index,
         });
+    }
+
+    _removeKeywords(keywords, keywordsToRemove) {
+        for (const keywordToRemove of keywordsToRemove) {
+            const index = keywords.findIndex(
+                (keyword) => keyword === keywordToRemove
+            );
+
+            if (~index) {
+                keywords.splice(index, 1);
+            }
+        }
     }
 
     _getMultiLineStartIndex(splitPatch, keyword, endIndex) {
