@@ -1,9 +1,11 @@
 /* eslint-disable no-console */
 
 const PositionedKeywordsRule = require('../rules/common/PositionedKeywords');
+const KeywordsOrderedByLengthRule = require('../rules/common/KeywordsOrderedByLength');
 
 const rules = {
     PositionedKeywordsRule,
+    KeywordsOrderedByLengthRule,
 };
 
 /**
