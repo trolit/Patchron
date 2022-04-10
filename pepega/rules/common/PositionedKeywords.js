@@ -7,7 +7,7 @@ const getNearestHunkHeader = require('../../helpers/getNearestHunkHeader');
 class PositionedKeywordsRule extends BaseRule {
     /**
      * @param {object} config
-     * @param {Array<{name: string, regex: object, position: { custom: { name: string, expression: string|object }, BOF: boolean }, ignoreNewline: boolean, enforced: boolean }>} config.keywords
+     * @param {Array<{name: string, regex: object, position: { custom: { name: string, expression: string|object }, BOF: boolean }, ignoreNewline: boolean, enforced: boolean, breakOnFirstOccurence: boolean, countDifferentCodeAsLineBreak: boolean, order: Array<{ name: string, expression: object}>}>} config.keywords
      * @param {string} config.keywords[].name - readable name
      * @param {object} config.keywords[].regex - matches line(s) that should be validated against rule
      * @param {Array<string>} config.keywords[].multilineOptions - if none of them will be included in matched line, line will be treated as multiline.
@@ -16,6 +16,7 @@ class PositionedKeywordsRule extends BaseRule {
      * @param {boolean} config.keywords[].enforced - when **enabled**, it basically means that when patch does not have expected position that was provided within configuration - but it has at least two keywords - first occurence will be counted as expected position, which means, remaining ones must be positioned in relation to first one.
      * @param {boolean} config.keywords[].breakOnFirstOccurence - when **true**, stops keyword review on first invalid occurence
      * @param {boolean} config.keywords[].countDifferentCodeAsLineBreak - when **disabled**, code other than line break (\n), found between matched keywords is counted as rule break.
+     * @param {Array<object>} config.keywords[].order - allows to provide second layer of keyword positioning. Requires at least two objects to compare matched lines against themselves. For instance, for `import` keyword, second layer could enforce following positioning: `packages -> components -> helpers`
      */
     constructor(config) {
         super();
@@ -67,55 +68,25 @@ class PositionedKeywordsRule extends BaseRule {
                 continue;
             }
 
-            const { position: keywordPosition } = keyword;
-            let position = null;
+            const firstLayerReview = this._reviewFirstLayer({
+                file,
+                data,
+                keyword,
+                keywords,
+                matchedData,
+            });
 
-            if (keywordPosition.custom !== null) {
-                position = this._findCustomPosition(splitPatch, keyword);
-            }
-
-            if (keywordPosition.BOF) {
-                const keywordsWithBOF = keywords.filter(
-                    (element) =>
-                        element.position.BOF && element.regex !== keyword.regex
-                );
-
-                position = this._findBOFPosition({
-                    data,
-                    keyword,
-                    splitPatch,
-                    matchedData,
-                    keywordsWithBOF,
-                });
-
-                if (
-                    position &&
-                    !position?.wasEnforced &&
-                    !position?.isMatched
-                ) {
-                    reviewComments.push(
-                        this._getWrongPositionComment(file, keyword, position)
-                    );
-
-                    this._removeKeywords(keywords, keywordsWithBOF);
-
-                    continue;
-                }
-            }
-
-            if (!position) {
+            if (!firstLayerReview) {
                 continue;
             }
 
-            reviewComments.push(
-                ...this._reviewPosition({
-                    file,
-                    data,
-                    keyword,
-                    position,
-                    matchedData,
-                })
-            );
+            reviewComments.push(...firstLayerReview);
+
+            if (keyword.order?.length > 1) {
+                const secondLayerReview = this._reviewSecondLayer({});
+
+                reviewComments.push(...secondLayerReview);
+            }
         }
 
         return reviewComments;
@@ -204,6 +175,62 @@ class PositionedKeywordsRule extends BaseRule {
         }
 
         return matchedData;
+    }
+
+    _reviewFirstLayer(parameters) {
+        const { file, data, keyword, keywords, matchedData } = parameters;
+        const { split_patch: splitPatch } = file;
+        let reviewComments = [];
+
+        const { position: keywordPosition } = keyword;
+        let position = null;
+
+        if (keywordPosition.custom !== null) {
+            position = this._findCustomPosition(splitPatch, keyword);
+        }
+
+        if (keywordPosition.BOF) {
+            const keywordsWithBOF = keywords.filter(
+                (element) =>
+                    element.position.BOF && element.regex !== keyword.regex
+            );
+
+            position = this._findBOFPosition({
+                data,
+                keyword,
+                splitPatch,
+                matchedData,
+                keywordsWithBOF,
+            });
+
+            if (position && !position?.wasEnforced && !position?.isMatched) {
+                reviewComments = [
+                    this._getWrongPositionComment(file, keyword, position),
+                ];
+
+                this._removeKeywords(keywords, keywordsWithBOF);
+
+                return reviewComments;
+            }
+        }
+
+        if (!position) {
+            return null;
+        }
+
+        reviewComments = this._reviewPosition({
+            file,
+            data,
+            keyword,
+            position,
+            matchedData,
+        });
+
+        return reviewComments;
+    }
+
+    _reviewSecondLayer(parameters) {
+        // test
     }
 
     _findCustomPosition(splitPatch, keyword) {
