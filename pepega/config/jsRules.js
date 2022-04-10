@@ -38,8 +38,15 @@ module.exports = [
         instance: new keywordsOrderedByLength({
             keywords: [
                 {
-                    name: 'import',
-                    regex: /import.*/,
+                    name: 'import (packages)',
+                    regex: /import(?!.*@).*/,
+                    multilineOptions: ['from'],
+                    order: 'ascending',
+                    ignoreNewline: false,
+                },
+                {
+                    name: 'import (components)',
+                    regex: /import.*@\/components.*/,
                     multilineOptions: ['from'],
                     order: 'ascending',
                     ignoreNewline: false,
