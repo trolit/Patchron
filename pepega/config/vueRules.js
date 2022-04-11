@@ -15,11 +15,20 @@ module.exports = [
                             expression: /<script>/,
                         },
                         BOF: false,
-                        EOF: false,
                     },
                     maxLineBreaks: 0,
                     enforced: true,
                     breakOnFirstOccurence: false,
+                    order: [
+                        {
+                            name: 'packages',
+                            expression: /import(?!.*@).*/,
+                        },
+                        {
+                            name: 'components',
+                            expression: /import.*@\/components.*/,
+                        },
+                    ],
                 },
             ],
         }),
