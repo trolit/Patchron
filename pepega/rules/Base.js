@@ -107,11 +107,11 @@ class BaseRule {
 
             if (
                 keyword?.multilineOptions &&
-                this.isMultiline(keyword, content)
+                this.isPartOfMultiLine(keyword, content)
             ) {
                 const multilineEndIndex = this.getMultiLineEndIndex(
-                    keyword,
                     splitPatch,
+                    keyword,
                     index
                 );
 
@@ -158,7 +158,7 @@ class BaseRule {
     }
 
     /**
-     * tests if given text is new line
+     * tests if given text is new line (apply only to raw splitPatch)
      * @param {string} text to check
      * @returns {boolean}
      */
@@ -167,33 +167,61 @@ class BaseRule {
     }
 
     /**
-     * determines whether passed line is part of multi-line
+     * tests if given text is merge line (apply only to raw splitPatch)
+     * @param {string} text to check
+     * @returns {boolean}
+     */
+    isMergeLine(content) {
+        return content.startsWith('-');
+    }
+
+    /**
+     * determines whether passed line is start of multi-line (direction = bottom) or end of multi-line (direction = top)
      * @param {object} keyword - keyword, **must** contain **multiLineOptions** array
      * @param {string} line - text of line
      * @returns {boolean}
      */
-    isMultiline(keyword, line, direction = 'bottom') {
+    isPartOfMultiLine(keyword, line, fragment = 'start') {
         const { multilineOptions } = keyword;
 
         const includesMultiLineOption = multilineOptions.some((option) =>
             line.includes(option)
         );
 
-        return direction === 'bottom'
-            ? !includesMultiLineOption
+        return fragment === 'start'
+            ? !includesMultiLineOption && line.match(keyword.regex)
             : includesMultiLineOption && !line.match(keyword.regex);
     }
 
-    getMultiLineEndIndex(keyword, splitPatch, currentIndex) {
-        let multilineEndIndex = -1;
+    getMultiLineStartIndex(splitPatch, keyword, endIndex) {
+        let multilineStartIndex = -1;
 
-        for (let index = currentIndex + 1; index < splitPatch.length; index++) {
+        for (let index = endIndex - 1; index >= 0; index--) {
             const row = splitPatch[index];
 
             if (
-                !row.startsWith('-') &&
-                removeWhitespaces(row) !== '+' &&
-                !this.isMultiline(keyword, row)
+                !this.isMergeLine(row) &&
+                this.isPartOfMultiLine(keyword, row)
+            ) {
+                multilineStartIndex = index;
+
+                break;
+            }
+        }
+
+        return multilineStartIndex;
+    }
+
+    getMultiLineEndIndex(splitPatch, keyword, startIndex) {
+        let multilineEndIndex = -1;
+        const splitPatchLength = splitPatch.length;
+
+        for (let index = startIndex + 1; index < splitPatchLength; index++) {
+            const row = splitPatch[index];
+
+            if (
+                !this.isMergeLine(row) &&
+                this.isPartOfMultiLine(keyword, row, 'end')
             ) {
                 multilineEndIndex = index;
 
@@ -208,6 +236,18 @@ class BaseRule {
         probotInstance.log.error(
             `${filename} >>> (${testedFile?.filename})\n${message}`
         );
+    }
+
+    /**
+     * @param {Array<object>} data - array of objects containing `content` property
+     * @param {integer} startsAt
+     * @param {integer} endsAt
+     * @returns {string}
+     */
+    convertMultiLineToSingleLine(data, startsAt, endsAt) {
+        const slicedPart = data.slice(startsAt, endsAt + 1);
+
+        return slicedPart.map(({ content }) => content).join('');
     }
 }
 

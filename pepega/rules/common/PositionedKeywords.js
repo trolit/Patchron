@@ -83,7 +83,12 @@ class PositionedKeywordsRule extends BaseRule {
             reviewComments.push(...firstLayerReview);
 
             if (keyword.order?.length > 1) {
-                const secondLayerReview = this._reviewSecondLayer({});
+                const secondLayerReview = this._reviewSecondLayer({
+                    file,
+                    data,
+                    keyword,
+                    matchedData,
+                });
 
                 reviewComments.push(...secondLayerReview);
             }
@@ -145,12 +150,12 @@ class PositionedKeywordsRule extends BaseRule {
 
                 const isMultiLine =
                     keyword?.multilineOptions?.length &&
-                    this.isMultiline(keyword, content);
+                    this.isPartOfMultiLine(keyword, content);
 
                 if (isMultiLine) {
                     const multilineEndIndex = this.getMultiLineEndIndex(
-                        keyword,
                         splitPatch,
+                        keyword,
                         index
                     );
 
@@ -230,7 +235,53 @@ class PositionedKeywordsRule extends BaseRule {
     }
 
     _reviewSecondLayer(parameters) {
-        // test
+        const { file, data, matchedData, keyword } = parameters;
+        const { order } = keyword;
+        let reviewComments = [];
+
+        for (const row of matchedData) {
+            if (row?.length) {
+                row.content = this.convertMultiLineToSingleLine(
+                    data,
+                    row.index,
+                    row.index + row.length
+                );
+            }
+
+            const { content } = row;
+
+            const orderIndex = order.findIndex(({ expression }) =>
+                content.match(expression)
+            );
+
+            row.orderIndex = orderIndex;
+        }
+
+        const matchedDataLength = matchedData.length;
+
+        for (let index = 1; index < matchedDataLength; index++) {
+            const row = matchedData[index];
+
+            const rowWithGreaterOrderIndex = matchedData.find(
+                ({ orderIndex }) => orderIndex > row.orderIndex
+            );
+
+            if (
+                rowWithGreaterOrderIndex &&
+                rowWithGreaterOrderIndex.index < row.index
+            ) {
+                reviewComments.push(
+                    this._getWrongOrderComment(
+                        keyword,
+                        file,
+                        row,
+                        rowWithGreaterOrderIndex
+                    )
+                );
+            }
+        }
+
+        return reviewComments;
     }
 
     _findCustomPosition(splitPatch, keyword) {
@@ -257,10 +308,10 @@ class PositionedKeywordsRule extends BaseRule {
 
         let length = null;
 
-        if (this.isMultiline(keyword, splitPatch[index])) {
+        if (this.isPartOfMultiLine(keyword, splitPatch[index])) {
             const multilineEndIndex = this.getMultiLineEndIndex(
-                keyword,
                 splitPatch,
+                keyword,
                 index
             );
 
@@ -312,16 +363,15 @@ class PositionedKeywordsRule extends BaseRule {
         let length = null;
 
         if (keyword.multilineOptions?.length) {
-            const isMultiLine = this.isMultiline(
+            const isMultiLine = this.isPartOfMultiLine(
                 keyword,
-                data[index].content,
-                'bottom'
+                data[index].content
             );
 
             if (isMultiLine) {
                 const multilineEndIndex = this.getMultiLineEndIndex(
-                    keyword,
                     splitPatch,
+                    keyword,
                     index
                 );
 
@@ -441,6 +491,36 @@ class PositionedKeywordsRule extends BaseRule {
         });
     }
 
+    _getWrongOrderComment(keyword, file, testedRow, foundRow) {
+        const { index: testedRowIndex } = testedRow;
+
+        const expectedOrder = keyword.order
+            .map(({ name }) => name)
+            .join(' >> ');
+
+        const body = dedent(`
+                \`\`\`
+                ${testedRow.content}
+                \`\`\`
+
+                should appear before
+
+                \`\`\`
+                ${foundRow.content}
+                \`\`\`  
+
+                ----
+                Expected order: 
+                ${expectedOrder}
+                `);
+
+        return this.getSingleLineComment({
+            file,
+            body,
+            index: testedRowIndex,
+        });
+    }
+
     _removeKeywords(keywords, keywordsToRemove) {
         for (const keywordToRemove of keywordsToRemove) {
             const index = keywords.findIndex(
@@ -451,22 +531,6 @@ class PositionedKeywordsRule extends BaseRule {
                 keywords.splice(index, 1);
             }
         }
-    }
-
-    _getMultiLineStartIndex(splitPatch, keyword, endIndex) {
-        let startIndex = -1;
-
-        for (let index = endIndex - 1; index >= 0; index--) {
-            const content = splitPatch[index];
-
-            if (content.match(keyword.regex)) {
-                startIndex = index;
-
-                break;
-            }
-        }
-
-        return startIndex;
     }
 
     _reduceDistanceFromMergeLines(data, startIndex, endIndex) {
