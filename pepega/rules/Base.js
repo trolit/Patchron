@@ -1,3 +1,4 @@
+const constants = require('../config/constants');
 const getPosition = require('../helpers/getPosition');
 const getLineNumber = require('../helpers/getLineNumber');
 const ReviewCommentBuilder = require('../builders/ReviewComment');
@@ -5,20 +6,19 @@ const removeWhitespaces = require('../helpers/removeWhitespaces');
 
 class BaseRule {
     constructor() {
-        const merge = '<<< merge >>>';
-        const newLine = '<<< new line >>>';
+        const { ADDED, DELETED, UNCHANGED, LEFT, RIGHT, MERGE, NEWLINE } =
+            constants;
 
-        this.merge = merge;
-        this.newLine = newLine;
-        this.customLines = [newLine, merge];
+        this.MERGE = MERGE;
+        this.NEWLINE = NEWLINE;
+        this.CUSTOM_LINES = [NEWLINE, MERGE];
 
-        const added = '+';
-        const deleted = '-';
-        const unchanged = ' ';
+        this.ADDED = ADDED;
+        this.DELETED = DELETED;
+        this.UNCHANGED = UNCHANGED;
 
-        this.added = added;
-        this.deleted = deleted;
-        this.unchanged = unchanged;
+        this.LEFT = LEFT;
+        this.RIGHT = RIGHT;
     }
 
     /**
@@ -79,18 +79,18 @@ class BaseRule {
             ) {
                 matchedRows.push({
                     index,
-                    content: this.newLine,
+                    content: this.NEWLINE,
                 });
 
                 continue;
-            } else if (matchedRows.length && row.startsWith('-')) {
+            } else if (matchedRows.length && row.startsWith(this.DELETED)) {
                 matchedRows.push({
                     index,
-                    content: this.merge,
+                    content: this.MERGE,
                 });
 
                 continue;
-            } else if (matchedRows.length && row.startsWith(' ')) {
+            } else if (matchedRows.length && row.startsWith(this.UNCHANGED)) {
                 unchangedRows.push({
                     index,
                     content: row.trim(),
@@ -148,9 +148,9 @@ class BaseRule {
     getRawContent(row) {
         let rawContent = row;
 
-        if (row.startsWith(this.unchanged)) {
+        if (row.startsWith(this.UNCHANGED)) {
             rawContent = row.trim();
-        } else if (row.startsWith(this.added) || row.startsWith(this.deleted)) {
+        } else if (row.startsWith(this.ADDED) || row.startsWith(this.DELETED)) {
             rawContent = row.slice(1).trim();
         }
 

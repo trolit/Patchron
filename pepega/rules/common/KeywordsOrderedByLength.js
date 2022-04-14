@@ -134,7 +134,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
 
                 if (sortedGroupElement.index !== groupElement.index) {
                     const rowsWithCode = group.filter(
-                        ({ content }) => content !== this.merge
+                        ({ content }) => content !== this.MERGE
                     );
 
                     const { index: firstElementIndex } = rowsWithCode[0];
@@ -159,13 +159,13 @@ class KeywordsOrderedByLengthRule extends BaseRule {
 
     _removeCustomLinesFromArray(array) {
         return array.filter(
-            ({ content }) => !this.customLines.includes(content)
+            ({ content }) => !this.CUSTOM_LINES.includes(content)
         );
     }
 
     _sortArray(array, keyword) {
         const { order } = keyword;
-        const customLines = this.customLines;
+        const customLines = this.CUSTOM_LINES;
 
         return [...array].sort((firstRow, secondRow) => {
             const { content: firstRowContent } = firstRow;
@@ -206,7 +206,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
             for (; index < matchedRows.length; index++) {
                 const matchedRow = matchedRows[index];
 
-                if (matchedRow.content.includes(this.newLine)) {
+                if (matchedRow.content.includes(this.NEWLINE)) {
                     index++;
 
                     break;
@@ -227,7 +227,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
 
     _isInvalidGroup(group) {
         const hasNotEnoughRowsWithCode =
-            group.filter(({ content }) => content !== this.merge).length <= 1;
+            group.filter(({ content }) => content !== this.MERGE).length <= 1;
 
         return group === [] || hasNotEnoughRowsWithCode;
     }

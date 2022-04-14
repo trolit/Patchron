@@ -112,7 +112,7 @@ class PositionedKeywordsRule extends BaseRule {
             if (['+', ''].includes(removeWhitespaces(row))) {
                 data.push({
                     index,
-                    content: this.newLine,
+                    content: this.NEWLINE,
                 });
 
                 continue;
@@ -121,7 +121,7 @@ class PositionedKeywordsRule extends BaseRule {
             if (row.startsWith('-')) {
                 data.push({
                     index,
-                    content: this.merge,
+                    content: this.MERGE,
                 });
 
                 continue;
@@ -348,7 +348,7 @@ class PositionedKeywordsRule extends BaseRule {
         for (; ; index++) {
             const { content } = data[index];
 
-            if (content !== this.merge) {
+            if (content !== this.MERGE) {
                 break;
             }
         }
@@ -495,14 +495,14 @@ class PositionedKeywordsRule extends BaseRule {
         const { order } = keyword;
         const testedRowLineNumber = getLineNumber(
             splitPatch,
-            'RIGHT',
+            this.RIGHT,
             testedRow.index
         );
         const { name: testedRowOrder } = order[testedRow.orderIndex];
 
         const foundRowLineNumber = getLineNumber(
             splitPatch,
-            'RIGHT',
+            this.RIGHT,
             foundRow.index
         );
         const { name: foundRowOrder } = order[foundRow.orderIndex];
@@ -539,7 +539,7 @@ class PositionedKeywordsRule extends BaseRule {
         for (let index = startIndex + 1; index < endIndex; index++) {
             const { content } = data[index];
 
-            if (content === this.merge) {
+            if (content === this.MERGE) {
                 toReduce++;
             }
         }
@@ -569,7 +569,7 @@ class PositionedKeywordsRule extends BaseRule {
         for (let index = currentIndex; index < data.length; index++) {
             const { content } = data[index];
 
-            if (this.customLines.includes(content)) {
+            if (this.CUSTOM_LINES.includes(content)) {
                 continue;
             }
 
@@ -602,8 +602,8 @@ class PositionedKeywordsRule extends BaseRule {
         const { from, to, distance, reason } = review;
         const { maxLineBreaks, name } = keyword;
 
-        const fromLineNumber = getLineNumber(splitPatch, 'RIGHT', from);
-        const toLineNumber = getLineNumber(splitPatch, 'RIGHT', to);
+        const fromLineNumber = getLineNumber(splitPatch, this.RIGHT, from);
+        const toLineNumber = getLineNumber(splitPatch, this.RIGHT, to);
 
         let commentBody = '';
 

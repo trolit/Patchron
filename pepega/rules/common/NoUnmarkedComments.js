@@ -40,7 +40,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
         for (let index = 0; index < splitPatch.length; index++) {
             const row = splitPatch[index];
 
-            if (row.startsWith(this.deleted)) {
+            if (row.startsWith(this.DELETED)) {
                 continue;
             }
 
