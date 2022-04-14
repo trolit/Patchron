@@ -261,6 +261,38 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
+    it('returns empty array on only one order type of custom positioning (second layer order)', () => {
+        positionedKeywordsRule = new PositionedKeywordsRule({
+            keywords: [
+                {
+                    ...importKeywordCustomConfig,
+                    order: [
+                        {
+                            name: 'packages',
+                            expression: /import(?!.*@).*/,
+                        },
+                        {
+                            name: 'components',
+                            expression: /import.*@\/components.*/,
+                        },
+                    ],
+                },
+            ],
+        });
+
+        const result = positionedKeywordsRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +5,7 @@`,
+                `+ import Component1 from '@/components/Component1'\n`,
+                `+ import Component12542 from '@/components/Component12542'\n`,
+                `+ import Component3 from '@/components/Component3'`,
+            ],
+        });
+
+        expect(result).toEqual([]);
+    });
+
     it('returns review on invalid custom positioning (maxLineBreaks = 0)', () => {
         const result = positionedKeywordsRule.invoke({
             filename: '...',
@@ -633,6 +665,38 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
+    it('returns empty array on only one order type of BOF positioning (second layer order)', () => {
+        positionedKeywordsRule = new PositionedKeywordsRule({
+            keywords: [
+                {
+                    ...importKeywordBOFConfig,
+                    order: [
+                        {
+                            name: 'packages',
+                            expression: /import(?!.*@).*/,
+                        },
+                        {
+                            name: 'components',
+                            expression: /import.*@\/components.*/,
+                        },
+                    ],
+                },
+            ],
+        });
+
+        const result = positionedKeywordsRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +1,7 @@`,
+                `+ import Component3 from '@/components/Component3'`,
+                `+ import Component1 from '@/components/Component1'\n`,
+                `+ import Component12542 from '@/components/Component12542'\n`,
+            ],
+        });
+
+        expect(result).toEqual([]);
+    });
+
     it('returns review on invalid BOF position', () => {
         positionedKeywordsRule = new PositionedKeywordsRule({
             keywords: [
@@ -915,7 +979,7 @@ describe('invoke function', () => {
         positionedKeywordsRule = new PositionedKeywordsRule({
             keywords: [
                 {
-                    ...importKeywordCustomConfig,
+                    ...importKeywordBOFConfig,
                     order: [
                         {
                             name: 'packages',
