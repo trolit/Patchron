@@ -28,21 +28,19 @@
 
 const getFiles = require('./pepega/github/getFiles');
 const { rules, settings } = require('./pepega/config');
-const printBotName = require('./pepega/helpers/printBotName');
 const postSummary = require('./pepega/pull-request/postSummary');
 const reviewPullRequest = require('./pepega/pull-request/review');
 const postComments = require('./pepega/pull-request/postComments');
 const initializeData = require('./pepega/pull-request/initialize');
 const resolveStrictWorkflow = require('./pepega/pull-request/resolveStrictWorkflow');
 const addPullSenderAsAssignee = require('./pepega/pull-request/addSenderAsAssignee');
+const debugRule = require('./pepega/helpers/debugRule');
 
 /**
  * This is the main entrypoint of Pepega Probot app
  * @param {import('probot').Probot} app
  */
 module.exports = (app) => {
-    printBotName();
-
     const {
         isOwnerAssigningEnabled,
         isReviewSummaryEnabled,
