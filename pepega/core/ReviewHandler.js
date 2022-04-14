@@ -22,12 +22,13 @@ class ReviewHandler {
 
         switch (this.file.extension) {
             case 'vue':
-                // TODO:
                 comments = Vue.review(basicData, this.rules);
                 break;
+
             case 'js':
                 comments = Js.review(basicData, this.rules);
                 break;
+
             default:
                 probotInstance.log.warn(
                     `Extension not supported: ${__filename}`
