@@ -1,7 +1,6 @@
 const dedent = require('dedent-js');
 const BaseRule = require('../Base');
 const getLineNumber = require('../../helpers/getLineNumber');
-const removeWhitespaces = require('../../helpers/removeWhitespaces');
 const getNearestHunkHeader = require('../../helpers/getNearestHunkHeader');
 
 class PositionedKeywordsRule extends BaseRule {
@@ -109,7 +108,7 @@ class PositionedKeywordsRule extends BaseRule {
         for (let index = 0; index < splitPatch.length; index++) {
             const row = splitPatch[index];
 
-            if (['+', ''].includes(removeWhitespaces(row))) {
+            if (this.isNewline(row)) {
                 data.push({
                     index,
                     content: this.NEWLINE,
@@ -118,7 +117,7 @@ class PositionedKeywordsRule extends BaseRule {
                 continue;
             }
 
-            if (row.startsWith('-')) {
+            if (this.isMergeLine(row)) {
                 data.push({
                     index,
                     content: this.MERGE,
@@ -553,11 +552,11 @@ class PositionedKeywordsRule extends BaseRule {
         for (let index = from + 1; index < to; index++) {
             const content = splitPatch[index];
 
-            if (content.startsWith('-')) {
+            if (this.isMergeLine(content)) {
                 continue;
             }
 
-            if (!this.isNewLine(content)) {
+            if (!this.isNewline(content)) {
                 result = true;
             }
         }

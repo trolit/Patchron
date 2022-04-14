@@ -83,21 +83,21 @@ class BaseRule {
         for (let index = 0; index < splitPatch.length; index++) {
             const row = splitPatch[index];
 
-            if (matchedRows.length && this.isNewLine(row)) {
+            if (matchedRows.length && this.isNewline(row)) {
                 matchedRows.push({
                     index,
                     content: this.NEWLINE,
                 });
 
                 continue;
-            } else if (matchedRows.length && row.startsWith(this.DELETED)) {
+            } else if (matchedRows.length && this.isMergeLine(row)) {
                 matchedRows.push({
                     index,
                     content: this.MERGE,
                 });
 
                 continue;
-            } else if (matchedRows.length && row.startsWith(this.UNCHANGED)) {
+            } else if (matchedRows.length && this.isUnchangedLine(row)) {
                 unchangedRows.push({
                     index,
                     content: row.trim(),
@@ -155,9 +155,9 @@ class BaseRule {
     getRawContent(row) {
         let rawContent = row;
 
-        if (row.startsWith(this.UNCHANGED)) {
+        if (this.isUnchangedLine(row)) {
             rawContent = row.trim();
-        } else if (row.startsWith(this.ADDED) || row.startsWith(this.DELETED)) {
+        } else if (this.isAddedLine(row) || this.isMergeLine(row)) {
             rawContent = row.slice(1).trim();
         }
 
@@ -165,21 +165,47 @@ class BaseRule {
     }
 
     /**
-     * tests if given text is new line (apply only to raw splitPatch)
-     * @param {string} text to check
+     * **\/\/ apply only to lines from splitPatch!!**
+     *
+     * tests if given line is added line
+     * @param {string} line to check
      * @returns {boolean}
      */
-    isNewLine(content) {
-        return [this.ADDED, this.EMPTY].includes(removeWhitespaces(content));
+    isAddedLine(line) {
+        return line.startsWith(this.ADDED);
     }
 
     /**
-     * tests if given text is merge line (apply only to raw splitPatch)
-     * @param {string} text to check
+     * **\/\/ apply only to lines from splitPatch!!**
+     *
+     * tests if given line is newline
+     * @param {string} line to check
      * @returns {boolean}
      */
-    isMergeLine(content) {
-        return content.startsWith('-');
+    isNewline(line) {
+        return [this.ADDED, this.EMPTY].includes(removeWhitespaces(line));
+    }
+
+    /**
+     * **\/\/ apply only to lines from splitPatch!!**
+     *
+     * tests if given line is merge
+     * @param {string} line to check
+     * @returns {boolean}
+     */
+    isMergeLine(line) {
+        return line.startsWith(this.DELETED);
+    }
+
+    /**
+     * **\/\/ apply only to lines from splitPatch!!**
+     *
+     * tests if given line is unchanged
+     * @param {string} line to check
+     * @returns {boolean}
+     */
+    isUnchangedLine(line) {
+        return line.startsWith(this.UNCHANGED);
     }
 
     /**
