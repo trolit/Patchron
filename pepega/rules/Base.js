@@ -150,7 +150,7 @@ class BaseRule {
     }
 
     /**
-     * Removes from row indicators added by Git (added, deleted, unchanged) and hunk header (if occured)
+     * Removes from row indicators added by Git (added, deleted, unchanged)
      */
     getRawContent(row) {
         let rawContent = row;
