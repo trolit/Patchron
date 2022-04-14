@@ -27,9 +27,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
 
     invoke(file) {
         if (this._hasInvalidConfig()) {
-            probotInstance.log.error(
-                `Couldn't run rule ${__filename} on ${file.filename}. Invalid config!`
-            );
+            this.logError(__filename, file, `Invalid config!`);
 
             return [];
         }
