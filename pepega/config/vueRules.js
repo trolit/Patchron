@@ -1,9 +1,11 @@
-const PositionedKeywords = require('../rules/common/PositionedKeywords');
+const {
+    common: { PositionedKeywordsRule },
+} = require('../rules');
 
 module.exports = [
     {
         enabled: true,
-        instance: new PositionedKeywords({
+        instance: new PositionedKeywordsRule({
             keywords: [
                 {
                     name: 'import',

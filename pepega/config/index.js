@@ -1,6 +1,9 @@
 const js = require('./jsRules');
 const vue = require('./vueRules');
-const strictWorkflow = require('../rules/pull/StrictWorkflow');
+
+const {
+    pull: { StrictWorkflowRule },
+} = require('../rules');
 
 require('dotenv').config({
     path: '../../.env',
@@ -24,7 +27,7 @@ module.exports = {
     },
     rules: {
         pull: {
-            strictWorkflow: new strictWorkflow({
+            strictWorkflow: new StrictWorkflowRule({
                 workflow: [
                     {
                         base: 'master',

@@ -1,9 +1,13 @@
 /* eslint-disable no-console */
 
-const StrictWorkflowRule = require('../rules/pull/StrictWorkflow');
-const PositionedKeywordsRule = require('../rules/common/PositionedKeywords');
-const NoUnmarkedCommentsRule = require('../rules/common/NoUnmarkedComments');
-const KeywordsOrderedByLengthRule = require('../rules/common/KeywordsOrderedByLength');
+const {
+    common: {
+        PositionedKeywordsRule,
+        NoUnmarkedCommentsRule,
+        KeywordsOrderedByLengthRule,
+    },
+    pull: { StrictWorkflowRule },
+} = require('../rules');
 
 const rules = {
     StrictWorkflowRule,
