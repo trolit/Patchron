@@ -85,7 +85,6 @@ class PositionedKeywordsRule extends BaseRule {
             if (keyword.order?.length > 1) {
                 const secondLayerReview = this._reviewSecondLayer({
                     file,
-                    data,
                     keyword,
                     matchedData,
                 });
@@ -159,13 +158,15 @@ class PositionedKeywordsRule extends BaseRule {
                         index
                     );
 
-                    const rawContent = this.getRawContent(
-                        splitPatch[multilineEndIndex]
+                    const content = this.convertMultiLineToSingleLine(
+                        data,
+                        index,
+                        multilineEndIndex
                     );
 
                     matchedData.push({
                         index,
-                        content: rawContent,
+                        content,
                         length: multilineEndIndex - index,
                     });
 
@@ -235,19 +236,11 @@ class PositionedKeywordsRule extends BaseRule {
     }
 
     _reviewSecondLayer(parameters) {
-        const { file, data, matchedData, keyword } = parameters;
+        const { file, matchedData, keyword } = parameters;
         const { order } = keyword;
         let reviewComments = [];
 
         for (const row of matchedData) {
-            if (row?.length) {
-                row.content = this.convertMultiLineToSingleLine(
-                    data,
-                    row.index,
-                    row.index + row.length
-                );
-            }
-
             const { content } = row;
 
             const orderIndex = order.findIndex(({ expression }) =>
@@ -493,24 +486,31 @@ class PositionedKeywordsRule extends BaseRule {
 
     _getWrongOrderComment(keyword, file, testedRow, foundRow) {
         const { index: testedRowIndex } = testedRow;
+        const { split_patch: splitPatch } = file;
 
         const expectedOrder = keyword.order
             .map(({ name }) => name)
             .join(' >> ');
 
+        const { order } = keyword;
+        const testedRowLineNumber = getLineNumber(
+            splitPatch,
+            'RIGHT',
+            testedRow.index
+        );
+        const { name: testedRowOrder } = order[testedRow.orderIndex];
+
+        const foundRowLineNumber = getLineNumber(
+            splitPatch,
+            'RIGHT',
+            foundRow.index
+        );
+        const { name: foundRowOrder } = order[foundRow.orderIndex];
+
         const body = dedent(`
-                \`\`\`
-                ${testedRow.content}
-                \`\`\`
-
-                should appear before
-
-                \`\`\`
-                ${foundRow.content}
-                \`\`\`  
-
+               Line ${testedRowLineNumber} (${testedRowOrder}) should appear before line ${foundRowLineNumber} (${foundRowOrder})
                 ----
-                Expected order: 
+                Configured order: 
                 ${expectedOrder}
                 `);
 
