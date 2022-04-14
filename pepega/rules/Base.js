@@ -179,6 +179,7 @@ class BaseRule {
      * determines whether passed line is start of multi-line (direction = bottom) or end of multi-line (direction = top)
      * @param {object} keyword - keyword, **must** contain **multiLineOptions** array
      * @param {string} line - text of line
+     * @param {string} fragment - start/end (start is default value)
      * @returns {boolean}
      */
     isPartOfMultiLine(keyword, line, fragment = 'start') {
@@ -247,7 +248,7 @@ class BaseRule {
     convertMultiLineToSingleLine(data, startsAt, endsAt) {
         const slicedPart = data.slice(startsAt, endsAt + 1);
 
-        return slicedPart.map(({ content }) => content).join('');
+        return slicedPart.map(({ content }) => content).join(' ');
     }
 }
 
