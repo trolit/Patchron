@@ -28,6 +28,10 @@ module.exports = [
                             name: 'components',
                             expression: /import.*@\/components.*/,
                         },
+                        {
+                            name: 'helpers',
+                            expression: /import.*@\/helpers.*/,
+                        },
                     ],
                 },
             ],

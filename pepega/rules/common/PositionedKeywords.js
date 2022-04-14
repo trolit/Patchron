@@ -510,7 +510,7 @@ class PositionedKeywordsRule extends BaseRule {
         const body = dedent(`
                Line ${testedRowLineNumber} (${testedRowOrder}) should appear before line ${foundRowLineNumber} (${foundRowOrder})
                 ----
-                Configured order: 
+                Expected order: 
                 ${expectedOrder}
                 `);
 
