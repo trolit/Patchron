@@ -29,7 +29,7 @@ class PositionedKeywordsRule extends BaseRule {
         const keywords = this.keywords;
 
         if (!keywords.length) {
-            this.logError(__filename, file, 'No keywords defined');
+            this.logError(__filename, file, 'No keywords defined.');
 
             return [];
         }

@@ -26,9 +26,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
         const keywords = this.keywords;
 
         if (!keywords.length) {
-            probotInstance.log.error(
-                `Couldn't run rule ${__filename} on ${file.filename}. No keywords defined.`
-            );
+            this.logError(__filename, file, 'No keywords defined.');
 
             return [];
         }
