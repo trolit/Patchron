@@ -209,7 +209,10 @@ class BaseRule {
     }
 
     /**
-     * determines whether passed line is start of multi-line (direction = bottom) or end of multi-line (direction = top)
+     * determines whether passed line is:
+     *
+     * - start of multi-line (fragment = start) (default)
+     * - end of multi-line (fragment = end)
      * @param {object} keyword - keyword, **must** contain **multiLineOptions** array
      * @param {string} line - text of line
      * @param {string} fragment - start/end (start is default value)
