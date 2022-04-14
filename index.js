@@ -34,7 +34,6 @@ const postComments = require('./pepega/pull-request/postComments');
 const initializeData = require('./pepega/pull-request/initialize');
 const resolveStrictWorkflow = require('./pepega/pull-request/resolveStrictWorkflow');
 const addPullSenderAsAssignee = require('./pepega/pull-request/addSenderAsAssignee');
-const debugRule = require('./pepega/helpers/debugRule');
 
 /**
  * This is the main entrypoint of Pepega Probot app
@@ -42,12 +41,12 @@ const debugRule = require('./pepega/helpers/debugRule');
  */
 module.exports = (app) => {
     const {
-        isOwnerAssigningEnabled,
-        isReviewSummaryEnabled,
-        strictWorkflow,
-        delayBetweenCommentRequestsInSeconds,
-        maxCommentsPerReview,
         senders,
+        strictWorkflow,
+        maxCommentsPerReview,
+        isReviewSummaryEnabled,
+        isOwnerAssigningEnabled,
+        delayBetweenCommentRequestsInSeconds,
     } = settings;
 
     global.probotInstance = app;
@@ -87,16 +86,14 @@ module.exports = (app) => {
 
                 let successfullyPostedComments = 0;
 
-                console.log({ reviewComments });
-
-                // if (reviewComments.length) {
-                //     successfullyPostedComments = await postComments(
-                //         context,
-                //         reviewComments,
-                //         delayBetweenCommentRequestsInSeconds,
-                //         maxCommentsPerReview
-                //     );
-                // }
+                if (reviewComments.length) {
+                    successfullyPostedComments = await postComments(
+                        context,
+                        reviewComments,
+                        delayBetweenCommentRequestsInSeconds,
+                        maxCommentsPerReview
+                    );
+                }
 
                 if (isReviewSummaryEnabled) {
                     postSummary(
