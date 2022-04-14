@@ -6,8 +6,16 @@ const removeWhitespaces = require('../helpers/removeWhitespaces');
 
 class BaseRule {
     constructor() {
-        const { ADDED, DELETED, UNCHANGED, LEFT, RIGHT, MERGE, NEWLINE } =
-            constants;
+        const {
+            ADDED,
+            EMPTY,
+            LEFT,
+            MERGE,
+            RIGHT,
+            DELETED,
+            NEWLINE,
+            UNCHANGED,
+        } = constants;
 
         this.MERGE = MERGE;
         this.NEWLINE = NEWLINE;
@@ -19,6 +27,8 @@ class BaseRule {
 
         this.LEFT = LEFT;
         this.RIGHT = RIGHT;
+
+        this.EMPTY = EMPTY;
     }
 
     /**
@@ -75,7 +85,7 @@ class BaseRule {
 
             if (
                 matchedRows.length &&
-                ['+', ''].includes(removeWhitespaces(row))
+                [this.ADDED, this.EMPTY].includes(removeWhitespaces(row))
             ) {
                 matchedRows.push({
                     index,

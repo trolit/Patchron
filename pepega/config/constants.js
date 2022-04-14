@@ -13,4 +13,6 @@ module.exports = Object.freeze({
     MERGE,
     NEWLINE,
     CUSTOM_LINES,
+
+    EMPTY: '',
 });
