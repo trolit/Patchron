@@ -83,10 +83,7 @@ class BaseRule {
         for (let index = 0; index < splitPatch.length; index++) {
             const row = splitPatch[index];
 
-            if (
-                matchedRows.length &&
-                [this.ADDED, this.EMPTY].includes(removeWhitespaces(row))
-            ) {
+            if (matchedRows.length && this.isNewLine(row)) {
                 matchedRows.push({
                     index,
                     content: this.NEWLINE,
@@ -173,7 +170,7 @@ class BaseRule {
      * @returns {boolean}
      */
     isNewLine(content) {
-        return ['+', ''].includes(removeWhitespaces(content));
+        return [this.ADDED, this.EMPTY].includes(removeWhitespaces(content));
     }
 
     /**
