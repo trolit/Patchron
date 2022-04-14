@@ -4,7 +4,7 @@ const nock = require('nock');
 const PepegaJs = require('../../..');
 const { Probot, ProbotOctokit } = require('probot');
 const { describe, expect, it, beforeEach } = require('@jest/globals');
-const PositionedKeywords = require('../../../pepega/rules/common/PositionedKeywords');
+const PositionedKeywordsRule = require('../../../pepega/rules/common/PositionedKeywords');
 
 const importKeywordCustomConfig = {
     name: 'import',
@@ -79,11 +79,11 @@ describe('invoke function', () => {
 
         probot.load(PepegaJs);
 
-        positionedKeywordsRule = new PositionedKeywords(validConfig);
+        positionedKeywordsRule = new PositionedKeywordsRule(validConfig);
     });
 
     it('returns empty array on empty keywords', () => {
-        positionedKeywordsRule = new PositionedKeywords({
+        positionedKeywordsRule = new PositionedKeywordsRule({
             keywords: [],
         });
 
@@ -101,7 +101,7 @@ describe('invoke function', () => {
      */
 
     it('returns empty array on missing custom position', () => {
-        positionedKeywordsRule = new PositionedKeywords({
+        positionedKeywordsRule = new PositionedKeywordsRule({
             keywords: [
                 {
                     ...importKeywordCustomConfig,
@@ -184,7 +184,7 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid custom positioning (maxLineBreaks = 2, countDifferentCodeAsLineBreak = true)', () => {
-        positionedKeywordsRule = new PositionedKeywords({
+        positionedKeywordsRule = new PositionedKeywordsRule({
             keywords: [
                 {
                     ...importKeywordCustomConfig,
@@ -217,6 +217,44 @@ describe('invoke function', () => {
                 `  from '@/helpers/methods'\n`,
                 `- \n`,
                 `- import method6 from '@/helpers/methods'\n`,
+            ],
+        });
+
+        expect(result).toEqual([]);
+    });
+
+    it('returns empty array on valid `import`custom positioning (second layer order)', () => {
+        positionedKeywordsRule = new PositionedKeywordsRule({
+            keywords: [
+                {
+                    ...importKeywordCustomConfig,
+                    order: [
+                        {
+                            name: 'packages',
+                            expression: /import(?!.*@).*/,
+                        },
+                        {
+                            name: 'components',
+                            expression: /import.*@\/components.*/,
+                        },
+                    ],
+                },
+            ],
+        });
+
+        const result = positionedKeywordsRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +5,7 @@`,
+                `+ import uniq from 'lodash/uniq'\n`,
+                `+ import {\n`,
+                `+  dedent,\n`,
+                `+  dedent2\n`,
+                `+ } from 'dedent-js'\n`,
+                `+ import { mapGetters } from 'vuex'\n`,
+                `+ import Component1 from '@/components/Component1'\n`,
+                `+ import Component12542 from '@/components/Component12542'\n`,
+                `+ import Component3 from '@/components/Component3'`,
             ],
         });
 
@@ -296,7 +334,7 @@ describe('invoke function', () => {
     });
 
     it('returns review on invalid custom positioning (maxLineBreaks = 2, countDifferentCodeAsLineBreak = false)', () => {
-        positionedKeywordsRule = new PositionedKeywords({
+        positionedKeywordsRule = new PositionedKeywordsRule({
             keywords: [
                 {
                     ...importKeywordCustomConfig,
@@ -340,8 +378,48 @@ describe('invoke function', () => {
         expect(result[1]).toHaveProperty('position', 13);
     });
 
+    it('returns review on invalid `import` custom positioning (second layer order)', () => {
+        positionedKeywordsRule = new PositionedKeywordsRule({
+            keywords: [
+                {
+                    ...importKeywordCustomConfig,
+                    order: [
+                        {
+                            name: 'packages',
+                            expression: /import(?!.*@).*/,
+                        },
+                        {
+                            name: 'components',
+                            expression: /import.*@\/components.*/,
+                        },
+                    ],
+                },
+            ],
+        });
+
+        const result = positionedKeywordsRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +5,7 @@`,
+                `+ import uniq from 'lodash/uniq'\n`,
+                `+ import {\n`,
+                `+  dedent,\n`,
+                `+  dedent2\n`,
+                `+ } from 'dedent-js'\n`,
+                `+ import Component3 from '@/components/Component3'`,
+                `+ import { mapGetters } from 'vuex'\n`,
+                `+ import Component1 from '@/components/Component1'\n`,
+                `+ import Component12542 from '@/components/Component12542'\n`,
+            ],
+        });
+
+        expect(result).toHaveLength(1);
+
+        expect(result[0]).toHaveProperty('line', 11);
+    });
+
     it('returns single comment on invalid custom positioning (breakOnFirstOccurence)', () => {
-        positionedKeywordsRule = new PositionedKeywords({
+        positionedKeywordsRule = new PositionedKeywordsRule({
             keywords: [
                 {
                     ...importKeywordCustomConfig,
@@ -389,7 +467,7 @@ describe('invoke function', () => {
      */
 
     it('returns empty array on missing BOF position', () => {
-        positionedKeywordsRule = new PositionedKeywords({
+        positionedKeywordsRule = new PositionedKeywordsRule({
             keywords: [
                 {
                     ...importKeywordBOFConfig,
@@ -416,7 +494,7 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid BOF positioning', () => {
-        positionedKeywordsRule = new PositionedKeywords({
+        positionedKeywordsRule = new PositionedKeywordsRule({
             keywords: [importKeywordBOFConfig],
         });
 
@@ -447,7 +525,7 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid BOF positioning (enforced)', () => {
-        positionedKeywordsRule = new PositionedKeywords({
+        positionedKeywordsRule = new PositionedKeywordsRule({
             keywords: [importKeywordBOFConfig],
         });
 
@@ -479,7 +557,7 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid BOF positioning (maxLineBreaks = 2, countDifferentCodeAsLineBreak = true)', () => {
-        positionedKeywordsRule = new PositionedKeywords({
+        positionedKeywordsRule = new PositionedKeywordsRule({
             keywords: [
                 {
                     ...importKeywordBOFConfig,
@@ -517,8 +595,46 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
+    it('returns empty array on valid `import` BOF positioning (second layer order)', () => {
+        positionedKeywordsRule = new PositionedKeywordsRule({
+            keywords: [
+                {
+                    ...importKeywordBOFConfig,
+                    order: [
+                        {
+                            name: 'packages',
+                            expression: /import(?!.*@).*/,
+                        },
+                        {
+                            name: 'components',
+                            expression: /import.*@\/components.*/,
+                        },
+                    ],
+                },
+            ],
+        });
+
+        const result = positionedKeywordsRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +1,7 @@`,
+                `+ import uniq from 'lodash/uniq'\n`,
+                `+ import {\n`,
+                `+  dedent,\n`,
+                `+  dedent2\n`,
+                `+ } from 'dedent-js'\n`,
+                `+ import { mapGetters } from 'vuex'\n`,
+                `+ import Component1 from '@/components/Component1'\n`,
+                `+ import Component12542 from '@/components/Component12542'\n`,
+                `+ import Component3 from '@/components/Component3'`,
+            ],
+        });
+
+        expect(result).toEqual([]);
+    });
+
     it('returns review on invalid BOF position', () => {
-        positionedKeywordsRule = new PositionedKeywords({
+        positionedKeywordsRule = new PositionedKeywordsRule({
             keywords: [
                 {
                     ...importKeywordBOFConfig,
@@ -595,7 +711,7 @@ describe('invoke function', () => {
     });
 
     it('returns review on invalid BOF positioning (enforced, maxLineBreaks = 0)', () => {
-        positionedKeywordsRule = new PositionedKeywords({
+        positionedKeywordsRule = new PositionedKeywordsRule({
             keywords: [importKeywordBOFConfig],
         });
 
@@ -636,7 +752,7 @@ describe('invoke function', () => {
     });
 
     it('returns review on invalid BOF positioning (maxLineBreaks = 2, countDifferentCodeAsLineBreak = false)', () => {
-        positionedKeywordsRule = new PositionedKeywords({
+        positionedKeywordsRule = new PositionedKeywordsRule({
             keywords: [
                 {
                     ...importKeywordBOFConfig,
@@ -681,8 +797,162 @@ describe('invoke function', () => {
         expect(result[1]).toHaveProperty('position', 14);
     });
 
+    it('returns empty array on valid BOF positioning (two BOF keywords)', () => {
+        positionedKeywordsRule = new PositionedKeywordsRule({
+            keywords: [
+                importKeywordBOFConfig,
+                constKeywordConfig({ custom: null, BOF: true }),
+            ],
+        });
+
+        const result = positionedKeywordsRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +1,17 @@`,
+                `+ const gamma = require('...')\n`,
+                `+ const beta = require('...');\n`,
+                `+ const alpha = require('...');\n`,
+                `+ \n`,
+                `  import {\n`,
+                `   method4,\n`,
+                `   method5,\n`,
+                `  from '@/helpers/methods'\n`,
+                `+ import method1 from '@/helpers/methods\n`,
+                `- \n`,
+                `  import {\n`,
+                `   method24,\n`,
+                `  from '@/helpers/methods'\n`,
+                `+ import method2 from '@/helpers/methods'\n`,
+                `+ import method3 from '@/helpers/methods'\n`,
+                `  import {\n`,
+                `   method34,\n`,
+                `  from '@/helpers/methods'\n`,
+            ],
+        });
+
+        expect(result).toEqual([]);
+    });
+
+    it('returns review on invalid `import` BOF positioning (two BOF keywords)', () => {
+        positionedKeywordsRule = new PositionedKeywordsRule({
+            keywords: [
+                importKeywordBOFConfig,
+                constKeywordConfig({ custom: null, BOF: true }),
+            ],
+        });
+
+        const result = positionedKeywordsRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +1,19 @@`,
+                `+ const gamma = require('...')\n`,
+                `+ const beta = require('...');\n`,
+                `+ const alpha = require('...');\n`,
+                `+ const b = () => { ... }\n`,
+                `+ const a = () => { ... }\n`,
+                `  import {\n`,
+                `   method4,\n`,
+                `   method5,\n`,
+                `  from '@/helpers/methods'\n`,
+                `+ import method1 from '@/helpers/methods\n`,
+                `- \n`,
+                `  import {\n`,
+                `   method24,\n`,
+                `  from '@/helpers/methods'\n`,
+                `+ import method2 from '@/helpers/methods'\n`,
+                `+ import method3 from '@/helpers/methods'\n`,
+                `  import {\n`,
+                `   method34,\n`,
+                `  from '@/helpers/methods'\n`,
+            ],
+        });
+
+        expect(result).toHaveLength(1);
+
+        expect(result[0]).toHaveProperty('line', 4);
+    });
+
+    it('returns review on invalid `import` BOF positioning (two BOF keywords)', () => {
+        positionedKeywordsRule = new PositionedKeywordsRule({
+            keywords: [
+                importKeywordBOFConfig,
+                constKeywordConfig({ custom: null, BOF: true }),
+            ],
+        });
+
+        const result = positionedKeywordsRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +1,19 @@`,
+                `+ const gamma = require('...')\n`,
+                `+ const beta = require('...');\n`,
+                `+ const alpha = require('...');\n`,
+                `+ const b = () => { ... }\n`,
+                `+ const a = () => { ... }\n`,
+                `  import {\n`,
+                `   method4,\n`,
+                `   method5,\n`,
+                `  from '@/helpers/methods'\n`,
+                `+ import method1 from '@/helpers/methods\n`,
+                `- \n`,
+                `  import {\n`,
+                `   method24,\n`,
+                `  from '@/helpers/methods'\n`,
+                `+ import method2 from '@/helpers/methods'\n`,
+                `+ import method3 from '@/helpers/methods'\n`,
+                `  import {\n`,
+                `   method34,\n`,
+                `  from '@/helpers/methods'\n`,
+            ],
+        });
+
+        expect(result).toHaveLength(1);
+
+        expect(result[0]).toHaveProperty('line', 4);
+    });
+
+    it('returns review on invalid `import` BOF positioning (second layer order)', () => {
+        positionedKeywordsRule = new PositionedKeywordsRule({
+            keywords: [
+                {
+                    ...importKeywordCustomConfig,
+                    order: [
+                        {
+                            name: 'packages',
+                            expression: /import(?!.*@).*/,
+                        },
+                        {
+                            name: 'components',
+                            expression: /import.*@\/components.*/,
+                        },
+                    ],
+                },
+            ],
+        });
+
+        const result = positionedKeywordsRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +1,7 @@`,
+                `+ import uniq from 'lodash/uniq'\n`,
+                `+ import {\n`,
+                `+  dedent,\n`,
+                `+  dedent2\n`,
+                `+ } from 'dedent-js'\n`,
+                `+ import Component3 from '@/components/Component3'`,
+                `+ import { mapGetters } from 'vuex'\n`,
+                `+ import Component1 from '@/components/Component1'\n`,
+                `+ import Component12542 from '@/components/Component12542'\n`,
+            ],
+        });
+
+        expect(result).toHaveLength(1);
+
+        expect(result[0]).toHaveProperty('line', 7);
+    });
+
     it('returns single comment on invalid BOF positioning (breakOnFirstOccurence)', () => {
-        positionedKeywordsRule = new PositionedKeywords({
+        positionedKeywordsRule = new PositionedKeywordsRule({
             keywords: [
                 {
                     ...importKeywordBOFConfig,
@@ -722,122 +992,8 @@ describe('invoke function', () => {
         expect(result[0]).toHaveProperty('position', 6);
     });
 
-    it('returns empty array on valid BOF positioning (two BOF keywords)', () => {
-        positionedKeywordsRule = new PositionedKeywords({
-            keywords: [
-                importKeywordBOFConfig,
-                constKeywordConfig({ custom: null, BOF: true }),
-            ],
-        });
-
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,17 @@`,
-                `+ const gamma = require('...')\n`,
-                `+ const beta = require('...');\n`,
-                `+ const alpha = require('...');\n`,
-                `+ \n`,
-                `  import {\n`,
-                `   method4,\n`,
-                `   method5,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method1 from '@/helpers/methods\n`,
-                `- \n`,
-                `  import {\n`,
-                `   method24,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method2 from '@/helpers/methods'\n`,
-                `+ import method3 from '@/helpers/methods'\n`,
-                `  import {\n`,
-                `   method34,\n`,
-                `  from '@/helpers/methods'\n`,
-            ],
-        });
-
-        expect(result).toEqual([]);
-    });
-
-    it('returns review on invalid `import` BOF positioning (two BOF keywords)', () => {
-        positionedKeywordsRule = new PositionedKeywords({
-            keywords: [
-                importKeywordBOFConfig,
-                constKeywordConfig({ custom: null, BOF: true }),
-            ],
-        });
-
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,19 @@`,
-                `+ const gamma = require('...')\n`,
-                `+ const beta = require('...');\n`,
-                `+ const alpha = require('...');\n`,
-                `+ const b = () => { ... }\n`,
-                `+ const a = () => { ... }\n`,
-                `  import {\n`,
-                `   method4,\n`,
-                `   method5,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method1 from '@/helpers/methods\n`,
-                `- \n`,
-                `  import {\n`,
-                `   method24,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method2 from '@/helpers/methods'\n`,
-                `+ import method3 from '@/helpers/methods'\n`,
-                `  import {\n`,
-                `   method34,\n`,
-                `  from '@/helpers/methods'\n`,
-            ],
-        });
-
-        expect(result).toHaveLength(1);
-
-        expect(result[0]).toHaveProperty('line', 4);
-    });
-
-    it('returns review on invalid `import` BOF positioning (two BOF keywords)', () => {
-        positionedKeywordsRule = new PositionedKeywords({
-            keywords: [
-                importKeywordBOFConfig,
-                constKeywordConfig({ custom: null, BOF: true }),
-            ],
-        });
-
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,19 @@`,
-                `+ const gamma = require('...')\n`,
-                `+ const beta = require('...');\n`,
-                `+ const alpha = require('...');\n`,
-                `+ const b = () => { ... }\n`,
-                `+ const a = () => { ... }\n`,
-                `  import {\n`,
-                `   method4,\n`,
-                `   method5,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method1 from '@/helpers/methods\n`,
-                `- \n`,
-                `  import {\n`,
-                `   method24,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method2 from '@/helpers/methods'\n`,
-                `+ import method3 from '@/helpers/methods'\n`,
-                `  import {\n`,
-                `   method34,\n`,
-                `  from '@/helpers/methods'\n`,
-            ],
-        });
-
-        expect(result).toHaveLength(1);
-
-        expect(result[0]).toHaveProperty('line', 4);
-    });
-
     it('returns single comment on invalid `import` and `const` BOF positioning (two BOF keywords)', () => {
-        positionedKeywordsRule = new PositionedKeywords({
+        positionedKeywordsRule = new PositionedKeywordsRule({
             keywords: [
                 importKeywordBOFConfig,
                 constKeywordConfig({ custom: null, BOF: true }),
