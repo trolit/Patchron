@@ -71,12 +71,10 @@ class StrictWorkflowRule extends BaseRule {
     _getComment(mergeFrom, mergeTo, hasMergeFromValidPrefix, isMergeToValid) {
         let commentBody = null;
 
-        if (!hasMergeFromValidPrefix && !isMergeToValid) {
-            commentBody = `Invalid flow (\`base: ${mergeTo}\` <- \`head: ${mergeFrom}\`) and unrecognized head prefix.`;
+        if (!isMergeToValid && hasMergeFromValidPrefix) {
+            commentBody = `Invalid flow (\`base: ${mergeTo}\` <- \`head: ${mergeFrom}\`). Change base branch?`;
         } else {
-            commentBody = !hasMergeFromValidPrefix
-                ? `Unrecognized head prefix (\`${mergeFrom}\`).`
-                : `Invalid flow  (\`base: ${mergeTo}\` <- \`head: ${mergeFrom}\`). Change base branch?`;
+            commentBody = `Unrecognized head prefix (\`${mergeFrom}\`).`;
         }
 
         if (!hasMergeFromValidPrefix) {
