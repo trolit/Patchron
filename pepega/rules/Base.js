@@ -269,9 +269,11 @@ class BaseRule {
         return multilineEndIndex;
     }
 
-    logError(filename, testedFile, message) {
+    logError(filename, message, testedFile = null) {
         probotInstance.log.error(
-            `${filename} >>> (${testedFile?.filename})\n${message}`
+            `${filename} >>>${
+                testedFile ? ` (${testedFile?.fileName})` : ``
+            }\n${message}`
         );
     }
 

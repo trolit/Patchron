@@ -29,7 +29,7 @@ class PositionedKeywordsRule extends BaseRule {
         const keywords = this.keywords;
 
         if (!keywords.length) {
-            this.logError(__filename, file, 'No keywords defined.');
+            this.logError(__filename, 'No keywords defined.', file);
 
             return [];
         }
@@ -37,7 +37,7 @@ class PositionedKeywordsRule extends BaseRule {
         const { split_patch: splitPatch } = file;
 
         if (!splitPatch) {
-            this.logError(__filename, file, 'Empty patch');
+            this.logError(__filename, 'Empty patch', file);
 
             return [];
         }
@@ -50,8 +50,8 @@ class PositionedKeywordsRule extends BaseRule {
             if (!this._hasKeywordValidConfig(keyword)) {
                 this.logError(
                     __filename,
-                    file,
-                    'Keyword review skipped due to invalid position config'
+                    'Keyword review skipped due to invalid position config',
+                    file
                 );
 
                 continue;

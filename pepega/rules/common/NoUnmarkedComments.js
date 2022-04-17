@@ -27,7 +27,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
 
     invoke(file) {
         if (this._hasInvalidConfig()) {
-            this.logError(__filename, file, `Invalid config!`);
+            this.logError(__filename, `Invalid config!`, file);
 
             return [];
         }
