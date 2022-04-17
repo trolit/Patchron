@@ -48,7 +48,6 @@ const addPullSenderAsAssignee = require('./pepega/pull-request/addSenderAsAssign
 module.exports = (app) => {
     const {
         senders,
-        strictWorkflow,
         maxCommentsPerReview,
         isReviewSummaryEnabled,
         isOwnerAssigningEnabled,
@@ -62,16 +61,15 @@ module.exports = (app) => {
         async (context) => {
             const { pullRequestOwner, payload, repo } = initializeData(context);
 
-            if (senders.length && !senders.includes(pullRequestOwner)) {
+            if (senders?.length && !senders.includes(pullRequestOwner)) {
                 return;
             }
 
-            if (strictWorkflow.enabled) {
+            if (rules?.pull) {
                 const isReviewAborted = resolveStrictWorkflow(
                     context,
                     payload,
-                    rules,
-                    strictWorkflow
+                    rules
                 );
 
                 if (isReviewAborted) {

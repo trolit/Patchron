@@ -5,22 +5,25 @@ const addComment = require('../github/addComment');
  * @param {WebhookEvent<EventPayloads.WebhookPayloadPullRequest>} context WebhookEvent instance.
  * @param {object} payload hooked PR data
  * @param {object} rules config rules object
- * @param {object} strictWorkflow strict workflow config
  * @returns {boolean} flag if review should be continued or not
  */
-module.exports = async (context, payload, rules, strictWorkflow) => {
-    const comment = rules.pull['strictWorkflow'].invoke(payload);
+module.exports = async (context, payload, rules) => {
+    const strictWorkflowRule = rules.pull['strictWorkflow'];
 
-    let isReviewAborted = false;
-
-    if (comment.reason === 'prefix') {
-        isReviewAborted = strictWorkflow.abortReviewOnInvalidBranchPrefix;
-    } else if (comment.reason === 'flow') {
-        isReviewAborted = strictWorkflow.abortReviewOnInvalidFlow;
+    if (!strictWorkflowRule) {
+        return false;
     }
 
+    const result = strictWorkflowRule.invoke(payload);
+
+    if (!result) {
+        return false;
+    }
+
+    const { body, isReviewAborted } = result;
+
     try {
-        await addComment(context, comment.body);
+        await addComment(context, body);
     } catch (error) {
         probotInstance.log.error(error);
     }

@@ -18,16 +18,11 @@ module.exports = {
         isReviewSummaryEnabled: false,
         maxCommentsPerReview: 50,
         senders: [],
-        // TODO: move these to rule?
-        strictWorkflow: {
-            enabled: false,
-            abortReviewOnInvalidBranchPrefix: false,
-            abortReviewOnInvalidFlow: true,
-        },
     },
     rules: {
         pull: {
             strictWorkflow: new StrictWorkflowRule({
+                enabled: false,
                 workflow: [
                     {
                         base: 'master',
@@ -54,6 +49,8 @@ module.exports = {
                         head: 'hotfix',
                     },
                 ],
+                abortReviewOnInvalidBranchPrefix: false,
+                abortReviewOnInvalidFlow: true,
             }),
         },
         files: {
