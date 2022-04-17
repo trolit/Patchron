@@ -51,18 +51,16 @@ class StrictWorkflowRule extends BaseRule {
             return null;
         }
 
-        let body = null;
-        let isReviewAborted = false;
+        const body = this._getComment(
+            mergeFrom,
+            mergeTo,
+            hasMergeFromValidPrefx,
+            isMergeToValid
+        );
 
-        if (!hasMergeFromValidPrefx) {
-            body = this._getComment(mergeFrom, mergeTo, 'prefix');
-
-            isReviewAborted = this.abortReviewOnInvalidBranchPrefix;
-        } else if (!isMergeToValid) {
-            body = this._getComment(mergeFrom, mergeTo, 'flow');
-
-            isReviewAborted = this.abortReviewOnInvalidFlow;
-        }
+        const isReviewAborted =
+            this.abortReviewOnInvalidBranchPrefix ||
+            this.abortReviewOnInvalidFlow;
 
         return {
             body,
@@ -70,22 +68,25 @@ class StrictWorkflowRule extends BaseRule {
         };
     }
 
-    _getComment(mergeFrom, mergeTo, reason) {
-        let formattedWorkflow = '';
+    _getComment(mergeFrom, mergeTo, hasMergeFromValidPrefix, isMergeToValid) {
+        let commentBody = null;
 
-        this.workflowArray.forEach((workflowItem) => {
-            formattedWorkflow = `${formattedWorkflow}
-            - \` ${workflowItem.base} \` <--- \` ${workflowItem.head} \``;
-        });
+        if (!hasMergeFromValidPrefix && !isMergeToValid) {
+            commentBody = `Invalid flow (\`base: ${mergeTo}\` <- \`head: ${mergeFrom}\`) and unrecognized head prefix.`;
+        } else {
+            commentBody = !hasMergeFromValidPrefix
+                ? `Unrecognized head prefix (\`${mergeFrom}\`).`
+                : `Invalid flow  (\`base: ${mergeTo}\` <- \`head: ${mergeFrom}\`). Change base branch?`;
+        }
 
-        const description =
-            reason === 'prefix'
-                ? `Invalid branch prefix :worried: (\`${mergeFrom}\`). Please, fix branch name and create new PR.`
-                : `Invalid flow (\`${mergeTo}\` <- \`${mergeFrom}\`). Either change base branch (recommended) or create new PR.`;
+        if (!hasMergeFromValidPrefix) {
+            let formattedWorkflow = '';
 
-        let commentBody = `${description}`;
+            this.workflowArray.forEach((workflowItem) => {
+                formattedWorkflow = `${formattedWorkflow}
+                - \` ${workflowItem.base} \` <--- \` ${workflowItem.head} \``;
+            });
 
-        if (reason === 'flow') {
             const workflowSnippet = `<details>
             <summary> Current allowed workflow </summary> \n\n${dedent(
                 formattedWorkflow
