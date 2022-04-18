@@ -1,3 +1,4 @@
+const constants = require('../config/constants');
 const getPosition = require('../helpers/getPosition');
 const getLineNumber = require('../helpers/getLineNumber');
 const ReviewCommentBuilder = require('../builders/ReviewComment');
@@ -5,20 +6,29 @@ const removeWhitespaces = require('../helpers/removeWhitespaces');
 
 class BaseRule {
     constructor() {
-        const merge = '<<< merge >>>';
-        const newLine = '<<< new line >>>';
+        const {
+            ADDED,
+            EMPTY,
+            LEFT,
+            MERGE,
+            RIGHT,
+            DELETED,
+            NEWLINE,
+            UNCHANGED,
+        } = constants;
 
-        this.merge = merge;
-        this.newLine = newLine;
-        this.customLines = [newLine, merge];
+        this.MERGE = MERGE;
+        this.NEWLINE = NEWLINE;
+        this.CUSTOM_LINES = [NEWLINE, MERGE];
 
-        const added = '+';
-        const deleted = '-';
-        const unchanged = ' ';
+        this.ADDED = ADDED;
+        this.DELETED = DELETED;
+        this.UNCHANGED = UNCHANGED;
 
-        this.added = added;
-        this.deleted = deleted;
-        this.unchanged = unchanged;
+        this.LEFT = LEFT;
+        this.RIGHT = RIGHT;
+
+        this.EMPTY = EMPTY;
     }
 
     /**
@@ -73,21 +83,21 @@ class BaseRule {
         for (let index = 0; index < splitPatch.length; index++) {
             const row = splitPatch[index];
 
-            if (matchedRows.length && removeWhitespaces(row) === '+') {
+            if (matchedRows.length && this.isNewline(row)) {
                 matchedRows.push({
                     index,
-                    content: this.newLine,
+                    content: this.NEWLINE,
                 });
 
                 continue;
-            } else if (matchedRows.length && row.startsWith('-')) {
+            } else if (matchedRows.length && this.isMergeLine(row)) {
                 matchedRows.push({
                     index,
-                    content: this.merge,
+                    content: this.MERGE,
                 });
 
                 continue;
-            } else if (matchedRows.length && row.startsWith(' ')) {
+            } else if (matchedRows.length && this.isUnchangedLine(row)) {
                 unchangedRows.push({
                     index,
                     content: row.trim(),
@@ -104,11 +114,11 @@ class BaseRule {
 
             if (
                 keyword?.multilineOptions &&
-                this._isMultiline(keyword, content)
+                this.isPartOfMultiLine(keyword, content)
             ) {
-                const multilineEndIndex = this._resolveMultilineMatch(
-                    keyword,
+                const multilineEndIndex = this.getMultiLineEndIndex(
                     splitPatch,
+                    keyword,
                     index
                 );
 
@@ -140,36 +150,115 @@ class BaseRule {
     }
 
     /**
-     * Removes from row indicators added by Git (added, deleted, unchanged) and hunk header (if occured)
+     * Removes from row indicators added by Git (added, deleted, unchanged)
      */
     getRawContent(row) {
         let rawContent = row;
 
-        if (row.startsWith(this.unchanged)) {
+        if (this.isUnchangedLine(row)) {
             rawContent = row.trim();
-        } else if (row.startsWith(this.added) || row.startsWith(this.deleted)) {
+        } else if (this.isAddedLine(row) || this.isMergeLine(row)) {
             rawContent = row.slice(1).trim();
         }
 
         return rawContent;
     }
 
-    _isMultiline(keyword, line) {
-        const { multilineOptions } = keyword;
-
-        return !multilineOptions.some((option) => line.includes(option));
+    /**
+     * **\/\/ apply only to lines from splitPatch!!**
+     *
+     * tests if given line is added line
+     * @param {string} line to check
+     * @returns {boolean}
+     */
+    isAddedLine(line) {
+        return line.startsWith(this.ADDED);
     }
 
-    _resolveMultilineMatch(keyword, splitPatch, currentIndex) {
-        let multilineEndIndex = -1;
+    /**
+     * **\/\/ apply only to lines from splitPatch!!**
+     *
+     * tests if given line is newline
+     * @param {string} line to check
+     * @returns {boolean}
+     */
+    isNewline(line) {
+        return [this.ADDED, this.EMPTY].includes(removeWhitespaces(line));
+    }
 
-        for (let index = currentIndex + 1; index < splitPatch.length; index++) {
+    /**
+     * **\/\/ apply only to lines from splitPatch!!**
+     *
+     * tests if given line is merge
+     * @param {string} line to check
+     * @returns {boolean}
+     */
+    isMergeLine(line) {
+        return line.startsWith(this.DELETED);
+    }
+
+    /**
+     * **\/\/ apply only to lines from splitPatch!!**
+     *
+     * tests if given line is unchanged
+     * @param {string} line to check
+     * @returns {boolean}
+     */
+    isUnchangedLine(line) {
+        return line.startsWith(this.UNCHANGED);
+    }
+
+    /**
+     * determines whether passed line is:
+     *
+     * - start of multi-line (fragment = start) (default)
+     * - end of multi-line (fragment = end)
+     * @param {object} keyword - keyword, **must** contain **multiLineOptions** array
+     * @param {string} line - text of line
+     * @param {string} fragment - start/end (start is default value)
+     * @returns {boolean}
+     */
+    isPartOfMultiLine(keyword, line, fragment = 'start') {
+        const { multilineOptions } = keyword;
+
+        const includesMultiLineOption = multilineOptions.some((option) =>
+            line.includes(option)
+        );
+
+        return fragment === 'start'
+            ? !includesMultiLineOption && line.match(keyword.regex)
+            : includesMultiLineOption && !line.match(keyword.regex);
+    }
+
+    getMultiLineStartIndex(splitPatch, keyword, endIndex) {
+        let multilineStartIndex = -1;
+
+        for (let index = endIndex - 1; index >= 0; index--) {
             const row = splitPatch[index];
 
             if (
-                !row.startsWith('-') &&
-                removeWhitespaces(row) !== '+' &&
-                !this._isMultiline(keyword, row)
+                !this.isMergeLine(row) &&
+                this.isPartOfMultiLine(keyword, row)
+            ) {
+                multilineStartIndex = index;
+
+                break;
+            }
+        }
+
+        return multilineStartIndex;
+    }
+
+    getMultiLineEndIndex(splitPatch, keyword, startIndex) {
+        let multilineEndIndex = -1;
+        const splitPatchLength = splitPatch.length;
+
+        for (let index = startIndex + 1; index < splitPatchLength; index++) {
+            const row = splitPatch[index];
+
+            if (
+                !this.isMergeLine(row) &&
+                this.isPartOfMultiLine(keyword, row, 'end')
             ) {
                 multilineEndIndex = index;
 
@@ -178,6 +267,26 @@ class BaseRule {
         }
 
         return multilineEndIndex;
+    }
+
+    logError(filename, message, testedFile = null) {
+        probotInstance.log.error(
+            `${filename} >>>${
+                testedFile ? ` (${testedFile?.fileName})` : ``
+            }\n${message}`
+        );
+    }
+
+    /**
+     * @param {Array<object>} data - array of objects containing `content` property
+     * @param {integer} startsAt
+     * @param {integer} endsAt
+     * @returns {string}
+     */
+    convertMultiLineToSingleLine(data, startsAt, endsAt) {
+        const slicedPart = data.slice(startsAt, endsAt + 1);
+
+        return slicedPart.map(({ content }) => content).join(' ');
     }
 }
 

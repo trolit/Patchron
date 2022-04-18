@@ -1,25 +1,38 @@
 const dedent = require('dedent-js');
+const BaseRule = require('../Base');
 
-class StrictWorkflowRule {
+class StrictWorkflowRule extends BaseRule {
     constructor(config) {
-        const { workflow } = config;
+        super();
 
+        const {
+            enabled,
+            workflow,
+            abortReviewOnInvalidBranchPrefix,
+            abortReviewOnInvalidFlow,
+        } = config;
+
+        this.enabled = enabled;
         this.workflowArray = workflow;
+        this.abortReviewOnInvalidFlow = abortReviewOnInvalidFlow;
+        this.abortReviewOnInvalidBranchPrefix =
+            abortReviewOnInvalidBranchPrefix;
     }
 
     invoke(payload) {
-        if (this.workflowArray.length === 0) {
-            probotInstance.log.error(
-                `Couldn't run rule ${__filename}. Empty workflow.`
-            );
+        if (!this.enabled) {
+            return null;
+        }
 
-            return [];
+        if (this.workflowArray.length === 0) {
+            this.logError(__filename, 'Could not run rule. Empty workflow.');
+
+            return null;
         }
 
         const { head, base } = payload.pull_request;
-
-        const { ref: mergeTo } = base;
         const { ref: mergeFrom } = head;
+        const { ref: mergeTo } = base;
 
         let hasMergeFromValidPrefx = false;
         let isMergeToValid = false;
@@ -34,33 +47,44 @@ class StrictWorkflowRule {
             }
         }
 
-        let comment = null;
-
-        if (!hasMergeFromValidPrefx) {
-            comment = this._getComment(mergeFrom, mergeTo, 'prefix');
-        } else if (!isMergeToValid) {
-            comment = this._getComment(mergeFrom, mergeTo, 'flow');
+        if (hasMergeFromValidPrefx && isMergeToValid) {
+            return null;
         }
 
-        return comment;
+        const body = this._getComment(
+            mergeFrom,
+            mergeTo,
+            hasMergeFromValidPrefx,
+            isMergeToValid
+        );
+
+        const isReviewAborted =
+            this.abortReviewOnInvalidBranchPrefix ||
+            this.abortReviewOnInvalidFlow;
+
+        return {
+            body,
+            isReviewAborted,
+        };
     }
 
-    _getComment(mergeFrom, mergeTo, reason) {
-        let formattedWorkflow = '';
+    _getComment(mergeFrom, mergeTo, hasMergeFromValidPrefix, isMergeToValid) {
+        let commentBody = null;
 
-        this.workflowArray.forEach((workflowItem) => {
-            formattedWorkflow = `${formattedWorkflow}
-            - \` ${workflowItem.base} \` <--- \` ${workflowItem.head} \``;
-        });
+        if (!isMergeToValid && hasMergeFromValidPrefix) {
+            commentBody = `Invalid flow (\`base: ${mergeTo}\` <- \`head: ${mergeFrom}\`). Change base branch?`;
+        } else {
+            commentBody = `Unrecognized head prefix (\`${mergeFrom}\`).`;
+        }
 
-        const description =
-            reason === 'prefix'
-                ? `Invalid branch prefix :worried: (\`${mergeFrom}\`). Please, fix branch name and create new PR.`
-                : `Invalid flow (\`${mergeTo}\` <- \`${mergeFrom}\`). Either change base branch (recommended) or create new PR.`;
+        if (!hasMergeFromValidPrefix) {
+            let formattedWorkflow = '';
 
-        let commentBody = `${description}`;
+            this.workflowArray.forEach((workflowItem) => {
+                formattedWorkflow = `${formattedWorkflow}
+                - \` ${workflowItem.base} \` <--- \` ${workflowItem.head} \``;
+            });
 
-        if (reason === 'flow') {
             const workflowSnippet = `<details>
             <summary> Current allowed workflow </summary> \n\n${dedent(
                 formattedWorkflow
@@ -70,10 +94,7 @@ class StrictWorkflowRule {
             commentBody = commentBody.concat('\n', workflowSnippet);
         }
 
-        return {
-            body: dedent(commentBody),
-            reason,
-        };
+        return dedent(commentBody);
     }
 }
 

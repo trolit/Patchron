@@ -1,5 +1,7 @@
 const getPartOfTheContent = require('./getPartOfTheContent');
 
+// TODO: SHOULD ACCEPT SIDE (RIGHT or LEFT) OR DATA ARRAY (after setting splitPatch)
+
 /**
  * returns array that gives information about content structure **(based on curly brackets)**
  * @param {string} content decoded file content
@@ -7,6 +9,8 @@ const getPartOfTheContent = require('./getPartOfTheContent');
  * @param {string} restriction.from
  * @param {string} restriction.to
  * @example
+ *
+ * ```
  * 0 | 'module.exports = () => {'
  * 1 | 'if (condition1) {'
  * 2 | 'if (condition2) {'
@@ -15,13 +19,13 @@ const getPartOfTheContent = require('./getPartOfTheContent');
  * 5 | '}'
  * 6 | '}'
  *
- * // yields
- * [
+ * // gives
+ * const result = [
  *  { from: 0, to: 6 },
  *  { from: 1, to: 5 },
  *  { from: 2, to: 4 }
- *  ...,
  * ]
+ * ```
  *
  * @returns {Array<{from, to}>}
  */

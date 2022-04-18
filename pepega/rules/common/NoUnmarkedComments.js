@@ -27,9 +27,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
 
     invoke(file) {
         if (this._hasInvalidConfig()) {
-            probotInstance.log.error(
-                `Couldn't run rule ${__filename} on ${file.filename}. Invalid config!`
-            );
+            this.logError(__filename, `Invalid config!`, file);
 
             return [];
         }
@@ -40,7 +38,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
         for (let index = 0; index < splitPatch.length; index++) {
             const row = splitPatch[index];
 
-            if (row.startsWith(this.deleted)) {
+            if (row.startsWith(this.DELETED)) {
                 continue;
             }
 

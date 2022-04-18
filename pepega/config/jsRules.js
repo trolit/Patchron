@@ -1,11 +1,15 @@
-const PositionedKeywords = require('../rules/common/PositionedKeywords');
-const noUnmarkedComments = require('../rules/common/NoUnmarkedComments');
-const keywordsOrderedByLength = require('../rules/common/KeywordsOrderedByLength');
+const {
+    common: {
+        PositionedKeywordsRule,
+        NoUnmarkedCommentsRule,
+        KeywordsOrderedByLengthRule,
+    },
+} = require('../rules');
 
 module.exports = [
     {
         enabled: false,
-        instance: new noUnmarkedComments({
+        instance: new NoUnmarkedCommentsRule({
             prefixes: [
                 {
                     value: 'TODO:',
@@ -35,11 +39,18 @@ module.exports = [
     },
     {
         enabled: false,
-        instance: new keywordsOrderedByLength({
+        instance: new KeywordsOrderedByLengthRule({
             keywords: [
                 {
-                    name: 'import',
-                    regex: /import.*/,
+                    name: 'import (packages)',
+                    regex: /import(?!.*@).*/,
+                    multilineOptions: ['from'],
+                    order: 'ascending',
+                    ignoreNewline: false,
+                },
+                {
+                    name: 'import (components)',
+                    regex: /import.*@\/components.*/,
                     multilineOptions: ['from'],
                     order: 'ascending',
                     ignoreNewline: false,
@@ -49,7 +60,7 @@ module.exports = [
     },
     {
         enabled: false,
-        instance: new PositionedKeywords({
+        instance: new PositionedKeywordsRule({
             keywords: [
                 {
                     name: 'const',

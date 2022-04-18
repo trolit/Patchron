@@ -1,9 +1,11 @@
-const PositionedKeywords = require('../rules/common/PositionedKeywords');
+const {
+    common: { PositionedKeywordsRule },
+} = require('../rules');
 
 module.exports = [
     {
         enabled: true,
-        instance: new PositionedKeywords({
+        instance: new PositionedKeywordsRule({
             keywords: [
                 {
                     name: 'import',
@@ -13,14 +15,26 @@ module.exports = [
                         custom: {
                             name: '<script>',
                             expression: /<script>/,
-                            direction: 'below',
                         },
                         BOF: false,
-                        EOF: false,
                     },
                     maxLineBreaks: 0,
                     enforced: true,
                     breakOnFirstOccurence: false,
+                    order: [
+                        {
+                            name: 'packages',
+                            expression: /import(?!.*@).*/,
+                        },
+                        {
+                            name: 'components',
+                            expression: /import.*@\/components.*/,
+                        },
+                        {
+                            name: 'helpers',
+                            expression: /import.*@\/helpers.*/,
+                        },
+                    ],
                 },
             ],
         }),

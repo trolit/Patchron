@@ -4,7 +4,7 @@ const nock = require('nock');
 const PepegaJs = require('../../..');
 const { Probot, ProbotOctokit } = require('probot');
 const { describe, expect, it, beforeEach } = require('@jest/globals');
-const KeywordsOrderedByLength = require('../../../pepega/rules/common/KeywordsOrderedByLength');
+const KeywordsOrderedByLengthRule = require('../../../pepega/rules/common/KeywordsOrderedByLength');
 
 const importKeywordConfig = {
     name: 'import',
@@ -15,11 +15,7 @@ const importKeywordConfig = {
 };
 
 const validConfig = {
-    keywords: [
-        {
-            ...importKeywordConfig,
-        },
-    ],
+    keywords: [importKeywordConfig],
 };
 
 const privateKey = fs.readFileSync(
@@ -45,11 +41,13 @@ describe('invoke function', () => {
 
         probot.load(PepegaJs);
 
-        keywordsOrderedByLengthRule = new KeywordsOrderedByLength(validConfig);
+        keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
+            validConfig
+        );
     });
 
     it('returns empty array on empty keywords', () => {
-        keywordsOrderedByLengthRule = new KeywordsOrderedByLength({
+        keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule({
             keywords: [],
         });
 
@@ -141,7 +139,7 @@ describe('invoke function', () => {
     });
 
     it('returns review on invalid descending `import` group order', () => {
-        keywordsOrderedByLengthRule = new KeywordsOrderedByLength({
+        keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule({
             keywords: [
                 {
                     ...importKeywordConfig,
@@ -172,7 +170,7 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid descending `import` group order', () => {
-        keywordsOrderedByLengthRule = new KeywordsOrderedByLength({
+        keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule({
             keywords: [
                 {
                     ...importKeywordConfig,
@@ -203,7 +201,7 @@ describe('invoke function', () => {
     });
 
     it('returns review on invalid `import` order with ignoreNewline enabled', () => {
-        keywordsOrderedByLengthRule = new KeywordsOrderedByLength({
+        keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule({
             keywords: [
                 {
                     ...importKeywordConfig,
@@ -243,7 +241,7 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid `import` order with ignoreNewline enabled', () => {
-        keywordsOrderedByLengthRule = new KeywordsOrderedByLength({
+        keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule({
             keywords: [
                 {
                     ...importKeywordConfig,
@@ -270,5 +268,91 @@ describe('invoke function', () => {
         });
 
         expect(result).toEqual([]);
+    });
+
+    it('returns empty array on valid `import` order split into packages and components', () => {
+        keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule({
+            keywords: [
+                {
+                    name: 'import (packages)',
+                    regex: /import(?!.*@).*/,
+                    multilineOptions: ['from'],
+                    order: 'ascending',
+                    ignoreNewline: false,
+                },
+                {
+                    name: 'import (components)',
+                    regex: /import.*@\/components.*/,
+                    multilineOptions: ['from'],
+                    order: 'ascending',
+                    ignoreNewline: false,
+                },
+            ],
+        });
+
+        const result = keywordsOrderedByLengthRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +5,7 @@`,
+                `+ import {\n`,
+                `+  dedent,\n`,
+                `+  dedent2\n`,
+                `+ } from 'dedent-js'\n`,
+                `+ import uniq from 'lodash/uniq'\n`,
+                `+ import { mapGetters } from 'vuex'\n`,
+                `+ \n`,
+                `+ import Component1 from '@/components/Component1'\n`,
+                `+ import Component2 from '@/components/Component2'\n`,
+                `+ import Component3 from '@/components/Component3'`,
+            ],
+        });
+
+        expect(result).toEqual([]);
+    });
+
+    it('returns review on invalid `import` order split into packages and components', () => {
+        keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule({
+            keywords: [
+                {
+                    name: 'import (packages)',
+                    regex: /import(?!.*@).*/,
+                    multilineOptions: ['from'],
+                    order: 'ascending',
+                    ignoreNewline: false,
+                },
+                {
+                    name: 'import (components)',
+                    regex: /import.*@\/components.*/,
+                    multilineOptions: ['from'],
+                    order: 'ascending',
+                    ignoreNewline: false,
+                },
+            ],
+        });
+
+        const result = keywordsOrderedByLengthRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +5,7 @@`,
+                `+ import uniq from 'lodash/uniq'\n`,
+                `+ import {\n`,
+                `+  dedent,\n`,
+                `+  dedent2\n`,
+                `+ } from 'dedent-js'\n`,
+                `+ import { mapGetters } from 'vuex'\n`,
+                `+ \n`,
+                `+ import Component1 from '@/components/Component1'\n`,
+                `+ import Component12542 from '@/components/Component12542'\n`,
+                `+ import Component3 from '@/components/Component3'`,
+            ],
+        });
+
+        expect(result).toHaveLength(2);
+
+        expect(result[0]).toHaveProperty('start_line', 5);
+        expect(result[0]).toHaveProperty('position', 6);
+
+        expect(result[1]).toHaveProperty('start_line', 12);
+        expect(result[1]).toHaveProperty('position', 10);
     });
 });

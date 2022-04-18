@@ -1,6 +1,9 @@
 const js = require('./jsRules');
 const vue = require('./vueRules');
-const strictWorkflow = require('../rules/pull/StrictWorkflow');
+
+const {
+    pull: { StrictWorkflowRule },
+} = require('../rules');
 
 require('dotenv').config({
     path: '../../.env',
@@ -15,15 +18,11 @@ module.exports = {
         isReviewSummaryEnabled: false,
         maxCommentsPerReview: 50,
         senders: [],
-        strictWorkflow: {
-            enabled: false,
-            abortReviewOnInvalidBranchPrefix: false,
-            abortReviewOnInvalidFlow: true,
-        },
     },
     rules: {
         pull: {
-            strictWorkflow: new strictWorkflow({
+            strictWorkflow: new StrictWorkflowRule({
+                enabled: false,
                 workflow: [
                     {
                         base: 'master',
@@ -50,6 +49,8 @@ module.exports = {
                         head: 'hotfix',
                     },
                 ],
+                abortReviewOnInvalidBranchPrefix: false,
+                abortReviewOnInvalidFlow: true,
             }),
         },
         files: {
