@@ -42,7 +42,7 @@ class PositionedKeywordsRule extends BaseRule {
             return [];
         }
 
-        const data = this._setupData(splitPatch);
+        const data = this.setupData(splitPatch);
 
         let reviewComments = [];
 
@@ -100,41 +100,6 @@ class PositionedKeywordsRule extends BaseRule {
         const { BOF } = keyword.position;
 
         return [isCustomPosition, BOF].filter((value) => value).length === 1;
-    }
-
-    _setupData(splitPatch) {
-        let data = [];
-
-        for (let index = 0; index < splitPatch.length; index++) {
-            const row = splitPatch[index];
-
-            if (this.isNewline(row)) {
-                data.push({
-                    index,
-                    content: this.NEWLINE,
-                });
-
-                continue;
-            }
-
-            if (this.isMergeLine(row)) {
-                data.push({
-                    index,
-                    content: this.MERGE,
-                });
-
-                continue;
-            }
-
-            const rawRow = this.getRawContent(row);
-
-            data.push({
-                index,
-                content: rawRow,
-            });
-        }
-
-        return data;
     }
 
     _matchKeywordData(splitPatch, data, keyword) {

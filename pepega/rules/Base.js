@@ -150,6 +150,44 @@ class BaseRule {
     }
 
     /**
+     * Cleans received patch
+     */
+    setupData(splitPatch) {
+        let data = [];
+
+        for (let index = 0; index < splitPatch.length; index++) {
+            const row = splitPatch[index];
+
+            if (this.isNewline(row)) {
+                data.push({
+                    index,
+                    content: this.NEWLINE,
+                });
+
+                continue;
+            }
+
+            if (this.isMergeLine(row)) {
+                data.push({
+                    index,
+                    content: this.MERGE,
+                });
+
+                continue;
+            }
+
+            const rawRow = this.getRawContent(row);
+
+            data.push({
+                index,
+                content: rawRow,
+            });
+        }
+
+        return data;
+    }
+
+    /**
      * Removes from row indicators added by Git (added, deleted, unchanged)
      */
     getRawContent(row) {
