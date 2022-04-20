@@ -72,7 +72,7 @@ class PositionedKeywordsRule extends BaseRule {
                 data,
                 keyword,
                 keywords,
-                matchedData,
+                matchedData
             });
 
             if (!firstLayerReview) {
@@ -85,7 +85,7 @@ class PositionedKeywordsRule extends BaseRule {
                 const secondLayerReview = this._reviewSecondLayer({
                     file,
                     keyword,
-                    matchedData,
+                    matchedData
                 });
 
                 reviewComments.push(...secondLayerReview);
@@ -131,14 +131,14 @@ class PositionedKeywordsRule extends BaseRule {
                     matchedData.push({
                         index,
                         content,
-                        length: multilineEndIndex - index,
+                        length: multilineEndIndex - index
                     });
 
                     index = multilineEndIndex;
                 } else {
                     matchedData.push({
                         index,
-                        content: content,
+                        content: content
                     });
                 }
             }
@@ -170,12 +170,12 @@ class PositionedKeywordsRule extends BaseRule {
                 keyword,
                 splitPatch,
                 matchedData,
-                keywordsWithBOF,
+                keywordsWithBOF
             });
 
             if (position && !position?.wasEnforced && !position?.isMatched) {
                 reviewComments = [
-                    this._getWrongPositionComment(file, keyword, position),
+                    this._getWrongPositionComment(file, keyword, position)
                 ];
 
                 this._removeKeywords(keywords, keywordsWithBOF);
@@ -193,7 +193,7 @@ class PositionedKeywordsRule extends BaseRule {
             data,
             keyword,
             position,
-            matchedData,
+            matchedData
         });
 
         return reviewComments;
@@ -278,7 +278,7 @@ class PositionedKeywordsRule extends BaseRule {
         return {
             index,
             wasEnforced,
-            length,
+            length
         };
     }
 
@@ -343,7 +343,7 @@ class PositionedKeywordsRule extends BaseRule {
             length,
             rawContent,
             wasEnforced,
-            isMatched: !!rawContent.match(keyword.regex),
+            isMatched: !!rawContent.match(keyword.regex)
         };
     }
 
@@ -356,7 +356,7 @@ class PositionedKeywordsRule extends BaseRule {
         const {
             breakOnFirstOccurence,
             maxLineBreaks,
-            countDifferentCodeAsLineBreak,
+            countDifferentCodeAsLineBreak
         } = keyword;
 
         const { split_patch: splitPatch } = file;
@@ -413,10 +413,10 @@ class PositionedKeywordsRule extends BaseRule {
                             from,
                             to,
                             distance,
-                            reason,
+                            reason
                         }),
                         from,
-                        to,
+                        to
                     })
                 );
             }
@@ -444,7 +444,7 @@ class PositionedKeywordsRule extends BaseRule {
         return this.getSingleLineComment({
             file,
             body,
-            index,
+            index
         });
     }
 
@@ -481,7 +481,7 @@ class PositionedKeywordsRule extends BaseRule {
         return this.getSingleLineComment({
             file,
             body,
-            index: testedRowIndex,
+            index: testedRowIndex
         });
     }
 
@@ -547,14 +547,6 @@ class PositionedKeywordsRule extends BaseRule {
         }
 
         return currentIndex;
-    }
-
-    _countPatchLength(patch) {
-        const value = patch.filter(
-            (row) => !row.startsWith('-') && !row.startsWith('@@')
-        );
-
-        return value?.length || 0;
     }
 
     /**
