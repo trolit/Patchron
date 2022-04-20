@@ -14,7 +14,7 @@ class BaseRule {
             RIGHT,
             DELETED,
             NEWLINE,
-            UNCHANGED,
+            UNCHANGED
         } = constants;
 
         this.MERGE = MERGE;
@@ -44,7 +44,7 @@ class BaseRule {
         const comment = reviewCommentBuilder.buildSingleLineComment({
             body,
             line,
-            side,
+            side
         });
 
         return comment;
@@ -66,7 +66,7 @@ class BaseRule {
             body,
             start_line,
             start_side: side,
-            position,
+            position
         });
 
         return comment;
@@ -86,21 +86,21 @@ class BaseRule {
             if (matchedRows.length && this.isNewline(row)) {
                 matchedRows.push({
                     index,
-                    content: this.NEWLINE,
+                    content: this.NEWLINE
                 });
 
                 continue;
             } else if (matchedRows.length && this.isMergeLine(row)) {
                 matchedRows.push({
                     index,
-                    content: this.MERGE,
+                    content: this.MERGE
                 });
 
                 continue;
             } else if (matchedRows.length && this.isUnchangedLine(row)) {
                 unchangedRows.push({
                     index,
-                    content: row.trim(),
+                    content: row.trim()
                 });
             }
 
@@ -129,7 +129,7 @@ class BaseRule {
                 matchedRows.push({
                     index,
                     content: rawContent,
-                    length: multilineEndIndex - index,
+                    length: multilineEndIndex - index
                 });
 
                 index = multilineEndIndex;
@@ -139,13 +139,13 @@ class BaseRule {
 
             matchedRows.push({
                 index,
-                content,
+                content
             });
         }
 
         return {
             matchedRows,
-            unchangedRows,
+            unchangedRows
         };
     }
 
@@ -161,7 +161,7 @@ class BaseRule {
             if (this.isNewline(row)) {
                 data.push({
                     index,
-                    content: this.NEWLINE,
+                    content: this.NEWLINE
                 });
 
                 continue;
@@ -170,7 +170,7 @@ class BaseRule {
             if (this.isMergeLine(row)) {
                 data.push({
                     index,
-                    content: this.MERGE,
+                    content: this.MERGE
                 });
 
                 continue;
@@ -180,7 +180,7 @@ class BaseRule {
 
             data.push({
                 index,
-                content: rawRow,
+                content: rawRow
             });
         }
 
