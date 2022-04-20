@@ -1,9 +1,10 @@
 const {
     common: {
+        SingleLineBlockRule,
         PositionedKeywordsRule,
         NoUnmarkedCommentsRule,
-        KeywordsOrderedByLengthRule,
-    },
+        KeywordsOrderedByLengthRule
+    }
 } = require('../rules');
 
 module.exports = [
@@ -13,29 +14,29 @@ module.exports = [
             prefixes: [
                 {
                     value: 'TODO:',
-                    meaning: 'needs to be implemented',
+                    meaning: 'needs to be implemented'
                 },
                 {
                     value: '*:',
-                    meaning: 'important note',
+                    meaning: 'important note'
                 },
                 {
                     value: '!:',
-                    meaning: 'to be removed',
+                    meaning: 'to be removed'
                 },
                 {
                     value: '?:',
-                    meaning: 'suggestion',
+                    meaning: 'suggestion'
                 },
                 {
                     value: 'TMP:',
-                    meaning: 'temporary solution',
-                },
+                    meaning: 'temporary solution'
+                }
             ],
             isAppliedToSingleLineComments: true,
             isAppliedToMultiLineComments: true,
-            isAppliedToInlineComments: true,
-        }),
+            isAppliedToInlineComments: true
+        })
     },
     {
         enabled: false,
@@ -46,17 +47,17 @@ module.exports = [
                     regex: /import(?!.*@).*/,
                     multilineOptions: ['from'],
                     order: 'ascending',
-                    ignoreNewline: false,
+                    ignoreNewline: false
                 },
                 {
                     name: 'import (components)',
                     regex: /import.*@\/components.*/,
                     multilineOptions: ['from'],
                     order: 'ascending',
-                    ignoreNewline: false,
-                },
-            ],
-        }),
+                    ignoreNewline: false
+                }
+            ]
+        })
     },
     {
         enabled: false,
@@ -69,13 +70,45 @@ module.exports = [
                     position: {
                         custom: null,
                         BOF: true,
-                        EOF: false,
+                        EOF: false
                     },
                     maxLineBreaks: 1,
                     enforced: true,
-                    breakOnFirstOccurence: false,
-                },
-            ],
-        }),
+                    breakOnFirstOccurence: false
+                }
+            ]
+        })
     },
+    {
+        enabled: false,
+        instance: new SingleLineBlockRule({
+            blocks: [
+                {
+                    name: 'if',
+                    expression: /^[\s]*(?:if).*[(].*[)].*/
+                },
+                {
+                    name: 'else',
+                    expression: /^(?:[{].*(?:else)).*|^(?:else).*/
+                },
+                {
+                    name: 'else if',
+                    expression: /^[{]?[\s]*(?:else if).*[(].*[)].*/
+                },
+                {
+                    name: 'for',
+                    expression: /^[\s]*(?:for).*[(].*[)].*/
+                },
+                {
+                    name: 'do..while',
+                    expression: /^[\s]*(?:do).*/
+                },
+                {
+                    name: 'while',
+                    expression: /^[\s]*(?:while).*[(].*[)].*/
+                }
+            ],
+            enforceCurlyBraces: true
+        })
+    }
 ];
