@@ -16,7 +16,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
             prefixes,
             isAppliedToSingleLineComments,
             isAppliedToMultiLineComments,
-            isAppliedToInlineComments,
+            isAppliedToInlineComments
         } = config;
 
         this.prefixes = prefixes;
@@ -54,7 +54,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
                         this.getSingleLineComment({
                             file,
                             body: this._getCommentBody(),
-                            index,
+                            index
                         })
                     );
                 }
@@ -103,7 +103,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
             comment = this.getSingleLineComment({
                 file,
                 body: this._getCommentBody(),
-                index,
+                index
             });
 
             return comment;
@@ -116,7 +116,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
                 file,
                 body: this._getCommentBody(true),
                 from: index,
-                to: result.endIndex,
+                to: result.endIndex
             });
         }
 
@@ -146,7 +146,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
             comment = this.getSingleLineComment({
                 file,
                 body: this._getCommentBody(),
-                index,
+                index
             });
         } else if (!this._startsWithPrefix(result)) {
             const result = this._verifyMultiLineComment(splitPatch, index);
@@ -156,7 +156,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
                     file,
                     body: this._getCommentBody(true),
                     from: index,
-                    to: result.endIndex,
+                    to: result.endIndex
                 });
             }
         }
@@ -190,7 +190,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
 
         return {
             hasValidPrefix,
-            endIndex,
+            endIndex
         };
     }
 
