@@ -48,7 +48,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
                     ...this._reviewLinesOrderIgnoringNewline({
                         file,
                         keyword,
-                        matchedRows,
+                        matchedRows
                     })
                 );
             } else {
@@ -57,7 +57,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
                         file,
                         keyword,
                         matchedRows,
-                        unchangedRows,
+                        unchangedRows
                     })
                 );
             }
@@ -86,7 +86,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
                     this.getSingleLineComment({
                         ...data,
                         body: this._getCommentBody(keyword),
-                        index: baseRow.index,
+                        index: baseRow.index
                     })
                 );
             }
@@ -143,7 +143,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
                             ...data,
                             body: this._getCommentBody(keyword),
                             from: firstElementIndex,
-                            to: lastElementIndex,
+                            to: lastElementIndex
                         })
                     );
 

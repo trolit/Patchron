@@ -108,7 +108,7 @@ module.exports = [
                     expression: /^[\s]*(?:while).*[(].*[)].*/
                 }
             ],
-            enforceCurlyBraces: true
+            curlyBraces: true
         })
     }
 ];
