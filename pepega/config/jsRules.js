@@ -101,7 +101,8 @@ module.exports = [
                 },
                 {
                     name: 'do..while',
-                    expression: /^[\s]*(?:do).*/
+                    expression: /^[\s]*(?:do).*/,
+                    endIndicator: /^while/
                 },
                 {
                     name: 'while',
