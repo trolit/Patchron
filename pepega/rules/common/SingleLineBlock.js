@@ -1,11 +1,11 @@
-const dedent = require('dedent-js');
 const BaseRule = require('../Base');
-const getLineNumber = require('../../helpers/getLineNumber');
+const getContentNesting = require('../../helpers/getContentNesting');
 
 class SingleLineBlockRule extends BaseRule {
     /**
+     * Please note that, if provided block does not end by curly brace or single line, assign regular expression under `endIndicator` property to specify block end manually.
      * @param {object} config
-     * @param {Array<{name: string, expression: object}>} config.blocks
+     * @param {Array<{name: string, expression: object, endIndicator: object?}>} config.blocks
      * @param {boolean} config.curlyBraces - true indicates that matched blocks should be wrapped with curly braces {}
      */
     constructor(config) {
@@ -18,9 +18,7 @@ class SingleLineBlockRule extends BaseRule {
     }
 
     invoke(file) {
-        const blocks = this.blocks;
-
-        if (!blocks.length) {
+        if (!this.blocks.length) {
             this.logError(__filename, 'No blocks defined.', file);
 
             return [];
@@ -36,91 +34,244 @@ class SingleLineBlockRule extends BaseRule {
 
         const data = this.setupData(splitPatch);
 
-        let reviewComments = [];
+        if (!this._includesAnyMatch(data)) {
+            return [];
+        }
 
-        // solve
+        const contentNesting = getContentNesting(data);
+
+        const singleLineBlocks = this._getSingleLineBlocks(
+            data,
+            contentNesting
+        );
+
+        const reviewComments = this._reviewSingleLineBlocks(
+            file,
+            singleLineBlocks
+        );
 
         return reviewComments;
     }
 
-    _matchKeywordData(splitPatch, data, keyword) {
-        let matchedData = [];
+    _includesAnyMatch(data) {
+        return data.some(({ content }) =>
+            this.blocks.some((block) => content.match(block.expression))
+        );
+    }
 
-        for (let index = 0; index < data.length; index++) {
-            const matchResult = data[index].content.match(keyword.regex);
+    _reviewSingleLineBlocks(file, singleLineBlocks) {
+        let reviewComments = [];
 
-            if (matchResult) {
-                const content = matchResult[0];
+        for (const singleLineBlock of singleLineBlocks) {
+            const { from, to, isWithBraces } = singleLineBlock;
 
-                const isMultiLine =
-                    keyword?.multilineOptions?.length &&
-                    this.isPartOfMultiLine(keyword, content);
+            if (this.curlyBraces !== isWithBraces) {
+                const body = this._getCommentBody();
 
-                if (isMultiLine) {
-                    const multilineEndIndex = this.getMultiLineEndIndex(
-                        splitPatch,
-                        keyword,
-                        index
-                    );
-
-                    const content = this.convertMultiLineToSingleLine(
-                        data,
-                        index,
-                        multilineEndIndex
-                    );
-
-                    matchedData.push({
-                        index,
-                        content,
-                        length: multilineEndIndex - index
-                    });
-
-                    index = multilineEndIndex;
-                } else {
-                    matchedData.push({
-                        index,
-                        content: content
-                    });
-                }
+                reviewComments.push(
+                    from === to
+                        ? this.getSingleLineComment({
+                              file,
+                              index: from,
+                              body
+                          })
+                        : this.getMultiLineComment({
+                              file,
+                              from,
+                              to,
+                              body
+                          })
+                );
             }
         }
 
-        return matchedData;
+        return reviewComments;
+    }
+
+    _getSingleLineBlocks(data, contentNesting) {
+        const endIndicators = [];
+        const singleLineBlocks = [];
+        const dataLength = data.length;
+
+        for (let index = 0; index < dataLength; index++) {
+            const row = data[index];
+            const { content } = row;
+
+            if (endIndicators?.length) {
+                const endIndicatorIndex = endIndicators.findIndex(
+                    (endIndicator) => content.match(endIndicator)
+                );
+
+                if (~endIndicatorIndex) {
+                    endIndicators.splice(endIndicatorIndex, 1);
+
+                    continue;
+                }
+            }
+
+            if (content === this.MERGE || content === this.NEWLINE) {
+                continue;
+            }
+
+            const block = this._findMatchingBlock(content);
+
+            if (!block) {
+                continue;
+            }
+
+            const nextRow = index + 1 < dataLength ? data[index + 1] : null;
+
+            const isWithBraces = this._isWithBraces(
+                contentNesting,
+                row,
+                nextRow
+            );
+
+            let to;
+            const from = row.index;
+
+            if (block?.endIndicator) {
+                to = this._getEndIndicatorIndex(data, block, row);
+
+                endIndicators.push(block.endIndicator);
+            } else {
+                to = this._getEndIndex(
+                    contentNesting,
+                    block,
+                    row,
+                    isWithBraces
+                );
+            }
+
+            if (this._isValidBlock(from, to)) {
+                singleLineBlocks.push({
+                    from,
+                    to,
+                    isWithBraces
+                });
+            }
+        }
+
+        return singleLineBlocks;
+    }
+
+    _isValidBlock(from, to) {
+        const isSingleLineBlock = from === to;
+
+        const isMultiLineBlockWithBraces = to - from - 1 === 1;
+
+        const isMultiLineBlockWithoutBraces = to - from === 1;
+
+        return (
+            isSingleLineBlock ||
+            isMultiLineBlockWithBraces ||
+            isMultiLineBlockWithoutBraces
+        );
+    }
+
+    _findMatchingBlock(content) {
+        return this.blocks.find(({ expression }) => content.match(expression));
+    }
+
+    _isWithBraces(contentNesting, row, nextRow = null) {
+        const { index } = row;
+
+        if (!nextRow) {
+            return contentNesting.some(({ from }) => from === index);
+        }
+
+        return contentNesting.some(
+            ({ from }) => from === index || nextRow.content.startsWith('{')
+        );
+    }
+
+    _getEndIndicatorIndex(data, block, row) {
+        let endIndex = -1;
+        let matchesToSkip = 0;
+
+        for (let index = row.index + 1; index < data.length; index++) {
+            const nextRow = data[index];
+
+            const nextRowBlock = this._findMatchingBlock(nextRow.content);
+
+            if (block === nextRowBlock) {
+                matchesToSkip++;
+
+                continue;
+            }
+
+            const isEndIndicator = nextRow.content.match(block.endIndicator);
+
+            if (isEndIndicator && matchesToSkip) {
+                matchesToSkip--;
+            } else if (isEndIndicator && !matchesToSkip) {
+                endIndex = index;
+
+                break;
+            }
+        }
+
+        return endIndex;
+    }
+
+    _getEndIndex(contentNesting, block, row, isWithBraces) {
+        if (isWithBraces) {
+            const { to } = contentNesting.find(({ from }) =>
+                [row.index, row.index + 1].includes(from)
+            );
+
+            return to;
+        } else {
+            const { content } = row;
+            const { expression } = block;
+
+            const expressionAsString = expression.toString().replace(/\//g, '');
+
+            const rawBlockExpression = expressionAsString.endsWith('.*')
+                ? expressionAsString.slice(0, -2)
+                : expressionAsString;
+
+            const rawBlockMatch = content.match(rawBlockExpression);
+
+            if (!rawBlockMatch) {
+                return -1;
+            }
+
+            const rawBlock = rawBlockMatch[0];
+
+            const contentLength = content.length;
+            const rawBlockLength = rawBlock.length;
+
+            const extraBlockContent = content.substr(rawBlockLength).trim();
+
+            return contentLength > rawBlockLength &&
+                !this.isLineCommented(extraBlockContent)
+                ? row.index
+                : row.index + 1;
+        }
+    }
+
+    _withBracesInTheSameLine(contentNesting, row) {
+        const rowContentNesting = contentNesting.find(
+            ({ from }) => from === row.index
+        );
+
+        if (!rowContentNesting) {
+            return false;
+        }
+
+        const { from, to } = rowContentNesting;
+
+        return from === to;
     }
 
     /**
-     * @param {object} keyword
-     * @param {Array<string>} splitPatch
-     * @param {object} review
+     * @returns {string}
      */
-    _getCommentBody(keyword, splitPatch, review) {
-        const { from, to, distance, reason } = review;
-        const { maxLineBreaks, name } = keyword;
-
-        const fromLineNumber = getLineNumber(splitPatch, this.RIGHT, from);
-        const toLineNumber = getLineNumber(splitPatch, this.RIGHT, to);
-
-        let commentBody = '';
-
-        switch (reason) {
-            case 'tooManyLineBreaks':
-                commentBody = `Found \`${distance}\` line(s) between \`${name}\` lines \`${fromLineNumber}\` and \`${toLineNumber}\` but ${
-                    maxLineBreaks
-                        ? `only \`${maxLineBreaks}\` are allowed`
-                        : `there shouldn't be any`
-                }`;
-                break;
-
-            case 'differentCode':
-                commentBody = `Fragment between \`line: ${fromLineNumber}\` and \`line: ${toLineNumber}\` should ${
-                    maxLineBreaks
-                        ? `only consist of line breaks (max: ${maxLineBreaks})`
-                        : `not contain any code or line breaks`
-                }`;
-                break;
-        }
-
-        return dedent(commentBody);
+    _getCommentBody() {
+        return `This single-line block should${
+            this.curlyBraces ? `` : `n't`
+        } be wrapped with curly braces.`;
     }
 }
 
