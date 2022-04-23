@@ -109,7 +109,7 @@ class SingleLineBlockRule extends BaseRule {
                 }
             }
 
-            if (content === this.MERGE || content === this.NEWLINE) {
+            if (this.CUSTOM_LINES.includes(content)) {
                 continue;
             }
 
