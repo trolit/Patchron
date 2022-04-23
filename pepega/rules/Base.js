@@ -157,8 +157,9 @@ class BaseRule {
 
         for (let index = 0; index < splitPatch.length; index++) {
             const row = splitPatch[index];
+            const rawRow = this.getRawContent(row);
 
-            if (this.isNewline(row)) {
+            if (this.isNewline(row) || this.isLineCommented(rawRow)) {
                 data.push({
                     index,
                     content: this.NEWLINE
@@ -175,8 +176,6 @@ class BaseRule {
 
                 continue;
             }
-
-            const rawRow = this.getRawContent(row);
 
             data.push({
                 index,
@@ -325,6 +324,17 @@ class BaseRule {
         const slicedPart = data.slice(startsAt, endsAt + 1);
 
         return slicedPart.map(({ content }) => content).join(' ');
+    }
+
+    /**
+     * determines whether passed line starts with //, /*, * or *\/
+     * @param {string} line
+     * @returns {boolean}
+     */
+    isLineCommented(line) {
+        const matchResult = line.match(/^(\/\/|\/\*|\*\/|\*)/);
+
+        return !!matchResult;
     }
 }
 
