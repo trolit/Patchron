@@ -3,7 +3,7 @@ const getContentNesting = require('../../helpers/getContentNesting');
 
 class SingleLineBlockRule extends BaseRule {
     /**
-     * Please note that, if provided block does not end by curly brace or single line, assign regular expression under `endIndicator` property to specify block end manually.
+     * Please note that, if provided block does not end by curly brace or single line, assign regular expression under `endIndicator` property to specify block end manually. For instance `endIndicator` of `do..while` could be ```/^while/```
      * @param {object} config
      * @param {Array<{name: string, expression: object, endIndicator: object?}>} config.blocks
      * @param {boolean} config.curlyBraces - true indicates that matched blocks should be wrapped with curly braces {}
