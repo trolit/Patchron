@@ -13,12 +13,12 @@ const validConfig = {
             expression: /^[\s]*(?:if).*[(].*[)].*/
         },
         {
-            name: 'else',
-            expression: /^(?:[{].*(?:else)).*|^(?:else).*/
-        },
-        {
             name: 'else if',
             expression: /^[{]?[\s]*(?:else if).*[(].*[)].*/
+        },
+        {
+            name: 'else',
+            expression: /^(?:[{].*(?:else)).*|^(?:else).*/
         },
         {
             name: 'for',
@@ -86,37 +86,41 @@ describe('invoke function', () => {
 
     /**
      * ---------------------------------------------------
-     * SINGLE IF BLOCK
+     * SINGLE-LINE IF/ELSE IF/ELSE BLOCKS
      * ---------------------------------------------------
      */
 
-    it('returns empty array on valid single-line `if` blocks (with curly braces)', () => {
+    it('returns empty array on valid single-line if/else if/else blocks (with curly braces)', () => {
         const result = singleLineBlockRule.invoke({
             filename: '...',
             split_patch: [
                 `@@ -10,13 +1,7 @@\n`,
+                `- const x = 3;\n`,
                 `+ const x = 4;\n`,
                 `+ const y = 5;\n`,
                 `+ if (x === y) { result = x; }\n`,
                 `+ \n`,
-                `+ if (x > y) {\n`,
-                `+  result = x + y;\n`,
-                `+ }\n`,
-                `+ \n`,
-                `+ if (x <= y)\n`,
+                `+ if (x > y)\n`,
                 `+ {\n`,
-                `+  result = x - y;\n`,
+                `+    result = x + y;\n`,
+                `+ }\n`,
+                `+ else if (x <= y)\n`,
+                `+ {\n`,
+                `+    result = x - y;\n`,
+                `+ }\n`,
+                `+ else\n`,
+                `+ {\n`,
+                `+    result = 0;\n`,
                 `+ }\n`,
                 `+ \n`,
-                `+ for (let index = 0; index < 10; index++) {\n`,
-                `+  if (index % 2 === 0) {\n`,
-                `+      console.log(index);\n`,
-                `+  }\n`,
-                `+  \n`,
-                `+  if (index % 3 === 0) {\n`,
-                `+      if (result > 20) { continue; }\n`,
-                `+      else { break; }\n`,
-                `+  }\n`,
+                `+ for (let index = 0; index < result; index++) {\n`,
+                `+    if (index % 2 === 0) {\n`,
+                `+       console.log(index);\n`,
+                `+    } else if (index % 3 === 0) {\n`,
+                `+       if (result > 18) { continue; }\n`,
+                `+       else if (result < 6) { result += 2; }`,
+                `+       else { break; }\n`,
+                `+    }\n`,
                 `+ }\n`
             ]
         });
@@ -124,48 +128,92 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
-    it('returns review on invalid single-line `if` blocks (with curly braces)', () => {
+    it('returns review on invalid single-line if/else if/else blocks (with curly braces)', () => {
         const result = singleLineBlockRule.invoke({
             filename: '...',
             split_patch: [
                 `@@ -10,13 +1,7 @@\n`,
+                `- const x = 3;\n`,
                 `+ const x = 4;\n`,
                 `+ const y = 5;\n`,
                 `+ if (x === y) result = x;\n`,
                 `+ \n`,
                 `+ if (x > y)\n`,
-                `+  result = x + y;\n`,
+                `+    result = x + y;\n`,
+                `+ else if (x <= y)\n`,
+                `+    result = x - y;\n`,
+                `+ else\n`,
+                `+    result = 0;\n`,
                 `+ \n`,
-                `+ if (x <= y)\n`,
-                `+  result = x - y;\n`,
-                `+ \n`,
-                `+ for (let index = 0; index < 10; index++) {\n`,
-                `+  if (index % 2 === 0)\n`,
-                `+      console.log(index);\n`,
-                `+  \n`,
-                `+  if (index % 3 === 0) {\n`,
-                `+      if (result > 20) continue;\n`,
-                `+      else break;\n`,
-                `+  }\n`,
+                `+ for (let index = 0; index < result; index++) {\n`,
+                `+    if (index % 2 === 0)\n`,
+                `+       console.log(index);\n`,
+                `+    else if (index % 3 === 0) {\n`,
+                `+       if (result > 18) continue;\n`,
+                `+       else if (result < 6) result += 2;`,
+                `+       else break;\n`,
+                `+    }\n`,
                 `+ }\n`
             ]
         });
 
-        expect(result).toHaveLength(6);
+        expect(result).toHaveLength(8);
 
         expect(result[0]).toHaveProperty('line', 3);
 
         expect(result[1]).toHaveProperty('start_line', 5);
         expect(result[1]).toHaveProperty('position', 6);
 
-        expect(result[2]).toHaveProperty('start_line', 8);
-        expect(result[2]).toHaveProperty('position', 9);
+        expect(result[2]).toHaveProperty('start_line', 7);
+        expect(result[2]).toHaveProperty('position', 8);
 
-        expect(result[3]).toHaveProperty('start_line', 12);
-        expect(result[3]).toHaveProperty('position', 13);
+        expect(result[3]).toHaveProperty('start_line', 9);
+        expect(result[3]).toHaveProperty('position', 10);
 
-        expect(result[4]).toHaveProperty('line', 16);
+        expect(result[4]).toHaveProperty('start_line', 13);
+        expect(result[4]).toHaveProperty('position', 14);
 
-        expect(result[5]).toHaveProperty('line', 17);
+        expect(result[5]).toHaveProperty('line', 16);
+
+        expect(result[6]).toHaveProperty('line', 17);
+
+        expect(result[7]).toHaveProperty('line', 18);
+    });
+
+    it('returns empty array on valid single-line if/else if/else blocks (without curly braces)', () => {
+        const singleLineBlockRule = new SingleLineBlockRule({
+            ...validConfig,
+            curlyBraces: false
+        });
+
+        const result = singleLineBlockRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +1,7 @@\n`,
+                `- const x = 3;\n`,
+                `+ const x = 4;\n`,
+                `+ const y = 5;\n`,
+                `+ if (x === y) result = x;\n`,
+                `+ \n`,
+                `+ if (x > y)\n`,
+                `+    result = x + y;\n`,
+                `+ else if (x <= y)\n`,
+                `+    result = x - y;\n`,
+                `+ else\n`,
+                `+    result = 0;\n`,
+                `+ \n`,
+                `+ for (let index = 0; index < result; index++) {\n`,
+                `+    if (index % 2 === 0)\n`,
+                `+       console.log(index);\n`,
+                `+    else if (index % 3 === 0) {\n`,
+                `+       if (result > 18) continue;\n`,
+                `+       else if (result < 6) result += 2;`,
+                `+       else break;\n`,
+                `+    }\n`,
+                `+ }\n`
+            ]
+        });
+
+        expect(result).toEqual([]);
     });
 });
