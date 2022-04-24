@@ -14,13 +14,13 @@ const importKeywordCustomConfig = {
         custom: {
             name: '<script>',
             expression: /<script>/,
-            BOF: false,
-        },
+            BOF: false
+        }
     },
     maxLineBreaks: 0,
     enforced: true,
     breakOnFirstOccurence: false,
-    countDifferentCodeAsLineBreak: false,
+    countDifferentCodeAsLineBreak: false
 };
 
 const importKeywordBOFConfig = {
@@ -30,12 +30,12 @@ const importKeywordBOFConfig = {
     position: {
         custom: null,
         BOF: true,
-        EOF: false,
+        EOF: false
     },
     maxLineBreaks: 0,
     enforced: true,
     breakOnFirstOccurence: false,
-    countDifferentCodeAsLineBreak: false,
+    countDifferentCodeAsLineBreak: false
 };
 
 const constKeywordConfig = (position, override = null) => {
@@ -48,12 +48,12 @@ const constKeywordConfig = (position, override = null) => {
         breakOnFirstOccurence: false,
         countDifferentCodeAsLineBreak: false,
         position,
-        override,
+        override
     };
 };
 
 const validConfig = {
-    keywords: [importKeywordCustomConfig],
+    keywords: [importKeywordCustomConfig]
 };
 
 const privateKey = fs.readFileSync(
@@ -72,9 +72,9 @@ describe('invoke function', () => {
             privateKey,
             Octokit: ProbotOctokit.defaults({
                 retry: { enabled: false },
-                throttle: { enabled: false },
+                throttle: { enabled: false }
             }),
-            logLevel: 'fatal',
+            logLevel: 'fatal'
         });
 
         probot.load(PepegaJs);
@@ -84,11 +84,11 @@ describe('invoke function', () => {
 
     it('returns empty array on empty keywords', () => {
         positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [],
+            keywords: []
         });
 
         const result = positionedKeywordsRule.invoke({
-            filename: '...',
+            filename: '...'
         });
 
         expect(result).toEqual([]);
@@ -105,9 +105,9 @@ describe('invoke function', () => {
             keywords: [
                 {
                     ...importKeywordCustomConfig,
-                    enforced: false,
-                },
-            ],
+                    enforced: false
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
@@ -120,8 +120,8 @@ describe('invoke function', () => {
                 `+ \n`,
                 `+ import method2 from '@/helpers/methods'\n`,
                 `+ \n`,
-                `+ import method3 from '@/helpers/methods'`,
-            ],
+                `+ import method3 from '@/helpers/methods'`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -148,8 +148,8 @@ describe('invoke function', () => {
                 `   method34,\n`,
                 `  from '@/helpers/methods'\n`,
                 `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                `- import method6 from '@/helpers/methods'\n`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -176,8 +176,8 @@ describe('invoke function', () => {
                 `   method34,\n`,
                 `  from '@/helpers/methods'\n`,
                 `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                `- import method6 from '@/helpers/methods'\n`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -189,9 +189,9 @@ describe('invoke function', () => {
                 {
                     ...importKeywordCustomConfig,
                     maxLineBreaks: 2,
-                    countDifferentCodeAsLineBreak: true,
-                },
-            ],
+                    countDifferentCodeAsLineBreak: true
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
@@ -216,8 +216,8 @@ describe('invoke function', () => {
                 `   method34,\n`,
                 `  from '@/helpers/methods'\n`,
                 `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                `- import method6 from '@/helpers/methods'\n`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -231,15 +231,15 @@ describe('invoke function', () => {
                     order: [
                         {
                             name: 'packages',
-                            expression: /import(?!.*@).*/,
+                            expression: /import(?!.*@).*/
                         },
                         {
                             name: 'components',
-                            expression: /import.*@\/components.*/,
-                        },
-                    ],
-                },
-            ],
+                            expression: /import.*@\/components.*/
+                        }
+                    ]
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
@@ -254,8 +254,8 @@ describe('invoke function', () => {
                 `+ import { mapGetters } from 'vuex'\n`,
                 `+ import Component1 from '@/components/Component1'\n`,
                 `+ import Component12542 from '@/components/Component12542'\n`,
-                `+ import Component3 from '@/components/Component3'`,
-            ],
+                `+ import Component3 from '@/components/Component3'`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -269,15 +269,15 @@ describe('invoke function', () => {
                     order: [
                         {
                             name: 'packages',
-                            expression: /import(?!.*@).*/,
+                            expression: /import(?!.*@).*/
                         },
                         {
                             name: 'components',
-                            expression: /import.*@\/components.*/,
-                        },
-                    ],
-                },
-            ],
+                            expression: /import.*@\/components.*/
+                        }
+                    ]
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
@@ -286,8 +286,8 @@ describe('invoke function', () => {
                 `@@ -10,13 +5,7 @@`,
                 `+ import Component1 from '@/components/Component1'\n`,
                 `+ import Component12542 from '@/components/Component12542'\n`,
-                `+ import Component3 from '@/components/Component3'`,
-            ],
+                `+ import Component3 from '@/components/Component3'`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -316,8 +316,8 @@ describe('invoke function', () => {
                 `   method34,\n`,
                 `  from '@/helpers/methods'\n`,
                 `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                `- import method6 from '@/helpers/methods'\n`
+            ]
         });
 
         expect(result).toHaveLength(2);
@@ -352,8 +352,8 @@ describe('invoke function', () => {
                 `   method34,\n`,
                 `  from '@/helpers/methods'\n`,
                 `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                `- import method6 from '@/helpers/methods'\n`
+            ]
         });
 
         expect(result).toHaveLength(2);
@@ -370,9 +370,9 @@ describe('invoke function', () => {
             keywords: [
                 {
                     ...importKeywordCustomConfig,
-                    maxLineBreaks: 2,
-                },
-            ],
+                    maxLineBreaks: 2
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
@@ -397,8 +397,8 @@ describe('invoke function', () => {
                 `   method34,\n`,
                 `  from '@/helpers/methods'\n`,
                 `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                `- import method6 from '@/helpers/methods'\n`
+            ]
         });
 
         expect(result).toHaveLength(2);
@@ -418,15 +418,15 @@ describe('invoke function', () => {
                     order: [
                         {
                             name: 'packages',
-                            expression: /import(?!.*@).*/,
+                            expression: /import(?!.*@).*/
                         },
                         {
                             name: 'components',
-                            expression: /import.*@\/components.*/,
-                        },
-                    ],
-                },
-            ],
+                            expression: /import.*@\/components.*/
+                        }
+                    ]
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
@@ -441,8 +441,8 @@ describe('invoke function', () => {
                 `+ import Component3 from '@/components/Component3'`,
                 `+ import { mapGetters } from 'vuex'\n`,
                 `+ import Component1 from '@/components/Component1'\n`,
-                `+ import Component12542 from '@/components/Component12542'\n`,
-            ],
+                `+ import Component12542 from '@/components/Component12542'\n`
+            ]
         });
 
         expect(result).toHaveLength(1);
@@ -455,9 +455,9 @@ describe('invoke function', () => {
             keywords: [
                 {
                     ...importKeywordCustomConfig,
-                    breakOnFirstOccurence: true,
-                },
-            ],
+                    breakOnFirstOccurence: true
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
@@ -482,8 +482,8 @@ describe('invoke function', () => {
                 `   method34,\n`,
                 `  from '@/helpers/methods'\n`,
                 `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                `- import method6 from '@/helpers/methods'\n`
+            ]
         });
 
         expect(result).toHaveLength(1);
@@ -503,9 +503,9 @@ describe('invoke function', () => {
             keywords: [
                 {
                     ...importKeywordBOFConfig,
-                    enforced: false,
-                },
-            ],
+                    enforced: false
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
@@ -518,8 +518,8 @@ describe('invoke function', () => {
                 `+ \n`,
                 `+ import method2 from '@/helpers/methods'\n`,
                 `+ \n`,
-                `+ import method3 from '@/helpers/methods'`,
-            ],
+                `+ import method3 from '@/helpers/methods'`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -527,7 +527,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid BOF positioning', () => {
         positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [importKeywordBOFConfig],
+            keywords: [importKeywordBOFConfig]
         });
 
         const result = positionedKeywordsRule.invoke({
@@ -549,8 +549,8 @@ describe('invoke function', () => {
                 `   method34,\n`,
                 `  from '@/helpers/methods'\n`,
                 `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                `- import method6 from '@/helpers/methods'\n`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -558,7 +558,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid BOF positioning (enforced)', () => {
         positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [importKeywordBOFConfig],
+            keywords: [importKeywordBOFConfig]
         });
 
         const result = positionedKeywordsRule.invoke({
@@ -581,8 +581,8 @@ describe('invoke function', () => {
                 `   method34,\n`,
                 `  from '@/helpers/methods'\n`,
                 `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                `- import method6 from '@/helpers/methods'\n`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -594,9 +594,9 @@ describe('invoke function', () => {
                 {
                     ...importKeywordBOFConfig,
                     maxLineBreaks: 2,
-                    countDifferentCodeAsLineBreak: true,
-                },
-            ],
+                    countDifferentCodeAsLineBreak: true
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
@@ -620,8 +620,8 @@ describe('invoke function', () => {
                 `   method34,\n`,
                 `  from '@/helpers/methods'\n`,
                 `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                `- import method6 from '@/helpers/methods'\n`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -635,15 +635,15 @@ describe('invoke function', () => {
                     order: [
                         {
                             name: 'packages',
-                            expression: /import(?!.*@).*/,
+                            expression: /import(?!.*@).*/
                         },
                         {
                             name: 'components',
-                            expression: /import.*@\/components.*/,
-                        },
-                    ],
-                },
-            ],
+                            expression: /import.*@\/components.*/
+                        }
+                    ]
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
@@ -658,8 +658,8 @@ describe('invoke function', () => {
                 `+ import { mapGetters } from 'vuex'\n`,
                 `+ import Component1 from '@/components/Component1'\n`,
                 `+ import Component12542 from '@/components/Component12542'\n`,
-                `+ import Component3 from '@/components/Component3'`,
-            ],
+                `+ import Component3 from '@/components/Component3'`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -673,15 +673,15 @@ describe('invoke function', () => {
                     order: [
                         {
                             name: 'packages',
-                            expression: /import(?!.*@).*/,
+                            expression: /import(?!.*@).*/
                         },
                         {
                             name: 'components',
-                            expression: /import.*@\/components.*/,
-                        },
-                    ],
-                },
-            ],
+                            expression: /import.*@\/components.*/
+                        }
+                    ]
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
@@ -690,8 +690,8 @@ describe('invoke function', () => {
                 `@@ -10,13 +1,7 @@`,
                 `+ import Component3 from '@/components/Component3'`,
                 `+ import Component1 from '@/components/Component1'\n`,
-                `+ import Component12542 from '@/components/Component12542'\n`,
-            ],
+                `+ import Component12542 from '@/components/Component12542'\n`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -703,9 +703,9 @@ describe('invoke function', () => {
                 {
                     ...importKeywordBOFConfig,
                     maxLineBreaks: 2,
-                    countDifferentCodeAsLineBreak: true,
-                },
-            ],
+                    countDifferentCodeAsLineBreak: true
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
@@ -730,8 +730,8 @@ describe('invoke function', () => {
                 `   method34,\n`,
                 `  from '@/helpers/methods'\n`,
                 `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                `- import method6 from '@/helpers/methods'\n`
+            ]
         });
 
         expect(result).toHaveLength(1);
@@ -761,8 +761,8 @@ describe('invoke function', () => {
                 `   method34,\n`,
                 `  from '@/helpers/methods'\n`,
                 `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                `- import method6 from '@/helpers/methods'\n`
+            ]
         });
 
         expect(result).toHaveLength(2);
@@ -776,7 +776,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid BOF positioning (enforced, maxLineBreaks = 0)', () => {
         positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [importKeywordBOFConfig],
+            keywords: [importKeywordBOFConfig]
         });
 
         const result = positionedKeywordsRule.invoke({
@@ -802,8 +802,8 @@ describe('invoke function', () => {
                 `   method34,\n`,
                 `  from '@/helpers/methods'\n`,
                 `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                `- import method6 from '@/helpers/methods'\n`
+            ]
         });
 
         expect(result).toHaveLength(2);
@@ -820,9 +820,9 @@ describe('invoke function', () => {
             keywords: [
                 {
                     ...importKeywordBOFConfig,
-                    maxLineBreaks: 2,
-                },
-            ],
+                    maxLineBreaks: 2
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
@@ -848,8 +848,8 @@ describe('invoke function', () => {
                 `   method34,\n`,
                 `  from '@/helpers/methods'\n`,
                 `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                `- import method6 from '@/helpers/methods'\n`
+            ]
         });
 
         expect(result).toHaveLength(2);
@@ -865,8 +865,8 @@ describe('invoke function', () => {
         positionedKeywordsRule = new PositionedKeywordsRule({
             keywords: [
                 importKeywordBOFConfig,
-                constKeywordConfig({ custom: null, BOF: true }),
-            ],
+                constKeywordConfig({ custom: null, BOF: true })
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
@@ -890,8 +890,8 @@ describe('invoke function', () => {
                 `+ import method3 from '@/helpers/methods'\n`,
                 `  import {\n`,
                 `   method34,\n`,
-                `  from '@/helpers/methods'\n`,
-            ],
+                `  from '@/helpers/methods'\n`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -901,8 +901,8 @@ describe('invoke function', () => {
         positionedKeywordsRule = new PositionedKeywordsRule({
             keywords: [
                 importKeywordBOFConfig,
-                constKeywordConfig({ custom: null, BOF: true }),
-            ],
+                constKeywordConfig({ custom: null, BOF: true })
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
@@ -927,8 +927,8 @@ describe('invoke function', () => {
                 `+ import method3 from '@/helpers/methods'\n`,
                 `  import {\n`,
                 `   method34,\n`,
-                `  from '@/helpers/methods'\n`,
-            ],
+                `  from '@/helpers/methods'\n`
+            ]
         });
 
         expect(result).toHaveLength(1);
@@ -940,8 +940,8 @@ describe('invoke function', () => {
         positionedKeywordsRule = new PositionedKeywordsRule({
             keywords: [
                 importKeywordBOFConfig,
-                constKeywordConfig({ custom: null, BOF: true }),
-            ],
+                constKeywordConfig({ custom: null, BOF: true })
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
@@ -966,8 +966,8 @@ describe('invoke function', () => {
                 `+ import method3 from '@/helpers/methods'\n`,
                 `  import {\n`,
                 `   method34,\n`,
-                `  from '@/helpers/methods'\n`,
-            ],
+                `  from '@/helpers/methods'\n`
+            ]
         });
 
         expect(result).toHaveLength(1);
@@ -983,15 +983,15 @@ describe('invoke function', () => {
                     order: [
                         {
                             name: 'packages',
-                            expression: /import(?!.*@).*/,
+                            expression: /import(?!.*@).*/
                         },
                         {
                             name: 'components',
-                            expression: /import.*@\/components.*/,
-                        },
-                    ],
-                },
-            ],
+                            expression: /import.*@\/components.*/
+                        }
+                    ]
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
@@ -1006,8 +1006,8 @@ describe('invoke function', () => {
                 `+ import Component3 from '@/components/Component3'`,
                 `+ import { mapGetters } from 'vuex'\n`,
                 `+ import Component1 from '@/components/Component1'\n`,
-                `+ import Component12542 from '@/components/Component12542'\n`,
-            ],
+                `+ import Component12542 from '@/components/Component12542'\n`
+            ]
         });
 
         expect(result).toHaveLength(1);
@@ -1020,9 +1020,9 @@ describe('invoke function', () => {
             keywords: [
                 {
                     ...importKeywordBOFConfig,
-                    breakOnFirstOccurence: true,
-                },
-            ],
+                    breakOnFirstOccurence: true
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
@@ -1046,8 +1046,8 @@ describe('invoke function', () => {
                 `   method34,\n`,
                 `  from '@/helpers/methods'\n`,
                 `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                `- import method6 from '@/helpers/methods'\n`
+            ]
         });
 
         expect(result).toHaveLength(1);
@@ -1060,8 +1060,8 @@ describe('invoke function', () => {
         positionedKeywordsRule = new PositionedKeywordsRule({
             keywords: [
                 importKeywordBOFConfig,
-                constKeywordConfig({ custom: null, BOF: true }),
-            ],
+                constKeywordConfig({ custom: null, BOF: true })
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
@@ -1087,8 +1087,8 @@ describe('invoke function', () => {
                 `+ import method3 from '@/helpers/methods'\n`,
                 `  import {\n`,
                 `   method34,\n`,
-                `  from '@/helpers/methods'\n`,
-            ],
+                `  from '@/helpers/methods'\n`
+            ]
         });
 
         expect(result).toHaveLength(1);
