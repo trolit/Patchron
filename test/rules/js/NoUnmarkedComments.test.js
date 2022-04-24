@@ -10,28 +10,28 @@ const validConfig = {
     prefixes: [
         {
             value: 'TODO:',
-            meaning: 'needs to be implemented',
+            meaning: 'needs to be implemented'
         },
         {
             value: '*:',
-            meaning: 'important note',
+            meaning: 'important note'
         },
         {
             value: '!:',
-            meaning: 'to be removed',
+            meaning: 'to be removed'
         },
         {
             value: '?:',
-            meaning: 'suggestion',
+            meaning: 'suggestion'
         },
         {
             value: 'TMP:',
-            meaning: 'temporary solution',
-        },
+            meaning: 'temporary solution'
+        }
     ],
     isAppliedToSingleLineComments: true,
     isAppliedToMultiLineComments: true,
-    isAppliedToInlineComments: true,
+    isAppliedToInlineComments: true
 };
 
 const privateKey = fs.readFileSync(
@@ -50,9 +50,9 @@ describe('invoke function', () => {
             privateKey,
             Octokit: ProbotOctokit.defaults({
                 retry: { enabled: false },
-                throttle: { enabled: false },
+                throttle: { enabled: false }
             }),
-            logLevel: 'fatal',
+            logLevel: 'fatal'
         });
 
         probot.load(PepegaJs);
@@ -65,11 +65,11 @@ describe('invoke function', () => {
             ...validConfig,
             isAppliedToSingleLineComments: false,
             isAppliedToMultiLineComments: false,
-            isAppliedToInlineComments: false,
+            isAppliedToInlineComments: false
         });
 
         const result = noUnmarkedCommentsRule.invoke({
-            filename: '...',
+            filename: '...'
         });
 
         expect(result).toEqual([]);
@@ -78,11 +78,11 @@ describe('invoke function', () => {
     it('returns empty array on empty prefixes', () => {
         noUnmarkedCommentsRule = new NoUnmarkedCommentsRule({
             ...validConfig,
-            prefixes: [],
+            prefixes: []
         });
 
         const result = noUnmarkedCommentsRule.invoke({
-            filename: '...',
+            filename: '...'
         });
 
         expect(result).toEqual([]);
@@ -99,8 +99,8 @@ describe('invoke function', () => {
                 `+ \n`,
                 `+ const { expect, test, beforeEach, afterEach } = require('@jest/globals');\n`,
                 `- // removed comment\n`,
-                `- // removed comment 2\n`,
-            ],
+                `- // removed comment 2\n`
+            ]
         });
 
         expect(result).toHaveLength(1);
@@ -117,8 +117,8 @@ describe('invoke function', () => {
                 `+ const fs = require('fs');\n`,
                 `        // !: unchanged line comment \n`,
                 `+ \n`,
-                `+ const { expect, test, beforeEach, afterEach } = require('@jest/globals');\n`,
-            ],
+                `+ const { expect, test, beforeEach, afterEach } = require('@jest/globals');\n`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -139,8 +139,8 @@ describe('invoke function', () => {
                 `+ const fs = require('fs');\n`,
                 `+ \n`,
                 `+ const { expect, test, beforeEach, afterEach } = require('@jest/globals');`,
-                `- /* removed comment */\n`,
-            ],
+                `- /* removed comment */\n`
+            ]
         });
 
         expect(result).toHaveLength(3);
@@ -170,8 +170,8 @@ describe('invoke function', () => {
                 `+ const { expect, test, beforeEach, afterEach } = require('@jest/globals');\n`,
                 `+ * !: in inline flavour`,
                 `+ */`,
-                `- /* removed comment */\n`,
-            ],
+                `- /* removed comment */\n`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -188,8 +188,8 @@ describe('invoke function', () => {
                 `+ const { expect, test, beforeEach, afterEach } = require('@jest/globals'); /*\n`,
                 `+ * inline comment 3\n`,
                 `+ */`,
-                `- /* removed comment */\n`,
-            ],
+                `- /* removed comment */\n`
+            ]
         });
 
         expect(result).toHaveLength(3);
@@ -213,8 +213,8 @@ describe('invoke function', () => {
                 `+ const { expect, test, beforeEach, afterEach } = require('@jest/globals'); /* \n`,
                 `+ * !: inline comment 3\n`,
                 `+ */`,
-                `- /* removed comment */\n`,
-            ],
+                `- /* removed comment */\n`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -235,8 +235,8 @@ describe('invoke function', () => {
                 `- * removed line`,
                 ` */`,
                 `+ const fs = require('fs'); /* !: inline comment 2 */\n`,
-                `+ \n`,
-            ],
+                `+ \n`
+            ]
         });
 
         expect(result).toHaveLength(2);

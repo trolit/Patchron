@@ -11,11 +11,11 @@ const importKeywordConfig = {
     regex: /import.*/,
     multilineOptions: ['from'],
     order: 'ascending',
-    ignoreNewline: false,
+    ignoreNewline: false
 };
 
 const validConfig = {
-    keywords: [importKeywordConfig],
+    keywords: [importKeywordConfig]
 };
 
 const privateKey = fs.readFileSync(
@@ -34,9 +34,9 @@ describe('invoke function', () => {
             privateKey,
             Octokit: ProbotOctokit.defaults({
                 retry: { enabled: false },
-                throttle: { enabled: false },
+                throttle: { enabled: false }
             }),
-            logLevel: 'fatal',
+            logLevel: 'fatal'
         });
 
         probot.load(PepegaJs);
@@ -48,11 +48,11 @@ describe('invoke function', () => {
 
     it('returns empty array on empty keywords', () => {
         keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule({
-            keywords: [],
+            keywords: []
         });
 
         const result = keywordsOrderedByLengthRule.invoke({
-            filename: '...',
+            filename: '...'
         });
 
         expect(result).toEqual([]);
@@ -70,8 +70,8 @@ describe('invoke function', () => {
                 `+ \n`,
                 `+ import baseHelper from 'helpers/base'\n`,
                 `+ \n`,
-                `+ import staticFiles from '../../assets'`,
-            ],
+                `+ import staticFiles from '../../assets'`
+            ]
         });
 
         expect(result).toHaveLength(1);
@@ -92,8 +92,8 @@ describe('invoke function', () => {
                 `+ \n`,
                 `+ import baseHelper from 'helpers/base'\n`,
                 `+ \n`,
-                `+ import staticFiles from '../../assets'`,
-            ],
+                `+ import staticFiles from '../../assets'`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -110,8 +110,8 @@ describe('invoke function', () => {
                 `+ import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'\n`,
                 `+ \n`,
                 `+ import staticFiles from '../../assets'\n`,
-                `+ import baseHelper from 'helpers/base'`,
-            ],
+                `+ import baseHelper from 'helpers/base'`
+            ]
         });
 
         expect(result).toHaveLength(1);
@@ -131,8 +131,8 @@ describe('invoke function', () => {
                 `+ import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'\n`,
                 `+ \n`,
                 `+ import baseHelper from 'helpers/base'\n`,
-                `+ import staticFiles from '../../assets'`,
-            ],
+                `+ import staticFiles from '../../assets'`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -143,9 +143,9 @@ describe('invoke function', () => {
             keywords: [
                 {
                     ...importKeywordConfig,
-                    order: 'descending',
-                },
-            ],
+                    order: 'descending'
+                }
+            ]
         });
 
         const result = keywordsOrderedByLengthRule.invoke({
@@ -159,8 +159,8 @@ describe('invoke function', () => {
                 `+ \n`,
                 `+ import baseHelper from 'helpers/base'\n`,
                 `+ \n`,
-                `+ import staticFiles from '../../assets'`,
-            ],
+                `+ import staticFiles from '../../assets'`
+            ]
         });
 
         expect(result).toHaveLength(1);
@@ -174,9 +174,9 @@ describe('invoke function', () => {
             keywords: [
                 {
                     ...importKeywordConfig,
-                    order: 'descending',
-                },
-            ],
+                    order: 'descending'
+                }
+            ]
         });
 
         const result = keywordsOrderedByLengthRule.invoke({
@@ -193,8 +193,8 @@ describe('invoke function', () => {
                 `+ \n`,
                 `+ import baseHelper from 'helpers/base'\n`,
                 `+ \n`,
-                `+ import staticFiles from '../../assets'`,
-            ],
+                `+ import staticFiles from '../../assets'`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -206,9 +206,9 @@ describe('invoke function', () => {
                 {
                     ...importKeywordConfig,
                     order: 'ascending',
-                    ignoreNewline: true,
-                },
-            ],
+                    ignoreNewline: true
+                }
+            ]
         });
 
         const result = keywordsOrderedByLengthRule.invoke({
@@ -225,8 +225,8 @@ describe('invoke function', () => {
                 `+ \n`,
                 `+ import baseHelper from 'helpers/base'\n`,
                 `+ \n`,
-                `+ import staticFiles from '../../assets'`,
-            ],
+                `+ import staticFiles from '../../assets'`
+            ]
         });
 
         expect(result).toHaveLength(4);
@@ -246,9 +246,9 @@ describe('invoke function', () => {
                 {
                     ...importKeywordConfig,
                     order: 'ascending',
-                    ignoreNewline: true,
-                },
-            ],
+                    ignoreNewline: true
+                }
+            ]
         });
 
         const result = keywordsOrderedByLengthRule.invoke({
@@ -263,8 +263,8 @@ describe('invoke function', () => {
                 `+ import staticFiles from '../../assets'`,
                 `+ import getLastNumber from '../helpers/getLastNumber'\n`,
                 `+ import usersController from '../controllers/UsersController'\n`,
-                `+ import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`,
-            ],
+                `+ import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -278,16 +278,16 @@ describe('invoke function', () => {
                     regex: /import(?!.*@).*/,
                     multilineOptions: ['from'],
                     order: 'ascending',
-                    ignoreNewline: false,
+                    ignoreNewline: false
                 },
                 {
                     name: 'import (components)',
                     regex: /import.*@\/components.*/,
                     multilineOptions: ['from'],
                     order: 'ascending',
-                    ignoreNewline: false,
-                },
-            ],
+                    ignoreNewline: false
+                }
+            ]
         });
 
         const result = keywordsOrderedByLengthRule.invoke({
@@ -303,8 +303,8 @@ describe('invoke function', () => {
                 `+ \n`,
                 `+ import Component1 from '@/components/Component1'\n`,
                 `+ import Component2 from '@/components/Component2'\n`,
-                `+ import Component3 from '@/components/Component3'`,
-            ],
+                `+ import Component3 from '@/components/Component3'`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -318,16 +318,16 @@ describe('invoke function', () => {
                     regex: /import(?!.*@).*/,
                     multilineOptions: ['from'],
                     order: 'ascending',
-                    ignoreNewline: false,
+                    ignoreNewline: false
                 },
                 {
                     name: 'import (components)',
                     regex: /import.*@\/components.*/,
                     multilineOptions: ['from'],
                     order: 'ascending',
-                    ignoreNewline: false,
-                },
-            ],
+                    ignoreNewline: false
+                }
+            ]
         });
 
         const result = keywordsOrderedByLengthRule.invoke({
@@ -343,8 +343,8 @@ describe('invoke function', () => {
                 `+ \n`,
                 `+ import Component1 from '@/components/Component1'\n`,
                 `+ import Component12542 from '@/components/Component12542'\n`,
-                `+ import Component3 from '@/components/Component3'`,
-            ],
+                `+ import Component3 from '@/components/Component3'`
+            ]
         });
 
         expect(result).toHaveLength(2);
