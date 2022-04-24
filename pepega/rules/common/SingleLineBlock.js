@@ -6,6 +6,7 @@ class SingleLineBlockRule extends BaseRule {
      * Please note that:
      * - if provided block does not end by curly brace or single line, assign regular expression under `endIndicator` property to specify block end manually. For instance `endIndicator` of `do..while` could be ```/^while/```
      * - if blocks have similiar parts, pay attention to their order e.g. if..else if..else and/or regular expression
+     * - each block's expression should end with `.*`
      * @param {object} config
      * @param {Array<{name: string, expression: object, endIndicator: object?}>} config.blocks
      * @param {boolean} config.curlyBraces - true indicates that matched blocks should be wrapped with curly braces {}
