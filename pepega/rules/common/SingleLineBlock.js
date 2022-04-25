@@ -146,7 +146,7 @@ class SingleLineBlockRule extends BaseRule {
                 );
             }
 
-            if (this._isValidBlock(from, to)) {
+            if (this._isValidBlock(from, to, isWithBraces, data)) {
                 singleLineBlocks.push({
                     from,
                     to,
@@ -158,18 +158,35 @@ class SingleLineBlockRule extends BaseRule {
         return singleLineBlocks;
     }
 
-    _isValidBlock(from, to) {
-        const isSingleLineBlock = from === to;
-
-        const isMultiLineBlockWithBraces = to - from - 1 === 1;
-
-        const isMultiLineBlockWithoutBraces = to - from === 1;
-
+    _isValidBlock(from, to, isWithBraces, data) {
         return (
-            isSingleLineBlock ||
-            isMultiLineBlockWithBraces ||
-            isMultiLineBlockWithoutBraces
+            from === to ||
+            (!isWithBraces && to - from === 1) ||
+            (isWithBraces && this._blockBodyLength(data, from, to) === 1)
         );
+    }
+
+    _blockBodyLength(data, from, to) {
+        let counter = 0;
+
+        const nextRowStartsWithCurlyBrace =
+            data[from + 1].content.startsWith('{');
+
+        for (
+            let index = nextRowStartsWithCurlyBrace ? from + 2 : from + 1;
+            index < to;
+            index++
+        ) {
+            const { content } = data[index];
+
+            if (this.CUSTOM_LINES.includes(content)) {
+                continue;
+            }
+
+            counter++;
+        }
+
+        return counter;
     }
 
     _findMatchingBlock(content) {
