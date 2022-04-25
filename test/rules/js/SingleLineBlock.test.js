@@ -216,4 +216,67 @@ describe('invoke function', () => {
 
         expect(result).toEqual([]);
     });
+
+    it('returns review on invalid single-line if/else if/else blocks (without curly braces)', () => {
+        const singleLineBlockRule = new SingleLineBlockRule({
+            ...validConfig,
+            curlyBraces: false
+        });
+
+        const result = singleLineBlockRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +1,7 @@\n`,
+                `- const x = 3;\n`,
+                `+ const x = 4;\n`,
+                `+ const y = 5;\n`,
+                `+ if (x === y) { result = x; }\n`,
+                `+ \n`,
+                `+ if (x > y)\n`,
+                `+ {\n`,
+                `+    result = x + y;\n`,
+                `+ }\n`,
+                `+ else if (x <= y)\n`,
+                `+ {\n`,
+                `+    result = x - y;\n`,
+                `+ }\n`,
+                `+ else\n`,
+                `+ {\n`,
+                `+    result = 0;\n`,
+                `+ }\n`,
+                `+ \n`,
+                `+ for (let index = 0; index < result; index++) {\n`,
+                `+    if (index % 2 === 0) {\n`,
+                `+       console.log(index);\n`,
+                `+    } else if (index % 3 === 0) {\n`,
+                `+       if (result > 18) { continue; }\n`,
+                `+       else if (result < 6) { result += 2; }`,
+                `+       else { break; }\n`,
+                `+    }\n`,
+                `+ }\n`
+            ]
+        });
+
+        expect(result).toHaveLength(8);
+
+        expect(result[0]).toHaveProperty('line', 3);
+
+        expect(result[1]).toHaveProperty('start_line', 5);
+        expect(result[1]).toHaveProperty('position', 8);
+
+        expect(result[2]).toHaveProperty('start_line', 9);
+        expect(result[2]).toHaveProperty('position', 12);
+
+        expect(result[3]).toHaveProperty('start_line', 13);
+        expect(result[3]).toHaveProperty('position', 16);
+
+        expect(result[4]).toHaveProperty('start_line', 19);
+        expect(result[4]).toHaveProperty('position', 21);
+
+        expect(result[5]).toHaveProperty('line', 22);
+
+        expect(result[6]).toHaveProperty('line', 23);
+
+        expect(result[7]).toHaveProperty('line', 24);
+    });
 });
