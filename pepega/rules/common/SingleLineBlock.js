@@ -169,6 +169,10 @@ class SingleLineBlockRule extends BaseRule {
     _blockBodyLength(data, from, to) {
         let counter = 0;
 
+        if (from + 1 >= data.length) {
+            return counter;
+        }
+
         const nextRowStartsWithCurlyBrace =
             data[from + 1].content.startsWith('{');
 
