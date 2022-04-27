@@ -188,17 +188,21 @@ class BaseRule {
 
     /**
      * Removes from row indicators added by Git (added, deleted, unchanged)
+     * @param {string} row
+     * @param {boolean} withIndentation when true, row won't be trimmed
      */
-    getRawContent(row) {
+    getRawContent(row, withIndentation = false) {
         let rawContent = row;
 
-        if (this.isUnchangedLine(row)) {
-            rawContent = row.trim();
-        } else if (this.isAddedLine(row) || this.isMergeLine(row)) {
-            rawContent = row.slice(1).trim();
+        if (
+            this.isUnchangedLine(row) ||
+            this.isAddedLine(row) ||
+            this.isMergeLine(row)
+        ) {
+            rawContent = row.slice(1);
         }
 
-        return rawContent;
+        return withIndentation ? rawContent : rawContent.trim();
     }
 
     /**
