@@ -378,6 +378,6 @@ describe('invoke function', () => {
         expect(result[3]).toHaveProperty('position', 13);
 
         expect(result[4]).toHaveProperty('start_line', 17);
-        expect(result[4]).toHaveProperty('position', 18);
+        expect(result[4]).toHaveProperty('position', 19);
     });
 });
