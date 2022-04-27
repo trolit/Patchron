@@ -146,7 +146,7 @@ class SingleLineBlockRule extends BaseRule {
                 );
             }
 
-            if (this._isValidBlock(from, to, isWithBraces, data)) {
+            if (this._isSingleLineBlock(data, from, to, isWithBraces)) {
                 singleLineBlocks.push({
                     from,
                     to,
@@ -158,39 +158,42 @@ class SingleLineBlockRule extends BaseRule {
         return singleLineBlocks;
     }
 
-    _isValidBlock(from, to, isWithBraces, data) {
+    _isSingleLineBlock(data, from, to, isWithBraces) {
         return (
             from === to ||
-            (!isWithBraces && to - from === 1) ||
-            (isWithBraces && this._blockBodyLength(data, from, to) === 1)
+            to - from - this._countMergeLines(data, from, to) === 1 ||
+            this._countBlockLength(data, from, to, isWithBraces) === 1
         );
     }
 
-    _blockBodyLength(data, from, to) {
-        let counter = 0;
+    _countMergeLines(data, from, to) {
+        const partOfData = data.slice(from, to + 1);
 
-        if (from + 1 >= data.length) {
-            return counter;
+        return partOfData.filter(({ content }) => content === this.MERGE)
+            .length;
+    }
+
+    _countBlockLength(data, from, to, isWithBraces) {
+        if (isWithBraces && from + 1 >= data?.length) {
+            return -1;
         }
 
-        const nextRowStartsWithCurlyBrace =
-            data[from + 1].content.startsWith('{');
+        let startIndex = 0;
 
-        for (
-            let index = nextRowStartsWithCurlyBrace ? from + 2 : from + 1;
-            index < to;
-            index++
-        ) {
-            const { content } = data[index];
+        if (isWithBraces) {
+            const nextRowStartsWithCurlyBrace =
+                data[from + 1].content.startsWith('{');
 
-            if (this.CUSTOM_LINES.includes(content)) {
-                continue;
-            }
-
-            counter++;
+            startIndex = nextRowStartsWithCurlyBrace ? from + 2 : from + 1;
+        } else {
+            startIndex = from + 1;
         }
 
-        return counter;
+        const partOfData = data.slice(startIndex, to);
+
+        return partOfData.filter(
+            ({ content }) => !this.CUSTOM_LINES.includes(content)
+        ).length;
     }
 
     _findMatchingBlock(content) {
@@ -213,9 +216,21 @@ class SingleLineBlockRule extends BaseRule {
         let endIndex = -1;
         let matchesToSkip = 0;
 
-        for (let index = row.index + 1; index < data.length; index++) {
-            const nextRow = data[index];
+        const dataLength = data.length;
+        const { endIndicator } = block;
+        const firstNextRow =
+            row.index + 1 < dataLength ? data[row.index + 1] : null;
 
+        if (row.content.match(endIndicator)) {
+            return row.index;
+        }
+
+        if (firstNextRow?.content.match(endIndicator)) {
+            return row.index + 1;
+        }
+
+        for (let index = row.index + 1; index < dataLength; index++) {
+            const nextRow = data[index];
             const nextRowBlock = this._findMatchingBlock(nextRow.content);
 
             if (block === nextRowBlock) {
@@ -273,20 +288,6 @@ class SingleLineBlockRule extends BaseRule {
                 ? row.index
                 : row.index + 1;
         }
-    }
-
-    _withBracesInTheSameLine(contentNesting, row) {
-        const rowContentNesting = contentNesting.find(
-            ({ from }) => from === row.index
-        );
-
-        if (!rowContentNesting) {
-            return false;
-        }
-
-        const { from, to } = rowContentNesting;
-
-        return from === to;
     }
 
     /**
