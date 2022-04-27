@@ -27,7 +27,7 @@ const validConfig = {
         {
             name: 'do..while',
             expression: /^[\s]*(?:do).*/,
-            endIndicator: /^while/
+            endIndicator: /^(?:while)|^((?:do).*(?:while))/
         },
         {
             name: 'while',
@@ -278,5 +278,106 @@ describe('invoke function', () => {
         expect(result[6]).toHaveProperty('line', 23);
 
         expect(result[7]).toHaveProperty('line', 24);
+    });
+
+    /**
+     * ---------------------------------------------------
+     * SINGLE-LINE BLOCKS WITH END INDICATOR (DO..WHILE)
+     * ---------------------------------------------------
+     */
+
+    it('returns empty array on valid single-line do..while blocks (with curly braces)', () => {
+        const result = singleLineBlockRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +1,7 @@\n`,
+                `- const x = 3;\n`,
+                `+ \n`,
+                `  do { result++; } while(result < 9999);\n`,
+                `+ \n`,
+                `+ do {\n`,
+                `-   result--;\n`,
+                `+   result++;\n`,
+                `+ }\n`,
+                `+ while (result < 9999);\n`,
+                `+ \n`,
+                `+ do\n`,
+                `+ {\n`,
+                `-   result--;\n`,
+                `+   result++;\n`,
+                `+ }\n`,
+                `+ while (result < 9999);\n`,
+                `+ \n`,
+                `+ do {\n`,
+                `-   result--;\n`,
+                `+   result++;\n`,
+                `+ } while (result < 9999);\n`,
+                `+ \n`,
+                `+ if (result) {\n`,
+                `+   this.increaseResultByValue(10);\n`,
+                `+   do {\n`,
+                `-      console.log('test123');\n`,
+                `+      something();\n`,
+                `+   }\n`,
+                `+   while (result < 9999);\n`,
+                `+ }\n`,
+                `- \n`,
+                `- do { console.log('test') } while (1);\n`
+            ]
+        });
+
+        expect(result).toEqual([]);
+    });
+
+    it('returns review on invalid single-line do..while blocks (with curly braces)', () => {
+        const result = singleLineBlockRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +1,7 @@\n`,
+                `- const x = 3;\n`,
+                `+ \n`,
+                `  do result++; while(result < 9999);\n`,
+                `+ \n`,
+                `+ do\n`,
+                `-   result--;\n`,
+                `+   result++;\n`,
+                `+ while (result < 9999);\n`,
+                `+ \n`,
+                `+ do\n`,
+                `-   result--;\n`,
+                `+   result++;\n`,
+                `+ while (result < 9999);\n`,
+                `+ \n`,
+                `- do result--;\n`,
+                `+ do result++;\n`,
+                `+ while (result < 9999);\n`,
+                `+ \n`,
+                `+ if (result) {\n`,
+                `+   this.increaseResultByValue(10);\n`,
+                `+   do\n`,
+                `-      console.log('test123');\n`,
+                `+      something();\n`,
+                `+   while (result < 9999);\n`,
+                `+ }\n`,
+                `- \n`,
+                `- do { console.log('test') } while (1);\n`
+            ]
+        });
+
+        expect(result).toHaveLength(5);
+
+        expect(result[0]).toHaveProperty('line', 2);
+
+        expect(result[1]).toHaveProperty('start_line', 4);
+        expect(result[1]).toHaveProperty('position', 6);
+
+        expect(result[2]).toHaveProperty('start_line', 8);
+        expect(result[2]).toHaveProperty('position', 10);
+
+        expect(result[3]).toHaveProperty('start_line', 12);
+        expect(result[3]).toHaveProperty('position', 13);
+
+        expect(result[4]).toHaveProperty('start_line', 17);
+        expect(result[4]).toHaveProperty('position', 18);
     });
 });
