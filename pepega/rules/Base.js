@@ -157,13 +157,17 @@ class BaseRule {
 
         for (let index = 0; index < splitPatch.length; index++) {
             const row = splitPatch[index];
+
+            // TODO: instead of (true) -> use "trimmedContent"
             const rawRow = this.getRawContent(row, true);
+            const indentation = rawRow.search(/\S|$/);
 
             if (this.isNewline(row) || this.isLineCommented(rawRow)) {
                 data.push({
                     index,
+                    indentation,
                     content: this.NEWLINE,
-                    indentation: 0
+                    trimmedContent: this.NEWLINE
                 });
 
                 continue;
@@ -172,8 +176,9 @@ class BaseRule {
             if (this.isMergeLine(row)) {
                 data.push({
                     index,
+                    indentation,
                     content: this.MERGE,
-                    indentation: 0
+                    trimmedContent: this.MERGE
                 });
 
                 continue;
@@ -181,9 +186,9 @@ class BaseRule {
 
             data.push({
                 index,
+                indentation,
                 content: rawRow,
-                trimmedContent: rawRow.trim(),
-                indentation: rawRow.search(/\S|$/)
+                trimmedContent: rawRow.trim()
             });
         }
 
