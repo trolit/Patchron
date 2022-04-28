@@ -89,11 +89,11 @@ module.exports = [
                 },
                 {
                     name: 'else if',
-                    expression: /^[{]?[\s]*(?:else if).*[(].*[)].*/
+                    expression: /^[{}]?[\s]*(?:else if).*[(].*[)].*/
                 },
                 {
                     name: 'else',
-                    expression: /^(?:[{].*(?:else)).*|^(?:else).*/
+                    expression: /^(?:[{}].*(?:else)).*|^(?:else).*/
                 },
                 {
                     name: 'for',
