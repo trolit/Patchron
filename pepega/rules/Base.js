@@ -182,6 +182,7 @@ class BaseRule {
             data.push({
                 index,
                 content: rawRow,
+                trimmedContent: rawRow.trim(),
                 indentation: rawRow.search(/\S|$/)
             });
         }
