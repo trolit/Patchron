@@ -33,11 +33,20 @@ class KeywordsOrderedByLengthRule extends BaseRule {
 
         const { split_patch: splitPatch } = file;
 
-        let reviewComments = [];
+        if (!splitPatch) {
+            this.logError(__filename, 'Empty patch', file);
+
+            return [];
+        }
+
+        const reviewComments = [];
+        const data = this.setupData(splitPatch);
 
         for (const keyword of keywords) {
-            const { matchedRows, unchangedRows } =
-                this.initializeRegexBasedData(splitPatch, keyword);
+            const { matchedRows, unchangedRows } = this._matchKeywordData(
+                data,
+                keyword
+            );
 
             if (matchedRows.length <= 1) {
                 continue;
@@ -66,22 +75,84 @@ class KeywordsOrderedByLengthRule extends BaseRule {
         return reviewComments;
     }
 
+    _matchKeywordData(data, keyword) {
+        let matchedRows = [];
+        let unchangedRows = [];
+        const dataLength = data.length;
+
+        for (let index = 0; index < dataLength; index++) {
+            const { trimmedContent } = data[index];
+
+            if (this.CUSTOM_LINES.includes(trimmedContent)) {
+                matchedRows.push({
+                    index,
+                    trimmedContent
+                });
+
+                continue;
+            }
+
+            const matchResult = trimmedContent.match(keyword.regex);
+
+            if (!matchResult) {
+                continue;
+            }
+
+            const matchResultTrimmedContent = matchResult[0].trim();
+
+            if (
+                keyword?.multilineOptions &&
+                this.isPartOfMultiLine(keyword, matchResultTrimmedContent)
+            ) {
+                const multilineEndIndex = this.getMultiLineEndIndex(
+                    data,
+                    keyword,
+                    index
+                );
+
+                const { trimmedContent: endRowTrimmedContent } =
+                    data[multilineEndIndex];
+
+                matchedRows.push({
+                    index,
+                    trimmedContent: endRowTrimmedContent,
+                    length: multilineEndIndex - index
+                });
+
+                index = multilineEndIndex;
+
+                continue;
+            }
+
+            matchedRows.push({
+                index,
+                trimmedContent: matchResultTrimmedContent
+            });
+        }
+
+        return {
+            matchedRows,
+            unchangedRows
+        };
+    }
+
     /**
      * @param {{ file: object, keyword: object, matchedRows: Array<object> }} data
      */
     _reviewLinesOrderIgnoringNewline(data) {
         const { matchedRows, keyword } = data;
-        let reviewComments = [];
+        const reviewComments = [];
 
         const baseArray = this._removeCustomLinesFromArray(matchedRows);
+        const baseArrayLength = baseArray.length;
 
         const expectedArray = this._sortArray(baseArray, keyword);
 
-        for (let index = 0; index < baseArray.length; index++) {
+        for (let index = 0; index < baseArrayLength; index++) {
             const baseRow = baseArray[index];
             const expectedRow = expectedArray[index];
 
-            if (baseRow.content !== expectedRow.content) {
+            if (baseRow.trimmedContent !== expectedRow.trimmedContent) {
                 reviewComments.push(
                     this.getSingleLineComment({
                         ...data,
@@ -105,6 +176,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
             matchedRows,
             keyword
         );
+        const splitMatchedRowsLength = splitMatchedRows.length;
 
         const splitSortedMatchedRows = this._splitRowsIntoGroups(
             matchedRows,
@@ -112,19 +184,20 @@ class KeywordsOrderedByLengthRule extends BaseRule {
             true
         );
 
-        let reviewComments = [];
+        const reviewComments = [];
 
         for (
             let groupIndex = 0;
-            groupIndex < splitMatchedRows.length;
+            groupIndex < splitMatchedRowsLength;
             groupIndex++
         ) {
             const group = splitMatchedRows[groupIndex];
             const sortedGroup = splitSortedMatchedRows[groupIndex];
+            const sortedGroupLength = sortedGroup.length;
 
             for (
                 let elementIndex = 0;
-                elementIndex < sortedGroup.length;
+                elementIndex < sortedGroupLength;
                 elementIndex++
             ) {
                 const groupElement = group[elementIndex];
@@ -132,7 +205,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
 
                 if (sortedGroupElement.index !== groupElement.index) {
                     const rowsWithCode = group.filter(
-                        ({ content }) => content !== this.MERGE
+                        ({ trimmedContent }) => trimmedContent !== this.MERGE
                     );
 
                     const { index: firstElementIndex } = rowsWithCode[0];
@@ -157,7 +230,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
 
     _removeCustomLinesFromArray(array) {
         return array.filter(
-            ({ content }) => !this.CUSTOM_LINES.includes(content)
+            ({ trimmedContent }) => !this.CUSTOM_LINES.includes(trimmedContent)
         );
     }
 
@@ -166,25 +239,27 @@ class KeywordsOrderedByLengthRule extends BaseRule {
         const customLines = this.CUSTOM_LINES;
 
         return [...array].sort((firstRow, secondRow) => {
-            const { content: firstRowContent } = firstRow;
-            const { content: secondRowContent } = secondRow;
+            const { trimmedContent: firstRowTrimmedContent } = firstRow;
+            const { trimmedContent: secondRowTrimmedContent } = secondRow;
 
             if (
-                customLines.includes(firstRowContent) ||
-                customLines.includes(secondRowContent) ||
-                firstRowContent === secondRowContent
+                customLines.includes(firstRowTrimmedContent) ||
+                customLines.includes(secondRowTrimmedContent) ||
+                firstRowTrimmedContent === secondRowTrimmedContent
             ) {
                 return 0;
             }
 
             switch (order) {
                 case 'ascending':
-                    return firstRowContent.length < secondRowContent.length
+                    return firstRowTrimmedContent.length <
+                        secondRowTrimmedContent.length
                         ? -1
                         : 1;
 
                 case 'descending':
-                    return firstRowContent.length > secondRowContent.length
+                    return firstRowTrimmedContent.length >
+                        secondRowTrimmedContent.length
                         ? -1
                         : 1;
 
@@ -197,14 +272,15 @@ class KeywordsOrderedByLengthRule extends BaseRule {
     _splitRowsIntoGroups(matchedRows, keyword, withSort = false) {
         let index = 0;
         let result = [];
+        const matchedRowsLength = matchedRows.length;
 
-        while (index < matchedRows.length) {
+        while (index < matchedRowsLength) {
             let group = [];
 
-            for (; index < matchedRows.length; index++) {
+            for (; index < matchedRowsLength; index++) {
                 const matchedRow = matchedRows[index];
 
-                if (matchedRow.content.includes(this.NEWLINE)) {
+                if (matchedRow.trimmedContent.includes(this.NEWLINE)) {
                     index++;
 
                     break;
@@ -225,7 +301,8 @@ class KeywordsOrderedByLengthRule extends BaseRule {
 
     _isInvalidGroup(group) {
         const hasNotEnoughRowsWithCode =
-            group.filter(({ content }) => content !== this.MERGE).length <= 1;
+            group.filter(({ trimmedContent }) => trimmedContent !== this.MERGE)
+                .length <= 1;
 
         return group === [] || hasNotEnoughRowsWithCode;
     }
