@@ -63,14 +63,14 @@ describe('invoke function', () => {
             filename: '...',
             split_patch: [
                 `@@ -10,13 +5,7 @@`,
-                `+ import getLastNumber from '../helpers/getLastNumber'\n`,
-                `+ import usersController from '../controllers/UsersController'\n`,
-                ` import dedent from 'dedent-js'\n`,
-                `+ import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'\n`,
-                `+ \n`,
-                `+ import baseHelper from 'helpers/base'\n`,
-                `+ \n`,
-                `+ import staticFiles from '../../assets'`
+                `+import getLastNumber from '../helpers/getLastNumber'`,
+                `+import usersController from '../controllers/UsersController'`,
+                ` import dedent from 'dedent-js'`,
+                `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`,
+                `+`,
+                `+import baseHelper from 'helpers/base'`,
+                `+`,
+                `+import staticFiles from '../../assets'`
             ]
         });
 
@@ -85,14 +85,14 @@ describe('invoke function', () => {
             filename: '...',
             split_patch: [
                 `@@ -10,13 +5,7 @@`,
-                ` import dedent from 'dedent-js'\n`,
-                `+ import getLastNumber from '../helpers/getLastNumber'\n`,
-                `+ import usersController from '../controllers/UsersController'\n`,
-                `+ import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'\n`,
-                `+ \n`,
-                `+ import baseHelper from 'helpers/base'\n`,
-                `+ \n`,
-                `+ import staticFiles from '../../assets'`
+                ` import dedent from 'dedent-js'`,
+                `+import getLastNumber from '../helpers/getLastNumber'`,
+                `+import usersController from '../controllers/UsersController'`,
+                `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`,
+                `+`,
+                `+import baseHelper from 'helpers/base'`,
+                `+`,
+                `+import staticFiles from '../../assets'`
             ]
         });
 
@@ -104,13 +104,13 @@ describe('invoke function', () => {
             filename: '...',
             split_patch: [
                 `@@ -10,13 +5,7 @@`,
-                ` import dedent from 'dedent-js'\n`,
-                `+ import usersController from '../controllers/UsersController'\n`,
-                `- import getLastNumber from '../helpers/getLastNumber'\n`,
-                `+ import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'\n`,
-                `+ \n`,
-                `+ import staticFiles from '../../assets'\n`,
-                `+ import baseHelper from 'helpers/base'`
+                ` import dedent from 'dedent-js'`,
+                `+import usersController from '../controllers/UsersController'`,
+                `-import getLastNumber from '../helpers/getLastNumber'`,
+                `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`,
+                `+`,
+                `+import staticFiles from '../../assets'`,
+                `+import baseHelper from 'helpers/base'`
             ]
         });
 
@@ -125,13 +125,13 @@ describe('invoke function', () => {
             filename: '...',
             split_patch: [
                 `@@ -10,13 +5,7 @@`,
-                ` import dedent from 'dedent-js'\n`,
-                `+ import getLastNumber from '../helpers/getLastNumber'\n`,
-                `+ import usersController from '../controllers/UsersController'\n`,
-                `+ import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'\n`,
-                `+ \n`,
-                `+ import baseHelper from 'helpers/base'\n`,
-                `+ import staticFiles from '../../assets'`
+                ` import dedent from 'dedent-js'`,
+                `+import getLastNumber from '../helpers/getLastNumber'`,
+                `+import usersController from '../controllers/UsersController'`,
+                `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`,
+                `+`,
+                `+import baseHelper from 'helpers/base'`,
+                `+import staticFiles from '../../assets'`
             ]
         });
 
@@ -152,14 +152,14 @@ describe('invoke function', () => {
             filename: '...',
             split_patch: [
                 `@@ -10,13 +5,7 @@`,
-                `+ import usersController from '../controllers/UsersController'\n`,
-                `+ import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'\n`,
-                ` import dedent from 'dedent-js'\n`,
-                `+ import getLastNumber from '../helpers/getLastNumber'\n`,
-                `+ \n`,
-                `+ import baseHelper from 'helpers/base'\n`,
-                `+ \n`,
-                `+ import staticFiles from '../../assets'`
+                `+import usersController from '../controllers/UsersController'`,
+                `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`,
+                ` import dedent from 'dedent-js'`,
+                `+import getLastNumber from '../helpers/getLastNumber'`,
+                `+`,
+                `+import baseHelper from 'helpers/base'`,
+                `+`,
+                `+import staticFiles from '../../assets'`
             ]
         });
 
@@ -183,17 +183,17 @@ describe('invoke function', () => {
             filename: '...',
             split_patch: [
                 `@@ -10,13 +5,7 @@`,
-                `+ import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'\n`,
-                `+ import usersController from '../controllers/UsersController'\n`,
-                `+ import getLastNumber from '../helpers/getLastNumber'\n`,
-                `+ import {\n`,
-                `+  dedent,\n`,
-                `+  dedent2\n`,
-                `+ } from 'dedent-js'\n`,
-                `+ \n`,
-                `+ import baseHelper from 'helpers/base'\n`,
-                `+ \n`,
-                `+ import staticFiles from '../../assets'`
+                `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`,
+                `+import usersController from '../controllers/UsersController'`,
+                `+import getLastNumber from '../helpers/getLastNumber'`,
+                `+import {`,
+                `+    dedent,`,
+                `+    dedent2`,
+                `+} from 'dedent-js'`,
+                `+`,
+                `+import baseHelper from 'helpers/base'`,
+                `+`,
+                `+import staticFiles from '../../assets'`
             ]
         });
 
@@ -215,17 +215,17 @@ describe('invoke function', () => {
             filename: '...',
             split_patch: [
                 `@@ -10,13 +5,7 @@`,
-                `+ import {\n`,
-                `+  dedent,\n`,
-                `+  dedent2\n`,
-                `+ } from 'dedent-js'\n`,
-                `+ import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'\n`,
-                `+ import usersController from '../controllers/UsersController'\n`,
-                `+ import getLastNumber from '../helpers/getLastNumber'\n`,
-                `+ \n`,
-                `+ import baseHelper from 'helpers/base'\n`,
-                `+ \n`,
-                `+ import staticFiles from '../../assets'`
+                `+import {`,
+                `+    dedent,`,
+                `+    dedent2`,
+                `+} from 'dedent-js'`,
+                `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`,
+                `+import usersController from '../controllers/UsersController'`,
+                `+import getLastNumber from '../helpers/getLastNumber'`,
+                `+`,
+                `+import baseHelper from 'helpers/base'`,
+                `+`,
+                `+import staticFiles from '../../assets'`
             ]
         });
 
@@ -255,15 +255,15 @@ describe('invoke function', () => {
             filename: '...',
             split_patch: [
                 `@@ -10,13 +5,7 @@`,
-                `+ import {\n`,
-                `+  dedent,\n`,
-                `+  dedent2\n`,
-                `+ } from 'dedent-js'\n`,
-                `+ import baseHelper from 'helpers/base'\n`,
-                `+ import staticFiles from '../../assets'`,
-                `+ import getLastNumber from '../helpers/getLastNumber'\n`,
-                `+ import usersController from '../controllers/UsersController'\n`,
-                `+ import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`
+                `+import {`,
+                `+    dedent,`,
+                `+    dedent2`,
+                `+} from 'dedent-js'`,
+                `+import baseHelper from 'helpers/base'`,
+                `+import staticFiles from '../../assets'`,
+                `+import getLastNumber from '../helpers/getLastNumber'`,
+                `+import usersController from '../controllers/UsersController'`,
+                `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`
             ]
         });
 
@@ -294,16 +294,16 @@ describe('invoke function', () => {
             filename: '...',
             split_patch: [
                 `@@ -10,13 +5,7 @@`,
-                `+ import {\n`,
-                `+  dedent,\n`,
-                `+  dedent2\n`,
-                `+ } from 'dedent-js'\n`,
-                `+ import uniq from 'lodash/uniq'\n`,
-                `+ import { mapGetters } from 'vuex'\n`,
-                `+ \n`,
-                `+ import Component1 from '@/components/Component1'\n`,
-                `+ import Component2 from '@/components/Component2'\n`,
-                `+ import Component3 from '@/components/Component3'`
+                `+import {`,
+                `+    dedent,`,
+                `+    dedent2`,
+                `+} from 'dedent-js'`,
+                `+import uniq from 'lodash/uniq'`,
+                `+import { mapGetters } from 'vuex'`,
+                `+`,
+                `+import Component1 from '@/components/Component1'`,
+                `+import Component2 from '@/components/Component2'`,
+                `+import Component3 from '@/components/Component3'`
             ]
         });
 
@@ -334,16 +334,16 @@ describe('invoke function', () => {
             filename: '...',
             split_patch: [
                 `@@ -10,13 +5,7 @@`,
-                `+ import uniq from 'lodash/uniq'\n`,
-                `+ import {\n`,
-                `+  dedent,\n`,
-                `+  dedent2\n`,
-                `+ } from 'dedent-js'\n`,
-                `+ import { mapGetters } from 'vuex'\n`,
-                `+ \n`,
-                `+ import Component1 from '@/components/Component1'\n`,
-                `+ import Component12542 from '@/components/Component12542'\n`,
-                `+ import Component3 from '@/components/Component3'`
+                `+import uniq from 'lodash/uniq'`,
+                `+import {`,
+                `+    dedent,`,
+                `+    dedent2`,
+                `+} from 'dedent-js'`,
+                `+import { mapGetters } from 'vuex'`,
+                `+`,
+                `+import Component1 from '@/components/Component1'`,
+                `+import Component12542 from '@/components/Component12542'`,
+                `+import Component3 from '@/components/Component3'`
             ]
         });
 
