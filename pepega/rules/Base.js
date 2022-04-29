@@ -14,12 +14,15 @@ class BaseRule {
             RIGHT,
             DELETED,
             NEWLINE,
-            UNCHANGED
+            UNCHANGED,
+            CUSTOM_LINES,
+            COMMENTED_LINE
         } = constants;
 
         this.MERGE = MERGE;
         this.NEWLINE = NEWLINE;
-        this.CUSTOM_LINES = [NEWLINE, MERGE];
+        this.CUSTOM_LINES = CUSTOM_LINES;
+        this.COMMENTED_LINE = COMMENTED_LINE;
 
         this.ADDED = ADDED;
         this.DELETED = DELETED;
@@ -161,7 +164,18 @@ class BaseRule {
             const rawRow = this.getRawContent(row);
             const indentation = rawRow.search(/\S|$/);
 
-            if (this.isNewline(row) || this.isLineCommented(rawRow)) {
+            if (this.isLineCommented(rawRow)) {
+                data.push({
+                    index,
+                    indentation,
+                    content: this.COMMENTED_LINE,
+                    trimmedContent: this.COMMENTED_LINE
+                });
+
+                continue;
+            }
+
+            if (this.isNewline(row)) {
                 data.push({
                     index,
                     indentation,

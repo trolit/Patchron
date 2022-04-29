@@ -1,6 +1,7 @@
 const MERGE = '<<< merge >>>';
 const NEWLINE = '<<< newline >>>';
-const CUSTOM_LINES = [MERGE, NEWLINE];
+const COMMENTED_LINE = '<<< commented >>>';
+const CUSTOM_LINES = [MERGE, NEWLINE, COMMENTED_LINE];
 
 module.exports = Object.freeze({
     ADDED: '+',
@@ -13,6 +14,7 @@ module.exports = Object.freeze({
     MERGE,
     NEWLINE,
     CUSTOM_LINES,
+    COMMENTED_LINE,
 
-    EMPTY: '',
+    EMPTY: ''
 });
