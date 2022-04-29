@@ -158,8 +158,7 @@ class BaseRule {
         for (let index = 0; index < splitPatch.length; index++) {
             const row = splitPatch[index];
 
-            // TODO: instead of (true) -> use "trimmedContent"
-            const rawRow = this.getRawContent(row, true);
+            const rawRow = this.getRawContent(row);
             const indentation = rawRow.search(/\S|$/);
 
             if (this.isNewline(row) || this.isLineCommented(rawRow)) {
@@ -198,9 +197,8 @@ class BaseRule {
     /**
      * Removes from row indicators added by Git (added, deleted, unchanged)
      * @param {string} row
-     * @param {boolean} withIndentation when true, row won't be trimmed
      */
-    getRawContent(row, withIndentation = false) {
+    getRawContent(row) {
         let rawContent = row;
 
         if (
@@ -211,7 +209,7 @@ class BaseRule {
             rawContent = row.slice(1);
         }
 
-        return withIndentation ? rawContent : rawContent.trim();
+        return rawContent;
     }
 
     /**
