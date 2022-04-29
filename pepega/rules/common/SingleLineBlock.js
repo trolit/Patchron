@@ -57,8 +57,8 @@ class SingleLineBlockRule extends BaseRule {
     }
 
     _includesAnyMatch(data) {
-        return data.some(({ content }) =>
-            this.blocks.some((block) => content.match(block.expression))
+        return data.some(({ trimmedContent }) =>
+            this.blocks.some((block) => trimmedContent.match(block.expression))
         );
     }
 
@@ -69,7 +69,7 @@ class SingleLineBlockRule extends BaseRule {
 
         for (let index = 0; index < dataLength; index++) {
             const row = data[index];
-            const { content } = row;
+            const { content, trimmedContent } = row;
 
             if (
                 this.CUSTOM_LINES.includes(content) ||
@@ -78,7 +78,7 @@ class SingleLineBlockRule extends BaseRule {
                 continue;
             }
 
-            const block = this._findMatchingBlock(content);
+            const block = this._findMatchingBlock(trimmedContent);
 
             if (!block) {
                 continue;
@@ -117,6 +117,72 @@ class SingleLineBlockRule extends BaseRule {
         return singleLineBlocks;
     }
 
+    _findMatchingBlock(trimmedContent) {
+        return this.blocks.find(({ expression }) =>
+            trimmedContent.match(expression)
+        );
+    }
+
+    _findRowNesting(contentNesting, row, nextRow) {
+        const { index } = row;
+
+        const currentRowNesting = contentNesting.find(
+            ({ from }) => from === index
+        );
+
+        if (!nextRow || currentRowNesting) {
+            return currentRowNesting;
+        }
+
+        const { trimmedContent } = nextRow;
+
+        return trimmedContent.startsWith('{')
+            ? contentNesting.find(({ from }) => from === nextRow.index)
+            : null;
+    }
+
+    _getEndIndicatorIndex(data, block, row) {
+        const { endIndicator } = block;
+        const partOfData = data.slice(row.index);
+
+        const foundRow = partOfData.find(
+            ({ trimmedContent, indentation }) =>
+                trimmedContent.match(endIndicator) &&
+                indentation >= row.indentation
+        );
+
+        return foundRow ? foundRow.index : -1;
+    }
+
+    _getEndIndex(block, row) {
+        const { expression } = block;
+        const { trimmedContent } = row;
+
+        const expressionAsString = expression.toString().replace(/\//g, '');
+
+        const rawBlockExpression = expressionAsString.endsWith('.*')
+            ? expressionAsString.slice(0, -2)
+            : expressionAsString;
+
+        const rawBlockMatch = trimmedContent.match(rawBlockExpression);
+
+        if (!rawBlockMatch) {
+            return -1;
+        }
+
+        const rawBlock = rawBlockMatch[0];
+
+        const contentLength = trimmedContent.length;
+        const rawBlockLength = rawBlock.length;
+
+        const extraBlockContent = trimmedContent.substr(rawBlockLength).trim();
+
+        return contentLength > rawBlockLength &&
+            !this.isLineCommented(extraBlockContent)
+            ? row.index
+            : row.index + 1;
+    }
+
     _isSingleLineBlock(data, from, to, rowNesting) {
         return (
             from === to ||
@@ -153,65 +219,6 @@ class SingleLineBlockRule extends BaseRule {
         return partOfData.filter(
             ({ content }) => !this.CUSTOM_LINES.includes(content)
         ).length;
-    }
-
-    _findMatchingBlock(content) {
-        return this.blocks.find(({ expression }) => content.match(expression));
-    }
-
-    _findRowNesting(contentNesting, row, nextRow) {
-        const { index } = row;
-
-        const currentRowNesting = contentNesting.find(
-            ({ from }) => from === index
-        );
-
-        if (!nextRow || currentRowNesting) {
-            return currentRowNesting;
-        }
-
-        return nextRow.content.startsWith('{') ? nextRow : null;
-    }
-
-    _getEndIndicatorIndex(data, block, row) {
-        const { endIndicator } = block;
-        const partOfData = data.slice(row.index);
-
-        const foundRow = partOfData.find(
-            ({ content, indentation }) =>
-                content.match(endIndicator) && indentation >= row.indentation
-        );
-
-        return foundRow ? foundRow.index : -1;
-    }
-
-    _getEndIndex(block, row) {
-        const { content } = row;
-        const { expression } = block;
-
-        const expressionAsString = expression.toString().replace(/\//g, '');
-
-        const rawBlockExpression = expressionAsString.endsWith('.*')
-            ? expressionAsString.slice(0, -2)
-            : expressionAsString;
-
-        const rawBlockMatch = content.match(rawBlockExpression);
-
-        if (!rawBlockMatch) {
-            return -1;
-        }
-
-        const rawBlock = rawBlockMatch[0];
-
-        const contentLength = content.length;
-        const rawBlockLength = rawBlock.length;
-
-        const extraBlockContent = content.substr(rawBlockLength).trim();
-
-        return contentLength > rawBlockLength &&
-            !this.isLineCommented(extraBlockContent)
-            ? row.index
-            : row.index + 1;
     }
 
     _reviewSingleLineBlocks(file, singleLineBlocks) {
