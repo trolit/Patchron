@@ -76,83 +76,6 @@ class BaseRule {
     }
 
     /**
-     * Prepares data for keyword that makes use of regular expression to match
-     * rows. Translates line breaks into "newLine" and deleted lines into "merge".
-     */
-    initializeRegexBasedData(splitPatch, keyword) {
-        let matchedRows = [];
-        let unchangedRows = [];
-
-        for (let index = 0; index < splitPatch.length; index++) {
-            const row = splitPatch[index];
-
-            if (matchedRows.length && this.isNewline(row)) {
-                matchedRows.push({
-                    index,
-                    content: this.NEWLINE
-                });
-
-                continue;
-            } else if (matchedRows.length && this.isMergeLine(row)) {
-                matchedRows.push({
-                    index,
-                    content: this.MERGE
-                });
-
-                continue;
-            } else if (matchedRows.length && this.isUnchangedLine(row)) {
-                unchangedRows.push({
-                    index,
-                    content: row.trim()
-                });
-            }
-
-            const matchResult = row.match(keyword.regex);
-
-            if (!matchResult) {
-                continue;
-            }
-
-            const content = matchResult[0].trim();
-
-            if (
-                keyword?.multilineOptions &&
-                this.isPartOfMultiLine(keyword, content)
-            ) {
-                const multilineEndIndex = this.getMultiLineEndIndex(
-                    splitPatch,
-                    keyword,
-                    index
-                );
-
-                const rawContent = this.getRawContent(
-                    splitPatch[multilineEndIndex]
-                );
-
-                matchedRows.push({
-                    index,
-                    content: rawContent,
-                    length: multilineEndIndex - index
-                });
-
-                index = multilineEndIndex;
-
-                continue;
-            }
-
-            matchedRows.push({
-                index,
-                content
-            });
-        }
-
-        return {
-            matchedRows,
-            unchangedRows
-        };
-    }
-
-    /**
      * Cleans received patch
      */
     setupData(splitPatch) {
@@ -292,15 +215,21 @@ class BaseRule {
             : includesMultiLineOption && !line.match(keyword.regex);
     }
 
-    getMultiLineStartIndex(splitPatch, keyword, endIndex) {
+    /**
+     * @param {Array} data - array received via `setupData(splitPatch)`
+     * @param {string} keyword
+     * @param {number} endIndex
+     * @returns {number}
+     */
+    getMultiLineStartIndex(data, keyword, endIndex) {
         let multilineStartIndex = -1;
 
         for (let index = endIndex - 1; index >= 0; index--) {
-            const row = splitPatch[index];
+            const { trimmedContent } = data[index];
 
             if (
-                !this.isMergeLine(row) &&
-                this.isPartOfMultiLine(keyword, row)
+                trimmedContent !== this.MERGE &&
+                this.isPartOfMultiLine(keyword, trimmedContent)
             ) {
                 multilineStartIndex = index;
 
@@ -311,16 +240,22 @@ class BaseRule {
         return multilineStartIndex;
     }
 
-    getMultiLineEndIndex(splitPatch, keyword, startIndex) {
+    /**
+     * @param {Array} data - array received via `setupData(splitPatch)`
+     * @param {string} keyword
+     * @param {number} startIndex
+     * @returns {number}
+     */
+    getMultiLineEndIndex(data, keyword, startIndex) {
         let multilineEndIndex = -1;
-        const splitPatchLength = splitPatch.length;
+        const dataLength = data.length;
 
-        for (let index = startIndex + 1; index < splitPatchLength; index++) {
-            const row = splitPatch[index];
+        for (let index = startIndex + 1; index < dataLength; index++) {
+            const { trimmedContent } = data[index];
 
             if (
-                !this.isMergeLine(row) &&
-                this.isPartOfMultiLine(keyword, row, 'end')
+                trimmedContent !== this.MERGE &&
+                this.isPartOfMultiLine(keyword, trimmedContent, 'end')
             ) {
                 multilineEndIndex = index;
 
@@ -340,7 +275,7 @@ class BaseRule {
     }
 
     /**
-     * @param {Array<object>} data - array of objects containing `content` property
+     * @param {Array<object>} data - array of objects containing `trimmedContent` property
      * @param {integer} startsAt
      * @param {integer} endsAt
      * @returns {string}
@@ -348,7 +283,7 @@ class BaseRule {
     convertMultiLineToSingleLine(data, startsAt, endsAt) {
         const slicedPart = data.slice(startsAt, endsAt + 1);
 
-        return slicedPart.map(({ content }) => content).join(' ');
+        return slicedPart.map(({ trimmedContent }) => trimmedContent).join(' ');
     }
 
     /**
