@@ -106,14 +106,14 @@ class PositionedKeywordsRule extends BaseRule {
         let matchedData = [];
 
         for (let index = 0; index < data.length; index++) {
-            const matchResult = data[index].content.match(keyword.regex);
+            const matchResult = data[index].trimmedContent.match(keyword.regex);
 
             if (matchResult) {
-                const content = matchResult[0];
+                const trimmedContent = matchResult[0];
 
                 const isMultiLine =
                     keyword?.multilineOptions?.length &&
-                    this.isPartOfMultiLine(keyword, content);
+                    this.isPartOfMultiLine(keyword, trimmedContent);
 
                 if (isMultiLine) {
                     const multilineEndIndex = this.getMultiLineEndIndex(
@@ -122,7 +122,7 @@ class PositionedKeywordsRule extends BaseRule {
                         index
                     );
 
-                    const content = this.convertMultiLineToSingleLine(
+                    const trimmedContent = this.convertMultiLineToSingleLine(
                         data,
                         index,
                         multilineEndIndex
@@ -130,7 +130,7 @@ class PositionedKeywordsRule extends BaseRule {
 
                     matchedData.push({
                         index,
-                        content,
+                        trimmedContent,
                         length: multilineEndIndex - index
                     });
 
@@ -138,7 +138,7 @@ class PositionedKeywordsRule extends BaseRule {
                 } else {
                     matchedData.push({
                         index,
-                        content: content
+                        trimmedContent
                     });
                 }
             }
@@ -205,10 +205,10 @@ class PositionedKeywordsRule extends BaseRule {
         let reviewComments = [];
 
         for (const row of matchedData) {
-            const { content } = row;
+            const { trimmedContent } = row;
 
             const orderIndex = order.findIndex(({ expression }) =>
-                content.match(expression)
+                trimmedContent.match(expression)
             );
 
             row.orderIndex = orderIndex;
@@ -310,9 +310,9 @@ class PositionedKeywordsRule extends BaseRule {
 
         // skip merge lines
         for (; ; index++) {
-            const { content } = data[index];
+            const { trimmedContent } = data[index];
 
-            if (content !== this.MERGE) {
+            if (trimmedContent !== this.MERGE) {
                 break;
             }
         }
@@ -322,7 +322,7 @@ class PositionedKeywordsRule extends BaseRule {
         if (keyword.multilineOptions?.length) {
             const isMultiLine = this.isPartOfMultiLine(
                 keyword,
-                data[index].content
+                data[index].trimmedContent
             );
 
             if (isMultiLine) {
@@ -501,9 +501,9 @@ class PositionedKeywordsRule extends BaseRule {
         let toReduce = 0;
 
         for (let index = startIndex + 1; index < endIndex; index++) {
-            const { content } = data[index];
+            const { trimmedContent } = data[index];
 
-            if (content === this.MERGE) {
+            if (trimmedContent === this.MERGE) {
                 toReduce++;
             }
         }
@@ -515,13 +515,13 @@ class PositionedKeywordsRule extends BaseRule {
         let result = false;
 
         for (let index = from + 1; index < to; index++) {
-            const content = splitPatch[index];
+            const trimmedContent = splitPatch[index];
 
-            if (this.isMergeLine(content)) {
+            if (this.isMergeLine(trimmedContent)) {
                 continue;
             }
 
-            if (!this.isNewline(content)) {
+            if (!this.isNewline(trimmedContent)) {
                 result = true;
             }
         }
@@ -531,14 +531,14 @@ class PositionedKeywordsRule extends BaseRule {
 
     _correctIndex(data, currentIndex, otherKeywords) {
         for (let index = currentIndex; index < data.length; index++) {
-            const { content } = data[index];
+            const { trimmedContent } = data[index];
 
-            if (this.CUSTOM_LINES.includes(content)) {
+            if (this.CUSTOM_LINES.includes(trimmedContent)) {
                 continue;
             }
 
             const isMatched = otherKeywords.some((otherKeyword) =>
-                content.match(otherKeyword.regex)
+                trimmedContent.match(otherKeyword.regex)
             );
 
             if (!isMatched) {
