@@ -186,39 +186,29 @@ class SingleLineBlockRule extends BaseRule {
     _isSingleLineBlock(data, from, to, rowNesting) {
         return (
             from === to ||
-            to - from - this._countMergeLines(data, from, to) === 1 ||
             this._countBlockLength(data, from, to, rowNesting) === 1
         );
     }
 
-    _countMergeLines(data, from, to) {
-        const partOfData = data.slice(from, to + 1);
-
-        return partOfData.filter(({ content }) => content === this.MERGE)
-            .length;
-    }
-
     _countBlockLength(data, from, to, rowNesting) {
-        if (rowNesting && from + 1 >= data?.length) {
-            return -1;
+        let result = 0;
+        const partOfData = data.slice(from + 1, to);
+        const partofDataLength = partOfData.length;
+
+        for (let index = 0; index < partofDataLength; index++) {
+            const { trimmedContent } = partOfData[index];
+
+            if (
+                (rowNesting && ['{', '}'].includes(trimmedContent)) ||
+                this.CUSTOM_LINES.includes(trimmedContent)
+            ) {
+                continue;
+            }
+
+            result++;
         }
 
-        let startIndex = 0;
-
-        if (rowNesting) {
-            const nextRowStartsWithCurlyBrace =
-                data[from + 1].content.startsWith('{');
-
-            startIndex = nextRowStartsWithCurlyBrace ? from + 2 : from + 1;
-        } else {
-            startIndex = from + 1;
-        }
-
-        const partOfData = data.slice(startIndex, to);
-
-        return partOfData.filter(
-            ({ content }) => !this.CUSTOM_LINES.includes(content)
-        ).length;
+        return result || 1;
     }
 
     _reviewSingleLineBlocks(file, singleLineBlocks) {
