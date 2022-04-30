@@ -9,7 +9,7 @@ class StrictWorkflowRule extends BaseRule {
             enabled,
             workflow,
             abortReviewOnInvalidBranchPrefix,
-            abortReviewOnInvalidFlow,
+            abortReviewOnInvalidFlow
         } = config;
 
         this.enabled = enabled;
@@ -64,7 +64,7 @@ class StrictWorkflowRule extends BaseRule {
 
         return {
             body,
-            isReviewAborted,
+            isReviewAborted
         };
     }
 
