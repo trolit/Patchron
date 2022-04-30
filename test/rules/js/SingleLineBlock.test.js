@@ -324,6 +324,8 @@ describe('invoke function', () => {
                 `+}`,
                 `+while (1);`,
                 `+while (123 === 123) { break; }`,
+                `+do { console.log('1');`,
+                `+} while (1);`,
                 `-`,
                 `-do { console.log('test') } while (1);`
             ]
@@ -367,12 +369,14 @@ describe('invoke function', () => {
                 `+}`,
                 `+while (1);`,
                 `+while (123 === 123) { break; }`,
+                `+do console.log('1');`,
+                `+    while (1);`,
                 `-`,
                 `-do { console.log('test') } while (1);`
             ]
         });
 
-        expect(result).toHaveLength(5);
+        expect(result).toHaveLength(6);
 
         expect(result[0]).toHaveProperty('line', 2);
 
@@ -387,6 +391,9 @@ describe('invoke function', () => {
 
         expect(result[4]).toHaveProperty('start_line', 17);
         expect(result[4]).toHaveProperty('position', 19);
+
+        expect(result[5]).toHaveProperty('start_line', 26);
+        expect(result[5]).toHaveProperty('position', 27);
     });
 
     it('returns empty array on valid single-line do..while blocks (without curly braces)', () => {
@@ -428,6 +435,8 @@ describe('invoke function', () => {
                 `+    console.log('1');`,
                 `+while (1);`,
                 `+while (123 === 123) break;`,
+                `+do console.log('1');`,
+                `+    while (1);`,
                 `-`,
                 `-do { console.log('test') } while (1);`
             ]
@@ -479,12 +488,14 @@ describe('invoke function', () => {
                 `+}`,
                 `+while (1);`,
                 `+while (123 === 123) break;`,
+                `+do { console.log('1');`,
+                `+} while (1);`,
                 `-`,
                 `-do { console.log('test') } while (1);`
             ]
         });
 
-        expect(result).toHaveLength(6);
+        expect(result).toHaveLength(7);
 
         expect(result[0]).toHaveProperty('line', 2);
 
@@ -502,5 +513,8 @@ describe('invoke function', () => {
 
         expect(result[5]).toHaveProperty('start_line', 24);
         expect(result[5]).toHaveProperty('position', 27);
+
+        expect(result[6]).toHaveProperty('start_line', 29);
+        expect(result[6]).toHaveProperty('position', 30);
     });
 });
