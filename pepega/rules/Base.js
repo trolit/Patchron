@@ -109,7 +109,7 @@ class BaseRule {
                 continue;
             }
 
-            if (this.isMergeLine(row)) {
+            if (row.startsWith(this.DELETED)) {
                 data.push({
                     index,
                     indentation,
@@ -138,11 +138,11 @@ class BaseRule {
     getRawContent(row) {
         let rawContent = row;
 
-        if (
-            this.isUnchangedLine(row) ||
-            this.isAddedLine(row) ||
-            this.isMergeLine(row)
-        ) {
+        const isAddedLine = row.startsWith(this.ADDED);
+        const isMergeLine = row.startsWith(this.DELETED);
+        const isUnchangedLine = row.startsWith(this.UNCHANGED);
+
+        if (isUnchangedLine || isAddedLine || isMergeLine) {
             rawContent = row.slice(1);
         }
 
@@ -150,47 +150,14 @@ class BaseRule {
     }
 
     /**
-     * **\/\/ apply only to lines from splitPatch!!**
-     *
-     * tests if given line is added line
-     * @param {string} line to check
-     * @returns {boolean}
-     */
-    isAddedLine(line) {
-        return line.startsWith(this.ADDED);
-    }
-
-    /**
-     * **\/\/ apply only to lines from splitPatch!!**
-     *
      * tests if given line is newline
+     *
+     * **\/\/ apply only to lines that are coming directly from splitPatch**
      * @param {string} line to check
      * @returns {boolean}
      */
     isNewline(line) {
         return [this.ADDED, this.EMPTY].includes(removeWhitespaces(line));
-    }
-
-    /**
-     * **\/\/ apply only to lines from splitPatch!!**
-     *
-     * tests if given line is merge
-     * @param {string} line to check
-     * @returns {boolean}
-     */
-    isMergeLine(line) {
-        return line.startsWith(this.DELETED);
-    }
-
-    /**
-     * **\/\/ apply only to lines from splitPatch!!**
-     *
-     * tests if given line is unchanged
-     * @param {string} line to check
-     * @returns {boolean}
-     */
-    isUnchangedLine(line) {
-        return line.startsWith(this.UNCHANGED);
     }
 
     /**
