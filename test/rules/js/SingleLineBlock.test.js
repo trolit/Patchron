@@ -388,4 +388,119 @@ describe('invoke function', () => {
         expect(result[4]).toHaveProperty('start_line', 17);
         expect(result[4]).toHaveProperty('position', 19);
     });
+
+    it('returns empty array on valid single-line do..while blocks (without curly braces)', () => {
+        const singleLineBlockRule = new SingleLineBlockRule({
+            ...validConfig,
+            curlyBraces: false
+        });
+
+        const result = singleLineBlockRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +1,7 @@`,
+                `-const x = 3;`,
+                `+`,
+                ` do result++; while(result < 9999);`,
+                `+`,
+                `+do`,
+                `-    result--;`,
+                `+    result++;`,
+                `+while (result < 9999);`,
+                `+`,
+                `+do`,
+                `-    result--;`,
+                `+    result++;`,
+                `+while (result < 9999);`,
+                `+`,
+                `-do { result--; }`,
+                `+do result++;`,
+                `+    while (result < 9999);`,
+                `+`,
+                `+if (result) {`,
+                `+    this.increaseResultByValue(10);`,
+                `+    do`,
+                `-        console.log('test123');`,
+                `+        something();`,
+                `+    while (result < 9999);`,
+                `+}`,
+                `+do`,
+                `+    console.log('1');`,
+                `+while (1);`,
+                `+while (123 === 123) break;`,
+                `-`,
+                `-do { console.log('test') } while (1);`
+            ]
+        });
+
+        expect(result).toEqual([]);
+    });
+
+    it('returns review on invalid single-line do..while blocks (without curly braces)', () => {
+        const singleLineBlockRule = new SingleLineBlockRule({
+            ...validConfig,
+            curlyBraces: false
+        });
+
+        const result = singleLineBlockRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +1,7 @@`,
+                `-const x = 3;`,
+                `+`,
+                ` do result++; { while(result < 9999); }`,
+                `+`,
+                `+do {`,
+                `-    result--;`,
+                `+    result++;`,
+                `+} while (result < 9999);`,
+                `+`,
+                `+do`,
+                `+{`,
+                `-    result--;`,
+                `+    result++;`,
+                `+}`,
+                `+while (result < 9999);`,
+                `+`,
+                `-do { result--; }`,
+                `+do { result++; }`,
+                `+    while (result < 9999);`,
+                `+`,
+                `+if (result) {`,
+                `+    this.increaseResultByValue(10);`,
+                `+    do {`,
+                `-        console.log('test123');`,
+                `+        something();`,
+                `+       }`,
+                `+    while (result < 9999);`,
+                `+}`,
+                `+do {`,
+                `+    console.log('1');`,
+                `+}`,
+                `+while (1);`,
+                `+while (123 === 123) break;`,
+                `-`,
+                `-do { console.log('test') } while (1);`
+            ]
+        });
+
+        expect(result).toHaveLength(6);
+
+        expect(result[0]).toHaveProperty('line', 2);
+
+        expect(result[1]).toHaveProperty('start_line', 4);
+        expect(result[1]).toHaveProperty('position', 6);
+
+        expect(result[2]).toHaveProperty('start_line', 8);
+        expect(result[2]).toHaveProperty('position', 12);
+
+        expect(result[3]).toHaveProperty('start_line', 14);
+        expect(result[3]).toHaveProperty('position', 15);
+
+        expect(result[4]).toHaveProperty('start_line', 19);
+        expect(result[4]).toHaveProperty('position', 22);
+
+        expect(result[5]).toHaveProperty('start_line', 24);
+        expect(result[5]).toHaveProperty('position', 27);
+    });
 });
