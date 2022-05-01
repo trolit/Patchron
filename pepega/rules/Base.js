@@ -1,4 +1,5 @@
 const constants = require('../config/constants');
+const EventLog = require('../utilities/EventLog');
 const getPosition = require('../helpers/getPosition');
 const getLineNumber = require('../helpers/getLineNumber');
 const ReviewCommentBuilder = require('../builders/ReviewComment');
@@ -32,6 +33,11 @@ class BaseRule {
         this.RIGHT = RIGHT;
 
         this.EMPTY = EMPTY;
+
+        this.logFatal = EventLog.logFatal;
+        this.logError = EventLog.logError;
+        this.logWarning = EventLog.logWarning;
+        this.logInformation = EventLog.logInformation;
     }
 
     /**
@@ -231,14 +237,6 @@ class BaseRule {
         }
 
         return multilineEndIndex;
-    }
-
-    logError(filename, message, testedFile = null) {
-        probotInstance.log.error(
-            `${filename} >>>${
-                testedFile ? ` (${testedFile?.fileName})` : ``
-            }\n${message}`
-        );
     }
 
     /**
