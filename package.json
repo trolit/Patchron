@@ -25,6 +25,8 @@
     "http-status-codes": "^2.2.0",
     "js-base64": "^3.7.2",
     "lodash": "^4.17.21",
+    "pino-multi-stream": "^6.0.0",
+    "pino-tee": "^0.3.0",
     "probot": "^11.0.1"
   },
   "devDependencies": {
