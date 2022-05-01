@@ -30,7 +30,7 @@ class BasicDataBuilder {
             ...file,
             commit_id,
             path,
-            split_patch,
+            split_patch
         };
 
         return content;
