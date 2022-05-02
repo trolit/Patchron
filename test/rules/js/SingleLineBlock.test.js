@@ -52,14 +52,6 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
-    it('returns empty array on empty patch', () => {
-        const result = singleLineBlockRule.invoke({
-            filename: '...'
-        });
-
-        expect(result).toEqual([]);
-    });
-
     /**
      * ---------------------------------------------------
      * SINGLE-LINE IF/ELSE IF/ELSE BLOCKS
