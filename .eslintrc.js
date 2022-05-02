@@ -14,7 +14,8 @@ module.exports = {
     },
 
     globals: {
-        log: true
+        log: true,
+        pullNumber: true
     },
 
     rules: {
