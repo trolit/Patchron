@@ -40,7 +40,7 @@ module.exports = async (
         if (reviewComment.start_line) {
             try {
                 await addMultiLineReviewComment(context, {
-                    ...reviewComment,
+                    ...reviewComment
                 });
 
                 numberOfPostedComments++;
@@ -50,7 +50,7 @@ module.exports = async (
         } else if (reviewComment.line) {
             try {
                 await addSingleLineReviewComment(context, {
-                    ...reviewComment,
+                    ...reviewComment
                 });
 
                 numberOfPostedComments++;
