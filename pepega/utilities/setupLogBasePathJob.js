@@ -5,6 +5,7 @@ const stream = require('stream');
 const { CronJob } = require('cron');
 const pinoms = require('pino-multi-stream');
 const childProcess = require('child_process');
+const setGlobalVariable = require('../helpers/setGlobalVariable');
 
 module.exports = () => {
     new CronJob(
@@ -59,7 +60,7 @@ module.exports = () => {
 
             logThrough.pipe(child.stdin);
 
-            global.log = log;
+            setGlobalVariable('log', log);
         },
         null,
         true,
