@@ -1,4 +1,5 @@
 const addComment = require('../github/addComment');
+const { logFatal } = require('../utilities/EventLog');
 
 /**
  * validates pull requested branch against strict workflow rule and posts comment (if needed).
@@ -25,7 +26,7 @@ module.exports = async (context, payload, rules) => {
     try {
         await addComment(context, body);
     } catch (error) {
-        probotInstance.log.error(error);
+        logFatal(__filename, error);
     }
 
     return isReviewAborted;

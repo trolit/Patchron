@@ -1,3 +1,5 @@
+const { logWarning } = require('../utilities/EventLog');
+
 /**
  * returns nearest **hunk**
  * @param {Array<string>} splitPatch - array including code
@@ -25,9 +27,7 @@ module.exports = (splitPatch, startIndex) => {
     let result = null;
 
     if (!Array.isArray(splitPatch) || !Number.isInteger(startIndex)) {
-        probotInstance.log.warn(
-            `Invalid data passed to the function -> ${__filename}`
-        );
+        logWarning(__filename, 'Invalid data passed to the function');
 
         return result;
     }
