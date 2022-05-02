@@ -47,7 +47,8 @@
   "jest": {
     "testEnvironment": "node",
     "globals": {
-      "log": null
+      "log": null,
+      "pullNumber": 0
     }
   },
   "main": "index.js",
