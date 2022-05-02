@@ -1,4 +1,4 @@
-const Review = require('./core/ReviewLoader');
+const Review = require('./pull-request/ReviewLoader');
 const { logWarning } = require('./utilities/EventLog');
 
 class Pepega {
