@@ -11,7 +11,7 @@ function logError(filename, message, file = null) {
 
     const logData = file
         ? {
-              cause: file?.filename,
+              causedBy: file?.filename,
               split_patch: file?.split_patch
           }
         : {};
@@ -37,12 +37,18 @@ function logInformation(filename, message) {
  * @param {string} filename
  * @param {string} message
  */
-function logWarning(filename, message) {
+function logWarning(filename, message, file = null) {
     if (!log) {
         return;
     }
 
-    log.info({ triggeredAt: filename }, `${filename}: ${message}`);
+    const logData = file
+        ? {
+              causedBy: file?.filename
+          }
+        : {};
+
+    log.info({ triggeredAt: filename, ...logData }, `${filename}: ${message}`);
 }
 
 /**
