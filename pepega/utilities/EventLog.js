@@ -50,12 +50,12 @@ function logWarning(filename, message) {
  * @param {string} filename
  * @param {string} message
  */
-function logFatal(filename, message) {
+function logFatal(filename, error) {
     if (!log) {
         return;
     }
 
-    log.fatal({ triggeredAt: filename }, `${filename}: ${message}`);
+    log.fatal({ triggeredAt: filename, error });
 }
 
 module.exports = {
