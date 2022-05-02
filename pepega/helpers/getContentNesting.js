@@ -28,8 +28,9 @@ module.exports = (data) => {
 
     for (let row = 0; row < dataLength; row++) {
         const { content: rowContent } = data[row];
+        const rowContentLength = rowContent.length;
 
-        for (let charIndex = 0; charIndex < rowContent.length; charIndex++) {
+        for (let charIndex = 0; charIndex < rowContentLength; charIndex++) {
             const char = rowContent[charIndex];
 
             if (char === '{') {

@@ -86,8 +86,9 @@ class BaseRule {
      */
     setupData(splitPatch) {
         let data = [];
+        const splitPatchLength = splitPatch.length;
 
-        for (let index = 0; index < splitPatch.length; index++) {
+        for (let index = 0; index < splitPatchLength; index++) {
             const row = splitPatch[index];
 
             const rawRow = this.getRawContent(row);

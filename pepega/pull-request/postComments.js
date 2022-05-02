@@ -32,7 +32,9 @@ module.exports = async (
         return numberOfPostedComments;
     }
 
-    for (let i = 0; i < reviewComments.length; i++) {
+    const reviewCommentsLength = reviewComments.length;
+
+    for (let i = 0; i < reviewCommentsLength; i++) {
         if (numberOfPostedComments >= maxCommentsPerReview) {
             logInformation(
                 __filename,

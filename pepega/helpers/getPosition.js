@@ -26,11 +26,12 @@ module.exports = (splitPatch, rowIndex, side = 'RIGHT') => {
     );
 
     let counter = 0;
+    const splitPatchLength = splitPatch.length;
     const ignoreCharacter = side === 'RIGHT' ? '-' : '+';
 
     for (
         let index = nearestHunkHeaderIndex;
-        index < splitPatch.length;
+        index < splitPatchLength;
         index++
     ) {
         if (splitPatch[index].startsWith(ignoreCharacter)) {

@@ -9,8 +9,9 @@ const Pepega = require('../Pepega');
  */
 module.exports = (repo, files, rules) => {
     let reviewComments = [];
+    const filesLength = files.length;
 
-    for (let i = 0; i < files.length; i++) {
+    for (let i = 0; i < filesLength; i++) {
         const file = { ...files[i], ...repo };
 
         const comments = Pepega.investigate(file).against(rules);

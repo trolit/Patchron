@@ -93,8 +93,9 @@ class PositionedKeywordsRule extends BaseRule {
 
     _matchKeywordData(data, keyword) {
         let matchedData = [];
+        const dataLength = data.length;
 
-        for (let index = 0; index < data.length; index++) {
+        for (let index = 0; index < dataLength; index++) {
             const { trimmedContent } = data[index];
             const matchResult = trimmedContent.match(keyword.regex);
 
@@ -523,7 +524,9 @@ class PositionedKeywordsRule extends BaseRule {
     }
 
     _correctIndex(data, currentIndex, otherKeywords) {
-        for (let index = currentIndex; index < data.length; index++) {
+        const dataLength = data.length;
+
+        for (let index = currentIndex; index < dataLength; index++) {
             const { trimmedContent } = data[index];
 
             if (this.CUSTOM_LINES.includes(trimmedContent)) {

@@ -28,7 +28,7 @@ module.exports = (content, side = 'RIGHT', rowIndex) => {
     const {
         index: nearestHunkHeaderIndex,
         modifiedFile,
-        sourceFile,
+        sourceFile
     } = getNearestHunkHeader(content, rowIndex);
 
     let counter = side === 'RIGHT' ? modifiedFile.line : sourceFile.line;
@@ -39,9 +39,11 @@ module.exports = (content, side = 'RIGHT', rowIndex) => {
         return counter;
     }
 
+    const contentLength = content.length;
+
     for (
         let index = nearestHunkHeaderIndex + 1;
-        index < content.length;
+        index < contentLength;
         index++
     ) {
         if (index == rowIndex) {

@@ -34,8 +34,9 @@ class NoUnmarkedCommentsRule extends BaseRule {
 
         const unmarkedComments = [];
         const { split_patch: splitPatch } = file;
+        const splitPatchLength = splitPatch.length;
 
-        for (let index = 0; index < splitPatch.length; index++) {
+        for (let index = 0; index < splitPatchLength; index++) {
             const row = splitPatch[index];
 
             if (row.startsWith(this.DELETED)) {
@@ -165,12 +166,13 @@ class NoUnmarkedCommentsRule extends BaseRule {
     }
 
     _verifyMultiLineComment(splitPatch, multiLineStartIndex) {
+        const splitPatchLength = splitPatch.length;
         let hasValidPrefix = false;
         let endIndex = null;
 
         for (
             let index = multiLineStartIndex;
-            index < splitPatch.length;
+            index < splitPatchLength;
             index++
         ) {
             const row = splitPatch[index];
