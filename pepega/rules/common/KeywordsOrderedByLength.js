@@ -26,20 +26,14 @@ class KeywordsOrderedByLengthRule extends BaseRule {
         const keywords = this.keywords;
 
         if (!keywords.length) {
-            this.logError(__filename, 'No keywords defined.', file);
-
-            return [];
-        }
-
-        const { split_patch: splitPatch } = file;
-
-        if (!splitPatch) {
-            this.logError(__filename, 'Empty patch', file);
+            this.logWarning(__filename, 'No keywords defined.', file);
 
             return [];
         }
 
         const reviewComments = [];
+        const { split_patch: splitPatch } = file;
+
         const data = this.setupData(splitPatch);
 
         for (const keyword of keywords) {

@@ -29,26 +29,19 @@ class PositionedKeywordsRule extends BaseRule {
         const keywords = this.keywords;
 
         if (!keywords.length) {
-            this.logError(__filename, 'No keywords defined.', file);
+            this.logWarning(__filename, 'No keywords defined.', file);
 
             return [];
         }
 
         const { split_patch: splitPatch } = file;
-
-        if (!splitPatch) {
-            this.logError(__filename, 'Empty patch', file);
-
-            return [];
-        }
-
         const data = this.setupData(splitPatch);
 
         let reviewComments = [];
 
         for (const keyword of keywords) {
             if (!this._hasKeywordValidConfig(keyword)) {
-                this.logError(
+                this.logWarning(
                     __filename,
                     'Keyword review skipped due to invalid [ position ] config',
                     file

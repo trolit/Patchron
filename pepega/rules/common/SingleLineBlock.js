@@ -1,5 +1,4 @@
 const BaseRule = require('../Base');
-const { logError, logInformation } = require('../../utilities/EventLog');
 const getContentNesting = require('../../helpers/getContentNesting');
 
 class SingleLineBlockRule extends BaseRule {
@@ -22,27 +21,22 @@ class SingleLineBlockRule extends BaseRule {
     }
 
     invoke(file) {
-        const { split_patch: splitPatch } = file;
-
-        if (!splitPatch) {
-            logError(__filename, 'Empty patch.', file);
-
-            return [];
-        }
-
         if (!this.blocks.length) {
-            logError(__filename, 'No blocks defined.', file);
+            this.logWarning(__filename, 'No blocks defined.', file);
 
             return [];
         }
 
+        const { split_patch: splitPatch } = file;
         const data = this.setupData(splitPatch);
 
         if (!this._includesAnyMatch(data)) {
-            logInformation(
+            this.logWarning(
                 __filename,
-                `${file?.filename} review skipped due to no single line blocks.`
+                `${file?.filename} review skipped due to no single line blocks.`,
+                file
             );
+
             return [];
         }
 

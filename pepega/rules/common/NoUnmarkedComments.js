@@ -27,13 +27,13 @@ class NoUnmarkedCommentsRule extends BaseRule {
 
     invoke(file) {
         if (this._hasInvalidConfig()) {
-            this.logError(__filename, `Invalid config!`, file);
+            this.logWarning(__filename, 'Invalid config!', file);
 
             return [];
         }
 
+        const unmarkedComments = [];
         const { split_patch: splitPatch } = file;
-        let unmarkedComments = [];
 
         for (let index = 0; index < splitPatch.length; index++) {
             const row = splitPatch[index];
