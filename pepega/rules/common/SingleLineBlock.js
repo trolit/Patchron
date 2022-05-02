@@ -21,6 +21,8 @@ class SingleLineBlockRule extends BaseRule {
     }
 
     invoke(file) {
+        this.logFatal(__filename, file);
+
         if (!this.blocks.length) {
             this.logWarning(__filename, 'No blocks defined.', file);
 

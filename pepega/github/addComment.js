@@ -1,3 +1,5 @@
+const { logFatal } = require('../utilities/EventLog');
+
 /**
  * creates comment under PR
  * @param {WebhookEvent<EventPayloads.WebhookPayloadPullRequest>} context WebhookEvent instance.
@@ -8,16 +10,12 @@
  */
 module.exports = async (context, body) => {
     const comment = context.issue({
-        body,
+        body
     });
 
     try {
         await context.octokit.issues.createComment(comment);
     } catch (error) {
-        probotInstance.log.error(
-            `Failed to add comment under PR -> ${__filename}`
-        );
-
-        probotInstance.log.error(error);
+        logFatal(__filename, error);
     }
 };

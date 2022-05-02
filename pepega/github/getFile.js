@@ -1,3 +1,5 @@
+const { logFatal } = require('../utilities/EventLog');
+
 /**
  * fetches specified file from pull request within it's content encoded in base64.
  * @param {WebhookEvent<EventPayloads.WebhookPayloadPullRequest>} context WebhookEvent instance.
@@ -26,11 +28,7 @@ module.exports = async (context, contents_url, payload) => {
             payload
         );
     } catch (error) {
-        probotInstance.log.error(
-            `Failed to fetch file from PR:${payload.pull_number} of ${payload.repo} -> ${__filename}`
-        );
-
-        probotInstance.log.error(error);
+        logFatal(__filename, error);
     }
 
     return result;
