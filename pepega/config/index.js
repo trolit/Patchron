@@ -2,11 +2,11 @@ const js = require('./jsRules');
 const vue = require('./vueRules');
 
 const {
-    pull: { StrictWorkflowRule },
+    pull: { StrictWorkflowRule }
 } = require('../rules');
 
 require('dotenv').config({
-    path: '../../.env',
+    path: '../../.env'
 });
 
 module.exports = {
@@ -16,8 +16,9 @@ module.exports = {
         delayBetweenCommentRequestsInSeconds: 3,
         isOwnerAssigningEnabled: false,
         isReviewSummaryEnabled: false,
+        isStoringLogsEnabled: true,
         maxCommentsPerReview: 50,
-        senders: [],
+        senders: []
     },
     rules: {
         pull: {
@@ -26,38 +27,38 @@ module.exports = {
                 workflow: [
                     {
                         base: 'master',
-                        head: 'release',
+                        head: 'release'
                     },
                     {
                         base: 'develop',
-                        head: 'release',
+                        head: 'release'
                     },
                     {
                         base: 'develop',
-                        head: 'feature',
+                        head: 'feature'
                     },
                     {
                         base: 'master',
-                        head: 'develop',
+                        head: 'develop'
                     },
                     {
                         base: 'master',
-                        head: 'hotfix',
+                        head: 'hotfix'
                     },
                     {
                         base: 'develop',
-                        head: 'hotfix',
-                    },
+                        head: 'hotfix'
+                    }
                 ],
                 abortReviewOnInvalidBranchPrefix: false,
-                abortReviewOnInvalidFlow: true,
-            }),
+                abortReviewOnInvalidFlow: true
+            })
         },
         files: {
             // TODO: applied across all files
             common: [],
             js,
-            vue,
-        },
-    },
+            vue
+        }
+    }
 };
