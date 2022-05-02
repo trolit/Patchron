@@ -12,11 +12,14 @@ function logError(filename, message, file = null) {
     const logData = file
         ? {
               causedBy: file?.filename,
-              split_patch: file?.split_patch
+              contentsUrl: file?.contents_url
           }
         : {};
 
-    log.error({ triggeredAt: filename, ...logData }, `${filename}: ${message}`);
+    log.error(
+        { triggeredAt: filename, ...logData, pullNumber },
+        `${filename}: ${message}`
+    );
 }
 
 /**
@@ -29,7 +32,7 @@ function logInformation(filename, message) {
         return;
     }
 
-    log.info({ triggeredAt: filename }, `${filename}: ${message}`);
+    log.info({ triggeredAt: filename, pullNumber }, `${filename}: ${message}`);
 }
 
 /**
@@ -44,11 +47,15 @@ function logWarning(filename, message, file = null) {
 
     const logData = file
         ? {
-              causedBy: file?.filename
+              causedBy: file?.filename,
+              contentsUrl: file?.contents_url
           }
         : {};
 
-    log.info({ triggeredAt: filename, ...logData }, `${filename}: ${message}`);
+    log.info(
+        { triggeredAt: filename, ...logData, pullNumber },
+        `${filename}: ${message}`
+    );
 }
 
 /**
@@ -61,7 +68,7 @@ function logFatal(filename, error) {
         return;
     }
 
-    log.fatal({ triggeredAt: filename, error });
+    log.fatal({ triggeredAt: filename, error, pullNumber });
 }
 
 module.exports = {
