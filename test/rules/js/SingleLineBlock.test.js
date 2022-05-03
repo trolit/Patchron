@@ -148,6 +148,48 @@ describe('invoke function', () => {
         expect(result[7]).toHaveProperty('line', 18);
     });
 
+    it('returns empty array on valid nested single-line if block (with curly braces)', () => {
+        const result = singleLineBlockRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +1,7 @@`,
+                `+for (let index = 0; index < result; index++) {`,
+                `+    if (1) {`,
+                `+        if (2) {`,
+                `+            if (3) {`,
+                `+                console.log('abc');`,
+                `+            }`,
+                `+        }`,
+                `+    }`,
+                `+}`
+            ]
+        });
+
+        expect(result).toEqual([]);
+    });
+
+    it('returns review on invalid nested single-line if block (with curly braces)', () => {
+        const result = singleLineBlockRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +1,7 @@`,
+                `+for (let index = 0; index < result; index++) {`,
+                `+    if (1) {`,
+                `+        if (2) {`,
+                `+            if (3)`,
+                `+                console.log('abc');`,
+                `+        }`,
+                `+    }`,
+                `+}`
+            ]
+        });
+
+        expect(result).toHaveLength(1);
+
+        expect(result[0]).toHaveProperty('start_line', 4);
+        expect(result[0]).toHaveProperty('position', 5);
+    });
+
     it('returns empty array on valid single-line if/else if/else blocks (without curly braces)', () => {
         const singleLineBlockRule = new SingleLineBlockRule({
             ...validConfig,
@@ -246,6 +288,58 @@ describe('invoke function', () => {
         expect(result[6]).toHaveProperty('line', 23);
 
         expect(result[7]).toHaveProperty('line', 24);
+    });
+
+    it('returns empty array on valid nested single-line if block (without curly braces)', () => {
+        const singleLineBlockRule = new SingleLineBlockRule({
+            ...validConfig,
+            curlyBraces: false
+        });
+
+        const result = singleLineBlockRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +1,7 @@`,
+                `+for (let index = 0; index < result; index++) {`,
+                `+    if (1) {`,
+                `+        if (2) {`,
+                `+            if (3)`,
+                `+                console.log('abc');`,
+                `+        }`,
+                `+    }`,
+                `+}`
+            ]
+        });
+
+        expect(result).toEqual([]);
+    });
+
+    it('returns review on invalid nested single-line if block (without curly braces)', () => {
+        const singleLineBlockRule = new SingleLineBlockRule({
+            ...validConfig,
+            curlyBraces: false
+        });
+
+        const result = singleLineBlockRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +1,7 @@`,
+                `+for (let index = 0; index < result; index++) {`,
+                `+    if (1) {`,
+                `+        if (2) {`,
+                `+            if (3) {`,
+                `+                console.log('abc');`,
+                `+            }`,
+                `+        }`,
+                `+    }`,
+                `+}`
+            ]
+        });
+
+        expect(result).toHaveLength(1);
+
+        expect(result[0]).toHaveProperty('start_line', 4);
+        expect(result[0]).toHaveProperty('position', 6);
     });
 
     /**
@@ -362,6 +456,47 @@ describe('invoke function', () => {
 
         expect(result[5]).toHaveProperty('start_line', 26);
         expect(result[5]).toHaveProperty('position', 27);
+    });
+
+    it('returns empty array on valid nested single-line do..while block (with curly braces)', () => {
+        const result = singleLineBlockRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +1,7 @@`,
+                `+do {`,
+                `+    do`,
+                `+    {`,
+                `+        do {`,
+                `+            console.log('abc');`,
+                `+        } while(3);`,
+                `+    } while(2);`,
+                `+} while (1);`
+            ]
+        });
+
+        expect(result).toEqual([]);
+    });
+
+    it('returns review on invalid nested single-line do..while block (with curly braces)', () => {
+        const result = singleLineBlockRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +1,7 @@`,
+                `+do {`,
+                `+    do`,
+                `+    {`,
+                `+        do`,
+                `+            console.log('abc');`,
+                `+        while(3);`,
+                `+    } while(2);`,
+                `+} while (1);`
+            ]
+        });
+
+        expect(result).toHaveLength(1);
+
+        expect(result[0]).toHaveProperty('start_line', 4);
+        expect(result[0]).toHaveProperty('position', 6);
     });
 
     it('returns empty array on valid single-line do..while blocks (without curly braces)', () => {
@@ -484,5 +619,56 @@ describe('invoke function', () => {
 
         expect(result[6]).toHaveProperty('start_line', 29);
         expect(result[6]).toHaveProperty('position', 30);
+    });
+
+    it('returns empty array on valid nested single-line do..while block (without curly braces)', () => {
+        const singleLineBlockRule = new SingleLineBlockRule({
+            ...validConfig,
+            curlyBraces: false
+        });
+
+        const result = singleLineBlockRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +1,7 @@`,
+                `+do {`,
+                `+    do`,
+                `+    {`,
+                `+        do`,
+                `+            console.log('abc');`,
+                `+        while(3);`,
+                `+    } while(2);`,
+                `+} while (1);`
+            ]
+        });
+
+        expect(result).toEqual([]);
+    });
+
+    it('returns review on invalid nested single-line do..while block (without curly braces)', () => {
+        const singleLineBlockRule = new SingleLineBlockRule({
+            ...validConfig,
+            curlyBraces: false
+        });
+
+        const result = singleLineBlockRule.invoke({
+            filename: '...',
+            split_patch: [
+                `@@ -10,13 +1,7 @@`,
+                `+do {`,
+                `+    do`,
+                `+    {`,
+                `+        do {`,
+                `+            console.log('abc');`,
+                `+        } while(3);`,
+                `+    } while(2);`,
+                `+} while (1);`
+            ]
+        });
+
+        expect(result).toHaveLength(1);
+
+        expect(result[0]).toHaveProperty('start_line', 4);
+        expect(result[0]).toHaveProperty('position', 6);
     });
 });
