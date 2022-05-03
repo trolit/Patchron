@@ -1,4 +1,7 @@
-const { settings } = require('../config');
+const {
+    settings: { isGetFilesRequestPaginated }
+} = require('../config');
+const { logFatal } = require('../utilities/EventLog');
 
 /**
  * fetches files from pull request. Unpaginated response includes a maximum of 3000 files
@@ -20,7 +23,7 @@ module.exports = async (context, payload) => {
     let files = [];
 
     try {
-        if (settings.isGetFilesRequestPaginated) {
+        if (isGetFilesRequestPaginated) {
             files = await context.octokit.paginate(
                 context.octokit.pulls.listFiles,
                 payload,
@@ -34,11 +37,7 @@ module.exports = async (context, payload) => {
 
         return Promise.resolve(files);
     } catch (error) {
-        probotInstance.log.error(
-            `Failed to fetch files from PR:${payload.pull_number} of ${payload.repo} -> ${__filename}`
-        );
-
-        probotInstance.log.error(error);
+        logFatal(__filename, error);
 
         return Promise.reject();
     }

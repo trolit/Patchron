@@ -1,3 +1,5 @@
+const setGlobalVariable = require('../helpers/setGlobalVariable');
+
 /**
  * extracts data from context
  * @param {WebhookEvent<EventPayloads.WebhookPayloadPullRequest>} context WebhookEvent instance.
@@ -10,11 +12,13 @@ module.exports = (context) => {
 
     repo.pull_number = payload.number;
 
+    setGlobalVariable('pullNumber', payload.number || undefined);
+
     const { login: pullRequestOwner } = payload.sender;
 
     return {
         pullRequestOwner,
         payload,
-        repo,
+        repo
     };
 };

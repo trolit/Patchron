@@ -40,6 +40,7 @@ const postComments = require('./pepega/pull-request/postComments');
 const initializeData = require('./pepega/pull-request/initialize');
 const resolveStrictWorkflow = require('./pepega/pull-request/resolveStrictWorkflow');
 const addPullSenderAsAssignee = require('./pepega/pull-request/addSenderAsAssignee');
+const configureLogger = require('./pepega/utilities/configureLogger');
 
 /**
  * This is the main entrypoint of Pepega Probot app
@@ -51,10 +52,10 @@ module.exports = (app) => {
         maxCommentsPerReview,
         isReviewSummaryEnabled,
         isOwnerAssigningEnabled,
-        delayBetweenCommentRequestsInSeconds,
+        delayBetweenCommentRequestsInSeconds
     } = settings;
 
-    global.probotInstance = app;
+    configureLogger(app);
 
     app.on(
         ['pull_request.opened', 'pull_request.synchronize'],
@@ -81,10 +82,8 @@ module.exports = (app) => {
                 addPullSenderAsAssignee(context, repo, pullRequestOwner);
             }
 
-            let files = null;
-
             try {
-                files = await getFiles(context, repo);
+                const files = await getFiles(context, repo);
 
                 const reviewComments = reviewPullRequest(repo, files, rules);
 

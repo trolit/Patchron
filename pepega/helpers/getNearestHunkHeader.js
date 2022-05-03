@@ -1,7 +1,9 @@
+const { logWarning } = require('../utilities/EventLog');
+
 /**
  * returns nearest **hunk**
- * @param {Array<string>} splitContent array including code
- * @param {number} row index of current loop iteration.
+ * @param {Array<string>} splitPatch - array including code
+ * @param {number} startIndex - index of splitPatch row indicating where to start from
  *
  * @link https://www.edureka.co/community/7949/what-are-these-in-github
  *
@@ -21,19 +23,17 @@
  *
  * @returns {object}
  */
-module.exports = (splitContent, row) => {
+module.exports = (splitPatch, startIndex) => {
     let result = null;
 
-    if (!Array.isArray(splitContent) || !Number.isInteger(row)) {
-        probotInstance.log.warn(
-            `Invalid data passed to the function -> ${__filename}`
-        );
+    if (!Array.isArray(splitPatch) || !Number.isInteger(startIndex)) {
+        logWarning(__filename, 'Invalid data passed to the function');
 
         return result;
     }
 
-    for (let i = row; i >= 0; i--) {
-        const rowContent = splitContent[i];
+    for (let i = startIndex; i >= 0; i--) {
+        const rowContent = splitPatch[i];
 
         if (rowContent.startsWith('@@')) {
             const splitRowContent = rowContent.split(' ');
@@ -49,12 +49,12 @@ module.exports = (splitContent, row) => {
                 index: i,
                 sourceFile: {
                     line: parseInt(sourceFile[1]),
-                    length: parseInt(sourceFile[2]),
+                    length: parseInt(sourceFile[2])
                 },
                 modifiedFile: {
                     line: parseInt(modifiedFile[1]),
-                    length: parseInt(modifiedFile[2]),
-                },
+                    length: parseInt(modifiedFile[2])
+                }
             };
 
             break;

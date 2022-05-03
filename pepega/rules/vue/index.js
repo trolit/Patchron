@@ -1,10 +1,12 @@
 const review = require('../review');
+const { logWarning } = require('../../utilities/EventLog');
 
 class Vue {
     static review(file, rules) {
         if (!rules.files.vue.length) {
-            probotInstance.log.warn(
-                `Attempted to review file against vue rules but no rules were provided: ${__filename}`
+            logWarning(
+                __filename,
+                'Attempted to review file against [ vue ] rules but no relevant rules were provided'
             );
 
             return [];

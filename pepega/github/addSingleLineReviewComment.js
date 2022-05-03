@@ -1,3 +1,5 @@
+const { logFatal } = require('../utilities/EventLog');
+
 /**
  * sends request to add single line review comment.
  * @param {WebhookEvent<EventPayloads.WebhookPayloadPullRequest>} context WebhookEvent instance.
@@ -22,11 +24,7 @@ module.exports = async (context, payload) => {
     try {
         result = await context.octokit.pulls.createReviewComment(payload);
     } catch (error) {
-        probotInstance.log.error(
-            `Failed to create single line review -> ${__filename}\npayload:\n${payload}`
-        );
-
-        probotInstance.log.error(error);
+        logFatal(__filename, error);
     }
 
     return result;

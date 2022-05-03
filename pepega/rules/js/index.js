@@ -1,10 +1,12 @@
 const review = require('../review');
+const { logWarning } = require('../../utilities/EventLog');
 
 class Js {
     static review(file, rules) {
         if (!rules.files.js.length) {
-            probotInstance.log.warn(
-                `Attempted to review file against js rules but no rules were provided: ${__filename}`
+            logWarning(
+                __filename,
+                'Attempted to review file against [ js ] rules but no relevant rules were provided'
             );
 
             return [];

@@ -1,3 +1,4 @@
+const { logFatal } = require('../utilities/EventLog');
 const addAssignees = require('../github/addAssignees');
 
 /**
@@ -13,6 +14,6 @@ module.exports = async (context, repo, pullRequestOwner) => {
     try {
         await addAssignees(context, repo, [pullRequestOwner]);
     } catch (error) {
-        probotInstance.log.error(error);
+        logFatal(__filename, error);
     }
 };

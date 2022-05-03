@@ -3,18 +3,19 @@ module.exports = {
 
     parserOptions: {
         ecmaVersion: 12,
-        sourceType: 'module',
+        sourceType: 'module'
     },
 
     extends: ['eslint:recommended', 'prettier'],
 
     env: {
         es2021: true,
-        node: true,
+        node: true
     },
 
     globals: {
-        probotInstance: true,
+        log: true,
+        pullNumber: true
     },
 
     rules: {
@@ -33,6 +34,6 @@ module.exports = {
         'no-return-assign': 'error',
         'no-return-await': 'error',
         'require-await': 'error',
-        'no-invalid-this': 'error',
-    },
+        'no-invalid-this': 'error'
+    }
 };

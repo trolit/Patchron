@@ -1,4 +1,9 @@
 const timer = require('../helpers/loopTimer');
+const {
+    logFatal,
+    logWarning,
+    logInformation
+} = require('../utilities/EventLog');
 const addMultiLineReviewComment = require('../github/addMultiLineReviewComment');
 const addSingleLineReviewComment = require('../github/addSingleLineReviewComment');
 
@@ -19,16 +24,20 @@ module.exports = async (
     let numberOfPostedComments = 0;
 
     if (maxCommentsPerReview <= 0) {
-        probotInstance.log.warn(
+        logWarning(
+            __filename,
             'Invalid value set on maxCommentsPerReview setting. No comments posted.'
         );
 
         return numberOfPostedComments;
     }
 
-    for (let i = 0; i < reviewComments.length; i++) {
+    const reviewCommentsLength = reviewComments.length;
+
+    for (let i = 0; i < reviewCommentsLength; i++) {
         if (numberOfPostedComments >= maxCommentsPerReview) {
-            probotInstance.log.warn(
+            logInformation(
+                __filename,
                 `Did not post more comments due to limit reach (${maxCommentsPerReview}).`
             );
 
@@ -40,22 +49,22 @@ module.exports = async (
         if (reviewComment.start_line) {
             try {
                 await addMultiLineReviewComment(context, {
-                    ...reviewComment,
+                    ...reviewComment
                 });
 
                 numberOfPostedComments++;
             } catch (error) {
-                probotInstance.log.error(error);
+                logFatal(error);
             }
         } else if (reviewComment.line) {
             try {
                 await addSingleLineReviewComment(context, {
-                    ...reviewComment,
+                    ...reviewComment
                 });
 
                 numberOfPostedComments++;
             } catch (error) {
-                probotInstance.log.error(error);
+                logFatal(error);
             }
         }
 

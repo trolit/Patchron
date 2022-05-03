@@ -1,5 +1,6 @@
 const dedent = require('dedent-js');
 const addComment = require('../github/addComment');
+const { logFatal } = require('../utilities/EventLog');
 
 /**
  * **POST** pull request review summary
@@ -37,6 +38,6 @@ module.exports = async (
     try {
         await addComment(context, dedent(commentBody));
     } catch (error) {
-        probotInstance.log.error(error);
+        logFatal(__filename, error);
     }
 };

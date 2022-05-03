@@ -20,10 +20,15 @@
     "trace-warnings": "node --trace-warnings index.js"
   },
   "dependencies": {
+    "cron": "^1.8.3",
+    "dayjs": "^1.11.1",
     "dedent-js": "^1.0.1",
     "dotenv": "^16.0.0",
     "http-status-codes": "^2.2.0",
     "js-base64": "^3.7.2",
+    "lodash": "^4.17.21",
+    "pino-multi-stream": "^6.0.0",
+    "pino-tee": "^0.3.0",
     "probot": "^11.0.1"
   },
   "devDependencies": {
@@ -40,7 +45,11 @@
     "node": ">= 10.13.0"
   },
   "jest": {
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "globals": {
+      "log": null,
+      "pullNumber": 0
+    }
   },
   "main": "index.js",
   "directories": {

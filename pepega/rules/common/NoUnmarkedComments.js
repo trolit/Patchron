@@ -16,7 +16,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
             prefixes,
             isAppliedToSingleLineComments,
             isAppliedToMultiLineComments,
-            isAppliedToInlineComments,
+            isAppliedToInlineComments
         } = config;
 
         this.prefixes = prefixes;
@@ -27,22 +27,23 @@ class NoUnmarkedCommentsRule extends BaseRule {
 
     invoke(file) {
         if (this._hasInvalidConfig()) {
-            this.logError(__filename, `Invalid config!`, file);
+            this.logWarning(__filename, 'Invalid config!', file);
 
             return [];
         }
 
+        const unmarkedComments = [];
         const { split_patch: splitPatch } = file;
-        let unmarkedComments = [];
+        const splitPatchLength = splitPatch.length;
 
-        for (let index = 0; index < splitPatch.length; index++) {
+        for (let index = 0; index < splitPatchLength; index++) {
             const row = splitPatch[index];
 
             if (row.startsWith(this.DELETED)) {
                 continue;
             }
 
-            const rawRow = this.getRawContent(row);
+            const rawRow = this.getRawContent(row).trim();
 
             if (rawRow.startsWith('@@')) {
                 continue;
@@ -54,7 +55,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
                         this.getSingleLineComment({
                             file,
                             body: this._getCommentBody(),
-                            index,
+                            index
                         })
                     );
                 }
@@ -103,7 +104,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
             comment = this.getSingleLineComment({
                 file,
                 body: this._getCommentBody(),
-                index,
+                index
             });
 
             return comment;
@@ -116,7 +117,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
                 file,
                 body: this._getCommentBody(true),
                 from: index,
-                to: result.endIndex,
+                to: result.endIndex
             });
         }
 
@@ -146,7 +147,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
             comment = this.getSingleLineComment({
                 file,
                 body: this._getCommentBody(),
-                index,
+                index
             });
         } else if (!this._startsWithPrefix(result)) {
             const result = this._verifyMultiLineComment(splitPatch, index);
@@ -156,7 +157,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
                     file,
                     body: this._getCommentBody(true),
                     from: index,
-                    to: result.endIndex,
+                    to: result.endIndex
                 });
             }
         }
@@ -165,12 +166,13 @@ class NoUnmarkedCommentsRule extends BaseRule {
     }
 
     _verifyMultiLineComment(splitPatch, multiLineStartIndex) {
+        const splitPatchLength = splitPatch.length;
         let hasValidPrefix = false;
         let endIndex = null;
 
         for (
             let index = multiLineStartIndex;
-            index < splitPatch.length;
+            index < splitPatchLength;
             index++
         ) {
             const row = splitPatch[index];
@@ -190,7 +192,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
 
         return {
             hasValidPrefix,
-            endIndex,
+            endIndex
         };
     }
 

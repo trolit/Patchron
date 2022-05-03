@@ -1,8 +1,3 @@
-const fs = require('fs');
-const path = require('path');
-const nock = require('nock');
-const PepegaJs = require('../../..');
-const { Probot, ProbotOctokit } = require('probot');
 const { describe, expect, it, beforeEach } = require('@jest/globals');
 const NoUnmarkedCommentsRule = require('../../../pepega/rules/common/NoUnmarkedComments');
 
@@ -10,53 +5,34 @@ const validConfig = {
     prefixes: [
         {
             value: 'TODO:',
-            meaning: 'needs to be implemented',
+            meaning: 'needs to be implemented'
         },
         {
             value: '*:',
-            meaning: 'important note',
+            meaning: 'important note'
         },
         {
             value: '!:',
-            meaning: 'to be removed',
+            meaning: 'to be removed'
         },
         {
             value: '?:',
-            meaning: 'suggestion',
+            meaning: 'suggestion'
         },
         {
             value: 'TMP:',
-            meaning: 'temporary solution',
-        },
+            meaning: 'temporary solution'
+        }
     ],
     isAppliedToSingleLineComments: true,
     isAppliedToMultiLineComments: true,
-    isAppliedToInlineComments: true,
+    isAppliedToInlineComments: true
 };
 
-const privateKey = fs.readFileSync(
-    path.join(__dirname, '../../fixtures/mock-cert.pem'),
-    'utf-8'
-);
-
 describe('invoke function', () => {
-    let probot;
     let noUnmarkedCommentsRule;
 
     beforeEach(() => {
-        nock.disableNetConnect();
-        probot = new Probot({
-            appId: 123,
-            privateKey,
-            Octokit: ProbotOctokit.defaults({
-                retry: { enabled: false },
-                throttle: { enabled: false },
-            }),
-            logLevel: 'fatal',
-        });
-
-        probot.load(PepegaJs);
-
         noUnmarkedCommentsRule = new NoUnmarkedCommentsRule(validConfig);
     });
 
@@ -65,11 +41,11 @@ describe('invoke function', () => {
             ...validConfig,
             isAppliedToSingleLineComments: false,
             isAppliedToMultiLineComments: false,
-            isAppliedToInlineComments: false,
+            isAppliedToInlineComments: false
         });
 
         const result = noUnmarkedCommentsRule.invoke({
-            filename: '...',
+            filename: '...'
         });
 
         expect(result).toEqual([]);
@@ -78,11 +54,11 @@ describe('invoke function', () => {
     it('returns empty array on empty prefixes', () => {
         noUnmarkedCommentsRule = new NoUnmarkedCommentsRule({
             ...validConfig,
-            prefixes: [],
+            prefixes: []
         });
 
         const result = noUnmarkedCommentsRule.invoke({
-            filename: '...',
+            filename: '...'
         });
 
         expect(result).toEqual([]);
@@ -93,14 +69,14 @@ describe('invoke function', () => {
             filename: '...',
             split_patch: [
                 `@@ -10,13 +10,7 @@ // this comment shouldn't be counted as it's only hunk header in patch`,
-                `+ const payload = require('./fixtures/pull_request.opened');\n`,
-                `+ const fs = require('fs');\n`,
-                `        // unchanged line comment \n`,
-                `+ \n`,
-                `+ const { expect, test, beforeEach, afterEach } = require('@jest/globals');\n`,
-                `- // removed comment\n`,
-                `- // removed comment 2\n`,
-            ],
+                `+const payload = require('./fixtures/pull_request.opened');`,
+                `+const fs = require('fs');`,
+                `        // unchanged line comment `,
+                `+`,
+                `+const { expect, test, beforeEach, afterEach } = require('@jest/globals');`,
+                `-// removed comment`,
+                `-// removed comment 2`
+            ]
         });
 
         expect(result).toHaveLength(1);
@@ -113,12 +89,12 @@ describe('invoke function', () => {
             filename: '...',
             split_patch: [
                 `@@ -10,13 +10,7 @@        // TODO: my imports`,
-                `+ const payload = require('./fixtures/pull_request.opened');\n`,
-                `+ const fs = require('fs');\n`,
-                `        // !: unchanged line comment \n`,
-                `+ \n`,
-                `+ const { expect, test, beforeEach, afterEach } = require('@jest/globals');\n`,
-            ],
+                `+const payload = require('./fixtures/pull_request.opened');`,
+                `+const fs = require('fs');`,
+                `        // !: unchanged line comment `,
+                `+`,
+                `+const { expect, test, beforeEach, afterEach } = require('@jest/globals');`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -128,19 +104,19 @@ describe('invoke function', () => {
         const result = noUnmarkedCommentsRule.invoke({
             filename: '...',
             split_patch: [
-                `@@ -10,13 +5,15 @@\n`,
-                `+ /**`,
-                `+ * -> 1`,
-                `+ * -> 2`,
-                `+ */`,
-                `+ const payload = require('./fixtures/pull_request.opened');\n`,
-                `+ /* multi-line comment as one-liner*/`,
-                `+ /******another one-liner*****/`,
-                `+ const fs = require('fs');\n`,
-                `+ \n`,
-                `+ const { expect, test, beforeEach, afterEach } = require('@jest/globals');`,
-                `- /* removed comment */\n`,
-            ],
+                `@@ -10,13 +5,15 @@`,
+                `+/**`,
+                `+* -> 1`,
+                `+* -> 2`,
+                `+*/`,
+                `+const payload = require('./fixtures/pull_request.opened');`,
+                `+/* multi-line comment as one-liner*/`,
+                `+/******another one-liner*****/`,
+                `+const fs = require('fs');`,
+                `+`,
+                `+const { expect, test, beforeEach, afterEach } = require('@jest/globals');`,
+                `-/* removed comment */`
+            ]
         });
 
         expect(result).toHaveLength(3);
@@ -157,21 +133,21 @@ describe('invoke function', () => {
         const result = noUnmarkedCommentsRule.invoke({
             filename: '...',
             split_patch: [
-                `@@ -10,13 +5,15 @@\n`,
-                `+ /**`,
-                `+ * -> 1`,
-                `+ * TMP: -> 2`,
-                `+ */`,
-                `+ const payload = require('./fixtures/pull_request.opened');\n`,
-                `+ /* *: multi-line comment as one-liner */`,
-                `+ /**: multi-line comment as one-liner */`,
-                `+ const fs = require('fs');\n`,
-                `+ \n`,
-                `+ const { expect, test, beforeEach, afterEach } = require('@jest/globals');\n`,
-                `+ * !: in inline flavour`,
-                `+ */`,
-                `- /* removed comment */\n`,
-            ],
+                `@@ -10,13 +5,15 @@`,
+                `+/**`,
+                `+* -> 1`,
+                `+* TMP: -> 2`,
+                `+*/`,
+                `+const payload = require('./fixtures/pull_request.opened');`,
+                `+/* *: multi-line comment as one-liner */`,
+                `+/**: multi-line comment as one-liner */`,
+                `+const fs = require('fs');`,
+                `+`,
+                `+const { expect, test, beforeEach, afterEach } = require('@jest/globals');`,
+                `+* !: in inline flavour`,
+                `+*/`,
+                `-/* removed comment */`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -181,15 +157,15 @@ describe('invoke function', () => {
         const result = noUnmarkedCommentsRule.invoke({
             filename: '...',
             split_patch: [
-                `@@ -10,13 +2,15 @@\n`,
-                `+ const payload = require('./fixtures/pull_request.opened'); // inline comment 1\n`,
-                `+ const fs = require('fs'); /* inline comment 2 */\n`,
-                `+ \n`,
-                `+ const { expect, test, beforeEach, afterEach } = require('@jest/globals'); /*\n`,
-                `+ * inline comment 3\n`,
-                `+ */`,
-                `- /* removed comment */\n`,
-            ],
+                `@@ -10,13 +2,15 @@`,
+                `+const payload = require('./fixtures/pull_request.opened'); // inline comment 1`,
+                `+const fs = require('fs'); /* inline comment 2 */`,
+                `+`,
+                `+const { expect, test, beforeEach, afterEach } = require('@jest/globals'); /*`,
+                `+* inline comment 3`,
+                `+*/`,
+                `-/* removed comment */`
+            ]
         });
 
         expect(result).toHaveLength(3);
@@ -206,15 +182,15 @@ describe('invoke function', () => {
         const result = noUnmarkedCommentsRule.invoke({
             filename: '...',
             split_patch: [
-                `@@ -10,13 +2,15 @@\n`,
-                `+ const payload = require('./fixtures/pull_request.opened'); // *: inline comment 1\n`,
-                `+ const fs = require('fs'); /* !: inline comment 2 */\n`,
-                `+ \n`,
-                `+ const { expect, test, beforeEach, afterEach } = require('@jest/globals'); /* \n`,
-                `+ * !: inline comment 3\n`,
-                `+ */`,
-                `- /* removed comment */\n`,
-            ],
+                `@@ -10,13 +2,15 @@`,
+                `+const payload = require('./fixtures/pull_request.opened'); // *: inline comment 1`,
+                `+const fs = require('fs'); /* !: inline comment 2 */`,
+                `+`,
+                `+const { expect, test, beforeEach, afterEach } = require('@jest/globals'); /* `,
+                `+* !: inline comment 3`,
+                `+*/`,
+                `-/* removed comment */`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -224,19 +200,19 @@ describe('invoke function', () => {
         const result = noUnmarkedCommentsRule.invoke({
             filename: '...',
             split_patch: [
-                `@@ -10,13 +2,15 @@\n`,
-                ` /* \n`,
-                ` * line -> 1 (unchanged)\n`,
-                `+ * line -> 2 (added)\n`,
-                `- * line -> 3 (removed)\n`,
-                ` */`,
-                `+ const payload = require('./fixtures/pull_request.opened'); /*`,
-                `+ * invalid comment`,
-                `- * removed line`,
-                ` */`,
-                `+ const fs = require('fs'); /* !: inline comment 2 */\n`,
-                `+ \n`,
-            ],
+                `@@ -10,13 +2,15 @@`,
+                `/* `,
+                `* line -> 1 (unchanged)`,
+                `+* line -> 2 (added)`,
+                `-* line -> 3 (removed)`,
+                `*/`,
+                `+const payload = require('./fixtures/pull_request.opened'); /*`,
+                `+* invalid comment`,
+                `-* removed line`,
+                `*/`,
+                `+const fs = require('fs'); /* !: inline comment 2 */`,
+                `+`
+            ]
         });
 
         expect(result).toHaveLength(2);

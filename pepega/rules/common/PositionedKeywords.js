@@ -29,39 +29,28 @@ class PositionedKeywordsRule extends BaseRule {
         const keywords = this.keywords;
 
         if (!keywords.length) {
-            this.logError(__filename, 'No keywords defined.', file);
+            this.logWarning(__filename, 'No keywords defined.', file);
 
             return [];
         }
 
         const { split_patch: splitPatch } = file;
-
-        if (!splitPatch) {
-            this.logError(__filename, 'Empty patch', file);
-
-            return [];
-        }
-
-        const data = this._setupData(splitPatch);
+        const data = this.setupData(splitPatch);
 
         let reviewComments = [];
 
         for (const keyword of keywords) {
             if (!this._hasKeywordValidConfig(keyword)) {
-                this.logError(
+                this.logWarning(
                     __filename,
-                    'Keyword review skipped due to invalid position config',
+                    'Keyword review skipped due to invalid [ position ] config',
                     file
                 );
 
                 continue;
             }
 
-            const matchedData = this._matchKeywordData(
-                splitPatch,
-                data,
-                keyword
-            );
+            const matchedData = this._matchKeywordData(data, keyword);
 
             if (matchedData.length <= 1) {
                 continue;
@@ -72,7 +61,7 @@ class PositionedKeywordsRule extends BaseRule {
                 data,
                 keyword,
                 keywords,
-                matchedData,
+                matchedData
             });
 
             if (!firstLayerReview) {
@@ -85,7 +74,7 @@ class PositionedKeywordsRule extends BaseRule {
                 const secondLayerReview = this._reviewSecondLayer({
                     file,
                     keyword,
-                    matchedData,
+                    matchedData
                 });
 
                 reviewComments.push(...secondLayerReview);
@@ -102,78 +91,45 @@ class PositionedKeywordsRule extends BaseRule {
         return [isCustomPosition, BOF].filter((value) => value).length === 1;
     }
 
-    _setupData(splitPatch) {
-        let data = [];
-
-        for (let index = 0; index < splitPatch.length; index++) {
-            const row = splitPatch[index];
-
-            if (this.isNewline(row)) {
-                data.push({
-                    index,
-                    content: this.NEWLINE,
-                });
-
-                continue;
-            }
-
-            if (this.isMergeLine(row)) {
-                data.push({
-                    index,
-                    content: this.MERGE,
-                });
-
-                continue;
-            }
-
-            const rawRow = this.getRawContent(row);
-
-            data.push({
-                index,
-                content: rawRow,
-            });
-        }
-
-        return data;
-    }
-
-    _matchKeywordData(splitPatch, data, keyword) {
+    _matchKeywordData(data, keyword) {
         let matchedData = [];
+        const dataLength = data.length;
 
-        for (let index = 0; index < data.length; index++) {
-            const matchResult = data[index].content.match(keyword.regex);
+        for (let index = 0; index < dataLength; index++) {
+            const { trimmedContent } = data[index];
+            const matchResult = trimmedContent.match(keyword.regex);
 
             if (matchResult) {
-                const content = matchResult[0];
+                const matchedContent = matchResult[0];
 
                 const isMultiLine =
                     keyword?.multilineOptions?.length &&
-                    this.isPartOfMultiLine(keyword, content);
+                    this.isPartOfMultiLine(keyword, matchedContent);
 
                 if (isMultiLine) {
-                    const multilineEndIndex = this.getMultiLineEndIndex(
-                        splitPatch,
+                    const multiLineEndIndex = this.getMultiLineEndIndex(
+                        data,
                         keyword,
                         index
                     );
 
-                    const content = this.convertMultiLineToSingleLine(
+                    const multiLineContent = this.convertMultiLineToSingleLine(
                         data,
                         index,
-                        multilineEndIndex
+                        multiLineEndIndex
                     );
 
                     matchedData.push({
                         index,
-                        content,
-                        length: multilineEndIndex - index,
+                        content: multiLineContent,
+                        length: multiLineEndIndex - index
                     });
 
-                    index = multilineEndIndex;
+                    index = multiLineEndIndex;
                 } else {
                     matchedData.push({
                         index,
-                        content: content,
+                        content: matchedContent
                     });
                 }
             }
@@ -191,7 +147,7 @@ class PositionedKeywordsRule extends BaseRule {
         let position = null;
 
         if (keywordPosition.custom !== null) {
-            position = this._findCustomPosition(splitPatch, keyword);
+            position = this._findCustomPosition(data, keyword);
         }
 
         if (keywordPosition.BOF) {
@@ -205,12 +161,12 @@ class PositionedKeywordsRule extends BaseRule {
                 keyword,
                 splitPatch,
                 matchedData,
-                keywordsWithBOF,
+                keywordsWithBOF
             });
 
             if (position && !position?.wasEnforced && !position?.isMatched) {
                 reviewComments = [
-                    this._getWrongPositionComment(file, keyword, position),
+                    this._getWrongPositionComment(file, keyword, position)
                 ];
 
                 this._removeKeywords(keywords, keywordsWithBOF);
@@ -228,7 +184,7 @@ class PositionedKeywordsRule extends BaseRule {
             data,
             keyword,
             position,
-            matchedData,
+            matchedData
         });
 
         return reviewComments;
@@ -276,20 +232,22 @@ class PositionedKeywordsRule extends BaseRule {
         return reviewComments;
     }
 
-    _findCustomPosition(splitPatch, keyword) {
+    _findCustomPosition(data, keyword) {
         let wasEnforced = false;
         let index = -1;
 
         const { expression } = keyword.position.custom;
 
-        index = splitPatch.findIndex((row) =>
+        index = data.findIndex(({ trimmedContent }) =>
             typeof expression === 'object'
-                ? row.match(expression)
-                : row.includes(expression)
+                ? trimmedContent.match(expression)
+                : trimmedContent.includes(expression)
         );
 
         if (index === -1 && keyword.enforced) {
-            index = splitPatch.findIndex((row) => row.match(keyword.regex));
+            index = data.findIndex(({ trimmedContent }) =>
+                trimmedContent.match(keyword.regex)
+            );
 
             wasEnforced = true;
         } else if (index === -1) {
@@ -300,9 +258,9 @@ class PositionedKeywordsRule extends BaseRule {
 
         let length = null;
 
-        if (this.isPartOfMultiLine(keyword, splitPatch[index])) {
+        if (this.isPartOfMultiLine(keyword, data[index].trimmedContent)) {
             const multilineEndIndex = this.getMultiLineEndIndex(
-                splitPatch,
+                data,
                 keyword,
                 index
             );
@@ -313,7 +271,7 @@ class PositionedKeywordsRule extends BaseRule {
         return {
             index,
             wasEnforced,
-            length,
+            length
         };
     }
 
@@ -345,9 +303,9 @@ class PositionedKeywordsRule extends BaseRule {
 
         // skip merge lines
         for (; ; index++) {
-            const { content } = data[index];
+            const { trimmedContent } = data[index];
 
-            if (content !== this.MERGE) {
+            if (![this.MERGE, this.COMMENTED_LINE].includes(trimmedContent)) {
                 break;
             }
         }
@@ -357,12 +315,12 @@ class PositionedKeywordsRule extends BaseRule {
         if (keyword.multilineOptions?.length) {
             const isMultiLine = this.isPartOfMultiLine(
                 keyword,
-                data[index].content
+                data[index].trimmedContent
             );
 
             if (isMultiLine) {
                 const multilineEndIndex = this.getMultiLineEndIndex(
-                    splitPatch,
+                    data,
                     keyword,
                     index
                 );
@@ -378,7 +336,7 @@ class PositionedKeywordsRule extends BaseRule {
             length,
             rawContent,
             wasEnforced,
-            isMatched: !!rawContent.match(keyword.regex),
+            isMatched: !!rawContent.match(keyword.regex)
         };
     }
 
@@ -391,18 +349,19 @@ class PositionedKeywordsRule extends BaseRule {
         const {
             breakOnFirstOccurence,
             maxLineBreaks,
-            countDifferentCodeAsLineBreak,
+            countDifferentCodeAsLineBreak
         } = keyword;
 
         const { split_patch: splitPatch } = file;
+        const matchedDataLength = matchedData.length;
 
         let recentRow = position;
         let reviewComments = [];
 
-        for (let index = 1; index < matchedData.length; index++) {
-            let reason = 'tooManyLineBreaks';
+        for (let index = 1; index < matchedDataLength; index++) {
             const row = matchedData[index];
 
+            let reason = 'tooManyLineBreaks';
             let isValid = false;
             let distance = 0;
 
@@ -429,7 +388,7 @@ class PositionedKeywordsRule extends BaseRule {
 
             if (isValid && !countDifferentCodeAsLineBreak) {
                 isValid = !this._includesDifferentCode(
-                    splitPatch,
+                    data,
                     previousIndex,
                     currentIndex
                 );
@@ -448,10 +407,10 @@ class PositionedKeywordsRule extends BaseRule {
                             from,
                             to,
                             distance,
-                            reason,
+                            reason
                         }),
                         from,
-                        to,
+                        to
                     })
                 );
             }
@@ -479,7 +438,7 @@ class PositionedKeywordsRule extends BaseRule {
         return this.getSingleLineComment({
             file,
             body,
-            index,
+            index
         });
     }
 
@@ -516,7 +475,7 @@ class PositionedKeywordsRule extends BaseRule {
         return this.getSingleLineComment({
             file,
             body,
-            index: testedRowIndex,
+            index: testedRowIndex
         });
     }
 
@@ -536,9 +495,9 @@ class PositionedKeywordsRule extends BaseRule {
         let toReduce = 0;
 
         for (let index = startIndex + 1; index < endIndex; index++) {
-            const { content } = data[index];
+            const { trimmedContent } = data[index];
 
-            if (content === this.MERGE) {
+            if (trimmedContent === this.MERGE) {
                 toReduce++;
             }
         }
@@ -546,17 +505,17 @@ class PositionedKeywordsRule extends BaseRule {
         return toReduce;
     }
 
-    _includesDifferentCode(splitPatch, from, to) {
+    _includesDifferentCode(data, from, to) {
         let result = false;
 
         for (let index = from + 1; index < to; index++) {
-            const content = splitPatch[index];
+            const { trimmedContent } = data[index];
 
-            if (this.isMergeLine(content)) {
+            if ([this.MERGE, this.COMMENTED_LINE].includes(trimmedContent)) {
                 continue;
             }
 
-            if (!this.isNewline(content)) {
+            if (trimmedContent !== this.NEWLINE) {
                 result = true;
             }
         }
@@ -565,15 +524,17 @@ class PositionedKeywordsRule extends BaseRule {
     }
 
     _correctIndex(data, currentIndex, otherKeywords) {
-        for (let index = currentIndex; index < data.length; index++) {
-            const { content } = data[index];
+        const dataLength = data.length;
 
-            if (this.CUSTOM_LINES.includes(content)) {
+        for (let index = currentIndex; index < dataLength; index++) {
+            const { trimmedContent } = data[index];
+
+            if (this.CUSTOM_LINES.includes(trimmedContent)) {
                 continue;
             }
 
             const isMatched = otherKeywords.some((otherKeyword) =>
-                content.match(otherKeyword.regex)
+                trimmedContent.match(otherKeyword.regex)
             );
 
             if (!isMatched) {
@@ -582,14 +543,6 @@ class PositionedKeywordsRule extends BaseRule {
         }
 
         return currentIndex;
-    }
-
-    _countPatchLength(patch) {
-        const value = patch.filter(
-            (row) => !row.startsWith('-') && !row.startsWith('@@')
-        );
-
-        return value?.length || 0;
     }
 
     /**

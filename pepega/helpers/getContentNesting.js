@@ -1,13 +1,6 @@
-const getPartOfTheContent = require('./getPartOfTheContent');
-
-// TODO: SHOULD ACCEPT SIDE (RIGHT or LEFT) OR DATA ARRAY (after setting splitPatch)
-
 /**
  * returns array that gives information about content structure **(based on curly brackets)**
- * @param {string} content decoded file content
- * @param {object} restriction optional param that allows to focus only on given fragment
- * @param {string} restriction.from
- * @param {string} restriction.to
+ * @param {Array<index: number, content: string>} data
  * @example
  *
  * ```
@@ -29,24 +22,20 @@ const getPartOfTheContent = require('./getPartOfTheContent');
  *
  * @returns {Array<{from, to}>}
  */
-module.exports = (content, restriction = null) => {
-    let splitContent = content.split('\n');
-
-    if (restriction) {
-        splitContent = getPartOfTheContent(content, restriction);
-    }
-
+module.exports = (data) => {
     let contentNests = [];
+    const dataLength = data.length;
 
-    for (let row = 0; row < splitContent.length; row++) {
-        const rowContent = splitContent[row];
+    for (let row = 0; row < dataLength; row++) {
+        const { content: rowContent } = data[row];
+        const rowContentLength = rowContent.length;
 
-        for (let charIndex = 0; charIndex < rowContent.length; charIndex++) {
+        for (let charIndex = 0; charIndex < rowContentLength; charIndex++) {
             const char = rowContent[charIndex];
 
             if (char === '{') {
                 contentNests.push({
-                    from: row,
+                    from: row
                 });
             } else if (char === '}') {
                 for (let i = contentNests.length - 1; i >= 0; i--) {

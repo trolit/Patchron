@@ -1,4 +1,5 @@
 const ReviewHandler = require('./ReviewHandler');
+const { logInformation } = require('../utilities/EventLog');
 
 class ReviewLoader {
     constructor(file) {
@@ -11,9 +12,7 @@ class ReviewLoader {
      */
     against(rules) {
         if (!rules) {
-            probotInstance.log.warn(
-                `Review skipped (no rules provided) -> ${__filename}`
-            );
+            logInformation(__filename, 'Review skipped (no rules provided)');
 
             return [];
         }

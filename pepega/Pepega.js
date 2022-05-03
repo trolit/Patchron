@@ -1,4 +1,5 @@
-const Review = require('./core/ReviewLoader');
+const Review = require('./pull-request/ReviewLoader');
+const { logWarning } = require('./utilities/EventLog');
 
 class Pepega {
     /**
@@ -8,8 +9,9 @@ class Pepega {
      */
     static investigate(file) {
         if (!file) {
-            probotInstance.log.warn(
-                `Review skipped (no file found or it's content is empty) -> ${__filename}`
+            logWarning(
+                __filename,
+                `Review skipped (no file found or it's content is empty)`
             );
 
             return null;

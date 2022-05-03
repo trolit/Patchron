@@ -1,8 +1,3 @@
-const fs = require('fs');
-const path = require('path');
-const nock = require('nock');
-const PepegaJs = require('../../..');
-const { Probot, ProbotOctokit } = require('probot');
 const { describe, expect, it, beforeEach } = require('@jest/globals');
 const PositionedKeywordsRule = require('../../../pepega/rules/common/PositionedKeywords');
 
@@ -14,13 +9,13 @@ const importKeywordCustomConfig = {
         custom: {
             name: '<script>',
             expression: /<script>/,
-            BOF: false,
-        },
+            BOF: false
+        }
     },
     maxLineBreaks: 0,
     enforced: true,
     breakOnFirstOccurence: false,
-    countDifferentCodeAsLineBreak: false,
+    countDifferentCodeAsLineBreak: false
 };
 
 const importKeywordBOFConfig = {
@@ -30,12 +25,12 @@ const importKeywordBOFConfig = {
     position: {
         custom: null,
         BOF: true,
-        EOF: false,
+        EOF: false
     },
     maxLineBreaks: 0,
     enforced: true,
     breakOnFirstOccurence: false,
-    countDifferentCodeAsLineBreak: false,
+    countDifferentCodeAsLineBreak: false
 };
 
 const constKeywordConfig = (position, override = null) => {
@@ -48,47 +43,28 @@ const constKeywordConfig = (position, override = null) => {
         breakOnFirstOccurence: false,
         countDifferentCodeAsLineBreak: false,
         position,
-        override,
+        override
     };
 };
 
 const validConfig = {
-    keywords: [importKeywordCustomConfig],
+    keywords: [importKeywordCustomConfig]
 };
 
-const privateKey = fs.readFileSync(
-    path.join(__dirname, '../../fixtures/mock-cert.pem'),
-    'utf-8'
-);
-
 describe('invoke function', () => {
-    let probot;
     let positionedKeywordsRule;
 
     beforeEach(() => {
-        nock.disableNetConnect();
-        probot = new Probot({
-            appId: 123,
-            privateKey,
-            Octokit: ProbotOctokit.defaults({
-                retry: { enabled: false },
-                throttle: { enabled: false },
-            }),
-            logLevel: 'fatal',
-        });
-
-        probot.load(PepegaJs);
-
         positionedKeywordsRule = new PositionedKeywordsRule(validConfig);
     });
 
     it('returns empty array on empty keywords', () => {
         positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [],
+            keywords: []
         });
 
         const result = positionedKeywordsRule.invoke({
-            filename: '...',
+            filename: '...'
         });
 
         expect(result).toEqual([]);
@@ -105,23 +81,23 @@ describe('invoke function', () => {
             keywords: [
                 {
                     ...importKeywordCustomConfig,
-                    enforced: false,
-                },
-            ],
+                    enforced: false
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
             filename: '...',
             split_patch: [
                 `@@ -10,13 +5,7 @@`,
-                `+ <scwddwdwript>\n`,
-                `+ import method1 from '@/helpers/methods\n`,
-                `- \n`,
-                `+ \n`,
-                `+ import method2 from '@/helpers/methods'\n`,
-                `+ \n`,
-                `+ import method3 from '@/helpers/methods'`,
-            ],
+                `+<scwddwdwript>`,
+                `+import method1 from '@/helpers/methods`,
+                `-`,
+                `+`,
+                `+import method2 from '@/helpers/methods'`,
+                `+`,
+                `+import method3 from '@/helpers/methods'`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -132,24 +108,24 @@ describe('invoke function', () => {
             filename: '...',
             split_patch: [
                 `@@ -10,13 +5,7 @@`,
-                `+ <script>\n`,
-                `  import {\n`,
-                `   method4,\n`,
-                `   method5,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method1 from '@/helpers/methods\n`,
-                `- \n`,
-                `  import {\n`,
-                `   method24,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method2 from '@/helpers/methods'\n`,
-                `+ import method3 from '@/helpers/methods'\n`,
-                `  import {\n`,
-                `   method34,\n`,
-                `  from '@/helpers/methods'\n`,
-                `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                `+<script>`,
+                ` import {`,
+                `     method4,`,
+                `     method5,`,
+                ` from '@/helpers/methods'`,
+                `+import method1 from '@/helpers/methods`,
+                `-`,
+                ` import {`,
+                `     method24,`,
+                ` from '@/helpers/methods'`,
+                `+import method2 from '@/helpers/methods'`,
+                `+import method3 from '@/helpers/methods'`,
+                ` import {`,
+                `     method34,`,
+                ` from '@/helpers/methods'`,
+                `-`,
+                `-import method6 from '@/helpers/methods'`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -160,24 +136,24 @@ describe('invoke function', () => {
             filename: '...',
             split_patch: [
                 `@@ -10,13 +1,7 @@`,
-                `+ <scrdwwddwdipt>\n`,
-                `  import {\n`,
-                `   method4,\n`,
-                `   method5,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method1 from '@/helpers/methods\n`,
-                `- \n`,
-                `  import {\n`,
-                `   method24,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method2 from '@/helpers/methods'\n`,
-                `+ import method3 from '@/helpers/methods'\n`,
-                `  import {\n`,
-                `   method34,\n`,
-                `  from '@/helpers/methods'\n`,
-                `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                `+<scrdwwddwdipt>`,
+                ` import {`,
+                `     method4,`,
+                `     method5,`,
+                ` from '@/helpers/methods'`,
+                `+import method1 from '@/helpers/methods`,
+                `-`,
+                ` import {`,
+                `     method24,`,
+                ` from '@/helpers/methods'`,
+                `+import method2 from '@/helpers/methods'`,
+                `+import method3 from '@/helpers/methods'`,
+                ` import {`,
+                `     method34,`,
+                ` from '@/helpers/methods'`,
+                `-`,
+                `-import method6 from '@/helpers/methods'`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -189,35 +165,35 @@ describe('invoke function', () => {
                 {
                     ...importKeywordCustomConfig,
                     maxLineBreaks: 2,
-                    countDifferentCodeAsLineBreak: true,
-                },
-            ],
+                    countDifferentCodeAsLineBreak: true
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
             filename: '...',
             split_patch: [
                 `@@ -10,13 +5,7 @@`,
-                `+ <script>\n`,
-                `  import {\n`,
-                `   method4,\n`,
-                `   method5,\n`,
-                `  from '@/helpers/methods'\n`,
+                `+<script>`,
+                ` import {`,
+                `     method4,`,
+                `     method5,`,
+                ` from '@/helpers/methods'`,
                 ` const x = 2;`,
-                `+ import method1 from '@/helpers/methods\n`,
-                `- \n`,
-                `  import {\n`,
-                `   method24,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method2 from '@/helpers/methods'\n`,
-                `+ const y = 3;`,
-                `+ import method3 from '@/helpers/methods'\n`,
-                `  import {\n`,
-                `   method34,\n`,
-                `  from '@/helpers/methods'\n`,
-                `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                `+import method1 from '@/helpers/methods`,
+                `-`,
+                ` import {`,
+                `     method24,`,
+                ` from '@/helpers/methods'`,
+                `+import method2 from '@/helpers/methods'`,
+                `+const y = 3;`,
+                `+import method3 from '@/helpers/methods'`,
+                ` import {`,
+                `     method34,`,
+                ` from '@/helpers/methods'`,
+                `-`,
+                `-import method6 from '@/helpers/methods'`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -231,31 +207,31 @@ describe('invoke function', () => {
                     order: [
                         {
                             name: 'packages',
-                            expression: /import(?!.*@).*/,
+                            expression: /import(?!.*@).*/
                         },
                         {
                             name: 'components',
-                            expression: /import.*@\/components.*/,
-                        },
-                    ],
-                },
-            ],
+                            expression: /import.*@\/components.*/
+                        }
+                    ]
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
             filename: '...',
             split_patch: [
                 `@@ -10,13 +5,7 @@`,
-                `+ import uniq from 'lodash/uniq'\n`,
-                `+ import {\n`,
-                `+  dedent,\n`,
-                `+  dedent2\n`,
-                `+ } from 'dedent-js'\n`,
-                `+ import { mapGetters } from 'vuex'\n`,
-                `+ import Component1 from '@/components/Component1'\n`,
-                `+ import Component12542 from '@/components/Component12542'\n`,
-                `+ import Component3 from '@/components/Component3'`,
-            ],
+                `+import uniq from 'lodash/uniq'`,
+                `+import {`,
+                `+    dedent,`,
+                `+    dedent2`,
+                `+} from 'dedent-js'`,
+                `+import { mapGetters } from 'vuex'`,
+                `+import Component1 from '@/components/Component1'`,
+                `+import Component12542 from '@/components/Component12542'`,
+                `+import Component3 from '@/components/Component3'`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -269,25 +245,25 @@ describe('invoke function', () => {
                     order: [
                         {
                             name: 'packages',
-                            expression: /import(?!.*@).*/,
+                            expression: /import(?!.*@).*/
                         },
                         {
                             name: 'components',
-                            expression: /import.*@\/components.*/,
-                        },
-                    ],
-                },
-            ],
+                            expression: /import.*@\/components.*/
+                        }
+                    ]
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
             filename: '...',
             split_patch: [
                 `@@ -10,13 +5,7 @@`,
-                `+ import Component1 from '@/components/Component1'\n`,
-                `+ import Component12542 from '@/components/Component12542'\n`,
-                `+ import Component3 from '@/components/Component3'`,
-            ],
+                `+import Component1 from '@/components/Component1'`,
+                `+import Component12542 from '@/components/Component12542'`,
+                `+import Component3 from '@/components/Component3'`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -298,26 +274,26 @@ describe('invoke function', () => {
             filename: '...',
             split_patch: [
                 `@@ -10,13 +5,7 @@`,
-                `+ <script>\n`,
-                `  import {\n`,
-                `   method4,\n`,
-                `   method5,\n`,
-                `  from '@/helpers/methods'\n`,
-                ` \n`,
-                `+ import method1 from '@/helpers/methods\n`,
-                `- \n`,
-                `  import {\n`,
-                `   method24,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method2 from '@/helpers/methods'\n`,
-                `+ \n`,
-                `+ import method3 from '@/helpers/methods'\n`,
-                `  import {\n`,
-                `   method34,\n`,
-                `  from '@/helpers/methods'\n`,
-                `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                `+<script>`,
+                ` import {`,
+                `     method4,`,
+                `     method5,`,
+                ` from '@/helpers/methods'`,
+                ` `,
+                `+import method1 from '@/helpers/methods`,
+                `-`,
+                ` import {`,
+                `     method24,`,
+                ` from '@/helpers/methods'`,
+                `+import method2 from '@/helpers/methods'`,
+                `+`,
+                `+import method3 from '@/helpers/methods'`,
+                ` import {`,
+                `     method34,`,
+                ` from '@/helpers/methods'`,
+                `-`,
+                `-import method6 from '@/helpers/methods'`
+            ]
         });
 
         expect(result).toHaveLength(2);
@@ -334,26 +310,26 @@ describe('invoke function', () => {
             filename: '...',
             split_patch: [
                 `@@ -10,13 +5,7 @@`,
-                `+ <scridwdwwdpt>\n`,
-                `  import {\n`,
-                `   method4,\n`,
-                `   method5,\n`,
-                `  from '@/helpers/methods'\n`,
+                `+<scridwdwwdpt>`,
+                ` import {`,
+                `     method4,`,
+                `     method5,`,
+                ` from '@/helpers/methods'`,
                 ` const x = 2;`,
-                `+ import method1 from '@/helpers/methods\n`,
-                `- \n`,
-                `  import {\n`,
-                `   method24,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method2 from '@/helpers/methods'\n`,
-                `+ const y = 3;`,
-                `+ import method3 from '@/helpers/methods'\n`,
-                `  import {\n`,
-                `   method34,\n`,
-                `  from '@/helpers/methods'\n`,
-                `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                `+import method1 from '@/helpers/methods`,
+                `-`,
+                ` import {`,
+                `     method24,`,
+                ` from '@/helpers/methods'`,
+                `+import method2 from '@/helpers/methods'`,
+                `+const y = 3;`,
+                `+import method3 from '@/helpers/methods'`,
+                ` import {`,
+                `     method34,`,
+                ` from '@/helpers/methods'`,
+                `-`,
+                `-import method6 from '@/helpers/methods'`
+            ]
         });
 
         expect(result).toHaveLength(2);
@@ -370,35 +346,35 @@ describe('invoke function', () => {
             keywords: [
                 {
                     ...importKeywordCustomConfig,
-                    maxLineBreaks: 2,
-                },
-            ],
+                    maxLineBreaks: 2
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
             filename: '...',
             split_patch: [
                 `@@ -10,13 +5,7 @@`,
-                `+ <script>\n`,
-                `  import {\n`,
-                `   method4,\n`,
-                `   method5,\n`,
-                `  from '@/helpers/methods'\n`,
+                `+<script>`,
+                ` import {`,
+                `     method4,`,
+                `     method5,`,
+                ` from '@/helpers/methods'`,
                 ` const x = 2;`,
-                `+ import method1 from '@/helpers/methods\n`,
-                `- \n`,
-                `  import {\n`,
-                `   method24,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method2 from '@/helpers/methods'\n`,
-                `+ const y = 3;`,
-                `+ import method3 from '@/helpers/methods'\n`,
-                `  import {\n`,
-                `   method34,\n`,
-                `  from '@/helpers/methods'\n`,
-                `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                `+import method1 from '@/helpers/methods`,
+                `-`,
+                ` import {`,
+                `     method24,`,
+                ` from '@/helpers/methods'`,
+                `+import method2 from '@/helpers/methods'`,
+                `+const y = 3;`,
+                `+import method3 from '@/helpers/methods'`,
+                ` import {`,
+                `     method34,`,
+                ` from '@/helpers/methods'`,
+                `-`,
+                `-import method6 from '@/helpers/methods'`
+            ]
         });
 
         expect(result).toHaveLength(2);
@@ -418,31 +394,31 @@ describe('invoke function', () => {
                     order: [
                         {
                             name: 'packages',
-                            expression: /import(?!.*@).*/,
+                            expression: /import(?!.*@).*/
                         },
                         {
                             name: 'components',
-                            expression: /import.*@\/components.*/,
-                        },
-                    ],
-                },
-            ],
+                            expression: /import.*@\/components.*/
+                        }
+                    ]
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
             filename: '...',
             split_patch: [
                 `@@ -10,13 +5,7 @@`,
-                `+ import uniq from 'lodash/uniq'\n`,
-                `+ import {\n`,
-                `+  dedent,\n`,
-                `+  dedent2\n`,
-                `+ } from 'dedent-js'\n`,
-                `+ import Component3 from '@/components/Component3'`,
-                `+ import { mapGetters } from 'vuex'\n`,
-                `+ import Component1 from '@/components/Component1'\n`,
-                `+ import Component12542 from '@/components/Component12542'\n`,
-            ],
+                `+import uniq from 'lodash/uniq'`,
+                `+import {`,
+                `+    dedent,`,
+                `+    dedent2`,
+                `+} from 'dedent-js'`,
+                `+import Component3 from '@/components/Component3'`,
+                `+import { mapGetters } from 'vuex'`,
+                `+import Component1 from '@/components/Component1'`,
+                `+import Component12542 from '@/components/Component12542'`
+            ]
         });
 
         expect(result).toHaveLength(1);
@@ -455,35 +431,35 @@ describe('invoke function', () => {
             keywords: [
                 {
                     ...importKeywordCustomConfig,
-                    breakOnFirstOccurence: true,
-                },
-            ],
+                    breakOnFirstOccurence: true
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
             filename: '...',
             split_patch: [
                 `@@ -10,13 +5,7 @@`,
-                `+ <script>\n`,
-                `  import {\n`,
-                `   method4,\n`,
-                `   method5,\n`,
-                `  from '@/helpers/methods'\n`,
+                `+<script>`,
+                ` import {`,
+                `     method4,`,
+                `     method5,`,
+                ` from '@/helpers/methods'`,
                 ` const x = 2;`,
-                `+ import method1 from '@/helpers/methods\n`,
-                `- \n`,
-                `  import {\n`,
-                `   method24,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method2 from '@/helpers/methods'\n`,
-                `+ const y = 3;`,
-                `+ import method3 from '@/helpers/methods'\n`,
-                `  import {\n`,
-                `   method34,\n`,
-                `  from '@/helpers/methods'\n`,
-                `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                `+import method1 from '@/helpers/methods`,
+                `-`,
+                ` import {`,
+                `     method24,`,
+                ` from '@/helpers/methods'`,
+                `+import method2 from '@/helpers/methods'`,
+                `+const y = 3;`,
+                `+import method3 from '@/helpers/methods'`,
+                ` import {`,
+                `     method34,`,
+                ` from '@/helpers/methods'`,
+                `-`,
+                `-import method6 from '@/helpers/methods'`
+            ]
         });
 
         expect(result).toHaveLength(1);
@@ -503,23 +479,23 @@ describe('invoke function', () => {
             keywords: [
                 {
                     ...importKeywordBOFConfig,
-                    enforced: false,
-                },
-            ],
+                    enforced: false
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
             filename: '...',
             split_patch: [
                 `@@ -10,13 +5,7 @@`,
-                `+ <scwddwdwript>\n`,
-                `+ import method1 from '@/helpers/methods\n`,
-                `- \n`,
-                `+ \n`,
-                `+ import method2 from '@/helpers/methods'\n`,
-                `+ \n`,
-                `+ import method3 from '@/helpers/methods'`,
-            ],
+                `+<scwddwdwript>`,
+                `+import method1 from '@/helpers/methods`,
+                `-`,
+                `+`,
+                `+import method2 from '@/helpers/methods'`,
+                `+`,
+                `+import method3 from '@/helpers/methods'`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -527,30 +503,30 @@ describe('invoke function', () => {
 
     it('returns empty array on valid BOF positioning', () => {
         positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [importKeywordBOFConfig],
+            keywords: [importKeywordBOFConfig]
         });
 
         const result = positionedKeywordsRule.invoke({
             filename: '...',
             split_patch: [
                 `@@ -10,13 +1,7 @@`,
-                `  import {\n`,
-                `   method4,\n`,
-                `   method5,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method1 from '@/helpers/methods\n`,
-                `- \n`,
-                `  import {\n`,
-                `   method24,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method2 from '@/helpers/methods'\n`,
-                `+ import method3 from '@/helpers/methods'\n`,
-                `  import {\n`,
-                `   method34,\n`,
-                `  from '@/helpers/methods'\n`,
-                `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                ` import {`,
+                `     method4,`,
+                `     method5,`,
+                ` from '@/helpers/methods'`,
+                `+import method1 from '@/helpers/methods`,
+                `-`,
+                ` import {`,
+                `     method24,`,
+                ` from '@/helpers/methods'`,
+                `+import method2 from '@/helpers/methods'`,
+                `+import method3 from '@/helpers/methods'`,
+                ` import {`,
+                `     method34,`,
+                ` from '@/helpers/methods'`,
+                `-`,
+                `-import method6 from '@/helpers/methods'`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -558,31 +534,31 @@ describe('invoke function', () => {
 
     it('returns empty array on valid BOF positioning (enforced)', () => {
         positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [importKeywordBOFConfig],
+            keywords: [importKeywordBOFConfig]
         });
 
         const result = positionedKeywordsRule.invoke({
             filename: '...',
             split_patch: [
                 `@@ -10,13 +4,7 @@`,
-                `+ <scrdwwddwdipt>\n`,
-                `  import {\n`,
-                `   method4,\n`,
-                `   method5,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method1 from '@/helpers/methods\n`,
-                `- \n`,
-                `  import {\n`,
-                `   method24,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method2 from '@/helpers/methods'\n`,
-                `+ import method3 from '@/helpers/methods'\n`,
-                `  import {\n`,
-                `   method34,\n`,
-                `  from '@/helpers/methods'\n`,
-                `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                `+<scrdwwddwdipt>`,
+                ` import {`,
+                `     method4,`,
+                `     method5,`,
+                ` from '@/helpers/methods'`,
+                `+import method1 from '@/helpers/methods`,
+                `-`,
+                ` import {`,
+                `     method24,`,
+                ` from '@/helpers/methods'`,
+                `+import method2 from '@/helpers/methods'`,
+                `+import method3 from '@/helpers/methods'`,
+                ` import {`,
+                `     method34,`,
+                ` from '@/helpers/methods'`,
+                `-`,
+                `-import method6 from '@/helpers/methods'`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -594,34 +570,34 @@ describe('invoke function', () => {
                 {
                     ...importKeywordBOFConfig,
                     maxLineBreaks: 2,
-                    countDifferentCodeAsLineBreak: true,
-                },
-            ],
+                    countDifferentCodeAsLineBreak: true
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
             filename: '...',
             split_patch: [
                 `@@ -10,13 +1,7 @@`,
-                `  import {\n`,
-                `   method4,\n`,
-                `   method5,\n`,
-                `  from '@/helpers/methods'\n`,
+                ` import {`,
+                `     method4,`,
+                `     method5,`,
+                ` from '@/helpers/methods'`,
                 ` const x = 2;`,
-                `+ import method1 from '@/helpers/methods\n`,
-                `- \n`,
-                `  import {\n`,
-                `   method24,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method2 from '@/helpers/methods'\n`,
-                `+ const y = 3;`,
-                `+ import method3 from '@/helpers/methods'\n`,
-                `  import {\n`,
-                `   method34,\n`,
-                `  from '@/helpers/methods'\n`,
-                `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                `+import method1 from '@/helpers/methods`,
+                `-`,
+                ` import {`,
+                `     method24,`,
+                ` from '@/helpers/methods'`,
+                `+import method2 from '@/helpers/methods'`,
+                `+const y = 3;`,
+                `+import method3 from '@/helpers/methods'`,
+                ` import {`,
+                `     method34,`,
+                ` from '@/helpers/methods'`,
+                `-`,
+                `-import method6 from '@/helpers/methods'`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -635,31 +611,31 @@ describe('invoke function', () => {
                     order: [
                         {
                             name: 'packages',
-                            expression: /import(?!.*@).*/,
+                            expression: /import(?!.*@).*/
                         },
                         {
                             name: 'components',
-                            expression: /import.*@\/components.*/,
-                        },
-                    ],
-                },
-            ],
+                            expression: /import.*@\/components.*/
+                        }
+                    ]
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
             filename: '...',
             split_patch: [
                 `@@ -10,13 +1,7 @@`,
-                `+ import uniq from 'lodash/uniq'\n`,
-                `+ import {\n`,
-                `+  dedent,\n`,
-                `+  dedent2\n`,
-                `+ } from 'dedent-js'\n`,
-                `+ import { mapGetters } from 'vuex'\n`,
-                `+ import Component1 from '@/components/Component1'\n`,
-                `+ import Component12542 from '@/components/Component12542'\n`,
-                `+ import Component3 from '@/components/Component3'`,
-            ],
+                `+import uniq from 'lodash/uniq'`,
+                `+import {`,
+                `+    dedent,`,
+                `+    dedent2`,
+                `+} from 'dedent-js'`,
+                `+import { mapGetters } from 'vuex'`,
+                `+import Component1 from '@/components/Component1'`,
+                `+import Component12542 from '@/components/Component12542'`,
+                `+import Component3 from '@/components/Component3'`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -673,25 +649,25 @@ describe('invoke function', () => {
                     order: [
                         {
                             name: 'packages',
-                            expression: /import(?!.*@).*/,
+                            expression: /import(?!.*@).*/
                         },
                         {
                             name: 'components',
-                            expression: /import.*@\/components.*/,
-                        },
-                    ],
-                },
-            ],
+                            expression: /import.*@\/components.*/
+                        }
+                    ]
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
             filename: '...',
             split_patch: [
                 `@@ -10,13 +1,7 @@`,
-                `+ import Component3 from '@/components/Component3'`,
-                `+ import Component1 from '@/components/Component1'\n`,
-                `+ import Component12542 from '@/components/Component12542'\n`,
-            ],
+                `+import Component3 from '@/components/Component3'`,
+                `+import Component1 from '@/components/Component1'`,
+                `+import Component12542 from '@/components/Component12542'`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -703,9 +679,9 @@ describe('invoke function', () => {
                 {
                     ...importKeywordBOFConfig,
                     maxLineBreaks: 2,
-                    countDifferentCodeAsLineBreak: true,
-                },
-            ],
+                    countDifferentCodeAsLineBreak: true
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
@@ -713,25 +689,25 @@ describe('invoke function', () => {
             split_patch: [
                 `@@ -10,13 +1,7 @@`,
                 `const abc = 5;`,
-                `  import {\n`,
-                `   method4,\n`,
-                `   method5,\n`,
-                `  from '@/helpers/methods'\n`,
+                ` import {`,
+                `     method4,`,
+                `     method5,`,
+                ` from '@/helpers/methods'`,
                 ` const x = 2;`,
-                `+ import method1 from '@/helpers/methods\n`,
-                `- \n`,
-                `  import {\n`,
-                `   method24,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method2 from '@/helpers/methods'\n`,
-                `+ const y = 3;`,
-                `+ import method3 from '@/helpers/methods'\n`,
-                `  import {\n`,
-                `   method34,\n`,
-                `  from '@/helpers/methods'\n`,
-                `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                `+import method1 from '@/helpers/methods`,
+                `-`,
+                ` import {`,
+                `     method24,`,
+                ` from '@/helpers/methods'`,
+                `+import method2 from '@/helpers/methods'`,
+                `+const y = 3;`,
+                `+import method3 from '@/helpers/methods'`,
+                ` import {`,
+                `     method34,`,
+                ` from '@/helpers/methods'`,
+                `-`,
+                `-import method6 from '@/helpers/methods'`
+            ]
         });
 
         expect(result).toHaveLength(1);
@@ -744,25 +720,25 @@ describe('invoke function', () => {
             filename: '...',
             split_patch: [
                 `@@ -10,13 +1,7 @@`,
-                `  import {\n`,
-                `   method4,\n`,
-                `   method5,\n`,
-                `  from '@/helpers/methods'\n`,
-                ` \n`,
-                `+ import method1 from '@/helpers/methods\n`,
-                `- \n`,
-                `  import {\n`,
-                `   method24,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method2 from '@/helpers/methods'\n`,
-                `+ \n`,
-                `+ import method3 from '@/helpers/methods'\n`,
-                `  import {\n`,
-                `   method34,\n`,
-                `  from '@/helpers/methods'\n`,
-                `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                ` import {`,
+                `     method4,`,
+                `     method5,`,
+                ` from '@/helpers/methods'`,
+                ` `,
+                `+import method1 from '@/helpers/methods`,
+                `-`,
+                ` import {`,
+                `     method24,`,
+                ` from '@/helpers/methods'`,
+                `+import method2 from '@/helpers/methods'`,
+                `+`,
+                `+import method3 from '@/helpers/methods'`,
+                ` import {`,
+                `     method34,`,
+                ` from '@/helpers/methods'`,
+                `-`,
+                `-import method6 from '@/helpers/methods'`
+            ]
         });
 
         expect(result).toHaveLength(2);
@@ -776,34 +752,34 @@ describe('invoke function', () => {
 
     it('returns review on invalid BOF positioning (enforced, maxLineBreaks = 0)', () => {
         positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [importKeywordBOFConfig],
+            keywords: [importKeywordBOFConfig]
         });
 
         const result = positionedKeywordsRule.invoke({
             filename: '...',
             split_patch: [
                 `@@ -10,13 +5,7 @@`,
-                `+ const a = 2;\n`,
-                `+ const b = 6;\n`,
-                `  import {\n`,
-                `   method4,\n`,
-                `   method5,\n`,
-                `  from '@/helpers/methods'\n`,
-                ` const x = 2;`,
-                `+ import method1 from '@/helpers/methods\n`,
-                `- \n`,
-                `  import {\n`,
-                `   method24,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method2 from '@/helpers/methods'\n`,
-                `+ const y = 3;`,
-                `+ import method3 from '@/helpers/methods'\n`,
-                `  import {\n`,
-                `   method34,\n`,
-                `  from '@/helpers/methods'\n`,
-                `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                `+const a = 2;`,
+                `+const b = 6;`,
+                ` import {`,
+                `     method4,`,
+                `     method5,`,
+                ` from '@/helpers/methods'`,
+                `const x = 2;`,
+                `+import method1 from '@/helpers/methods`,
+                `-`,
+                ` import {`,
+                `     method24,`,
+                ` from '@/helpers/methods'`,
+                `+import method2 from '@/helpers/methods'`,
+                `+const y = 3;`,
+                `+import method3 from '@/helpers/methods'`,
+                ` import {`,
+                `     method34,`,
+                ` from '@/helpers/methods'`,
+                `-`,
+                `-import method6 from '@/helpers/methods'`
+            ]
         });
 
         expect(result).toHaveLength(2);
@@ -820,36 +796,36 @@ describe('invoke function', () => {
             keywords: [
                 {
                     ...importKeywordBOFConfig,
-                    maxLineBreaks: 2,
-                },
-            ],
+                    maxLineBreaks: 2
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
             filename: '...',
             split_patch: [
                 `@@ -10,13 +5,7 @@`,
-                `+ const a = 2;\n`,
-                `+ const b = 6;\n`,
-                `  import {\n`,
-                `   method4,\n`,
-                `   method5,\n`,
-                `  from '@/helpers/methods'\n`,
+                `+const a = 2;`,
+                `+const b = 6;`,
+                ` import {`,
+                `     method4,`,
+                `     method5,`,
+                ` from '@/helpers/methods'`,
                 ` const x = 2;`,
-                `+ import method1 from '@/helpers/methods\n`,
-                `- \n`,
-                `  import {\n`,
-                `   method24,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method2 from '@/helpers/methods'\n`,
-                `+ const y = 3;`,
-                `+ import method3 from '@/helpers/methods'\n`,
-                `  import {\n`,
-                `   method34,\n`,
-                `  from '@/helpers/methods'\n`,
-                `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                `+import method1 from '@/helpers/methods`,
+                `-`,
+                ` import {`,
+                `     method24,`,
+                ` from '@/helpers/methods'`,
+                `+import method2 from '@/helpers/methods'`,
+                `+const y = 3;`,
+                `+import method3 from '@/helpers/methods'`,
+                ` import {`,
+                `     method34,`,
+                ` from '@/helpers/methods'`,
+                `-`,
+                `-import method6 from '@/helpers/methods'`
+            ]
         });
 
         expect(result).toHaveLength(2);
@@ -865,33 +841,33 @@ describe('invoke function', () => {
         positionedKeywordsRule = new PositionedKeywordsRule({
             keywords: [
                 importKeywordBOFConfig,
-                constKeywordConfig({ custom: null, BOF: true }),
-            ],
+                constKeywordConfig({ custom: null, BOF: true })
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
             filename: '...',
             split_patch: [
                 `@@ -10,13 +1,17 @@`,
-                `+ const gamma = require('...')\n`,
-                `+ const beta = require('...');\n`,
-                `+ const alpha = require('...');\n`,
-                `+ \n`,
-                `  import {\n`,
-                `   method4,\n`,
-                `   method5,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method1 from '@/helpers/methods\n`,
-                `- \n`,
-                `  import {\n`,
-                `   method24,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method2 from '@/helpers/methods'\n`,
-                `+ import method3 from '@/helpers/methods'\n`,
-                `  import {\n`,
-                `   method34,\n`,
-                `  from '@/helpers/methods'\n`,
-            ],
+                `+const gamma = require('...')`,
+                `+const beta = require('...');`,
+                `+const alpha = require('...');`,
+                `+`,
+                ` import {`,
+                `     method4,`,
+                `     method5,`,
+                ` from '@/helpers/methods'`,
+                `+import method1 from '@/helpers/methods`,
+                `-`,
+                ` import {`,
+                `     method24,`,
+                ` from '@/helpers/methods'`,
+                `+import method2 from '@/helpers/methods'`,
+                `+import method3 from '@/helpers/methods'`,
+                ` import {`,
+                `     method34,`,
+                ` from '@/helpers/methods'`
+            ]
         });
 
         expect(result).toEqual([]);
@@ -901,34 +877,34 @@ describe('invoke function', () => {
         positionedKeywordsRule = new PositionedKeywordsRule({
             keywords: [
                 importKeywordBOFConfig,
-                constKeywordConfig({ custom: null, BOF: true }),
-            ],
+                constKeywordConfig({ custom: null, BOF: true })
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
             filename: '...',
             split_patch: [
                 `@@ -10,13 +1,19 @@`,
-                `+ const gamma = require('...')\n`,
-                `+ const beta = require('...');\n`,
-                `+ const alpha = require('...');\n`,
-                `+ const b = () => { ... }\n`,
-                `+ const a = () => { ... }\n`,
-                `  import {\n`,
-                `   method4,\n`,
-                `   method5,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method1 from '@/helpers/methods\n`,
-                `- \n`,
-                `  import {\n`,
-                `   method24,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method2 from '@/helpers/methods'\n`,
-                `+ import method3 from '@/helpers/methods'\n`,
-                `  import {\n`,
-                `   method34,\n`,
-                `  from '@/helpers/methods'\n`,
-            ],
+                `+const gamma = require('...')`,
+                `+const beta = require('...');`,
+                `+const alpha = require('...');`,
+                `+const b = () => { ... }`,
+                `+const a = () => { ... }`,
+                ` import {`,
+                `     method4,`,
+                `     method5,`,
+                ` from '@/helpers/methods'`,
+                `+import method1 from '@/helpers/methods`,
+                `-`,
+                ` import {`,
+                `     method24,`,
+                ` from '@/helpers/methods'`,
+                `+import method2 from '@/helpers/methods'`,
+                `+import method3 from '@/helpers/methods'`,
+                ` import {`,
+                `     method34,`,
+                ` from '@/helpers/methods'`
+            ]
         });
 
         expect(result).toHaveLength(1);
@@ -940,34 +916,34 @@ describe('invoke function', () => {
         positionedKeywordsRule = new PositionedKeywordsRule({
             keywords: [
                 importKeywordBOFConfig,
-                constKeywordConfig({ custom: null, BOF: true }),
-            ],
+                constKeywordConfig({ custom: null, BOF: true })
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
             filename: '...',
             split_patch: [
                 `@@ -10,13 +1,19 @@`,
-                `+ const gamma = require('...')\n`,
-                `+ const beta = require('...');\n`,
-                `+ const alpha = require('...');\n`,
-                `+ const b = () => { ... }\n`,
-                `+ const a = () => { ... }\n`,
-                `  import {\n`,
-                `   method4,\n`,
-                `   method5,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method1 from '@/helpers/methods\n`,
-                `- \n`,
-                `  import {\n`,
-                `   method24,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method2 from '@/helpers/methods'\n`,
-                `+ import method3 from '@/helpers/methods'\n`,
-                `  import {\n`,
-                `   method34,\n`,
-                `  from '@/helpers/methods'\n`,
-            ],
+                `+const gamma = require('...')`,
+                `+const beta = require('...');`,
+                `+const alpha = require('...');`,
+                `+const b = () => { ... }`,
+                `+const a = () => { ... }`,
+                ` import {`,
+                `     method4,`,
+                `     method5,`,
+                ` from '@/helpers/methods'`,
+                `+import method1 from '@/helpers/methods`,
+                `-`,
+                ` import {`,
+                `     method24,`,
+                ` from '@/helpers/methods'`,
+                `+import method2 from '@/helpers/methods'`,
+                `+import method3 from '@/helpers/methods'`,
+                ` import {`,
+                `     method34,`,
+                ` from '@/helpers/methods'`
+            ]
         });
 
         expect(result).toHaveLength(1);
@@ -983,31 +959,31 @@ describe('invoke function', () => {
                     order: [
                         {
                             name: 'packages',
-                            expression: /import(?!.*@).*/,
+                            expression: /import(?!.*@).*/
                         },
                         {
                             name: 'components',
-                            expression: /import.*@\/components.*/,
-                        },
-                    ],
-                },
-            ],
+                            expression: /import.*@\/components.*/
+                        }
+                    ]
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
             filename: '...',
             split_patch: [
                 `@@ -10,13 +1,7 @@`,
-                `+ import uniq from 'lodash/uniq'\n`,
-                `+ import {\n`,
-                `+  dedent,\n`,
-                `+  dedent2\n`,
-                `+ } from 'dedent-js'\n`,
-                `+ import Component3 from '@/components/Component3'`,
-                `+ import { mapGetters } from 'vuex'\n`,
-                `+ import Component1 from '@/components/Component1'\n`,
-                `+ import Component12542 from '@/components/Component12542'\n`,
-            ],
+                `+import uniq from 'lodash/uniq'`,
+                `+import {`,
+                `+    dedent,`,
+                `+    dedent2`,
+                `+} from 'dedent-js'`,
+                `+import Component3 from '@/components/Component3'`,
+                `+import { mapGetters } from 'vuex'`,
+                `+import Component1 from '@/components/Component1'`,
+                `+import Component12542 from '@/components/Component12542'`
+            ]
         });
 
         expect(result).toHaveLength(1);
@@ -1020,34 +996,34 @@ describe('invoke function', () => {
             keywords: [
                 {
                     ...importKeywordBOFConfig,
-                    breakOnFirstOccurence: true,
-                },
-            ],
+                    breakOnFirstOccurence: true
+                }
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
             filename: '...',
             split_patch: [
                 `@@ -10,13 +1,7 @@`,
-                `  import {\n`,
-                `   method4,\n`,
-                `   method5,\n`,
-                `  from '@/helpers/methods'\n`,
+                ` import {`,
+                `     method4,`,
+                `     method5,`,
+                ` from '@/helpers/methods'`,
                 ` const x = 2;`,
-                `+ import method1 from '@/helpers/methods\n`,
-                `- \n`,
-                `  import {\n`,
-                `   method24,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method2 from '@/helpers/methods'\n`,
-                `+ const y = 3;`,
-                `+ import method3 from '@/helpers/methods'\n`,
-                `  import {\n`,
-                `   method34,\n`,
-                `  from '@/helpers/methods'\n`,
-                `- \n`,
-                `- import method6 from '@/helpers/methods'\n`,
-            ],
+                `+import method1 from '@/helpers/methods`,
+                `-`,
+                ` import {`,
+                `     method24,`,
+                ` from '@/helpers/methods'`,
+                `+import method2 from '@/helpers/methods'`,
+                `+const y = 3;`,
+                `+import method3 from '@/helpers/methods'`,
+                ` import {`,
+                `     method34,`,
+                ` from '@/helpers/methods'`,
+                `-`,
+                `-import method6 from '@/helpers/methods'`
+            ]
         });
 
         expect(result).toHaveLength(1);
@@ -1060,35 +1036,35 @@ describe('invoke function', () => {
         positionedKeywordsRule = new PositionedKeywordsRule({
             keywords: [
                 importKeywordBOFConfig,
-                constKeywordConfig({ custom: null, BOF: true }),
-            ],
+                constKeywordConfig({ custom: null, BOF: true })
+            ]
         });
 
         const result = positionedKeywordsRule.invoke({
             filename: '...',
             split_patch: [
                 `@@ -10,13 +1,19 @@`,
-                `+ kappa\n`,
-                `+ const gamma = require('...')\n`,
-                `+ const beta = require('...');\n`,
-                `+ const alpha = require('...');\n`,
-                `+ const b = () => { ... }\n`,
-                `+ const a = () => { ... }\n`,
-                `  import {\n`,
-                `   method4,\n`,
-                `   method5,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method1 from '@/helpers/methods\n`,
-                `- \n`,
-                `  import {\n`,
-                `   method24,\n`,
-                `  from '@/helpers/methods'\n`,
-                `+ import method2 from '@/helpers/methods'\n`,
-                `+ import method3 from '@/helpers/methods'\n`,
-                `  import {\n`,
-                `   method34,\n`,
-                `  from '@/helpers/methods'\n`,
-            ],
+                `+kappa`,
+                `+const gamma = require('...')`,
+                `+const beta = require('...');`,
+                `+const alpha = require('...');`,
+                `+const b = () => { ... }`,
+                `+const a = () => { ... }`,
+                ` import {`,
+                `     method4,`,
+                `     method5,`,
+                ` from '@/helpers/methods'`,
+                `+import method1 from '@/helpers/methods`,
+                `-`,
+                ` import {`,
+                `     method24,`,
+                `     from '@/helpers/methods'`,
+                `+import method2 from '@/helpers/methods'`,
+                `+import method3 from '@/helpers/methods'`,
+                ` import {`,
+                `     method34,`,
+                ` from '@/helpers/methods'`
+            ]
         });
 
         expect(result).toHaveLength(1);

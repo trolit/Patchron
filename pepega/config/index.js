@@ -1,23 +1,26 @@
+/* eslint-disable no-inline-comments */
+
 const js = require('./jsRules');
 const vue = require('./vueRules');
 
 const {
-    pull: { StrictWorkflowRule },
+    pull: { StrictWorkflowRule }
 } = require('../rules');
 
 require('dotenv').config({
-    path: '../../.env',
+    path: '../../.env'
 });
 
 module.exports = {
     env: {},
     settings: {
-        isGetFilesRequestPaginated: false,
+        isGetFilesRequestPaginated: false, // when `false`, getFiles can receive up to 3000 files
         delayBetweenCommentRequestsInSeconds: 3,
         isOwnerAssigningEnabled: false,
         isReviewSummaryEnabled: false,
-        maxCommentsPerReview: 50,
-        senders: [],
+        isStoringLogsEnabled: false,
+        maxCommentsPerReview: 50, // limit number of comments that can be added per single review
+        senders: [] // (optional) limit people whose pull requests will be reviewed (pass GitHub usernames)
     },
     rules: {
         pull: {
@@ -26,38 +29,36 @@ module.exports = {
                 workflow: [
                     {
                         base: 'master',
-                        head: 'release',
+                        head: 'release'
                     },
                     {
                         base: 'develop',
-                        head: 'release',
+                        head: 'release'
                     },
                     {
                         base: 'develop',
-                        head: 'feature',
+                        head: 'feature'
                     },
                     {
                         base: 'master',
-                        head: 'develop',
+                        head: 'develop'
                     },
                     {
                         base: 'master',
-                        head: 'hotfix',
+                        head: 'hotfix'
                     },
                     {
                         base: 'develop',
-                        head: 'hotfix',
-                    },
+                        head: 'hotfix'
+                    }
                 ],
                 abortReviewOnInvalidBranchPrefix: false,
-                abortReviewOnInvalidFlow: true,
-            }),
+                abortReviewOnInvalidFlow: true
+            })
         },
         files: {
-            // TODO: applied across all files
-            common: [],
             js,
-            vue,
-        },
-    },
+            vue
+        }
+    }
 };

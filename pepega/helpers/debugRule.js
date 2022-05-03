@@ -2,18 +2,20 @@
 
 const {
     common: {
+        SingleLineBlockRule,
         PositionedKeywordsRule,
         NoUnmarkedCommentsRule,
-        KeywordsOrderedByLengthRule,
+        KeywordsOrderedByLengthRule
     },
-    pull: { StrictWorkflowRule },
+    pull: { StrictWorkflowRule }
 } = require('../rules');
 
 const rules = {
     StrictWorkflowRule,
+    SingleLineBlockRule,
     NoUnmarkedCommentsRule,
     PositionedKeywordsRule,
-    KeywordsOrderedByLengthRule,
+    KeywordsOrderedByLengthRule
 };
 
 /**

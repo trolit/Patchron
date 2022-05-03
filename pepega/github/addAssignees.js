@@ -1,3 +1,5 @@
+const { logFatal } = require('../utilities/EventLog');
+
 /**
  * adds assignees to pull request
  * @param {WebhookEvent<EventPayloads.WebhookPayloadPullRequest>} context WebhookEvent instance.
@@ -15,13 +17,9 @@ module.exports = async (context, repo, assignees) => {
         await context.octokit.issues.addAssignees({
             ...repo,
             assignees,
-            issue_number: repo.pull_number,
+            issue_number: repo.pull_number
         });
     } catch (error) {
-        probotInstance.log.error(
-            `Failed to add assignee(s) to PR: ${__filename}`
-        );
-
-        probotInstance.log.error(error);
+        logFatal(__filename, error);
     }
 };

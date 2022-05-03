@@ -1,8 +1,3 @@
-const fs = require('fs');
-const path = require('path');
-const nock = require('nock');
-const PepegaJs = require('../../..');
-const { Probot, ProbotOctokit } = require('probot');
 const { describe, expect, it, beforeEach } = require('@jest/globals');
 const StrictWorkflowRule = require('../../../pepega/rules/pull/StrictWorkflow');
 
@@ -11,67 +6,48 @@ const validConfig = {
     workflow: [
         {
             base: 'master',
-            head: 'release',
+            head: 'release'
         },
         {
             base: 'develop',
-            head: 'release',
+            head: 'release'
         },
         {
             base: 'develop',
-            head: 'feature',
+            head: 'feature'
         },
         {
             base: 'master',
-            head: 'develop',
+            head: 'develop'
         },
         {
             base: 'master',
-            head: 'hotfix',
+            head: 'hotfix'
         },
         {
             base: 'develop',
-            head: 'hotfix',
-        },
+            head: 'hotfix'
+        }
     ],
     abortReviewOnInvalidBranchPrefix: true,
-    abortReviewOnInvalidFlow: true,
+    abortReviewOnInvalidFlow: true
 };
 
-const privateKey = fs.readFileSync(
-    path.join(__dirname, '../../fixtures/mock-cert.pem'),
-    'utf-8'
-);
-
 describe('invoke function', () => {
-    let probot;
     let strictWorkflowRule;
 
     beforeEach(() => {
-        nock.disableNetConnect();
-        probot = new Probot({
-            appId: 123,
-            privateKey,
-            Octokit: ProbotOctokit.defaults({
-                retry: { enabled: false },
-                throttle: { enabled: false },
-            }),
-            logLevel: 'fatal',
-        });
-
-        probot.load(PepegaJs);
-
         strictWorkflowRule = new StrictWorkflowRule(validConfig);
     });
 
     it('returns null when rule is not enabled', () => {
         strictWorkflowRule = new StrictWorkflowRule({
             ...validConfig,
-            enabled: false,
+            enabled: false
         });
 
         const result = strictWorkflowRule.invoke({
-            filename: '...',
+            filename: '...'
         });
 
         expect(result).toEqual(null);
@@ -80,11 +56,11 @@ describe('invoke function', () => {
     it('returns null when rule workflow is empty', () => {
         strictWorkflowRule = new StrictWorkflowRule({
             ...validConfig,
-            workflow: [],
+            workflow: []
         });
 
         const result = strictWorkflowRule.invoke({
-            filename: '...',
+            filename: '...'
         });
 
         expect(result).toEqual(null);
@@ -94,12 +70,12 @@ describe('invoke function', () => {
         const result = strictWorkflowRule.invoke({
             pull_request: {
                 head: {
-                    ref: 'feature/do-something-1',
+                    ref: 'feature/do-something-1'
                 },
                 base: {
-                    ref: 'develop',
-                },
-            },
+                    ref: 'develop'
+                }
+            }
         });
 
         expect(result).toEqual(null);
@@ -109,12 +85,12 @@ describe('invoke function', () => {
         const result = strictWorkflowRule.invoke({
             pull_request: {
                 head: {
-                    ref: 'not/do-something-1',
+                    ref: 'not/do-something-1'
                 },
                 base: {
-                    ref: 'develop',
-                },
-            },
+                    ref: 'develop'
+                }
+            }
         });
 
         expect(result).toHaveProperty('body');
@@ -124,12 +100,12 @@ describe('invoke function', () => {
         const result = strictWorkflowRule.invoke({
             pull_request: {
                 head: {
-                    ref: 'feature/do-something-1',
+                    ref: 'feature/do-something-1'
                 },
                 base: {
-                    ref: 'master',
-                },
-            },
+                    ref: 'master'
+                }
+            }
         });
 
         expect(result).toHaveProperty('body');

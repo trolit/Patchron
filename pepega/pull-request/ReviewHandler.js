@@ -1,12 +1,13 @@
 const Js = require('../rules/js');
 const Vue = require('../rules/vue');
+const { logInformation } = require('../utilities/EventLog');
 const BasicDataBuilder = require('../builders/BasicData');
 
 class ReviewHandler {
     constructor(file, rules) {
         this.file = {
             ...file,
-            extension: file.filename.split('.').pop(),
+            extension: file.filename.split('.').pop()
         };
 
         this.rules = rules;
@@ -30,9 +31,11 @@ class ReviewHandler {
                 break;
 
             default:
-                probotInstance.log.warn(
-                    `Extension not supported: ${__filename}`
+                logInformation(
+                    __filename,
+                    `Extension not supported (${this.file?.extension})`
                 );
+
                 break;
         }
 

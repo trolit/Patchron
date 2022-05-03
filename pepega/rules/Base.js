@@ -1,4 +1,5 @@
 const constants = require('../config/constants');
+const EventLog = require('../utilities/EventLog');
 const getPosition = require('../helpers/getPosition');
 const getLineNumber = require('../helpers/getLineNumber');
 const ReviewCommentBuilder = require('../builders/ReviewComment');
@@ -15,11 +16,14 @@ class BaseRule {
             DELETED,
             NEWLINE,
             UNCHANGED,
+            CUSTOM_LINES,
+            COMMENTED_LINE
         } = constants;
 
         this.MERGE = MERGE;
         this.NEWLINE = NEWLINE;
-        this.CUSTOM_LINES = [NEWLINE, MERGE];
+        this.CUSTOM_LINES = CUSTOM_LINES;
+        this.COMMENTED_LINE = COMMENTED_LINE;
 
         this.ADDED = ADDED;
         this.DELETED = DELETED;
@@ -29,6 +33,11 @@ class BaseRule {
         this.RIGHT = RIGHT;
 
         this.EMPTY = EMPTY;
+
+        this.logFatal = EventLog.logFatal;
+        this.logError = EventLog.logError;
+        this.logWarning = EventLog.logWarning;
+        this.logInformation = EventLog.logInformation;
     }
 
     /**
@@ -44,7 +53,7 @@ class BaseRule {
         const comment = reviewCommentBuilder.buildSingleLineComment({
             body,
             line,
-            side,
+            side
         });
 
         return comment;
@@ -66,146 +75,96 @@ class BaseRule {
             body,
             start_line,
             start_side: side,
-            position,
+            position
         });
 
         return comment;
     }
 
     /**
-     * Prepares data for keyword that makes use of regular expression to match
-     * rows. Translates line breaks into "newLine" and deleted lines into "merge".
+     * Cleans received patch
      */
-    initializeRegexBasedData(splitPatch, keyword) {
-        let matchedRows = [];
-        let unchangedRows = [];
+    setupData(splitPatch) {
+        let data = [];
+        const splitPatchLength = splitPatch.length;
 
-        for (let index = 0; index < splitPatch.length; index++) {
+        for (let index = 0; index < splitPatchLength; index++) {
             const row = splitPatch[index];
 
-            if (matchedRows.length && this.isNewline(row)) {
-                matchedRows.push({
+            const rawRow = this.getRawContent(row);
+            const indentation = rawRow.search(/\S|$/);
+
+            if (this.isLineCommented(rawRow)) {
+                data.push({
                     index,
+                    indentation,
+                    content: this.COMMENTED_LINE,
+                    trimmedContent: this.COMMENTED_LINE
+                });
+
+                continue;
+            }
+
+            if (this.isNewline(row)) {
+                data.push({
+                    index,
+                    indentation,
                     content: this.NEWLINE,
+                    trimmedContent: this.NEWLINE
                 });
 
                 continue;
-            } else if (matchedRows.length && this.isMergeLine(row)) {
-                matchedRows.push({
+            }
+
+            if (row.startsWith(this.DELETED)) {
+                data.push({
                     index,
+                    indentation,
                     content: this.MERGE,
+                    trimmedContent: this.MERGE
                 });
-
-                continue;
-            } else if (matchedRows.length && this.isUnchangedLine(row)) {
-                unchangedRows.push({
-                    index,
-                    content: row.trim(),
-                });
-            }
-
-            const matchResult = row.match(keyword.regex);
-
-            if (!matchResult) {
-                continue;
-            }
-
-            const content = matchResult[0].trim();
-
-            if (
-                keyword?.multilineOptions &&
-                this.isPartOfMultiLine(keyword, content)
-            ) {
-                const multilineEndIndex = this.getMultiLineEndIndex(
-                    splitPatch,
-                    keyword,
-                    index
-                );
-
-                const rawContent = this.getRawContent(
-                    splitPatch[multilineEndIndex]
-                );
-
-                matchedRows.push({
-                    index,
-                    content: rawContent,
-                    length: multilineEndIndex - index,
-                });
-
-                index = multilineEndIndex;
 
                 continue;
             }
 
-            matchedRows.push({
+            data.push({
                 index,
-                content,
+                indentation,
+                content: rawRow,
+                trimmedContent: rawRow.trim()
             });
         }
 
-        return {
-            matchedRows,
-            unchangedRows,
-        };
+        return data;
     }
 
     /**
      * Removes from row indicators added by Git (added, deleted, unchanged)
+     * @param {string} row
      */
     getRawContent(row) {
         let rawContent = row;
 
-        if (this.isUnchangedLine(row)) {
-            rawContent = row.trim();
-        } else if (this.isAddedLine(row) || this.isMergeLine(row)) {
-            rawContent = row.slice(1).trim();
+        const isAddedLine = row.startsWith(this.ADDED);
+        const isMergeLine = row.startsWith(this.DELETED);
+        const isUnchangedLine = row.startsWith(this.UNCHANGED);
+
+        if (isUnchangedLine || isAddedLine || isMergeLine) {
+            rawContent = row.slice(1);
         }
 
         return rawContent;
     }
 
     /**
-     * **\/\/ apply only to lines from splitPatch!!**
-     *
-     * tests if given line is added line
-     * @param {string} line to check
-     * @returns {boolean}
-     */
-    isAddedLine(line) {
-        return line.startsWith(this.ADDED);
-    }
-
-    /**
-     * **\/\/ apply only to lines from splitPatch!!**
-     *
      * tests if given line is newline
+     *
+     * **\/\/ apply only to lines that are coming directly from splitPatch**
      * @param {string} line to check
      * @returns {boolean}
      */
     isNewline(line) {
         return [this.ADDED, this.EMPTY].includes(removeWhitespaces(line));
-    }
-
-    /**
-     * **\/\/ apply only to lines from splitPatch!!**
-     *
-     * tests if given line is merge
-     * @param {string} line to check
-     * @returns {boolean}
-     */
-    isMergeLine(line) {
-        return line.startsWith(this.DELETED);
-    }
-
-    /**
-     * **\/\/ apply only to lines from splitPatch!!**
-     *
-     * tests if given line is unchanged
-     * @param {string} line to check
-     * @returns {boolean}
-     */
-    isUnchangedLine(line) {
-        return line.startsWith(this.UNCHANGED);
     }
 
     /**
@@ -230,15 +189,21 @@ class BaseRule {
             : includesMultiLineOption && !line.match(keyword.regex);
     }
 
-    getMultiLineStartIndex(splitPatch, keyword, endIndex) {
+    /**
+     * @param {Array} data - array received via `setupData(splitPatch)`
+     * @param {string} keyword
+     * @param {number} endIndex
+     * @returns {number}
+     */
+    getMultiLineStartIndex(data, keyword, endIndex) {
         let multilineStartIndex = -1;
 
         for (let index = endIndex - 1; index >= 0; index--) {
-            const row = splitPatch[index];
+            const { trimmedContent } = data[index];
 
             if (
-                !this.isMergeLine(row) &&
-                this.isPartOfMultiLine(keyword, row)
+                trimmedContent !== this.MERGE &&
+                this.isPartOfMultiLine(keyword, trimmedContent)
             ) {
                 multilineStartIndex = index;
 
@@ -249,16 +214,22 @@ class BaseRule {
         return multilineStartIndex;
     }
 
-    getMultiLineEndIndex(splitPatch, keyword, startIndex) {
+    /**
+     * @param {Array} data - array received via `setupData(splitPatch)`
+     * @param {string} keyword
+     * @param {number} startIndex
+     * @returns {number}
+     */
+    getMultiLineEndIndex(data, keyword, startIndex) {
         let multilineEndIndex = -1;
-        const splitPatchLength = splitPatch.length;
+        const dataLength = data.length;
 
-        for (let index = startIndex + 1; index < splitPatchLength; index++) {
-            const row = splitPatch[index];
+        for (let index = startIndex + 1; index < dataLength; index++) {
+            const { trimmedContent } = data[index];
 
             if (
-                !this.isMergeLine(row) &&
-                this.isPartOfMultiLine(keyword, row, 'end')
+                trimmedContent !== this.MERGE &&
+                this.isPartOfMultiLine(keyword, trimmedContent, 'end')
             ) {
                 multilineEndIndex = index;
 
@@ -269,16 +240,8 @@ class BaseRule {
         return multilineEndIndex;
     }
 
-    logError(filename, message, testedFile = null) {
-        probotInstance.log.error(
-            `${filename} >>>${
-                testedFile ? ` (${testedFile?.fileName})` : ``
-            }\n${message}`
-        );
-    }
-
     /**
-     * @param {Array<object>} data - array of objects containing `content` property
+     * @param {Array<object>} data - array of objects containing `trimmedContent` property
      * @param {integer} startsAt
      * @param {integer} endsAt
      * @returns {string}
@@ -286,7 +249,18 @@ class BaseRule {
     convertMultiLineToSingleLine(data, startsAt, endsAt) {
         const slicedPart = data.slice(startsAt, endsAt + 1);
 
-        return slicedPart.map(({ content }) => content).join(' ');
+        return slicedPart.map(({ trimmedContent }) => trimmedContent).join(' ');
+    }
+
+    /**
+     * determines whether passed line starts with //, /*, * or *\/
+     * @param {string} line
+     * @returns {boolean}
+     */
+    isLineCommented(line) {
+        const matchResult = line.match(/^(\/\/|\/\*|\*\/|\*)/);
+
+        return !!matchResult;
     }
 }
 

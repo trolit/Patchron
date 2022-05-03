@@ -1,0 +1,79 @@
+/**
+ * use to log errors that are coming from rules
+ * @param {string} filename
+ * @param {string} message
+ * @param {object} [file]
+ */
+function logError(filename, message, file = null) {
+    if (!log) {
+        return;
+    }
+
+    const logData = file
+        ? {
+              causedBy: file?.filename,
+              contentsUrl: file?.contents_url
+          }
+        : {};
+
+    log.error(
+        { triggeredAt: filename, ...logData, pullNumber },
+        `${filename}: ${message}`
+    );
+}
+
+/**
+ * use to log any useful information (e.g. skipped 20 comments due to limit per review)
+ * @param {string} filename
+ * @param {string} message
+ */
+function logInformation(filename, message) {
+    if (!log) {
+        return;
+    }
+
+    log.info({ triggeredAt: filename, pullNumber }, `${filename}: ${message}`);
+}
+
+/**
+ * use to log any unexpected behaviour (e.g. wrong rule config)
+ * @param {string} filename
+ * @param {string} message
+ */
+function logWarning(filename, message, file = null) {
+    if (!log) {
+        return;
+    }
+
+    const logData = file
+        ? {
+              causedBy: file?.filename,
+              contentsUrl: file?.contents_url
+          }
+        : {};
+
+    log.info(
+        { triggeredAt: filename, ...logData, pullNumber },
+        `${filename}: ${message}`
+    );
+}
+
+/**
+ * use to log errors that are coming from GitHub API responses
+ * @param {string} filename
+ * @param {string} message
+ */
+function logFatal(filename, error) {
+    if (!log) {
+        return;
+    }
+
+    log.fatal({ triggeredAt: filename, error, pullNumber });
+}
+
+module.exports = {
+    logError,
+    logFatal,
+    logWarning,
+    logInformation
+};
