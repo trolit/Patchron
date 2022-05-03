@@ -1,3 +1,5 @@
+/* eslint-disable no-inline-comments */
+
 const js = require('./jsRules');
 const vue = require('./vueRules');
 
@@ -12,13 +14,13 @@ require('dotenv').config({
 module.exports = {
     env: {},
     settings: {
-        isGetFilesRequestPaginated: false,
+        isGetFilesRequestPaginated: false, // when `false`, getFiles can receive up to 3000 files
         delayBetweenCommentRequestsInSeconds: 3,
         isOwnerAssigningEnabled: false,
         isReviewSummaryEnabled: false,
-        isStoringLogsEnabled: true,
-        maxCommentsPerReview: 50,
-        senders: []
+        isStoringLogsEnabled: false,
+        maxCommentsPerReview: 50, // limit number of comments that can be added per single review
+        senders: [] // (optional) limit people whose pull requests will be reviewed (pass GitHub usernames)
     },
     rules: {
         pull: {
@@ -55,8 +57,6 @@ module.exports = {
             })
         },
         files: {
-            // TODO: applied across all files
-            common: [],
             js,
             vue
         }
