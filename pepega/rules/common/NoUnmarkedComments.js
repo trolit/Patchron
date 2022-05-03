@@ -43,7 +43,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
                 continue;
             }
 
-            const rawRow = this.getRawContent(row);
+            const rawRow = this.getRawContent(row).trim();
 
             if (rawRow.startsWith('@@')) {
                 continue;
