@@ -30,4 +30,4 @@ For more, check out the [Contributing Guide](CONTRIBUTING.md).
 
 ## License
 
-[ISC](LICENSE) © 2022 p4w31 !d21k0w5k1  <iddziku@gmail.com>
+[ISC](LICENSE) © 2022 p4w31 !d21k0w5k1
