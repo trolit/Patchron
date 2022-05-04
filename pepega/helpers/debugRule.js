@@ -5,6 +5,7 @@ const {
         SingleLineBlockRule,
         PositionedKeywordsRule,
         NoUnmarkedCommentsRule,
+        ValueComparisionStyleRule,
         KeywordsOrderedByLengthRule
     },
     pull: { StrictWorkflowRule }
@@ -15,6 +16,7 @@ const rules = {
     SingleLineBlockRule,
     NoUnmarkedCommentsRule,
     PositionedKeywordsRule,
+    ValueComparisionStyleRule,
     KeywordsOrderedByLengthRule
 };
 
