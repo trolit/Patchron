@@ -1,94 +1,156 @@
 const { CUSTOM_LINES } = require('../../config/constants');
 
 /**
- * extends `setupData` collection with information about multi line strings, built with backticks that can contain interpolated fragments. Note that received patch can contain part of multi line string. In such case line won't be considered as multi line string. Lines that contain multi line strings will be expanded with following properties:
+ * extends `setupData` collection with information about strings built with backticks (which can contain interpolated fragments). Lines that contain backticks will be expanded with properties mentioned below.
  *
+ * **Note** that when `data` comes from `patch`, it can contain only part of multi line string with backticks disturbing method's outcome. 
+ * 
  * ```js
  *  {
- *      multiLineString: {
- *          startsAt: number, // index of line of multi line string in respect to `data` array
- *          endsAt: number,
- *          thisRow: {
- *              firstBacktickAt: number, // -1 if none found
- *              lastBacktickAt: number, // -1 if none found,
- *              count: number
+ *      backticks: {
+ *          startLineIndex: number, // in respect to `data` array
+ *          endLineIndex: number, // in respect to `data` array
+ *          thisLine: {
+ *              firstBacktickIndex: number, // -1 if none found
+ *              lastBacktickIndex: number, // -1 if none found,
+ *              total: number
  *          }
  *      }
  *  }
  * ```
  *
+
+ *
  * @param {Array<object>} data
  * @returns {Array<object>}
  */
-module.exports = (data) => {
+module.exports = (
+    data,
+    settings = {
+        dataOnAbort: data,
+        abortOnUnevenBackticksCountInPatch: false,
+        abortOnMultiLineStringWithoutEndIndex: false
+    }
+) => {
+    const {
+        dataOnAbort,
+        abortOnUnevenBackticksCountInPatch,
+        abortOnMultiLineStringWithoutEndIndex
+    } = settings;
+
     const extendedData = [];
     const dataLength = data.length;
 
+    if (
+        abortOnUnevenBackticksCountInPatch &&
+        !_hasEvenAmountOfBackticks(data)
+    ) {
+        return dataOnAbort;
+    }
+
     for (let index = 0; index < dataLength; index++) {
         const { trimmedContent } = data[index];
-
         const trimmedContentBackticksCount = _countBackticks(trimmedContent);
 
         if (
-            trimmedContentBackticksCount % 2 !== 0 &&
+            trimmedContentBackticksCount &&
             !CUSTOM_LINES.includes(trimmedContent)
         ) {
-            const startsAt = index;
+            const startLineIndex = index;
 
-            const { index: nextUnevenBackticksCount } =
-                _findUnevenBackticksCount(data, index);
-
-            if (nextUnevenBackticksCount) {
-                for (; index <= nextUnevenBackticksCount; index++) {
-                    const { trimmedContent: line } = data[index];
-
-                    extendedData.push({
-                        ...data[index],
-                        multiLineString: {
-                            startsAt,
-                            endsAt: nextUnevenBackticksCount,
-                            thisRow: {
-                                firstBacktickAt: line.indexOf('`'),
-                                lastBacktickAt: line.lastIndexOf('`'),
-                                totalBackticks: _countBackticks(line)
-                            }
-                        }
-                    });
-                }
+            if (trimmedContentBackticksCount % 2 === 0) {
+                extendedData.push({
+                    ...data[index],
+                    ..._createBackticksObject(
+                        trimmedContent,
+                        startLineIndex,
+                        startLineIndex
+                    )
+                });
 
                 continue;
+            } else {
+                const endLineRow = _findRowWithUnevenBackticks(data, index);
+
+                if (endLineRow) {
+                    const { index: endLineIndex } = endLineRow;
+
+                    for (
+                        let localIndex = index;
+                        localIndex <= endLineIndex;
+                        localIndex++
+                    ) {
+                        const row = data[localIndex];
+                        const { trimmedContent: line } = row;
+
+                        extendedData.push({
+                            ...row,
+                            ..._createBackticksObject(
+                                line,
+                                startLineIndex,
+                                endLineIndex
+                            )
+                        });
+                    }
+
+                    index = endLineIndex;
+
+                    continue;
+                } else if (
+                    !endLineRow &&
+                    abortOnMultiLineStringWithoutEndIndex
+                ) {
+                    return dataOnAbort;
+                }
             }
         }
 
         extendedData.push({
             ...data[index],
-            multiLineString: null
+            backticks: null
         });
     }
 
     return extendedData;
 };
 
-/**
- * counts template literals (`) occurences in given line
- * @param {string} line
- * @returns {number}
- */
 function _countBackticks(line) {
     let counter = line.split('`').length - 1;
 
     return line.includes('`') ? counter : 0;
 }
 
+function _hasEvenAmountOfBackticks(data) {
+    const sum = data.reduce(
+        (partialSum, { trimmedContent }) =>
+            partialSum + _countBackticks(trimmedContent),
+        0
+    );
+
+    return sum % 2 === 0;
+}
+
 /**
- * @param {Array<object>} data
- * @param {number} startIndex - index of row where `countBackticks` returned un
- * @returns {object}
+ * attempts to find `data` row that has uneven amount of backticks, starting from `startIndex + 1`
  */
-function _findUnevenBackticksCount(data, startIndex) {
+function _findRowWithUnevenBackticks(data, startIndex) {
     const partOfData = data.slice(startIndex + 1);
 
     return partOfData.find(
         ({ trimmedContent }) => _countBackticks(trimmedContent) % 2 !== 0
     );
+}
+
+function _createBackticksObject(line, startLineIndex, endLineIndex) {
+    return {
+        backticks: {
+            startLineIndex,
+            endLineIndex,
+            thisLine: {
+                firstBacktickIndex: line.indexOf('`'),
+                lastBacktickIndex: line.lastIndexOf('`'),
+                total: _countBackticks(line)
+            }
+        }
+    };
 }
