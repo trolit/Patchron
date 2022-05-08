@@ -4,6 +4,7 @@ const getPosition = require('../helpers/getPosition');
 const getLineNumber = require('../helpers/getLineNumber');
 const ReviewCommentBuilder = require('../builders/ReviewComment');
 const removeWhitespaces = require('../helpers/removeWhitespaces');
+const extendWithBackticks = require('../extensions/setup-data/extendWithBackticks');
 
 class BaseRule {
     constructor() {
@@ -84,7 +85,7 @@ class BaseRule {
     /**
      * Cleans received patch
      */
-    setupData(splitPatch) {
+    setupData(splitPatch, extensions = { withBackticks: false }) {
         let data = [];
         const splitPatchLength = splitPatch.length;
 
@@ -133,6 +134,10 @@ class BaseRule {
                 content: rawRow,
                 trimmedContent: rawRow.trim()
             });
+        }
+
+        if (extensions?.withBackticks) {
+            data = extendWithBackticks(data);
         }
 
         return data;
@@ -261,94 +266,6 @@ class BaseRule {
         const matchResult = line.match(/^(\/\/|\/\*|\*\/|\*)/);
 
         return !!matchResult;
-    }
-
-    /**
-     * counts template literals (`) occurences in given line
-     * @param {string} line
-     * @returns {number}
-     */
-    countBackticks(line) {
-        let counter = line.split('`').length;
-
-        return line.includes('`') ? counter : 0;
-    }
-
-    /**
-     * @param {Array<object>} data
-     * @param {number} startIndex - index of row where `countBackticks` returned un
-     * @returns {object}
-     */
-    findUnevenBackticksCount(data, startIndex) {
-        const partOfData = data.slice(startIndex + 1);
-
-        return partOfData.find(
-            ({ trimmedContent }) =>
-                this._countBackticks(trimmedContent) % 2 !== 0
-        );
-    }
-
-    /**
-     * extends `setupData` collection with information about multi line strings, built with backticks that can contain interpolated fragments. Note that received patch can contain part of multi line string. In such case line won't be considered as multi line string. Lines that contain multi line strings will be expanded with following properties:
-     *
-     * ```js
-     *  {
-     *      multiLineString: {
-     *          startsAt: number, // index of line of multi line string in `data` array
-     *          endsAt: number,
-     *          thisRow: {
-     *              firstBacktickAt: number, // -1 if none found
-     *              lastBacktickAt: number, // -1 if none found,
-     *              count: number
-     *          }
-     *      }
-     *  }
-     * ```
-     *
-     * @param {Array<object>} data
-     * @returns {Array<object>}
-     */
-    extendDataWithBackticks(data) {
-        const matchedData = [];
-        const dataLength = data.length;
-
-        for (let index = 0; index < dataLength; index++) {
-            const { trimmedContent } = data[index];
-
-            const trimmedContentBackticksCount =
-                this.countBackticks(trimmedContent);
-
-            if (trimmedContentBackticksCount % 2 !== 0) {
-                const { index: nextUnevenBackticksCount } =
-                    this.findUnevenBackticksCount(data, index);
-
-                if (nextUnevenBackticksCount) {
-                    for (; index <= nextUnevenBackticksCount; index++) {
-                        const { trimmedContent: line } = data[index];
-
-                        matchedData.push({
-                            ...data[index],
-                            multiLineString: {
-                                startsAt: index,
-                                endsAt: nextUnevenBackticksCount,
-                                thisRow: {
-                                    firstBacktickAt: line.indexOf('`'),
-                                    lastBacktickAt: line.lastIndexOf('`'),
-                                    totalBackticks: this.countBackticks(line)
-                                }
-                            }
-                        });
-                    }
-
-                    continue;
-                }
-            }
-
-            matchedData.push({
-                ...data[index],
-                multiLineString: null
-            });
-        }
     }
 }
 
