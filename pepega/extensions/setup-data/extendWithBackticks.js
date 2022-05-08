@@ -3,9 +3,19 @@ const { CUSTOM_LINES } = require('../../config/constants');
 /**
  * extends `setupData` collection with information about strings built with backticks (which can contain interpolated fragments). Lines that contain backticks will be expanded with properties mentioned below.
  *
- * **Note** that when `data` comes from `patch`, it can contain only part of multi line string with backticks disturbing method's outcome. 
+ * **Note** that when `data` comes from `patch`, it can contain only part of multi line string with backticks disturbing method's outcome. Adjust extension behaviour by passing second argument to the method - settings. 
  * 
  * ```js
+ * // extension additional settings:
+ * {
+ *      dataOnAbort: any, // decide what to return if `abort` occurs
+ *      abortOnUnevenBackticksCountInPatch: boolean, // if true (not enough backticks), dataOnAbort is returned
+ *      abortOnMultiLineStringWithoutEndIndex: boolean // if true (part of multi line string), dataOnAbort is returned
+ * }
+ * ```
+ * 
+ * ```js
+ * // rows with backticks are extended with following properties
  *  {
  *      backticks: {
  *          startLineIndex: number, // in respect to `data` array
