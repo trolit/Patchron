@@ -21,7 +21,7 @@ const { CUSTOM_LINES } = require('../../config/constants');
  * @returns {Array<object>}
  */
 module.exports = (data) => {
-    const matchedData = [];
+    const extendedData = [];
     const dataLength = data.length;
 
     for (let index = 0; index < dataLength; index++) {
@@ -33,6 +33,8 @@ module.exports = (data) => {
             trimmedContentBackticksCount % 2 !== 0 &&
             !CUSTOM_LINES.includes(trimmedContent)
         ) {
+            const startsAt = index;
+
             const { index: nextUnevenBackticksCount } =
                 _findUnevenBackticksCount(data, index);
 
@@ -40,10 +42,10 @@ module.exports = (data) => {
                 for (; index <= nextUnevenBackticksCount; index++) {
                     const { trimmedContent: line } = data[index];
 
-                    matchedData.push({
+                    extendedData.push({
                         ...data[index],
                         multiLineString: {
-                            startsAt: index,
+                            startsAt,
                             endsAt: nextUnevenBackticksCount,
                             thisRow: {
                                 firstBacktickAt: line.indexOf('`'),
@@ -58,11 +60,13 @@ module.exports = (data) => {
             }
         }
 
-        matchedData.push({
+        extendedData.push({
             ...data[index],
             multiLineString: null
         });
     }
+
+    return extendedData;
 };
 
 /**
@@ -71,7 +75,7 @@ module.exports = (data) => {
  * @returns {number}
  */
 function _countBackticks(line) {
-    let counter = line.split('`').length;
+    let counter = line.split('`').length - 1;
 
     return line.includes('`') ? counter : 0;
 }
