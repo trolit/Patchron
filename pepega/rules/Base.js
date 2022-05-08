@@ -85,7 +85,12 @@ class BaseRule {
     /**
      * Cleans received patch
      */
-    setupData(splitPatch, extensions = { withBackticks: false }) {
+    setupData(
+        splitPatch,
+        extensions = {
+            withBackticks: null
+        }
+    ) {
         let data = [];
         const splitPatchLength = splitPatch.length;
 
@@ -137,7 +142,10 @@ class BaseRule {
         }
 
         if (extensions?.withBackticks) {
-            data = extendWithBackticks(data);
+            data = extendWithBackticks(
+                data,
+                extensions.withBackticks?.settings
+            );
         }
 
         return data;
