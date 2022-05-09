@@ -23,7 +23,7 @@ class ValueComparisionStyleRule extends BaseRule {
         const { allowedLevels, specificPatterns } = config;
 
         const defaultPatterns = [
-            { expression: /(?:={2})/, levels: [0, 1] },
+            { expression: /(?:={2,3})/, levels: [0, 1] },
             { expression: /(?:Object.is\(.*\))/, levels: [2] }
         ];
 
