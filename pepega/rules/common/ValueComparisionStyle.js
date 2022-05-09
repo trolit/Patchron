@@ -105,10 +105,7 @@ class ValueComparisionStyleRule extends BaseRule {
         );
     }
 
-    _isPartOfString(line) {
-        const regex = /^[A-Za-z\s]+$/;
 
-        return !!line.match(regex);
     }
 
     /**
