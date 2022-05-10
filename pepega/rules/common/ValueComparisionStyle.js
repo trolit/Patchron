@@ -1,5 +1,4 @@
 const BaseRule = require('../Base');
-const getContentNesting = require('../../helpers/getContentNesting');
 
 class ValueComparisionStyleRule extends BaseRule {
     /**
@@ -11,7 +10,7 @@ class ValueComparisionStyleRule extends BaseRule {
      * - 2 - strict equality (Object.is)
      * @param {object} config
      * @param {Array<number>} config.allowedLevels pass which levels are allowed
-     * @param {Array<{expression: object, level: number}>} config.specificPatterns to handle custom cases
+     * @param {Array<{name: string, expression: object, levels: number}>} config.specificPatterns to handle custom cases
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals
      * @link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Equality_comparisons_and_sameness
@@ -126,17 +125,24 @@ class ValueComparisionStyleRule extends BaseRule {
 
         return reviewComments;
     }
-        const defaultPatternsLength = this.defaultPatterns.length;
-        let isRowValid = false;
 
-        for (let index = 0; index < defaultPatternsLength; index++) {
-            const { expression, levels } = this.defaultPatterns[index];
+    _isLineValid(line) {
+        const patterns = [...this.defaultPatterns, ...this.specificPatterns];
+        const patternsLength = patterns.length;
+        let isRowValid = true;
 
-            const matches = row.matchAll(expression);
+        for (let index = 0; index < patternsLength; index++) {
+            const { expression, levels } = patterns[index];
+
+            const matches = line.matchAll(expression);
+
+            if (!matches.length) {
+                break;
+            }
 
             for (const match of matches) {
-                if (this._isPatternAllowed(levels)) {
-                    isRowValid = true;
+                if (!this._isMatchValid(match, levels)) {
+                    isRowValid = false;
 
                     break;
                 }
