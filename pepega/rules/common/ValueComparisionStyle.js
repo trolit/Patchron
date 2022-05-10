@@ -41,15 +41,11 @@ class ValueComparisionStyleRule extends BaseRule {
     invoke(file) {
         const { split_patch: splitPatch } = file;
 
-        console.table(splitPatch);
-
         const data = this.setupData(splitPatch, {
             withBackticks: {
                 settings: { abortOnUnevenBackticksCountInPatch: true }
             }
         });
-
-        console.table(data);
 
         if (!this._hasAnyMatchingComparision(data)) {
             this.logWarning(
@@ -61,11 +57,7 @@ class ValueComparisionStyleRule extends BaseRule {
             return [];
         }
 
-        // const contentNesting = getContentNesting(data);
-
-        // const matchedData = this.extendDataWithBackticks(data);
-
-        const reviewComments = [];
+        const reviewComments = this._reviewData(file, data);
 
         return reviewComments;
     }
@@ -82,9 +74,58 @@ class ValueComparisionStyleRule extends BaseRule {
         );
     }
 
-    _reviewRowWithTemplateLiteral(row, contentNesting) {}
+    _reviewData(file, data) {
+        const reviewComments = [];
+        const dataLength = data.length;
 
-    _reviewRowWithDefaultPatterns(row) {
+        for (let index = 0; index < dataLength; index++) {
+            const row = data[index];
+            const backticks = row?.backticks;
+            const line = { content: row.trimmedContent, startIndex: index };
+
+            if (
+                backticks &&
+                backticks.startLineIndex !== backticks.endLineIndex
+            ) {
+                const { startLineIndex, endLineIndex } = backticks;
+                line.startIndex = startLineIndex;
+                line.endIndex = endLineIndex;
+
+                line.content = this.convertMultiLineToSingleLine(
+                    data,
+                    startLineIndex,
+                    endLineIndex
+                );
+
+                index = endLineIndex;
+            }
+
+            const isLineValid = this._isLineValid(line.content);
+
+            if (!isLineValid) {
+                reviewComments.push(
+                    this.line?.endIndex
+                        ? {
+                              ...this.getMultiLineComment({
+                                  file,
+                                  body: this._getCommentBody(),
+                                  from: this.line.startIndex,
+                                  to: this.line.endIndex
+                              })
+                          }
+                        : {
+                              ...this.getSingleLineComment({
+                                  file,
+                                  body: this._getCommentBody(),
+                                  index: this.line.startIndex
+                              })
+                          }
+                );
+            }
+        }
+
+        return reviewComments;
+    }
         const defaultPatternsLength = this.defaultPatterns.length;
         let isRowValid = false;
 
