@@ -25,13 +25,11 @@ class ValueComparisionStyleRule extends BaseRule {
         const defaultPatterns = [
             {
                 levels: [0, 1],
-                regularExpression: /(?:={2,3})/g,
-                templateLiteralExpression: /{.+?={2,3}.+?}/g
+                expression: /(?:={2,3})/g
             },
             {
                 levels: [2],
-                regularExpression: /(?:Object.is\(.*\))/g,
-                templateLiteralExpression: /{.+?Object.is\(.+?\).+?}/g
+                expression: /(?:Object.is\(.*\))/g
             }
         ];
 
