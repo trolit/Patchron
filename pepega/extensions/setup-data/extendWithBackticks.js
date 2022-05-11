@@ -8,9 +8,9 @@ const { CUSTOM_LINES } = require('../../config/constants');
  * ```js
  * // extension additional settings:
  * {
- *      dataOnAbort: any, // decide what to return if `abort` occurs (when null, returns passed data)
- *      abortOnUnevenBackticksCountInPatch: boolean, // if true (not enough backticks), dataOnAbort is returned
- *      abortOnMultiLineStringWithoutEndIndex: boolean // if true (part of multi line string), dataOnAbort is returned
+ *      resultOnAbort: any, // decide what to return if `abort` occurs (when null, returns passed data)
+ *      abortOnUnevenBackticksCountInPatch: boolean, // if true (not enough backticks), resultOnAbort is returned
+ *      abortOnMultiLineStringWithoutEndIndex: boolean // if true (part of multi line string), resultOnAbort is returned
  * }
  * ```
  * 
@@ -37,13 +37,13 @@ const { CUSTOM_LINES } = require('../../config/constants');
 module.exports = (
     data,
     settings = {
-        dataOnAbort: null,
+        resultOnAbort: null,
         abortOnUnevenBackticksCountInPatch: false,
         abortOnMultiLineStringWithoutEndIndex: false
     }
 ) => {
     const {
-        dataOnAbort,
+        resultOnAbort,
         abortOnUnevenBackticksCountInPatch,
         abortOnMultiLineStringWithoutEndIndex
     } = settings;
@@ -55,7 +55,7 @@ module.exports = (
         abortOnUnevenBackticksCountInPatch &&
         !_hasEvenAmountOfBackticks(data)
     ) {
-        return dataOnAbort || data;
+        return resultOnAbort || data;
     }
 
     for (let index = 0; index < dataLength; index++) {
@@ -110,7 +110,7 @@ module.exports = (
                     !endLineRow &&
                     abortOnMultiLineStringWithoutEndIndex
                 ) {
-                    return dataOnAbort || data;
+                    return resultOnAbort || data;
                 }
             }
         }
