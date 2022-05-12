@@ -1,3 +1,6 @@
+const dedent = require('dedent-js');
+const isEqual = require('lodash/isEqual');
+
 const BaseRule = require('../Base');
 
 // TODO: Consider Vue specific `ValueComparisionStyleRule` that would fetch whole file to have full perspective of <template> and <script> parts
@@ -52,12 +55,14 @@ class ValueComparisionStyleRule extends BaseRule {
     }
 
     invoke(file) {
-        if (this.allowedLevels === [0, 1, 2]) {
+        if (isEqual(this.allowedLevels, [0, 1, 2])) {
             this.logWarning(
                 __filename,
                 `All comparision styles are allowed, nothing to do.`,
                 file
             );
+
+            return [];
         }
 
         const { split_patch: splitPatch } = file;
@@ -97,6 +102,13 @@ class ValueComparisionStyleRule extends BaseRule {
             const line = { content: row.trimmedContent, startIndex: index };
 
             if (
+                this.CUSTOM_LINES.includes(line.content) ||
+                line.content.startsWith('@@')
+            ) {
+                continue;
+            }
+
+            if (
                 backticks &&
                 backticks.startLineIndex !== backticks.endLineIndex
             ) {
@@ -117,20 +129,20 @@ class ValueComparisionStyleRule extends BaseRule {
 
             if (!isLineValid) {
                 reviewComments.push(
-                    this.line?.endIndex
+                    line?.endIndex
                         ? {
                               ...this.getMultiLineComment({
                                   file,
                                   body: this._getCommentBody(),
-                                  from: this.line.startIndex,
-                                  to: this.line.endIndex
+                                  from: line.startIndex,
+                                  to: line.endIndex
                               })
                           }
                         : {
                               ...this.getSingleLineComment({
                                   file,
                                   body: this._getCommentBody(),
-                                  index: this.line.startIndex
+                                  index: line.startIndex
                               })
                           }
                 );
@@ -152,7 +164,7 @@ class ValueComparisionStyleRule extends BaseRule {
             }
 
             for (const expression of expressions) {
-                const matches = line.matchAll(expression);
+                const matches = [...line.matchAll(expression)];
 
                 if (matches.length) {
                     isRowValid = false;
@@ -173,15 +185,13 @@ class ValueComparisionStyleRule extends BaseRule {
     _getCommentBody() {
         const allowedPatterns = this.defaultPatterns
             .map(({ text, level }) => {
-                if (this.allowedLevels.includes(level)) {
-                    return text;
-                }
+                return this.allowedLevels.includes(level) ? text : null;
             })
             .filter((text) => text);
 
-        return `It seems that marked fragment includes comparision pattern. If it's raw text, ignore this comment or consider using unicode representation of = character or escape it with backslash.
+        return dedent(`It seems that marked fragment includes comparision pattern. If it's raw text, ignore this comment or consider using unicode representation of = character or escape it with backslash.
 
-        Allowed comparision patterns: (${allowedPatterns.join(', ')})`;
+        Allowed comparision patterns: (${allowedPatterns.join(', ')})`);
     }
 }
 
