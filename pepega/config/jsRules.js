@@ -116,8 +116,7 @@ module.exports = [
     {
         enabled: false,
         instance: new ValueComparisionStyleRule({
-            allowedLevels: [1],
-            specificPatterns: []
+            allowedLevels: [2]
         })
     }
 ];
