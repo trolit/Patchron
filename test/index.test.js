@@ -2,7 +2,7 @@ const nock = require('nock');
 const { StatusCodes: HTTP } = require('http-status-codes');
 
 // Requiring our app implementation
-const myProbotApp = require('..');
+const myProbotApp = require('../src/index');
 const { Probot, ProbotOctokit } = require('probot');
 
 // Requiring our fixtures
@@ -15,7 +15,7 @@ const {
     expect,
     test,
     beforeEach,
-    afterEach,
+    afterEach
 } = require('@jest/globals');
 
 const deployment = {
@@ -24,12 +24,12 @@ const deployment = {
     auto_merge: true,
     required_contexts: [],
     payload: {
-        schema: 'rocks!',
+        schema: 'rocks!'
     },
     environment: 'production',
     description: "My Probot App's first deploy!",
     transient_environment: false,
-    production_environment: true,
+    production_environment: true
 };
 
 const deploymentStatus = {
@@ -37,7 +37,7 @@ const deploymentStatus = {
     log_url: 'https://example.com',
     description: 'My Probot App set a deployment status!',
     environment_url: 'https://example.com',
-    auto_inactive: true,
+    auto_inactive: true
 };
 
 const privateKey = fs.readFileSync(
@@ -56,8 +56,8 @@ describe.skip('My Probot app', () => {
             // disable request throttling and retries for testing
             Octokit: ProbotOctokit.defaults({
                 retry: { enabled: false },
-                throttle: { enabled: false },
-            }),
+                throttle: { enabled: false }
+            })
         });
         // Load our app into probot
         probot.load(myProbotApp);
@@ -71,8 +71,8 @@ describe.skip('My Probot app', () => {
                 token: 'test',
                 permissions: {
                     deployments: 'write',
-                    pull_requests: 'read',
-                },
+                    pull_requests: 'read'
+                }
             })
 
             // Test that a deployment is created
