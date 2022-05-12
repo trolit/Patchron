@@ -46,7 +46,7 @@ class ValueComparisionStyleRule extends BaseRule {
             {
                 level: 2,
                 text: 'Object.is',
-                expressions: [/(?:Object.is\(.*\))/g]
+                expressions: [/(?:Object.is\(.*\))|(?:Object.is\()/g]
             }
         ];
 
