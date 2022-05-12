@@ -1,16 +1,17 @@
 const BaseRule = require('../Base');
 
+// TODO: Consider Vue specific `ValueComparisionStyleRule` that would fetch whole file to have full perspective of <template> and <script> parts
 class ValueComparisionStyleRule extends BaseRule {
     /**
-     * Allows to set expected equality/inequality comparement convention. Rule by default covers basic usage `(==, ===, Object.is)`. Custom ones can be passed via `specificPatterns` array.
+     * Allows to set expected equality/inequality comparement convention. Rule is based on patch and currently does not implement any way to deduce whether part of patch is pure text or part of code (e.g. in case of Vue). An workaround to that could be to escape `=` characters in strings and use `=` unicode representation in HTML.
+     *
      *
      * **allowedLevels** options:
-     * - 0 - weak equality (==)
-     * - 1 - strict equality (===)
-     * - 2 - strict equality (Object.is)
+     * - 0 - weak equality/inequality (==, !=)
+     * - 1 - strict equality/inequality (===, !==)
+     * - 2 - strict equality/inequality via `Object.is` (ES6)
      * @param {object} config
      * @param {Array<number>} config.allowedLevels pass which levels are allowed
-     * @param {Array<{name: string, expression: object, levels: number}>} config.specificPatterns to handle custom cases
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals
      * @link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Equality_comparisons_and_sameness
@@ -19,40 +20,57 @@ class ValueComparisionStyleRule extends BaseRule {
     constructor(config) {
         super();
 
-        const { allowedLevels, specificPatterns } = config;
+        const { allowedLevels } = config;
+        allowedLevels.sort();
 
         const defaultPatterns = [
             {
-                levels: [0, 1],
-                expression: /(?:={2,3})/g
+                level: 0,
+                text: '==, !=',
+                expressions: [
+                    /[\sa-zA-Z0-9]==[\sa-zA-Z0-9]/g,
+                    /[\sa-zA-Z0-9]!=[\sa-zA-Z0-9]/g
+                ]
             },
             {
-                levels: [2],
-                expression: /(?:Object.is\(.*\))/g
+                level: 1,
+                text: '===, !==',
+                expressions: [
+                    /[\sa-zA-Z0-9]===[\sa-zA-Z0-9]/g,
+                    /[\sa-zA-Z0-9]!==[\sa-zA-Z0-9]/g
+                ]
+            },
+            {
+                level: 2,
+                text: 'Object.is',
+                expressions: [/(?:Object.is\(.*\))/g]
             }
         ];
 
         this.allowedLevels = allowedLevels;
         this.defaultPatterns = defaultPatterns;
-        this.specificPatterns = specificPatterns;
     }
 
     invoke(file) {
+        if (this.allowedLevels === [0, 1, 2]) {
+            this.logWarning(
+                __filename,
+                `All comparision styles are allowed, nothing to do.`,
+                file
+            );
+        }
+
         const { split_patch: splitPatch } = file;
 
         const data = this.setupData(splitPatch, {
             withBackticks: {
-                settings: { abortOnUnevenBackticksCountInPatch: true }
+                settings: {
+                    abortOnUnevenBackticksCountInPatch: true
+                }
             }
         });
 
         if (!this._hasAnyMatchingComparision(data)) {
-            this.logWarning(
-                __filename,
-                `${file?.filename} review skipped due to no matches.`,
-                file
-            );
-
             return [];
         }
 
@@ -62,14 +80,10 @@ class ValueComparisionStyleRule extends BaseRule {
     }
 
     _hasAnyMatchingComparision(data) {
-        return data.some(
-            ({ trimmedContent }) =>
-                this.defaultPatterns.some((defaultPattern) =>
-                    trimmedContent.match(defaultPattern)
-                ) ||
-                this.specificPatterns.some(({ expression }) =>
-                    trimmedContent.match(expression)
-                )
+        return data.some(({ trimmedContent }) =>
+            this.defaultPatterns.some((defaultPattern) =>
+                trimmedContent.match(defaultPattern)
+            )
         );
     }
 
@@ -127,47 +141,47 @@ class ValueComparisionStyleRule extends BaseRule {
     }
 
     _isLineValid(line) {
-        const patterns = [...this.defaultPatterns, ...this.specificPatterns];
-        const patternsLength = patterns.length;
         let isRowValid = true;
+        const defaultPatternsLength = this.defaultPatterns.length;
 
-        for (let index = 0; index < patternsLength; index++) {
-            const { expression, levels } = patterns[index];
+        for (let index = 0; index < defaultPatternsLength; index++) {
+            const { expressions, level } = this.defaultPatterns[index];
 
-            const matches = line.matchAll(expression);
-
-            if (!matches.length) {
-                break;
+            if (this.allowedLevels.includes(level)) {
+                continue;
             }
 
-            for (const match of matches) {
-                if (!this._isMatchValid(match, levels)) {
-                    isRowValid = false;
+            for (const expression of expressions) {
+                const matches = line.matchAll(expression);
 
-                    break;
+                if (matches.length) {
+                    isRowValid = false;
                 }
             }
+
+            if (!isRowValid) {
+                break;
+            }
         }
-    }
 
-    _isMatchFromDefaultPatternValid(match, patternLevels) {
-        if (patternLevels === [0, 1]) {
-        }
-        return this.allowedLevels.some((allowedLevel) =>
-            patternLevels.includes(allowedLevel)
-        );
-    }
-
-
+        return isRowValid;
     }
 
     /**
      * @returns {string}
      */
     _getCommentBody() {
-        return `This single-line block should${
-            this.curlyBraces ? `` : `n't`
-        } be wrapped with curly braces.`;
+        const allowedPatterns = this.defaultPatterns
+            .map(({ text, level }) => {
+                if (this.allowedLevels.includes(level)) {
+                    return text;
+                }
+            })
+            .filter((text) => text);
+
+        return `It seems that marked fragment includes comparision pattern. If it's raw text, ignore this comment or consider using unicode representation of = character or escape it with backslash.
+
+        Allowed comparision patterns: (${allowedPatterns.join(', ')})`;
     }
 }
 
