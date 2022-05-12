@@ -1,5 +1,5 @@
 const { describe, expect, it, beforeEach } = require('@jest/globals');
-const KeywordsOrderedByLengthRule = require('../../../pepega/rules/common/KeywordsOrderedByLength');
+const KeywordsOrderedByLengthRule = require('../../../src/rules/common/KeywordsOrderedByLength');
 
 const importKeywordConfig = {
     name: 'import',

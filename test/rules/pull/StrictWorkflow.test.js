@@ -1,5 +1,5 @@
 const { describe, expect, it, beforeEach } = require('@jest/globals');
-const StrictWorkflowRule = require('../../../pepega/rules/pull/StrictWorkflow');
+const StrictWorkflowRule = require('../../../src/rules/pull/StrictWorkflow');
 
 const validConfig = {
     enabled: true,

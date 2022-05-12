@@ -1,5 +1,5 @@
 const { describe, expect, it, beforeEach } = require('@jest/globals');
-const SingleLineBlockRule = require('../../../pepega/rules/common/SingleLineBlock');
+const SingleLineBlockRule = require('../../../src/rules/common/SingleLineBlock');
 
 const validConfig = {
     blocks: [
