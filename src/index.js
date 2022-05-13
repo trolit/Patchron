@@ -34,13 +34,13 @@
 
 const getFiles = require('./github/getFiles');
 const { rules, settings } = require('./config');
+const addAssignees = require('./github/addAssignees');
 const postSummary = require('./pull-request/postSummary');
 const reviewPullRequest = require('./pull-request/review');
 const postComments = require('./pull-request/postComments');
 const initializeData = require('./pull-request/initialize');
 const configureLogger = require('./utilities/configureLogger');
 const resolveStrictWorkflow = require('./pull-request/resolveStrictWorkflow');
-const addPullSenderAsAssignee = require('./pull-request/addSenderAsAssignee');
 
 /**
  * This is the main entrypoint of Pepega Probot app
@@ -79,7 +79,7 @@ module.exports = (app) => {
             }
 
             if (isOwnerAssigningEnabled) {
-                addPullSenderAsAssignee(context, repo, pullRequestOwner);
+                addAssignees(context, repo, pullRequestOwner);
             }
 
             try {
