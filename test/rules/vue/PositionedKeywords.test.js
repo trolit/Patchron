@@ -1,5 +1,5 @@
 const { describe, expect, it, beforeEach } = require('@jest/globals');
-const PositionedKeywordsRule = require('../../../pepega/rules/common/PositionedKeywords');
+const PositionedKeywordsRule = require('../../../src/rules/common/PositionedKeywords');
 
 const importKeywordCustomConfig = {
     name: 'import',

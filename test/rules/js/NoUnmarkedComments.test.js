@@ -1,5 +1,5 @@
 const { describe, expect, it, beforeEach } = require('@jest/globals');
-const NoUnmarkedCommentsRule = require('../../../pepega/rules/common/NoUnmarkedComments');
+const NoUnmarkedCommentsRule = require('../../../src/rules/common/NoUnmarkedComments');
 
 const validConfig = {
     prefixes: [

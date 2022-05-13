@@ -3,6 +3,7 @@ const {
         SingleLineBlockRule,
         PositionedKeywordsRule,
         NoUnmarkedCommentsRule,
+        ValueComparisionStyleRule,
         KeywordsOrderedByLengthRule
     }
 } = require('../rules');
@@ -110,6 +111,12 @@ module.exports = [
                 }
             ],
             curlyBraces: true
+        })
+    },
+    {
+        enabled: false,
+        instance: new ValueComparisionStyleRule({
+            allowedLevels: [2]
         })
     }
 ];

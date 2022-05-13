@@ -1,7 +1,7 @@
 const { logFatal } = require('../utilities/EventLog');
 
 /**
- * fetches specified file from pull request within it's content encoded in base64.
+ * fetches specified file from pull request from particular commit, within it's content (encoded in base64).
  * @param {WebhookEvent<EventPayloads.WebhookPayloadPullRequest>} context WebhookEvent instance.
  * @param {string} contents_url path to file's content URL.
  * @param {object} payload repository details.

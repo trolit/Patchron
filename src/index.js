@@ -32,15 +32,15 @@
  *
  */
 
-const getFiles = require('./pepega/github/getFiles');
-const { rules, settings } = require('./pepega/config');
-const postSummary = require('./pepega/pull-request/postSummary');
-const reviewPullRequest = require('./pepega/pull-request/review');
-const postComments = require('./pepega/pull-request/postComments');
-const initializeData = require('./pepega/pull-request/initialize');
-const resolveStrictWorkflow = require('./pepega/pull-request/resolveStrictWorkflow');
-const addPullSenderAsAssignee = require('./pepega/pull-request/addSenderAsAssignee');
-const configureLogger = require('./pepega/utilities/configureLogger');
+const getFiles = require('./github/getFiles');
+const { rules, settings } = require('./config');
+const postSummary = require('./pull-request/postSummary');
+const reviewPullRequest = require('./pull-request/review');
+const postComments = require('./pull-request/postComments');
+const initializeData = require('./pull-request/initialize');
+const configureLogger = require('./utilities/configureLogger');
+const resolveStrictWorkflow = require('./pull-request/resolveStrictWorkflow');
+const addPullSenderAsAssignee = require('./pull-request/addSenderAsAssignee');
 
 /**
  * This is the main entrypoint of Pepega Probot app

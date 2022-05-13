@@ -4,6 +4,7 @@ const getPosition = require('../helpers/getPosition');
 const getLineNumber = require('../helpers/getLineNumber');
 const ReviewCommentBuilder = require('../builders/ReviewComment');
 const removeWhitespaces = require('../helpers/removeWhitespaces');
+const extendWithBackticks = require('../extensions/setup-data/extendWithBackticks');
 
 class BaseRule {
     constructor() {
@@ -84,7 +85,12 @@ class BaseRule {
     /**
      * Cleans received patch
      */
-    setupData(splitPatch) {
+    setupData(
+        splitPatch,
+        extensions = {
+            withBackticks: null
+        }
+    ) {
         let data = [];
         const splitPatchLength = splitPatch.length;
 
@@ -133,6 +139,13 @@ class BaseRule {
                 content: rawRow,
                 trimmedContent: rawRow.trim()
             });
+        }
+
+        if (extensions?.withBackticks) {
+            data = extendWithBackticks(
+                data,
+                extensions.withBackticks?.settings
+            );
         }
 
         return data;
