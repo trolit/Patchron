@@ -3,7 +3,6 @@ const isEqual = require('lodash/isEqual');
 
 const BaseRule = require('../Base');
 
-// TODO: Consider Vue specific `ValueComparisionStyleRule` that would fetch whole file to have full perspective of <template> and <script> parts
 class ValueComparisionStyleRule extends BaseRule {
     /**
      * Allows to set expected equality/inequality comparement convention. Rule is based on patch and currently does not implement any way to deduce whether part of patch is pure text or part of code (e.g. in case of Vue). An workaround to that could be to escape `=` characters in strings and use `=` unicode representation in HTML.
@@ -55,6 +54,10 @@ class ValueComparisionStyleRule extends BaseRule {
     }
 
     invoke(file) {
+        if (!this.allowedLevels?.length) {
+            return [];
+        }
+
         if (isEqual(this.allowedLevels, [0, 1, 2])) {
             this.logWarning(
                 __filename,
