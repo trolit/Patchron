@@ -8,12 +8,12 @@ const updateLogPathJob = require('./updateLogPathJob');
 module.exports = (app, pepegaContext) => {
     const eventEmitter = new EventEmitter();
 
+    eventEmitter.on('path-updated', (updatedLog) => {
+        pepegaContext.log = updatedLog;
+    });
+
     if (isStoringLogsEnabled) {
         updateLogPathJob(eventEmitter);
-
-        eventEmitter.on('path-updated', (updatedLog) => {
-            pepegaContext.log = updatedLog;
-        });
     } else {
         pepegaContext.log = app.log;
     }
