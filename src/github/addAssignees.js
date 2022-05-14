@@ -1,5 +1,3 @@
-const { logFatal } = require('../utilities/EventLog');
-
 /**
  * adds assignees to pull request
  * @param {WebhookEvent<EventPayloads.WebhookPayloadPullRequest>} context WebhookEvent instance.
@@ -8,16 +6,17 @@ const { logFatal } = require('../utilities/EventLog');
  * @link
  * https://octokit.github.io/rest.js/v18#issues-add-assignees
  */
-module.exports = async (context, assignees) => {
-    const repo = context.repo();
+module.exports = async (pepegaContext, assignees) => {
+    const { pullRequest, log, repo } = pepegaContext;
+    const { context } = pullRequest;
 
     try {
         await context.octokit.issues.addAssignees({
             ...repo,
             assignees,
-            issue_number: repo.pull_number
+            issue_number: pullRequest.id
         });
     } catch (error) {
-        logFatal(__filename, error);
+        log.fatal(error);
     }
 };
