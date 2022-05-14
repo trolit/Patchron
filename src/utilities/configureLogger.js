@@ -1,13 +1,20 @@
+const EventEmitter = require('events');
+
 const {
     settings: { isStoringLogsEnabled }
 } = require('../config');
-const setGlobalVariable = require('../helpers/setGlobalVariable');
-const setupLogBasePathJob = require('../utilities/setupLogBasePathJob');
+const updateLogPathJob = require('./updateLogPathJob');
 
-module.exports = (app) => {
+module.exports = (app, pepegaContext) => {
+    const eventEmitter = new EventEmitter();
+
     if (isStoringLogsEnabled) {
-        setupLogBasePathJob();
+        updateLogPathJob(eventEmitter);
+
+        eventEmitter.on('path-updated', (updatedLog) => {
+            pepegaContext.log = updatedLog;
+        });
     } else {
-        setGlobalVariable('log', app.log);
+        pepegaContext.log = app.log;
     }
 };
