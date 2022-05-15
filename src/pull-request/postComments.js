@@ -1,30 +1,25 @@
-const timer = require('../helpers/loopTimer');
 const {
-    logFatal,
-    logWarning,
-    logInformation
-} = require('../utilities/EventLog');
+    settings: { maxCommentsPerReview, delayBetweenCommentRequestsInSeconds }
+} = require('../config');
+
+const timer = require('../helpers/loopTimer');
+const addComment = require('../github/addComment');
 const addMultiLineReviewComment = require('../github/addMultiLineReviewComment');
 const addSingleLineReviewComment = require('../github/addSingleLineReviewComment');
 
 /**
  * **POST** review comments to GitHub
- * @param {WebhookEvent<EventPayloads.WebhookPayloadPullRequest>} context WebhookEvent instance.
+ * @param {import('../builders/PepegaContext')} pepegaContext
  * @param {Array<object>} reviewComments
- * @param {number} delayBetweenCommentRequestsInSeconds
- * @param {number} maxCommentsPerReview
  * @returns {number} number of comments successfully posted to the GitHub
  */
-module.exports = async (
-    context,
-    reviewComments,
-    delayBetweenCommentRequestsInSeconds,
-    maxCommentsPerReview
-) => {
+module.exports = async (pepegaContext, reviewComments) => {
+    const { log } = pepegaContext;
+
     let numberOfPostedComments = 0;
 
     if (maxCommentsPerReview <= 0) {
-        logWarning(
+        log.warning(
             __filename,
             'Invalid value set on maxCommentsPerReview setting. No comments posted.'
         );
@@ -36,7 +31,7 @@ module.exports = async (
 
     for (let i = 0; i < reviewCommentsLength; i++) {
         if (numberOfPostedComments >= maxCommentsPerReview) {
-            logInformation(
+            log.information(
                 __filename,
                 `Did not post more comments due to limit reach (${maxCommentsPerReview}).`
             );
@@ -46,26 +41,20 @@ module.exports = async (
 
         const reviewComment = reviewComments[i];
 
-        if (reviewComment.start_line) {
-            try {
-                await addMultiLineReviewComment(context, {
-                    ...reviewComment
-                });
+        try {
+            if (reviewComment?.body) {
+                const { body } = reviewComment;
 
-                numberOfPostedComments++;
-            } catch (error) {
-                logFatal(error);
+                await addComment(pepegaContext, body);
+            } else if (reviewComment?.start_line) {
+                await addMultiLineReviewComment(pepegaContext, reviewComment);
+            } else if (reviewComment?.line) {
+                await addSingleLineReviewComment(pepegaContext, reviewComment);
             }
-        } else if (reviewComment.line) {
-            try {
-                await addSingleLineReviewComment(context, {
-                    ...reviewComment
-                });
 
-                numberOfPostedComments++;
-            } catch (error) {
-                logFatal(error);
-            }
+            numberOfPostedComments++;
+        } catch (error) {
+            log.fatal(error);
         }
 
         await timer(delayBetweenCommentRequestsInSeconds * 1000);
