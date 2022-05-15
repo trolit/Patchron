@@ -1,6 +1,6 @@
 const configureLogger = require('../utilities/configureLogger');
 
-/** TBD */
+/** Class wrapping Probot's features and Pepega's logic. */
 class PepegaContextBuilder {
     constructor(app) {
         configureLogger(app, this);
@@ -8,18 +8,22 @@ class PepegaContextBuilder {
         return this;
     }
 
-    initPullRequestData(pullRequestContext) {
+    initializePullRequestData(pullRequestContext) {
         const payload = pullRequestContext.payload;
 
         const repo = pullRequestContext.repo();
 
-        repo.pull_number = payload.number;
+        this.log.setPullNumber(payload.number);
+
+        const { login: owner } = payload.sender;
 
         this.pullRequest = {
-            ...repo,
+            owner,
             id: payload.number,
             context: pullRequestContext
         };
+
+        this.repo = repo;
     }
 }
 
