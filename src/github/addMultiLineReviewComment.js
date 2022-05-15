@@ -1,8 +1,6 @@
-const { logFatal } = require('../utilities/EventLog');
-
 /**
  * sends request to add multi line review comment.
- * @param {WebhookEvent<EventPayloads.WebhookPayloadPullRequest>} context WebhookEvent instance.
+ * @param {import('../builders/PepegaContext')} pepegaContext
  * @param {object} payload review details.
  * @param {string} payload.owner repository owner's name
  * @param {string} payload.repo repository name
@@ -19,13 +17,15 @@ const { logFatal } = require('../utilities/EventLog');
  *
  * @returns {object} request response
  */
-module.exports = async (context, payload) => {
+module.exports = async (pepegaContext, payload) => {
+    const { pullRequest, log } = pepegaContext;
+    const { context } = pullRequest;
     let result = null;
 
     try {
         result = await context.octokit.pulls.createReviewComment(payload);
     } catch (error) {
-        logFatal(__filename, error);
+        log.fatal(error);
     }
 
     return result;

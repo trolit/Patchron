@@ -1,14 +1,15 @@
-const { logFatal } = require('../utilities/EventLog');
-
 /**
  * creates comment under PR
- * @param {WebhookEvent<EventPayloads.WebhookPayloadPullRequest>} context WebhookEvent instance.
+ * @param {import('../builders/PepegaContext')} pepegaContext
  * @param {string} body text of the comment.
  *
  * @link
  * https://octokit.github.io/rest.js/v18#issues-create-comment
  */
-module.exports = async (context, body) => {
+module.exports = async (pepegaContext, body) => {
+    const { pullRequest, log } = pepegaContext;
+    const { context } = pullRequest;
+
     const comment = context.issue({
         body
     });
@@ -16,6 +17,6 @@ module.exports = async (context, body) => {
     try {
         await context.octokit.issues.createComment(comment);
     } catch (error) {
-        logFatal(__filename, error);
+        log.fatal(error);
     }
 };

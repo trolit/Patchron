@@ -1,6 +1,6 @@
 /**
  * adds assignees to pull request
- * @param {WebhookEvent<EventPayloads.WebhookPayloadPullRequest>} context WebhookEvent instance.
+ * @param {import('../builders/PepegaContext')} pepegaContext
  * @param {Array<string>} assignees usernames of people to assign
  *
  * @link
