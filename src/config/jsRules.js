@@ -11,7 +11,8 @@ const {
 module.exports = [
     {
         enabled: false,
-        instance: new NoUnmarkedCommentsRule({
+        reference: NoUnmarkedCommentsRule,
+        config: {
             prefixes: [
                 {
                     value: 'TODO:',
@@ -37,11 +38,12 @@ module.exports = [
             isAppliedToSingleLineComments: true,
             isAppliedToMultiLineComments: true,
             isAppliedToInlineComments: true
-        })
+        }
     },
     {
         enabled: false,
-        instance: new KeywordsOrderedByLengthRule({
+        reference: KeywordsOrderedByLengthRule,
+        config: {
             keywords: [
                 {
                     name: 'import (packages)',
@@ -58,11 +60,12 @@ module.exports = [
                     ignoreNewline: false
                 }
             ]
-        })
+        }
     },
     {
         enabled: false,
-        instance: new PositionedKeywordsRule({
+        reference: PositionedKeywordsRule,
+        config: {
             keywords: [
                 {
                     name: 'const',
@@ -78,11 +81,12 @@ module.exports = [
                     breakOnFirstOccurence: false
                 }
             ]
-        })
+        }
     },
     {
         enabled: false,
-        instance: new SingleLineBlockRule({
+        reference: SingleLineBlockRule,
+        config: {
             blocks: [
                 {
                     name: 'if',
@@ -111,12 +115,13 @@ module.exports = [
                 }
             ],
             curlyBraces: true
-        })
+        }
     },
     {
         enabled: false,
-        instance: new ValueComparisionStyleRule({
+        reference: ValueComparisionStyleRule,
+        config: {
             allowedLevels: [2]
-        })
+        }
     }
 ];

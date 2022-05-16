@@ -5,7 +5,8 @@ const {
 module.exports = [
     {
         enabled: false,
-        instance: new StrictWorkflowRule({
+        reference: StrictWorkflowRule,
+        config: {
             enabled: false,
             workflow: [
                 {
@@ -35,6 +36,6 @@ module.exports = [
             ],
             abortReviewOnInvalidBranchPrefix: false,
             abortReviewOnInvalidFlow: true
-        })
+        }
     }
 ];
