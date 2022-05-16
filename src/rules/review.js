@@ -1,9 +1,9 @@
-module.exports = (pepegaContext, rules, file = null) => {
+module.exports = (pepegaContext, rulesConfig, file = null) => {
     let comments = [];
 
-    rules.forEach((rule) => {
-        if (rule.enabled) {
-            const { reference: Rule, config } = rule;
+    rulesConfig.forEach((ruleConfig) => {
+        if (ruleConfig.enabled) {
+            const { reference: Rule, config } = ruleConfig;
 
             const instance = new Rule(pepegaContext, config);
 
