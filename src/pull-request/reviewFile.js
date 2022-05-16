@@ -1,6 +1,6 @@
 const { rules } = require('../config');
 const review = require('../rules/review');
-const BasicDataBuilder = require('../builders/BasicData');
+const setupFileForReview = require('../helpers/setupFileForReview');
 
 /**
  * triggers `Pepega.js` to review files against configured rules
@@ -10,17 +10,17 @@ const BasicDataBuilder = require('../builders/BasicData');
  */
 module.exports = (pepegaContext, file) => {
     const { log } = pepegaContext;
-    const basicData = new BasicDataBuilder(file);
 
+    setupFileForReview(file);
     let comments = [];
 
     switch (file.extension) {
         case 'vue':
-            comments = review(pepegaContext, rules.files.vue, basicData);
+            comments = review(pepegaContext, rules.files.vue, file);
             break;
 
         case 'js':
-            comments = review(pepegaContext, rules.files.js, basicData);
+            comments = review(pepegaContext, rules.files.js, file);
             break;
 
         default:
