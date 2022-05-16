@@ -19,16 +19,18 @@ class StrictWorkflowRule extends BaseRule {
             abortReviewOnInvalidBranchPrefix;
     }
 
-    invoke(payload) {
-        if (!this.enabled) {
-            return null;
-        }
-
+    invoke(pepegaContext) {
         if (this.workflowArray.length === 0) {
             this.logError(__filename, 'Could not run rule. Empty workflow.');
 
             return null;
         }
+
+        const {
+            pullRequest: { context }
+        } = pepegaContext;
+
+        const payload = context.payload;
 
         const { head, base } = payload.pull_request;
         const { ref: mergeFrom } = head;
