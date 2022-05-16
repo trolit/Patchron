@@ -6,12 +6,15 @@ const removeWhitespaces = require('../helpers/removeWhitespaces');
 const extendWithBackticks = require('../extensions/setup-data/extendWithBackticks');
 
 class BaseRule {
+    /**
+     * @param {import('../builders/PepegaContext')} pepegaContext
+     */
     constructor(pepegaContext) {
-        /**
-         * @type {import('../builders/PepegaContext')}
-         */
         this.pepegaContext = pepegaContext;
+
         this.log = this.pepegaContext.log;
+
+        this.reviewCommentBuilder = new ReviewCommentBuilder(pepegaContext);
 
         const {
             ADDED,
@@ -45,16 +48,15 @@ class BaseRule {
      * @returns {object}
      */
     getSingleLineComment({ file, body, index, side = 'RIGHT' }) {
-        const { split_patch: splitPatch } = file;
+        const { split_patch, commit_id } = file;
 
-        const line = getLineNumber(splitPatch, side, index);
+        const line = getLineNumber(split_patch, side, index);
 
-        const reviewCommentBuilder = new ReviewCommentBuilder(file);
-
-        const comment = reviewCommentBuilder.buildSingleLineComment({
+        const comment = this.reviewCommentBuilder.buildSingleLineComment({
             body,
             line,
-            side
+            side,
+            commit_id
         });
 
         return comment;
@@ -64,19 +66,18 @@ class BaseRule {
      * @returns {object}
      */
     getMultiLineComment({ file, body, from, to, side = 'RIGHT' }) {
-        const { split_patch: splitPatch } = file;
+        const { split_patch, commit_id } = file;
 
-        const start_line = getLineNumber(splitPatch, side, from);
+        const start_line = getLineNumber(split_patch, side, from);
 
-        const position = getPosition(splitPatch, to, side);
+        const position = getPosition(split_patch, to, side);
 
-        const reviewCommentBuilder = new ReviewCommentBuilder(file);
-
-        const comment = reviewCommentBuilder.buildMultiLineComment({
+        const comment = this.reviewCommentBuilder.buildMultiLineComment({
             body,
             start_line,
             start_side: side,
-            position
+            position,
+            commit_id
         });
 
         return comment;
