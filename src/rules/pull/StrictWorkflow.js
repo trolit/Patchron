@@ -2,8 +2,8 @@ const dedent = require('dedent-js');
 const BaseRule = require('../Base');
 
 class StrictWorkflowRule extends BaseRule {
-    constructor(config) {
-        super();
+    constructor(pepegaContext, config) {
+        super(pepegaContext);
 
         const {
             enabled,
@@ -19,7 +19,7 @@ class StrictWorkflowRule extends BaseRule {
             abortReviewOnInvalidBranchPrefix;
     }
 
-    invoke(pepegaContext) {
+    invoke() {
         if (this.workflowArray.length === 0) {
             this.logError(__filename, 'Could not run rule. Empty workflow.');
 
@@ -28,7 +28,7 @@ class StrictWorkflowRule extends BaseRule {
 
         const {
             pullRequest: { context }
-        } = pepegaContext;
+        } = this.pepegaContext;
 
         const payload = context.payload;
 

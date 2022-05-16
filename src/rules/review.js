@@ -3,7 +3,11 @@ module.exports = (pepegaContext, rules, file = null) => {
 
     rules.forEach((rule) => {
         if (rule.enabled) {
-            const ruleComments = rule.instance.invoke(pepegaContext, file);
+            const { reference: Rule, config } = rule;
+
+            const instance = new Rule(pepegaContext, config);
+
+            const ruleComments = instance.invoke(file);
 
             if (ruleComments.length) {
                 comments.push(...ruleComments);

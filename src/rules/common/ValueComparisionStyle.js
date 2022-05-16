@@ -19,8 +19,8 @@ class ValueComparisionStyleRule extends BaseRule {
      * @link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Equality_comparisons_and_sameness
      * @link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_inequality
      */
-    constructor(config) {
-        super();
+    constructor(pepegaContext, config) {
+        super(pepegaContext);
 
         const { allowedLevels } = config;
         allowedLevels.sort();

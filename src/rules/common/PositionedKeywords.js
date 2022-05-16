@@ -17,8 +17,8 @@ class PositionedKeywordsRule extends BaseRule {
      * @param {boolean} config.keywords[].countDifferentCodeAsLineBreak - when **disabled**, code other than line break (\n), found between matched keywords is counted as rule break.
      * @param {Array<object>} config.keywords[].order - allows to provide second layer of keyword positioning. Requires at least two objects to compare matched lines against themselves. For instance, for `import` keyword, second layer could enforce following positioning: `packages -> components -> helpers`
      */
-    constructor(config) {
-        super();
+    constructor(pepegaContext, config) {
+        super(pepegaContext);
 
         const { keywords } = config;
 

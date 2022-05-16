@@ -1,5 +1,4 @@
 const constants = require('../config/constants');
-const EventLog = require('../utilities/EventLog');
 const getPosition = require('../helpers/getPosition');
 const getLineNumber = require('../helpers/getLineNumber');
 const ReviewCommentBuilder = require('../builders/ReviewComment');
@@ -7,7 +6,9 @@ const removeWhitespaces = require('../helpers/removeWhitespaces');
 const extendWithBackticks = require('../extensions/setup-data/extendWithBackticks');
 
 class BaseRule {
-    constructor() {
+    constructor(pepegaContext) {
+        this.pepegaContext = pepegaContext;
+
         const {
             ADDED,
             EMPTY,
@@ -35,10 +36,8 @@ class BaseRule {
 
         this.EMPTY = EMPTY;
 
-        this.logFatal = EventLog.logFatal;
-        this.logError = EventLog.logError;
-        this.logWarning = EventLog.logWarning;
-        this.logInformation = EventLog.logInformation;
+        const { log } = pepegaContext;
+        this.log = log;
     }
 
     /**

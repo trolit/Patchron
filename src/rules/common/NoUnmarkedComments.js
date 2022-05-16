@@ -9,8 +9,8 @@ class NoUnmarkedCommentsRule extends BaseRule {
      * @param {boolean} config.isAppliedToMultiLineComments
      * @param {boolean} config.isAppliedToInlineComments
      */
-    constructor(config) {
-        super();
+    constructor(pepegaContext, config) {
+        super(pepegaContext);
 
         const {
             prefixes,

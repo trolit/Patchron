@@ -11,8 +11,8 @@ class SingleLineBlockRule extends BaseRule {
      * @param {Array<{name: string, expression: object, endIndicator: object?}>} config.blocks
      * @param {boolean} config.curlyBraces - true indicates that matched blocks should be wrapped with curly braces {}
      */
-    constructor(config) {
-        super();
+    constructor(pepegaContext, config) {
+        super(pepegaContext);
 
         const { blocks, curlyBraces } = config;
 
