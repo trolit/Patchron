@@ -27,14 +27,14 @@ class PepegaContextBuilder {
         this.pullRequest = {
             /**
              * hooked pull request owner login
-             * @type {import('probot').Context}
+             * @type {string}
              * @public
              */
             owner: null,
 
             /**
              * hooked pull request id
-             * @type {import('probot').Context}
+             * @type {number}
              * @public
              */
             id: null,
