@@ -54,45 +54,38 @@ module.exports = (app) => {
      */
     const pepegaContext = new PepegaContext(app);
 
-    app.on(
-        ['pull_request.opened', 'pull_request.synchronize'],
-        async (context) => {
-            pepegaContext.initializePullRequestData(context);
+    app.on(['pull_request.opened', 'pull_request.synchronize'], (context) => {
+        pepegaContext.initializePullRequestData(context);
 
-            const {
-                pullRequest: { owner }
-            } = pepegaContext;
+        const {
+            pullRequest: { owner }
+        } = pepegaContext;
 
-            if (isOwnerAssigningEnabled) {
-                addAssignees(pepegaContext, [owner]);
-            }
-
-            if (senders?.length && !senders.includes(owner)) {
-                return;
-            }
-
-            const reviewComments = [];
-
-            reviewComments.push(...reviewContext(pepegaContext));
-
-            if (!isReviewAborted(reviewComments)) {
-                reviewComments.push(...reviewFiles(pepegaContext));
-            }
-
-            const numberOfPostedComments = postComments(
-                pepegaContext,
-                reviewComments
-            );
-
-            if (isReviewSummaryEnabled) {
-                postSummary(
-                    pepegaContext,
-                    numberOfPostedComments,
-                    reviewComments
-                );
-            }
+        if (isOwnerAssigningEnabled) {
+            addAssignees(pepegaContext, [owner]);
         }
-    );
+
+        if (senders?.length && !senders.includes(owner)) {
+            return;
+        }
+
+        const reviewComments = [];
+
+        reviewComments.push(...reviewContext(pepegaContext));
+
+        if (!isReviewAborted(reviewComments)) {
+            reviewComments.push(...reviewFiles(pepegaContext));
+        }
+
+        const numberOfPostedComments = postComments(
+            pepegaContext,
+            reviewComments
+        );
+
+        if (isReviewSummaryEnabled) {
+            postSummary(pepegaContext, numberOfPostedComments, reviewComments);
+        }
+    });
 };
 
 function isReviewAborted(reviewComments) {
