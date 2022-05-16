@@ -47,11 +47,6 @@ const reviewContext = require('./pull-request/reviewContext');
  * @param {import('probot').Probot} app
  */
 module.exports = (app) => {
-    /**
-     * @param {object} pullRequest
-     * @param {WebhookEvent<EventPayloads.WebhookPayloadPullRequest>} pullRequest.context
-     * @param {object} repo
-     */
     const pepegaContext = new PepegaContext(app);
 
     app.on(['pull_request.opened', 'pull_request.synchronize'], (context) => {
