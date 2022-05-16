@@ -1,19 +1,19 @@
 const {
-    settings: {
-        maxCommentsPerReview,
-        isReviewSummaryEnabled,
-        delayBetweenCommentRequestsInSeconds
-    }
+    settings: { maxCommentsPerReview, delayBetweenCommentRequestsInSeconds }
 } = require('../config');
 
-const postSummary = require('./postSummary');
 const timer = require('../helpers/loopTimer');
 const addComment = require('../github/addComment');
 const addMultiLineReviewComment = require('../github/addMultiLineReviewComment');
 const addSingleLineReviewComment = require('../github/addSingleLineReviewComment');
 
 /**
- * **POST** review comments to GitHub
+ * **POST** review comments to GitHub.
+ * When `reviewComment:`
+ * - has `body`, it indicates that review comes from Pull Request Rule,
+ * - has `start_line`, it indicates that it's file's multi-line comment,
+ * - has `line`, it indicates that it's file's single-line comment.
+ *
  * @param {import('../builders/PepegaContext')} pepegaContext
  * @param {Array<object>} reviewComments
  * @returns {number} number of comments successfully posted to the GitHub
@@ -64,7 +64,5 @@ module.exports = async (pepegaContext, reviewComments) => {
         await timer(delayBetweenCommentRequestsInSeconds * 1000);
     }
 
-    if (isReviewSummaryEnabled) {
-        postSummary(pepegaContext, numberOfPostedComments, reviewComments);
-    }
+    return numberOfPostedComments;
 };
