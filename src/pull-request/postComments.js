@@ -1,7 +1,12 @@
 const {
-    settings: { maxCommentsPerReview, delayBetweenCommentRequestsInSeconds }
+    settings: {
+        maxCommentsPerReview,
+        isReviewSummaryEnabled,
+        delayBetweenCommentRequestsInSeconds
+    }
 } = require('../config');
 
+const postSummary = require('./postSummary');
 const timer = require('../helpers/loopTimer');
 const addComment = require('../github/addComment');
 const addMultiLineReviewComment = require('../github/addMultiLineReviewComment');
@@ -15,7 +20,6 @@ const addSingleLineReviewComment = require('../github/addSingleLineReviewComment
  */
 module.exports = async (pepegaContext, reviewComments) => {
     const { log } = pepegaContext;
-
     let numberOfPostedComments = 0;
 
     if (maxCommentsPerReview <= 0) {
@@ -60,5 +64,7 @@ module.exports = async (pepegaContext, reviewComments) => {
         await timer(delayBetweenCommentRequestsInSeconds * 1000);
     }
 
-    return numberOfPostedComments;
+    if (isReviewSummaryEnabled) {
+        postSummary(pepegaContext, numberOfPostedComments, reviewComments);
+    }
 };

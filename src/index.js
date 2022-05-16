@@ -32,83 +32,57 @@
  *
  */
 
-const getFiles = require('./github/getFiles');
-const { rules, settings } = require('./config');
+const {
+    settings: { senders, isOwnerAssigningEnabled }
+} = require('./config');
 const addAssignees = require('./github/addAssignees');
-const postSummary = require('./pull-request/postSummary');
-const reviewPullRequest = require('./pull-request/review');
+const PepegaContext = require('./builders/PepegaContext');
+const reviewFiles = require('./pull-request/reviewFiles');
 const postComments = require('./pull-request/postComments');
-const initializeData = require('./pull-request/initialize');
-const configureLogger = require('./utilities/configureLogger');
-const resolveStrictWorkflow = require('./pull-request/resolveStrictWorkflow');
+const reviewContext = require('./pull-request/reviewContext');
 
 /**
  * This is the main entrypoint of Pepega Probot app
  * @param {import('probot').Probot} app
  */
 module.exports = (app) => {
-    const {
-        senders,
-        maxCommentsPerReview,
-        isReviewSummaryEnabled,
-        isOwnerAssigningEnabled,
-        delayBetweenCommentRequestsInSeconds
-    } = settings;
+    /**
+     * @param {object} pullRequest
+     * @param {WebhookEvent<EventPayloads.WebhookPayloadPullRequest>} pullRequest.context
+     * @param {object} repo
+     */
+    const pepegaContext = new PepegaContext(app);
 
-    configureLogger(app);
+    app.on(['pull_request.opened', 'pull_request.synchronize'], (context) => {
+        pepegaContext.initializePullRequestData(context);
 
-    app.on(
-        ['pull_request.opened', 'pull_request.synchronize'],
-        async (context) => {
-            const { pullRequestOwner, payload, repo } = initializeData(context);
+        const {
+            pullRequest: { owner }
+        } = pepegaContext;
 
-            if (senders?.length && !senders.includes(pullRequestOwner)) {
-                return;
-            }
-
-            if (rules?.pull) {
-                const isReviewAborted = resolveStrictWorkflow(
-                    context,
-                    payload,
-                    rules
-                );
-
-                if (isReviewAborted) {
-                    return;
-                }
-            }
-
-            if (isOwnerAssigningEnabled) {
-                addAssignees(context, repo, pullRequestOwner);
-            }
-
-            try {
-                const files = await getFiles(context, repo);
-
-                const reviewComments = reviewPullRequest(repo, files, rules);
-
-                let successfullyPostedComments = 0;
-
-                if (reviewComments.length) {
-                    successfullyPostedComments = await postComments(
-                        context,
-                        reviewComments,
-                        delayBetweenCommentRequestsInSeconds,
-                        maxCommentsPerReview
-                    );
-                }
-
-                if (isReviewSummaryEnabled) {
-                    postSummary(
-                        context,
-                        successfullyPostedComments,
-                        reviewComments,
-                        payload
-                    );
-                }
-            } catch (error) {
-                app.log.error(error);
-            }
+        if (isOwnerAssigningEnabled) {
+            addAssignees(pepegaContext, [owner]);
         }
-    );
+
+        if (senders?.length && !senders.includes(owner)) {
+            return;
+        }
+
+        const reviewComments = [];
+
+        reviewComments.push(...reviewContext(pepegaContext));
+
+        if (!isReviewAborted(reviewComments)) {
+            reviewComments.push(...reviewFiles(pepegaContext));
+        }
+
+        postComments(pepegaContext, reviewComments);
+    });
 };
+
+function isReviewAborted(reviewComments) {
+    return (
+        reviewComments.length &&
+        reviewComments.some((comment) => comment.isReviewAborted)
+    );
+}
