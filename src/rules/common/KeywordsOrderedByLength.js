@@ -26,7 +26,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
         const keywords = this.keywords;
 
         if (!keywords.length) {
-            this.logWarning(__filename, 'No keywords defined.', file);
+            this.log.warning(__filename, 'No keywords defined.', file);
 
             return [];
         }

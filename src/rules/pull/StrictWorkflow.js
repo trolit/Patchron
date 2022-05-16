@@ -21,7 +21,7 @@ class StrictWorkflowRule extends BaseRule {
 
     invoke() {
         if (this.workflowArray.length === 0) {
-            this.logError(__filename, 'Could not run rule. Empty workflow.');
+            this.log.warning(__filename, 'Could not run rule. Empty workflow.');
 
             return null;
         }

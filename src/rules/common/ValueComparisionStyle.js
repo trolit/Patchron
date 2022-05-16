@@ -59,7 +59,7 @@ class ValueComparisionStyleRule extends BaseRule {
         }
 
         if (isEqual(this.allowedLevels, [0, 1, 2])) {
-            this.logWarning(
+            this.log.warning(
                 __filename,
                 `All comparision styles are allowed, nothing to do.`,
                 file

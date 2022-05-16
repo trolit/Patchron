@@ -22,7 +22,7 @@ class SingleLineBlockRule extends BaseRule {
 
     invoke(file) {
         if (!this.blocks.length) {
-            this.logWarning(__filename, 'No blocks defined.', file);
+            this.log.warning(__filename, 'No blocks defined', file);
 
             return [];
         }
@@ -31,7 +31,7 @@ class SingleLineBlockRule extends BaseRule {
         const data = this.setupData(splitPatch);
 
         if (!this._includesAnyMatch(data)) {
-            this.logWarning(
+            this.log.warning(
                 __filename,
                 `${file?.filename} review skipped due to no single line blocks.`,
                 file
