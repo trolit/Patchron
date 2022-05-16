@@ -10,13 +10,50 @@ const updateLogPathJob = require('./updateLogPathJob');
  */
 class PepegaContextBuilder {
     constructor(app) {
-        const eventEmitter = new EventEmitter();
+        /**
+         * reference to logger wrapped within `EventLog`
+         * @type {import('../utilities/EventLog')}
+         * @public
+         */
+        this.log = null;
 
-        eventEmitter.on('path-updated', (updatedLog) => {
-            this.log = new EventLog(updatedLog);
-        });
+        /**
+         * stores properties received via Probot's `context.repo()`
+         * @type {object}
+         * @public
+         */
+        this.repo = null;
+
+        this.pullRequest = {
+            /**
+             * hooked pull request owner login
+             * @type {import('probot').Context}
+             * @public
+             */
+            owner: null,
+
+            /**
+             * hooked pull request id
+             * @type {import('probot').Context}
+             * @public
+             */
+            id: null,
+
+            /**
+             * reference to Probot's context
+             * @type {import('probot').Context}
+             * @public
+             */
+            context: null
+        };
 
         if (isStoringLogsEnabled) {
+            const eventEmitter = new EventEmitter();
+
+            eventEmitter.on('path-updated', (updatedLog) => {
+                this.log = new EventLog(updatedLog);
+            });
+
             updateLogPathJob(eventEmitter);
         } else {
             this.log = new EventLog(app.log);
@@ -25,10 +62,13 @@ class PepegaContextBuilder {
         return this;
     }
 
-    initializePullRequestData(pullRequestContext) {
-        const payload = pullRequestContext.payload;
+    /**
+     * @param {import('probot').Context} context
+     */
+    initializePullRequestData(context) {
+        const payload = context.payload;
 
-        const repo = pullRequestContext.repo();
+        const repo = context.repo();
 
         this.log.setPullNumber(payload.number);
 
@@ -36,15 +76,12 @@ class PepegaContextBuilder {
 
         this.pullRequest = {
             owner,
-            id: payload.number,
-            context: pullRequestContext
+            context,
+            id: payload.number
         };
 
         this.repo = repo;
     }
 }
 
-/**
- * Class wrapping Probot's features and Pepega's logic.
- */
 module.exports = PepegaContextBuilder;
