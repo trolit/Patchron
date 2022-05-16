@@ -4,7 +4,8 @@ const BasicDataBuilder = require('../builders/BasicData');
 
 /**
  * triggers `Pepega.js` to review files against configured rules
- * @param {object} repo basic repo data (including pull number)
+ * @param {import('../builders/PepegaContext')} pepegaContext
+ * @param {object} file
  * @returns {Array<object>} review comments
  */
 module.exports = (pepegaContext, file) => {

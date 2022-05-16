@@ -7,7 +7,11 @@ const extendWithBackticks = require('../extensions/setup-data/extendWithBacktick
 
 class BaseRule {
     constructor(pepegaContext) {
+        /**
+         * @type {import('../builders/PepegaContext')}
+         */
         this.pepegaContext = pepegaContext;
+        this.log = this.pepegaContext.log;
 
         const {
             ADDED,
@@ -35,9 +39,6 @@ class BaseRule {
         this.RIGHT = RIGHT;
 
         this.EMPTY = EMPTY;
-
-        const { log } = pepegaContext;
-        this.log = log;
     }
 
     /**

@@ -1,3 +1,9 @@
+/**
+ * @param {import('../builders/PepegaContext')} pepegaContext
+ * @param {Array<object>} rulesConfig
+ * @param {object} file
+ * @returns {Array<object>}
+ */
 module.exports = (pepegaContext, rulesConfig, file = null) => {
     let comments = [];
 

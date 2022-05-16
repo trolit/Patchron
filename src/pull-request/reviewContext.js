@@ -3,7 +3,7 @@ const review = require('../rules/review');
 
 /**
  * triggers `Pepega.js` to review files against configured rules
- * @param {object} repo basic repo data (including pull number)
+ * @param {import('../builders/PepegaContext')} pepegaContext
  * @returns {Array<object>} review comments
  */
 module.exports = (pepegaContext) => {
