@@ -26,16 +26,16 @@ const rules = {
  * @param {object} config - rule config
  * @param {object} file - provide all elements that are required by given rules
  */
-module.exports = (ruleName, config, file) => {
+module.exports = (ruleName, config, file, pepegaContext = null) => {
     const Rule = rules[ruleName];
 
-    const rule = new Rule(config);
+    const rule = new Rule(pepegaContext, config);
+
+    const result = rule.invoke(file);
 
     console.log(`***************************************************`);
     console.log(`${ruleName} rule result`);
     console.log(`***************************************************`);
-
-    const result = rule.invoke(file);
 
     console.log(result);
 };
