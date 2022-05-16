@@ -18,7 +18,10 @@ class PepegaContextBuilder {
         this.log = null;
 
         /**
-         * stores properties received via Probot's `context.repo()`
+         * stores properties received via `context.repo()`
+         * ```js
+         * {owner: 'username', repo: 'reponame', path: 'path'}
+         * ```
          * @type {object}
          * @public
          */
