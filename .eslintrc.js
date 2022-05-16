@@ -13,11 +13,6 @@ module.exports = {
         node: true
     },
 
-    globals: {
-        log: true,
-        pullNumber: true
-    },
-
     rules: {
         'consistent-return': 'error',
         'no-console': 'warn',
@@ -27,7 +22,7 @@ module.exports = {
         'no-alert': 'error',
         'no-bitwise': ['error', { allow: ['~'] }],
         'no-empty': 'error',
-        'no-implicit-globals': ['error', { lexicalBindings: true }],
+        'no-implicit-globals': ['error'],
         'no-inline-comments': 'error',
         'no-mixed-operators': 'error',
         'no-multi-assign': 'error',

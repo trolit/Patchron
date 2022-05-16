@@ -45,11 +45,7 @@
     "node": ">= 10.13.0"
   },
   "jest": {
-    "testEnvironment": "node",
-    "globals": {
-      "log": null,
-      "pullNumber": 0
-    }
+    "testEnvironment": "node"
   },
   "main": "index.js",
   "directories": {
