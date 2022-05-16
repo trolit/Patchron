@@ -5,7 +5,6 @@ const addComment = require('../github/addComment');
  * **POST** pull request review summary
  * @param {import('../builders/PepegaContext')} pepegaContext
  * @param {number} successfullyPostedComments number of comments posted to the GitHub
- * @param {Array<object>} reviewComments
  */
 module.exports = async (
     pepegaContext,
