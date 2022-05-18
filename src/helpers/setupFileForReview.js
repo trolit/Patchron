@@ -13,16 +13,16 @@
 module.exports = (file) => {
     const { filename, contents_url, patch } = file;
 
-    const commit_id = contents_url.split('ref=').pop();
+    const commitId = contents_url.split('ref=').pop();
 
     const path = filename;
 
-    const split_patch = patch.split('\n');
+    const splitPatch = patch.split('\n');
 
     const extension = file.filename.split('.').pop();
 
     file.path = path;
-    file.commit_id = commit_id;
+    file.commitId = commitId;
     file.extension = extension;
-    file.split_patch = split_patch;
+    file.splitPatch = splitPatch;
 };

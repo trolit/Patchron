@@ -10,7 +10,6 @@ const setupFileForReview = require('../helpers/setupFileForReview');
  */
 module.exports = (pepegaContext, file) => {
     const { log } = pepegaContext;
-
     setupFileForReview(file);
     let comments = [];
 
