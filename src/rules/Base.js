@@ -7,14 +7,21 @@ const extendWithBackticks = require('../extensions/setup-data/extendWithBacktick
 
 class BaseRule {
     /**
-     * @param {import('../builders/PepegaContext')} pepegaContext
+     * @param {PepegaContext} pepegaContext
+     * @param {File} file
      */
-    constructor(pepegaContext) {
+    constructor(pepegaContext, file = null) {
         this.pepegaContext = pepegaContext;
-
         this.log = this.pepegaContext.log;
 
-        this.reviewCommentBuilder = new ReviewCommentBuilder(pepegaContext);
+        if (file) {
+            this.file = file;
+
+            this.reviewCommentBuilder = new ReviewCommentBuilder(
+                pepegaContext,
+                file
+            );
+        }
 
         const {
             ADDED,
@@ -47,16 +54,15 @@ class BaseRule {
     /**
      * @returns {object}
      */
-    getSingleLineComment({ file, body, index, side = 'RIGHT' }) {
-        const { split_patch, commit_id } = file;
+    getSingleLineComment({ body, index, side = 'RIGHT' }) {
+        const { splitPatch } = this.file;
 
-        const line = getLineNumber(split_patch, side, index);
+        const line = getLineNumber(splitPatch, side, index);
 
         const comment = this.reviewCommentBuilder.buildSingleLineComment({
             body,
             line,
-            side,
-            commit_id
+            side
         });
 
         return comment;
@@ -65,26 +71,26 @@ class BaseRule {
     /**
      * @returns {object}
      */
-    getMultiLineComment({ file, body, from, to, side = 'RIGHT' }) {
-        const { split_patch, commit_id } = file;
+    getMultiLineComment({ body, from, to, side = 'RIGHT' }) {
+        const { splitPatch } = this.file;
 
-        const start_line = getLineNumber(split_patch, side, from);
+        const start_line = getLineNumber(splitPatch, side, from);
 
-        const position = getPosition(split_patch, to, side);
+        const position = getPosition(splitPatch, to, side);
 
         const comment = this.reviewCommentBuilder.buildMultiLineComment({
             body,
             start_line,
             start_side: side,
-            position,
-            commit_id
+            position
         });
 
         return comment;
     }
 
     /**
-     * Cleans received patch
+     * sets up received patch
+     * @returns {Array<SplitPatchRow>}
      */
     setupData(
         splitPatch,

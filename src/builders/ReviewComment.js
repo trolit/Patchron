@@ -2,7 +2,8 @@
 class ReviewCommentBuilder {
     /**
      *
-     * @param {import('../builders/PepegaContext')} pepegaContext
+     * @param {PepegaContext} pepegaContext
+     * @param {Patch} file
      */
     constructor(pepegaContext, file) {
         const { pullRequest, repo } = pepegaContext;

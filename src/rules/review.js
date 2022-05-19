@@ -11,9 +11,9 @@ module.exports = (pepegaContext, rulesConfig, file = null) => {
         if (ruleConfig.enabled) {
             const { reference: Rule, config } = ruleConfig;
 
-            const instance = new Rule(pepegaContext, config);
+            const instance = new Rule(pepegaContext, config, file);
 
-            const ruleComments = instance.invoke(file);
+            const ruleComments = instance.invoke();
 
             if (ruleComments.length) {
                 comments.push(...ruleComments);
