@@ -31,7 +31,7 @@ module.exports = (eventEmitter) => {
             { stream: prettyStream }
         ];
 
-        log = pinoms(pinoms.multistream(streams));
+        const log = pinoms(pinoms.multistream(streams));
 
         eventEmitter.emit('path-updated', log);
     };
