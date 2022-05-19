@@ -9,44 +9,15 @@ const updateLogPathJob = require('./updateLogPathJob');
  * Class wrapping Probot's features and Pepega's logic.
  */
 class PepegaContextBuilder {
+    /**
+     * @param {ProbotApp} app
+     */
     constructor(app) {
-        /**
-         * reference to logger wrapped within `EventLog`
-         * @type {import('../utilities/EventLog')}
-         * @public
-         */
         this.log = null;
-
-        /**
-         * stores properties received via `context.repo()`
-         * ```js
-         * {owner: 'username', repo: 'reponame', path: 'path'}
-         * ```
-         * @type {object}
-         * @public
-         */
         this.repo = null;
-
         this.pullRequest = {
-            /**
-             * hooked pull request owner login
-             * @type {string}
-             * @public
-             */
             owner: null,
-
-            /**
-             * hooked pull request id
-             * @type {number}
-             * @public
-             */
             id: null,
-
-            /**
-             * reference to Probot's context
-             * @type {import('probot').Context}
-             * @public
-             */
             context: null
         };
 
@@ -66,7 +37,7 @@ class PepegaContextBuilder {
     }
 
     /**
-     * @param {import('probot').Context} context
+     * @param {ProbotContext} context
      */
     initializePullRequestData(context) {
         const payload = context.payload;
