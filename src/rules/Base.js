@@ -8,7 +8,7 @@ const extendWithBackticks = require('../extensions/setup-data/extendWithBacktick
 class BaseRule {
     /**
      * @param {PepegaContext} pepegaContext
-     * @param {File} file
+     * @param {Patch} file
      */
     constructor(pepegaContext, file = null) {
         this.pepegaContext = pepegaContext;

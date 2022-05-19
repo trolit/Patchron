@@ -1,7 +1,7 @@
 /**
- * @param {import('../builders/PepegaContext')} pepegaContext
+ * @param {PepegaContext} pepegaContext
  * @param {Array<object>} rulesConfig
- * @param {object} file
+ * @param {Patch} file
  * @returns {Array<object>}
  */
 module.exports = (pepegaContext, rulesConfig, file = null) => {

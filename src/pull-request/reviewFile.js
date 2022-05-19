@@ -4,7 +4,7 @@ const setupFileForReview = require('../helpers/setupFileForReview');
 
 /**
  * triggers `Pepega.js` to review files against configured rules
- * @param {import('../builders/PepegaContext')} pepegaContext
+ * @param {PepegaContext} pepegaContext
  * @param {object} file
  * @returns {Array<object>} review comments
  */

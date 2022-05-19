@@ -14,7 +14,7 @@ const addSingleLineReviewComment = require('../github/addSingleLineReviewComment
  * - has `start_line`, it indicates that it's file's multi-line comment,
  * - has `line`, it indicates that it's file's single-line comment.
  *
- * @param {import('../builders/PepegaContext')} pepegaContext
+ * @param {PepegaContext} pepegaContext
  * @param {Array<object>} reviewComments
  * @returns {number} number of comments successfully posted to the GitHub
  */
