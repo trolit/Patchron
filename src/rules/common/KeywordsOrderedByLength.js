@@ -1,40 +1,34 @@
+/// <reference path="../../config/type-definitions/rules/KeywordsOrderedByLength.js" />
+
 const BaseRule = require('../Base');
 const dedent = require('dedent-js');
 
 class KeywordsOrderedByLengthRule extends BaseRule {
     /**
-     * @param {object} config
-     * @param {Array<{name: string, regex: object, order: 'ascending'|'descending', ignoreNewline: boolean }>} config.keywords
-     * @param {string} config.keywords[].name - readable name
-     * @param {object} config.keywords[].regex - regular expression to match line with keyword
-     * @param {string} config.keywords[].order - ascending/descending
-     * @param {string} config.keywords[].ignoreNewline - when set to 'true' **(not recommended)**, rule is tested against all keywords
-     * matched in given data and when 'false' **(recommended)**, only adjacent ones.
-     *
-     * e.g. when keywords are at lines: 0, 1, 2, 5, 6, 10, 'false' makes that rule apply only across group:
-     * [0, 1, 2] and [5, 6].
+     * @param {PepegaContext} pepegaContext
+     * @param {Config} config
+     * @param {Patch} file
      */
-    constructor(pepegaContext, config) {
-        super(pepegaContext);
+    constructor(pepegaContext, config, file) {
+        super(pepegaContext, file);
 
         const { keywords } = config;
 
         this.keywords = keywords;
     }
 
-    invoke(file) {
+    invoke() {
         const keywords = this.keywords;
 
         if (!keywords.length) {
-            this.log.warning(__filename, 'No keywords defined.', file);
+            this.log.warning(__filename, 'No keywords defined.', this.file);
 
             return [];
         }
 
         const reviewComments = [];
-        const { split_patch: splitPatch } = file;
 
-        const data = this.setupData(splitPatch);
+        const data = this.setupData(this.file.splitPatch);
 
         for (const keyword of keywords) {
             const { matchedRows, unchangedRows } = this._matchKeywordData(
@@ -49,7 +43,6 @@ class KeywordsOrderedByLengthRule extends BaseRule {
             if (keyword.ignoreNewline) {
                 reviewComments.push(
                     ...this._reviewLinesOrderIgnoringNewline({
-                        file,
                         keyword,
                         matchedRows
                     })
@@ -57,7 +50,6 @@ class KeywordsOrderedByLengthRule extends BaseRule {
             } else {
                 reviewComments.push(
                     ...this._reviewLinesOrder({
-                        file,
                         keyword,
                         matchedRows,
                         unchangedRows
@@ -149,7 +141,6 @@ class KeywordsOrderedByLengthRule extends BaseRule {
             if (baseRow.trimmedContent !== expectedRow.trimmedContent) {
                 reviewComments.push(
                     this.getSingleLineComment({
-                        ...data,
                         body: this._getCommentBody(keyword),
                         index: baseRow.index
                     })
@@ -207,7 +198,6 @@ class KeywordsOrderedByLengthRule extends BaseRule {
 
                     reviewComments.push(
                         this.getMultiLineComment({
-                            ...data,
                             body: this._getCommentBody(keyword),
                             from: firstElementIndex,
                             to: lastElementIndex
