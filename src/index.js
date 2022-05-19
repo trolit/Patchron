@@ -43,8 +43,7 @@ const postComments = require('./pull-request/postComments');
 const reviewContext = require('./pull-request/reviewContext');
 
 /**
- * This is the main entrypoint of Pepega Probot app
- * @param {import('probot').Probot} app
+ * @param {ProbotApp} app
  */
 module.exports = (app) => {
     const pepegaContext = new PepegaContext(app);

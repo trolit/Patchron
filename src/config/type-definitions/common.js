@@ -38,3 +38,58 @@
  * @property {string} patch changes made to file
  * @property {Array<string>} splitPatch changes made to file split by \n
  */
+
+/**
+ * @typedef {Object} Repo
+ * @property {string} owner repository owner
+ * @property {string} repo repository name
+ * @property {string} path path to file
+ */
+
+/**
+ * @typedef {Object} PullRequest
+ * @property {string} owner hooked pull request owner's login
+ * @property {number} id hooked pull request's id
+ * @property {ProbotContext} context reference to Probot's context
+ */
+
+/**
+ * @typedef {Object} PepegaContext
+ * @property  {import('../../utilities/EventLog')} log
+ * @property {Repo} repo
+ * @property {PullRequest} pullRequest
+ */
+
+/**
+ * @typedef {import('probot').Context} ProbotContext
+ */
+
+/**
+ * @typedef {import('probot').Probot} ProbotApp
+ */
+
+/**
+ * @typedef {Object} MultiLineComment file review comment
+ * @property {string} owner repository owner's name
+ * @property {string} repo reporitory's name
+ * @property {number} pull_number PR id
+ * @property {string} body
+ * @property {number} start_line line number (counted from hunk header '@@')
+ * @property {'LEFT'|'RIGHT'} start_side which side line refers to (LEFT=deletion, RIGHT=addition)
+ * @property {number} position  number of lines to take into review (counted from line after '@@')
+ * @property {string} path
+ * @property {string} commit_id
+ */
+
+/**
+ * @typedef {Object} SingleLineComment file review comment
+ * @property {string} owner repository owner's name
+ * @property {string} repo reporitory's name
+ * @property {number} pull_number PR id
+ * @property {string} body
+ * @property {number} line line number (counted from hunk header '@@')
+ * @property {'LEFT'|'RIGHT'} side which side line refers to (LEFT=deletion, RIGHT=addition)
+ * @property {number} position  number of lines to take into review (counted from line after '@@')
+ * @property {string} path
+ * @property {string} commit_id
+ */

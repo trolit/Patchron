@@ -1,12 +1,10 @@
-/// <reference path="../../config/type-definitions/rules/KeywordsOrderedByLength.js" />
-
 const BaseRule = require('../Base');
 const dedent = require('dedent-js');
 
 class KeywordsOrderedByLengthRule extends BaseRule {
     /**
      * @param {PepegaContext} pepegaContext
-     * @param {Config} config
+     * @param {KeywordsOrderedByLengthConfig} config
      * @param {Patch} file
      */
     constructor(pepegaContext, config, file) {
