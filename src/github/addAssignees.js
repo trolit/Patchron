@@ -1,6 +1,6 @@
 /**
  * adds assignees to pull request
- * @param {import('../builders/PepegaContext')} pepegaContext
+ * @param {PepegaContext} pepegaContext
  * @param {Array<string>} assignees usernames of people to assign
  *
  * @link

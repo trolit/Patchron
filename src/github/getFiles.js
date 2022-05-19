@@ -5,15 +5,15 @@ const {
 /**
  * fetches files from pull request. Unpaginated response includes a maximum of 3000 files
  * so **it's not recommended** to overload GitHub API by multiple small requests in 99% cases.
- * @param {import('../builders/PepegaContext')} pepegaContext
- * @param {object} options pass payload optional params (or params to overwrite used ones)
+ * @param {PepegaContext} pepegaContext
+ * @param {Object} options pass payload optional params (or params to overwrite used ones)
  * @param {string} [options.per_page = 30] results per page (max 100)
  * @param {string} [options.page] page number of the results to fetch.
  *
  * @link
  * https://octokit.github.io/rest.js/v18#pulls-list-files
  *
- * @returns {Promise<Array<object>>}
+ * @returns {Promise<Array<Object>>}
  */
 module.exports = async (pepegaContext, options = {}) => {
     const { pullRequest, log, repo } = pepegaContext;

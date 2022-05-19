@@ -1,6 +1,6 @@
 /**
  * creates comment under PR
- * @param {import('../builders/PepegaContext')} pepegaContext
+ * @param {PepegaContext} pepegaContext
  * @param {string} body text of the comment.
  *
  * @link
