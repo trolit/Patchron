@@ -22,6 +22,7 @@ module.exports = [
                     maxLineBreaks: 0,
                     enforced: true,
                     breakOnFirstOccurence: false,
+                    countDifferentCodeAsLineBreak: false,
                     order: [
                         {
                             name: 'packages',

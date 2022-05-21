@@ -92,6 +92,7 @@ class BaseRule {
 
     /**
      * sets up received patch
+     *
      * @returns {Array<SplitPatchRow>}
      */
     setupData(
@@ -162,6 +163,7 @@ class BaseRule {
 
     /**
      * Removes from row indicators added by Git (added, deleted, unchanged)
+     *
      * @param {string} row
      */
     getRawContent(row) {
@@ -182,6 +184,7 @@ class BaseRule {
      * tests if given line is newline
      *
      * **\/\/ apply only to lines that are coming directly from splitPatch**
+     *
      * @param {string} line to check
      * @returns {boolean}
      */
@@ -194,6 +197,7 @@ class BaseRule {
      *
      * - start of multi-line (fragment = start) (default)
      * - end of multi-line (fragment = end)
+     *
      * @param {object} keyword - keyword, **must** contain **multiLineOptions** array
      * @param {string} line - text of line
      * @param {string} fragment - start/end (start is default value)
@@ -276,6 +280,7 @@ class BaseRule {
 
     /**
      * determines whether passed line starts with //, /*, * or *\/
+     *
      * @param {string} line
      * @returns {boolean}
      */

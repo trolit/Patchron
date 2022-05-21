@@ -73,12 +73,12 @@ module.exports = [
                     multiLineOptions: ['require'],
                     position: {
                         custom: null,
-                        BOF: true,
-                        EOF: false
+                        BOF: true
                     },
                     maxLineBreaks: 1,
                     enforced: true,
-                    breakOnFirstOccurence: false
+                    breakOnFirstOccurence: false,
+                    countDifferentCodeAsLineBreak: false
                 }
             ]
         }
