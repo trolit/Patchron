@@ -2,7 +2,7 @@
 
 /**
  * @typedef {object} Backticks `SplitPatchRow` property added via extension, `extedWithBackticks`
- * @property {number} endLineIndex index of row with backticks (if `endLineIndex` equals this then it's single line with backticks and if different, multi-line with backticks)
+ * @property {number} endLineIndex index of row with backticks (when equals index, it's single line row with backticks)
  * @property {object} thisLine
  * @property {number} thisLine.firstBacktickIndex
  * @property {number} thisLine.lastBacktickIndex

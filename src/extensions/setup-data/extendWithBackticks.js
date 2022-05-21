@@ -17,7 +17,6 @@ const { CUSTOM_LINES } = require('../../config/constants');
  * // rows with backticks are extended with following properties
  *  {
  *      backticks: {
- *          startLineIndex: number, // in respect to `data` array
  *          endLineIndex: number, // in respect to `data` array
  *          thisLine: {
  *              firstBacktickIndex: number, // -1 if none found
@@ -65,11 +64,7 @@ module.exports = (
             if (trimmedContentBackticksCount % 2 === 0) {
                 extendedData.push({
                     ...data[index],
-                    ..._createBackticksObject(
-                        trimmedContent,
-                        startLineIndex,
-                        startLineIndex
-                    )
+                    ..._createBackticksObject(trimmedContent, startLineIndex)
                 });
 
                 continue;
@@ -89,11 +84,7 @@ module.exports = (
 
                         extendedData.push({
                             ...row,
-                            ..._createBackticksObject(
-                                line,
-                                startLineIndex,
-                                endLineIndex
-                            )
+                            ..._createBackticksObject(line, endLineIndex)
                         });
                     }
 
@@ -140,10 +131,9 @@ function _findRowWithUnevenBackticks(data, startIndex) {
     );
 }
 
-function _createBackticksObject(line, startLineIndex, endLineIndex) {
+function _createBackticksObject(line, endLineIndex) {
     return {
         backticks: {
-            startLineIndex,
             endLineIndex,
             thisLine: {
                 firstBacktickIndex: line.indexOf('`'),

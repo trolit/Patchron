@@ -9,7 +9,6 @@ class ValueComparisionStyleRule extends BaseRule {
     /**
      * Allows to set expected equality/inequality comparement convention. Rule is based on patch and currently does not implement any way to deduce whether part of patch is pure text or part of code (e.g. in case of Vue). An workaround to that could be to escape `=` characters in strings and use `=` unicode representation in HTML.
      *
-     *
      * **allowedLevels** options:
      * - 0 - weak equality/inequality (==, !=)
      * - 1 - strict equality/inequality (===, !==)
@@ -106,7 +105,7 @@ class ValueComparisionStyleRule extends BaseRule {
         for (let index = 0; index < dataLength; index++) {
             const row = data[index];
             const backticks = row?.backticks;
-            const line = { content: row.trimmedContent, startIndex: index };
+            const line = { content: row.trimmedContent };
 
             if (
                 this.CUSTOM_LINES.includes(line.content) ||
@@ -115,17 +114,13 @@ class ValueComparisionStyleRule extends BaseRule {
                 continue;
             }
 
-            if (
-                backticks &&
-                backticks.startLineIndex !== backticks.endLineIndex
-            ) {
-                const { startLineIndex, endLineIndex } = backticks;
-                line.startIndex = startLineIndex;
+            if (backticks && backticks.index !== backticks.endLineIndex) {
+                const { endLineIndex } = backticks;
                 line.endIndex = endLineIndex;
 
                 line.content = this.convertMultiLineToSingleLine(
                     data,
-                    startLineIndex,
+                    index,
                     endLineIndex
                 );
 
@@ -140,14 +135,14 @@ class ValueComparisionStyleRule extends BaseRule {
                         ? {
                               ...this.getMultiLineComment({
                                   body: this._getCommentBody(),
-                                  from: line.startIndex,
+                                  from: index,
                                   to: line.endIndex
                               })
                           }
                         : {
                               ...this.getSingleLineComment({
                                   body: this._getCommentBody(),
-                                  index: line.startIndex
+                                  index
                               })
                           }
                 );
