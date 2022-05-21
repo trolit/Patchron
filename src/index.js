@@ -69,15 +69,19 @@ module.exports = (app) => {
 
         if (!isReviewAborted(reviewComments)) {
             reviewComments.push(...reviewFiles(pepegaContext));
-        }
 
-        const numberOfPostedComments = postComments(
-            pepegaContext,
-            reviewComments
-        );
+            const numberOfPostedComments = postComments(
+                pepegaContext,
+                reviewComments
+            );
 
-        if (isReviewSummaryEnabled) {
-            postSummary(pepegaContext, numberOfPostedComments, reviewComments);
+            if (isReviewSummaryEnabled) {
+                postSummary(
+                    pepegaContext,
+                    numberOfPostedComments,
+                    reviewComments
+                );
+            }
         }
     });
 };

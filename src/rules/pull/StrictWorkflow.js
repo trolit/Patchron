@@ -60,16 +60,17 @@ class StrictWorkflowRule extends BaseRule {
             return null;
         }
 
+        const isReviewAborted =
+            this.abortReviewOnInvalidBranchPrefix ||
+            this.abortReviewOnInvalidFlow;
+
         const body = this._getComment(
             mergeFrom,
             mergeTo,
             hasMergeFromValidPrefx,
-            isMergeToValid
+            isMergeToValid,
+            isReviewAborted
         );
-
-        const isReviewAborted =
-            this.abortReviewOnInvalidBranchPrefix ||
-            this.abortReviewOnInvalidFlow;
 
         return {
             body,
@@ -77,14 +78,22 @@ class StrictWorkflowRule extends BaseRule {
         };
     }
 
-    _getComment(mergeFrom, mergeTo, hasMergeFromValidPrefix, isMergeToValid) {
+    _getComment(
+        mergeFrom,
+        mergeTo,
+        hasMergeFromValidPrefix,
+        isMergeToValid,
+        isReviewAborted
+    ) {
         let commentBody = null;
 
         if (!isMergeToValid && hasMergeFromValidPrefix) {
-            commentBody = `Invalid flow (\`base: ${mergeTo}\` <- \`head: ${mergeFrom}\`). Change base branch?`;
+            commentBody = `Invalid flow (\`base: ${mergeTo}\` <- \`head: ${mergeFrom}\`)`;
         } else {
             commentBody = `Unrecognized head prefix (\`${mergeFrom}\`).`;
         }
+
+        commentBody.concat(`${isReviewAborted ? ' (review aborted)' : ''}`);
 
         if (!hasMergeFromValidPrefix) {
             let formattedWorkflow = '';
