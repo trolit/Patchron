@@ -1,7 +1,7 @@
 // https://stackoverflow.com/a/60030618
 
 /**
- * @typedef {Object} backticks `SplitPatchRow` property added via extension, `extedWithBackticks`
+ * @typedef {Object} Backticks `SplitPatchRow` property added via extension, `extedWithBackticks`
  * @property {number} endLineIndex index of row with backticks (if `endLineIndex` equals this then it's single line with backticks and if different, multi-line with backticks)
  * @property {object} thisLine
  * @property {number} thisLine.firstBacktickIndex
@@ -15,7 +15,7 @@
  * @property {number} indentation indentation amount searched with `/\S|$/`
  * @property {string} content row content without GIT indication
  * @property {string} trimmedContent row content  without GIT indication after trim
- * @property {backticks} backticks information about row's backticks (available via extension). When line has no backticks, it's value is `null`
+ * @property {Backticks} backticks information about row's backticks (available via extension). When line has no backticks, it's value is `null`
  */
 
 /**

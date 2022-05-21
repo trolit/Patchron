@@ -1,3 +1,5 @@
+/// <reference path="../config/type-definitions/common.js" />
+
 const constants = require('../config/constants');
 const getPosition = require('../helpers/getPosition');
 const getLineNumber = require('../helpers/getLineNumber');
