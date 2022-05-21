@@ -39,6 +39,7 @@ class EventLog {
 
     /**
      * use to log any useful information (e.g. skipped 20 comments due to limit per review)
+     *
      * @param {string} filename
      * @param {string} message
      * @param {object} [additionalData]
@@ -60,8 +61,10 @@ class EventLog {
 
     /**
      * use to log any unexpected behaviour (e.g. wrong rule config, insufficient data)
+     *
      * @param {string} filename
      * @param {string} message
+     * @param {object} file
      * @param {object} [additionalData]
      */
     warning(filename, message, file = null, additionalData = null) {
@@ -88,9 +91,9 @@ class EventLog {
     }
 
     /**
-     * use to log errors that are coming from GitHub API responses
-     * @param {string} filename
-     * @param {string} message
+     * use to log errors that are coming from GitHub API responses\
+     *
+     * @param {object} error
      * @param {object} [additionalData]
      */
     fatal(error, additionalData = null) {

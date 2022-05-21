@@ -3,7 +3,9 @@ const getFiles = require('../github/getFiles');
 
 /**
  * triggers `Pepega.js` to review files against configured rules
+ *
  * @param {PepegaContext} pepegaContext
+ *
  * @returns {Array<object>} review comments
  */
 module.exports = async (pepegaContext) => {

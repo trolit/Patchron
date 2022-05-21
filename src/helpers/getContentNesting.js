@@ -1,5 +1,6 @@
 /**
  * returns array that gives information about content structure **(based on curly brackets)**
+ *
  * @param {Array<index: number, content: string>} data
  * @example
  *

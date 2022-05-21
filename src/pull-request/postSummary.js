@@ -3,6 +3,7 @@ const addComment = require('../github/addComment');
 
 /**
  * **POST** pull request review summary
+ *
  * @param {PepegaContext} pepegaContext
  * @param {number} successfullyPostedComments number of comments posted to the GitHub
  */

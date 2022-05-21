@@ -3,10 +3,10 @@
  * ```js
  * { commit_id, extension, split_patch }
  * ```
+ *
  * @param {object} file
  *
- * @link file's response can be found here:
- * https://docs.github.com/en/rest/reference/pulls#list-pull-requests-files
+ * {@link https://docs.github.com/en/rest/reference/pulls#list-pull-requests-files}
  *
  * @returns {void}
  */

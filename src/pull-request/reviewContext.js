@@ -3,7 +3,9 @@ const review = require('../rules/review');
 
 /**
  * triggers `Pepega.js` to review files against configured rules
- * @param {PepegaContext)} pepegaContext
+ *
+ * @param {PepegaContext} pepegaContext
+ *
  * @returns {Array<object>} review comments
  */
 module.exports = (pepegaContext) => {

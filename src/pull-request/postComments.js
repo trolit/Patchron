@@ -16,6 +16,7 @@ const addSingleLineReviewComment = require('../github/addSingleLineReviewComment
  *
  * @param {PepegaContext} pepegaContext
  * @param {Array<object>} reviewComments
+ *
  * @returns {number} number of comments successfully posted to the GitHub
  */
 module.exports = async (pepegaContext, reviewComments) => {

@@ -1,9 +1,10 @@
 /**
  * returns nearest **hunk**
+ *
  * @param {Array<string>} splitPatch - array including code
  * @param {number} startIndex - index of splitPatch row indicating where to start from
  *
- * @link https://www.edureka.co/community/7949/what-are-these-in-github
+ * {@link https://www.edureka.co/community/7949/what-are-these-in-github}
  *
  * @example (a) = @
  * ┌─────────┬───────────────────────────────┐

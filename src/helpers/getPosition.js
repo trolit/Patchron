@@ -2,12 +2,13 @@ const getNearestHunkHeader = require('./getNearestHunkHeader');
 
 /**
  * translates row index of array split in Pepega.js into GitHub line number
+ *
  * @param {Array<string>} splitPatch file splitPatch split by \n
- * @param {string} side left | right
  * @param {number} rowIndex index of row to get GitHub line number
+ * @param {string} side left | right
  *
  * @example
- *  * getPosition(splitPatch, 2) => 2
+ * getPosition(splitPatch, 2) => 2
  * ┌─────────┬─────────────────────────┐
  * │ (index) │          Values         │
  * ├─────────┼─────────────────────────┤

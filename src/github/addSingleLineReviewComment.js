@@ -1,10 +1,10 @@
 /**
  * sends request to add single line review comment.
+ *
  * @param {PepegaContext} pepegaContext
  * @param {SingleLineComment} singleLineComment
  *
- * @link
- * https://octokit.github.io/rest.js/v18#pulls-create-review-comment
+ * {@link https://octokit.github.io/rest.js/v18#pulls-create-review-comment}
  *
  * @returns {object} request response
  */

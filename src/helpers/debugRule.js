@@ -22,6 +22,7 @@ const rules = {
 
 /**
  * Import that method into core **index.js** file to easily debug particular rule with particular state.
+ *
  * @param {string} ruleName - file name of rule
  * @param {object} config - rule config
  * @param {object} file - provide all elements that are required by passed rule
