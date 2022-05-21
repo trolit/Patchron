@@ -1,4 +1,4 @@
-/// <reference path="../../config/type-definitions/rules/MarkedComments.js" />
+/// <reference path="../../config/type-definitions/rules/common/MarkedComments.js" />
 
 const BaseRule = require('../Base');
 const dedent = require('dedent-js');

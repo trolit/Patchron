@@ -1,4 +1,4 @@
-/// <reference path="../../config/type-definitions/rules/KeywordsOrderedByLength.js" />
+/// <reference path="../../config/type-definitions/rules/common/KeywordsOrderedByLength.js" />
 
 const BaseRule = require('../Base');
 const dedent = require('dedent-js');

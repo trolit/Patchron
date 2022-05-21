@@ -1,4 +1,4 @@
-/// <reference path="../../config/type-definitions/rules/ValueComparisionStyle.js" />
+/// <reference path="../../config/type-definitions/rules/common/ValueComparisionStyle.js" />
 
 const dedent = require('dedent-js');
 const isEqual = require('lodash/isEqual');

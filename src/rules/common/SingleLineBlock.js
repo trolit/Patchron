@@ -1,4 +1,4 @@
-/// <reference path="../../config/type-definitions/rules/SingleLineBlock.js" />
+/// <reference path="../../config/type-definitions/rules/common/SingleLineBlock.js" />
 
 const BaseRule = require('../Base');
 const getContentNesting = require('../../helpers/getContentNesting');

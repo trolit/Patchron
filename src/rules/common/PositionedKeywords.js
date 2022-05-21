@@ -1,4 +1,4 @@
-/// <reference path="../../config/type-definitions/rules/PositionedKeywords.js" />
+/// <reference path="../../config/type-definitions/rules/common/PositionedKeywords.js" />
 
 const dedent = require('dedent-js');
 const BaseRule = require('../Base');
