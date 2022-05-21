@@ -4,7 +4,7 @@ const PositionedKeywordsRule = require('../../../src/rules/common/PositionedKeyw
 const importKeywordCustomConfig = {
     name: 'import',
     regex: /import.*/,
-    multilineOptions: ['from'],
+    multiLineOptions: ['from'],
     position: {
         custom: {
             name: '<script>',
@@ -21,7 +21,7 @@ const importKeywordCustomConfig = {
 const importKeywordBOFConfig = {
     name: 'import',
     regex: /import.*/,
-    multilineOptions: ['from'],
+    multiLineOptions: ['from'],
     position: {
         custom: null,
         BOF: true,
@@ -37,7 +37,7 @@ const constKeywordConfig = (position, override = null) => {
     return {
         name: 'const',
         regex: /const.*require.*/,
-        multilineOptions: [],
+        multiLineOptions: [],
         maxLineBreaks: 0,
         enforced: true,
         breakOnFirstOccurence: false,

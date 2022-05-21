@@ -9,7 +9,7 @@ class PositionedKeywordsRule extends BaseRule {
      * @param {Array<{name: string, regex: object, position: { custom: { name: string, expression: string|object }, BOF: boolean }, ignoreNewline: boolean, enforced: boolean, breakOnFirstOccurence: boolean, countDifferentCodeAsLineBreak: boolean, order: Array<{ name: string, expression: object}>}>} config.keywords
      * @param {string} config.keywords[].name - readable name
      * @param {object} config.keywords[].regex - matches line(s) that should be validated against rule
-     * @param {Array<string>} config.keywords[].multilineOptions - if none of them will be included in matched line, line will be treated as multiline.
+     * @param {Array<string>} config.keywords[].multiLineOptions - if none of them will be included in matched line, line will be treated as multiline.
      * @param {object} config.keywords[].position - defines keyword expected position (custom or BOF). Configure each keyword with **only** one way of determining position.
      * @param {number} config.keywords[].maxLineBreaks - defines maximum allowed line breaks between each keyword. When 0, spaces between matched line(s) are counted as rule break
      * @param {boolean} config.keywords[].enforced - when **enabled**, it basically means that when patch does not have expected position that was provided within configuration - but it has at least two keywords - first occurence will be counted as expected position, which means, remaining ones must be positioned in relation to first one.
@@ -17,15 +17,15 @@ class PositionedKeywordsRule extends BaseRule {
      * @param {boolean} config.keywords[].countDifferentCodeAsLineBreak - when **disabled**, code other than line break (\n), found between matched keywords is counted as rule break.
      * @param {Array<object>} config.keywords[].order - allows to provide second layer of keyword positioning. Requires at least two objects to compare matched lines against themselves. For instance, for `import` keyword, second layer could enforce following positioning: `packages -> components -> helpers`
      */
-    constructor(pepegaContext, config) {
-        super(pepegaContext);
+    constructor(pepegaContext, config, file) {
+        super(pepegaContext, file);
 
         const { keywords } = config;
 
         this.keywords = keywords;
     }
 
-    invoke(file) {
+    invoke() {
         const keywords = this.keywords;
 
         if (!keywords.length) {
@@ -104,7 +104,7 @@ class PositionedKeywordsRule extends BaseRule {
                 const matchedContent = matchResult[0];
 
                 const isMultiLine =
-                    keyword?.multilineOptions?.length &&
+                    keyword?.multiLineOptions?.length &&
                     this.isPartOfMultiLine(keyword, matchedContent);
 
                 if (isMultiLine) {
@@ -260,13 +260,13 @@ class PositionedKeywordsRule extends BaseRule {
         let length = null;
 
         if (this.isPartOfMultiLine(keyword, data[index].trimmedContent)) {
-            const multilineEndIndex = this.getMultiLineEndIndex(
+            const multiLineEndIndex = this.getMultiLineEndIndex(
                 data,
                 keyword,
                 index
             );
 
-            length = multilineEndIndex - index;
+            length = multiLineEndIndex - index;
         }
 
         return {
@@ -313,20 +313,20 @@ class PositionedKeywordsRule extends BaseRule {
 
         let length = null;
 
-        if (keyword.multilineOptions?.length) {
+        if (keyword.multiLineOptions?.length) {
             const isMultiLine = this.isPartOfMultiLine(
                 keyword,
                 data[index].trimmedContent
             );
 
             if (isMultiLine) {
-                const multilineEndIndex = this.getMultiLineEndIndex(
+                const multiLineEndIndex = this.getMultiLineEndIndex(
                     data,
                     keyword,
                     index
                 );
 
-                length = multilineEndIndex - index;
+                length = multiLineEndIndex - index;
             }
         }
 

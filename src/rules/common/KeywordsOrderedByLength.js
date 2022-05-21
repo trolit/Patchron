@@ -1,3 +1,5 @@
+/// <reference path="../../config/type-definitions/rules/KeywordsOrderedByLength.js" />
+
 const BaseRule = require('../Base');
 const dedent = require('dedent-js');
 
@@ -85,25 +87,25 @@ class KeywordsOrderedByLengthRule extends BaseRule {
             const matchResultTrimmedContent = matchResult[0].trim();
 
             if (
-                keyword?.multilineOptions &&
+                keyword?.multiLineOptions &&
                 this.isPartOfMultiLine(keyword, matchResultTrimmedContent)
             ) {
-                const multilineEndIndex = this.getMultiLineEndIndex(
+                const multiLineEndIndex = this.getMultiLineEndIndex(
                     data,
                     keyword,
                     index
                 );
 
                 const { trimmedContent: endRowTrimmedContent } =
-                    data[multilineEndIndex];
+                    data[multiLineEndIndex];
 
                 matchedRows.push({
                     index,
                     trimmedContent: endRowTrimmedContent,
-                    length: multilineEndIndex - index
+                    length: multiLineEndIndex - index
                 });
 
-                index = multilineEndIndex;
+                index = multiLineEndIndex;
 
                 continue;
             }

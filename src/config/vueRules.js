@@ -11,7 +11,7 @@ module.exports = [
                 {
                     name: 'import',
                     regex: /import.*/,
-                    multilineOptions: ['from'],
+                    multiLineOptions: ['from'],
                     position: {
                         custom: {
                             name: '<script>',

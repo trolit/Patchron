@@ -48,14 +48,14 @@ module.exports = [
                 {
                     name: 'import (packages)',
                     regex: /import(?!.*@).*/,
-                    multilineOptions: ['from'],
+                    multiLineOptions: ['from'],
                     order: 'ascending',
                     ignoreNewline: false
                 },
                 {
                     name: 'import (components)',
                     regex: /import.*@\/components.*/,
-                    multilineOptions: ['from'],
+                    multiLineOptions: ['from'],
                     order: 'ascending',
                     ignoreNewline: false
                 }
@@ -70,7 +70,7 @@ module.exports = [
                 {
                     name: 'const',
                     regex: /const.*require.*/,
-                    multilineOptions: ['require'],
+                    multiLineOptions: ['require'],
                     position: {
                         custom: null,
                         BOF: true,

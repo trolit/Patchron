@@ -4,7 +4,7 @@ const KeywordsOrderedByLengthRule = require('../../../src/rules/common/KeywordsO
 const importKeywordConfig = {
     name: 'import',
     regex: /import.*/,
-    multilineOptions: ['from'],
+    multiLineOptions: ['from'],
     order: 'ascending',
     ignoreNewline: false
 };
@@ -252,14 +252,14 @@ describe('invoke function', () => {
                 {
                     name: 'import (packages)',
                     regex: /import(?!.*@).*/,
-                    multilineOptions: ['from'],
+                    multiLineOptions: ['from'],
                     order: 'ascending',
                     ignoreNewline: false
                 },
                 {
                     name: 'import (components)',
                     regex: /import.*@\/components.*/,
-                    multilineOptions: ['from'],
+                    multiLineOptions: ['from'],
                     order: 'ascending',
                     ignoreNewline: false
                 }
@@ -292,14 +292,14 @@ describe('invoke function', () => {
                 {
                     name: 'import (packages)',
                     regex: /import(?!.*@).*/,
-                    multilineOptions: ['from'],
+                    multiLineOptions: ['from'],
                     order: 'ascending',
                     ignoreNewline: false
                 },
                 {
                     name: 'import (components)',
                     regex: /import.*@\/components.*/,
-                    multilineOptions: ['from'],
+                    multiLineOptions: ['from'],
                     order: 'ascending',
                     ignoreNewline: false
                 }

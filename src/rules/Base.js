@@ -198,9 +198,9 @@ class BaseRule {
      * @returns {boolean}
      */
     isPartOfMultiLine(keyword, line, fragment = 'start') {
-        const { multilineOptions } = keyword;
+        const { multiLineOptions } = keyword;
 
-        const includesMultiLineOption = multilineOptions.some((option) =>
+        const includesMultiLineOption = multiLineOptions.some((option) =>
             line.includes(option)
         );
 
@@ -216,7 +216,7 @@ class BaseRule {
      * @returns {number}
      */
     getMultiLineStartIndex(data, keyword, endIndex) {
-        let multilineStartIndex = -1;
+        let multiLineStartIndex = -1;
 
         for (let index = endIndex - 1; index >= 0; index--) {
             const { trimmedContent } = data[index];
@@ -225,13 +225,13 @@ class BaseRule {
                 trimmedContent !== this.MERGE &&
                 this.isPartOfMultiLine(keyword, trimmedContent)
             ) {
-                multilineStartIndex = index;
+                multiLineStartIndex = index;
 
                 break;
             }
         }
 
-        return multilineStartIndex;
+        return multiLineStartIndex;
     }
 
     /**
@@ -241,7 +241,7 @@ class BaseRule {
      * @returns {number}
      */
     getMultiLineEndIndex(data, keyword, startIndex) {
-        let multilineEndIndex = -1;
+        let multiLineEndIndex = -1;
         const dataLength = data.length;
 
         for (let index = startIndex + 1; index < dataLength; index++) {
@@ -251,13 +251,13 @@ class BaseRule {
                 trimmedContent !== this.MERGE &&
                 this.isPartOfMultiLine(keyword, trimmedContent, 'end')
             ) {
-                multilineEndIndex = index;
+                multiLineEndIndex = index;
 
                 break;
             }
         }
 
-        return multilineEndIndex;
+        return multiLineEndIndex;
     }
 
     /**
