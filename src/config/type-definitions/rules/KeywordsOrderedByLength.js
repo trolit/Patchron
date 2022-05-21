@@ -1,5 +1,5 @@
 /**
- * @typedef {object} keyword
+ * @typedef {object} Keyword
  * @property {string} name readable name
  * @property {object} regex regular expression to match line with keyword
  * @property {Array<string>} multiLineOptions array of strings to help identify whether matched line is multi-line or single-line
@@ -11,5 +11,5 @@
 
 /**
  * @typedef {Object} KeywordsOrderedByLengthConfig
- * @property {Array<keyword>} keywords
+ * @property {Array<Keyword>} keywords
  */
