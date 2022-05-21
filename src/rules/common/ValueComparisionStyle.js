@@ -1,3 +1,5 @@
+/// <reference path="../../config/type-definitions/rules/ValueComparisionStyle.js" />
+
 const dedent = require('dedent-js');
 const isEqual = require('lodash/isEqual');
 
@@ -12,15 +14,17 @@ class ValueComparisionStyleRule extends BaseRule {
      * - 0 - weak equality/inequality (==, !=)
      * - 1 - strict equality/inequality (===, !==)
      * - 2 - strict equality/inequality via `Object.is` (ES6)
-     * @param {object} config
-     * @param {Array<number>} config.allowedLevels pass which levels are allowed
      *
-     * @link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals
-     * @link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Equality_comparisons_and_sameness
-     * @link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_inequality
+     * @param {PepegaContext} pepegaContext
+     * @param {ValueComparisionStyleConfig} config
+     * @param {Patch} file
+     *
+     * {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals}
+     * {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Equality_comparisons_and_sameness}
+     * {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_inequality}
      */
-    constructor(pepegaContext, config) {
-        super(pepegaContext);
+    constructor(pepegaContext, config, file) {
+        super(pepegaContext, file);
 
         const { allowedLevels } = config;
         allowedLevels.sort();
@@ -53,7 +57,7 @@ class ValueComparisionStyleRule extends BaseRule {
         this.defaultPatterns = defaultPatterns;
     }
 
-    invoke(file) {
+    invoke() {
         if (!this.allowedLevels?.length) {
             return [];
         }
@@ -62,13 +66,13 @@ class ValueComparisionStyleRule extends BaseRule {
             this.log.warning(
                 __filename,
                 `All comparision styles are allowed, nothing to do.`,
-                file
+                this.file
             );
 
             return [];
         }
 
-        const { split_patch: splitPatch } = file;
+        const { splitPatch } = this.file;
 
         const data = this.setupData(splitPatch, {
             withBackticks: {
@@ -82,7 +86,7 @@ class ValueComparisionStyleRule extends BaseRule {
             return [];
         }
 
-        const reviewComments = this._reviewData(file, data);
+        const reviewComments = this._reviewData(data);
 
         return reviewComments;
     }
@@ -95,7 +99,7 @@ class ValueComparisionStyleRule extends BaseRule {
         );
     }
 
-    _reviewData(file, data) {
+    _reviewData(data) {
         const reviewComments = [];
         const dataLength = data.length;
 
@@ -135,7 +139,6 @@ class ValueComparisionStyleRule extends BaseRule {
                     line?.endIndex
                         ? {
                               ...this.getMultiLineComment({
-                                  file,
                                   body: this._getCommentBody(),
                                   from: line.startIndex,
                                   to: line.endIndex
@@ -143,7 +146,6 @@ class ValueComparisionStyleRule extends BaseRule {
                           }
                         : {
                               ...this.getSingleLineComment({
-                                  file,
                                   body: this._getCommentBody(),
                                   index: line.startIndex
                               })

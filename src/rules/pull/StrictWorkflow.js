@@ -1,9 +1,16 @@
+/// <reference path="../../config/type-definitions/rules/pull/StrictWorkflow.js" />
+
 const dedent = require('dedent-js');
 const BaseRule = require('../Base');
 
 class StrictWorkflowRule extends BaseRule {
-    constructor(pepegaContext, config) {
-        super(pepegaContext);
+    /**
+     * @param {PepegaContext} pepegaContext
+     * @param {StrictWorkflowConfig} config
+     * @param {Patch} file
+     */
+    constructor(pepegaContext, config, file) {
+        super(pepegaContext, file);
 
         const {
             enabled,

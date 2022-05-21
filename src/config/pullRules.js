@@ -7,7 +7,6 @@ module.exports = [
         enabled: false,
         reference: StrictWorkflowRule,
         config: {
-            enabled: false,
             workflow: [
                 {
                     base: 'master',
