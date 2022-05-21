@@ -1,5 +1,5 @@
 const { describe, expect, it, beforeEach } = require('@jest/globals');
-const NoUnmarkedCommentsRule = require('../../../src/rules/common/NoUnmarkedComments');
+const MarkedCommentsRule = require('../../../src/rules/common/MarkedComments');
 
 const validConfig = {
     prefixes: [
@@ -33,11 +33,11 @@ describe('invoke function', () => {
     let noUnmarkedCommentsRule;
 
     beforeEach(() => {
-        noUnmarkedCommentsRule = new NoUnmarkedCommentsRule(validConfig);
+        noUnmarkedCommentsRule = new MarkedCommentsRule(validConfig);
     });
 
     it('returns empty array on invalid flags config', () => {
-        noUnmarkedCommentsRule = new NoUnmarkedCommentsRule({
+        noUnmarkedCommentsRule = new MarkedCommentsRule({
             ...validConfig,
             isAppliedToSingleLineComments: false,
             isAppliedToMultiLineComments: false,
@@ -52,7 +52,7 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on empty prefixes', () => {
-        noUnmarkedCommentsRule = new NoUnmarkedCommentsRule({
+        noUnmarkedCommentsRule = new MarkedCommentsRule({
             ...validConfig,
             prefixes: []
         });

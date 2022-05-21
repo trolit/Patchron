@@ -1,8 +1,8 @@
 const {
     common: {
+        MarkedCommentsRule,
         SingleLineBlockRule,
         PositionedKeywordsRule,
-        NoUnmarkedCommentsRule,
         ValueComparisionStyleRule,
         KeywordsOrderedByLengthRule
     }
@@ -11,7 +11,7 @@ const {
 module.exports = [
     {
         enabled: false,
-        reference: NoUnmarkedCommentsRule,
+        reference: MarkedCommentsRule,
         config: {
             prefixes: [
                 {

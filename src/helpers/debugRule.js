@@ -2,9 +2,9 @@
 
 const {
     common: {
+        MarkedCommentsRule,
         SingleLineBlockRule,
         PositionedKeywordsRule,
-        NoUnmarkedCommentsRule,
         ValueComparisionStyleRule,
         KeywordsOrderedByLengthRule
     },
@@ -12,9 +12,9 @@ const {
 } = require('../rules');
 
 const rules = {
+    MarkedCommentsRule,
     StrictWorkflowRule,
     SingleLineBlockRule,
-    NoUnmarkedCommentsRule,
     PositionedKeywordsRule,
     ValueComparisionStyleRule,
     KeywordsOrderedByLengthRule

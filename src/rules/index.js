@@ -1,15 +1,15 @@
 const StrictWorkflowRule = require('./pull/StrictWorkflow');
 
+const MarkedCommentsRule = require('./common/MarkedComments');
 const SingleLineBlockRule = require('./common/SingleLineBlock');
 const PositionedKeywordsRule = require('./common/PositionedKeywords');
-const NoUnmarkedCommentsRule = require('./common/NoUnmarkedComments');
 const ValueComparisionStyleRule = require('./common/ValueComparisionStyle');
 const KeywordsOrderedByLengthRule = require('./common/KeywordsOrderedByLength');
 
 module.exports = {
     common: {
+        MarkedCommentsRule,
         SingleLineBlockRule,
-        NoUnmarkedCommentsRule,
         PositionedKeywordsRule,
         ValueComparisionStyleRule,
         KeywordsOrderedByLengthRule
