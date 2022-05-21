@@ -10,6 +10,6 @@
  */
 
 /**
- * @typedef {Object} KeywordsOrderedByLengthConfig
+ * @typedef {object} KeywordsOrderedByLengthConfig
  * @property {Array<Keyword>} keywords
  */

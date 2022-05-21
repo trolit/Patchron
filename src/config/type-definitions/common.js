@@ -1,7 +1,7 @@
 // https://stackoverflow.com/a/60030618
 
 /**
- * @typedef {Object} Backticks `SplitPatchRow` property added via extension, `extedWithBackticks`
+ * @typedef {object} Backticks `SplitPatchRow` property added via extension, `extedWithBackticks`
  * @property {number} endLineIndex index of row with backticks (if `endLineIndex` equals this then it's single line with backticks and if different, multi-line with backticks)
  * @property {object} thisLine
  * @property {number} thisLine.firstBacktickIndex
@@ -10,7 +10,7 @@
  */
 
 /**
- * @typedef {Object} SplitPatchRow patch single row expressed with properties.
+ * @typedef {object} SplitPatchRow patch single row expressed with properties.
  * @property {number} index
  * @property {number} indentation indentation amount searched with `/\S|$/`
  * @property {string} content row content without GIT indication
@@ -19,7 +19,7 @@
  */
 
 /**
- * @typedef {Object} Patch part of file received via `getFiles` and extended in Pepega. Full response can be found here:
+ * @typedef {object} Patch part of file received via `getFiles` and extended in Pepega. Full response can be found here:
  * https://docs.github.com/en/rest/reference/pulls#list-pull-requests-files
  * @property {string} sha unique ID (a.k.a. the "SHA" or "hash") that allows to keep record of the specific changes committed along with who made them and when.
  * @property {string} filename e.g. `test/index.test.js`
@@ -40,21 +40,21 @@
  */
 
 /**
- * @typedef {Object} Repo
+ * @typedef {object} Repo
  * @property {string} owner repository owner
  * @property {string} repo repository name
  * @property {string} path path to file
  */
 
 /**
- * @typedef {Object} PullRequest
+ * @typedef {object} PullRequest
  * @property {string} owner hooked pull request owner's login
  * @property {number} id hooked pull request's id
  * @property {ProbotContext} context reference to Probot's context
  */
 
 /**
- * @typedef {Object} PepegaContext
+ * @typedef {object} PepegaContext
  * @property  {import('../../utilities/EventLog')} log
  * @property {Repo} repo
  * @property {PullRequest} pullRequest
@@ -69,7 +69,7 @@
  */
 
 /**
- * @typedef {Object} MultiLineComment file review comment
+ * @typedef {object} MultiLineComment file review comment
  * @property {string} owner repository owner's name
  * @property {string} repo reporitory's name
  * @property {number} pull_number PR id
@@ -82,7 +82,7 @@
  */
 
 /**
- * @typedef {Object} SingleLineComment file review comment
+ * @typedef {object} SingleLineComment file review comment
  * @property {string} owner repository owner's name
  * @property {string} repo reporitory's name
  * @property {number} pull_number PR id
