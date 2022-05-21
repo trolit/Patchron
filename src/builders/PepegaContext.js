@@ -2,8 +2,8 @@ const {
     settings: { isStoringLogsEnabled }
 } = require('../config');
 const EventEmitter = require('events');
-const EventLog = require('./EventLog');
-const updateLogPathJob = require('./updateLogPathJob');
+const EventLog = require('../utilities/EventLog');
+const updateLogPathJob = require('../utilities/updateLogPathJob');
 
 /**
  * Class wrapping Probot's features and Pepega's logic.
