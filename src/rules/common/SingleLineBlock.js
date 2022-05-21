@@ -1,3 +1,5 @@
+/// <reference path="../../config/type-definitions/rules/SingleLineBlock.js" />
+
 const BaseRule = require('../Base');
 const getContentNesting = require('../../helpers/getContentNesting');
 
@@ -7,12 +9,13 @@ class SingleLineBlockRule extends BaseRule {
      * - if provided block does not end by curly brace or single line, assign regular expression under `endIndicator` property to specify block end manually. For instance `endIndicator` of `do..while` could be ```/while/``` since we have no 100% certainity that it will always appear at the start of the line.
      * - if blocks have similiar parts, pay attention to their order e.g. if..else if..else and/or regular expression
      * - each block's expression should end with `.*`
-     * @param {object} config
-     * @param {Array<{name: string, expression: object, endIndicator: object?}>} config.blocks
-     * @param {boolean} config.curlyBraces - true indicates that matched blocks should be wrapped with curly braces {}
+     *
+     * @param {PepegaContext} pepegaContext
+     * @param {SingleLineBlockConfig} config
+     * @param {Patch} file
      */
-    constructor(pepegaContext, config) {
-        super(pepegaContext);
+    constructor(pepegaContext, config, file) {
+        super(pepegaContext, file);
 
         const { blocks, curlyBraces } = config;
 
@@ -20,21 +23,21 @@ class SingleLineBlockRule extends BaseRule {
         this.curlyBraces = curlyBraces;
     }
 
-    invoke(file) {
+    invoke() {
         if (!this.blocks.length) {
-            this.log.warning(__filename, 'No blocks defined', file);
+            this.log.warning(__filename, 'No blocks defined', this.file);
 
             return [];
         }
 
-        const { split_patch: splitPatch } = file;
+        const { splitPatch } = this.file;
         const data = this.setupData(splitPatch);
 
         if (!this._includesAnyMatch(data)) {
             this.log.warning(
                 __filename,
-                `${file?.filename} review skipped due to no single line blocks.`,
-                file
+                'Review skipped due to no single line blocks.',
+                this.file
             );
 
             return [];
@@ -47,10 +50,7 @@ class SingleLineBlockRule extends BaseRule {
             contentNesting
         );
 
-        const reviewComments = this._reviewSingleLineBlocks(
-            file,
-            singleLineBlocks
-        );
+        const reviewComments = this._reviewSingleLineBlocks(singleLineBlocks);
 
         return reviewComments;
     }
@@ -210,7 +210,7 @@ class SingleLineBlockRule extends BaseRule {
         return result || 1;
     }
 
-    _reviewSingleLineBlocks(file, singleLineBlocks) {
+    _reviewSingleLineBlocks(singleLineBlocks) {
         const reviewComments = [];
 
         for (const singleLineBlock of singleLineBlocks) {
@@ -222,12 +222,10 @@ class SingleLineBlockRule extends BaseRule {
                 reviewComments.push(
                     from === to
                         ? this.getSingleLineComment({
-                              file,
                               index: from,
                               body
                           })
                         : this.getMultiLineComment({
-                              file,
                               from,
                               to,
                               body
