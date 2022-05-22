@@ -1,4 +1,5 @@
 const {
+    nodeEnvironment,
     settings: { isStoringLogsEnabled }
 } = require('../config');
 const EventEmitter = require('events');
@@ -21,7 +22,7 @@ class PepegaContextBuilder {
             context: null
         };
 
-        if (isStoringLogsEnabled) {
+        if (isStoringLogsEnabled && nodeEnvironment !== 'test') {
             const eventEmitter = new EventEmitter();
 
             eventEmitter.on('path-updated', (updatedLog) => {

@@ -9,7 +9,7 @@ require('dotenv').config({
 });
 
 module.exports = {
-    env: {},
+    nodeEnvironment: process.env.NODE_ENV,
     settings: {
         isGetFilesRequestPaginated: false, // when `false`, getFiles can receive up to 3000 files
         delayBetweenCommentRequestsInSeconds: 3,
