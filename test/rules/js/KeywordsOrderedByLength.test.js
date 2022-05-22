@@ -1,3 +1,4 @@
+const nock = require('nock');
 const {
     describe,
     expect,
@@ -5,6 +6,7 @@ const {
     beforeEach,
     afterEach
 } = require('@jest/globals');
+
 const {
     common: { KeywordsOrderedByLengthRule }
 } = require('../../../src/rules');
@@ -21,8 +23,6 @@ const importKeywordConfig = {
 const validConfig = {
     keywords: [importKeywordConfig]
 };
-
-const nock = require('nock');
 
 describe('invoke function', () => {
     let pepegaContext = null;
