@@ -25,7 +25,7 @@ module.exports = () => {
 
     probot.load(app);
 
-    const pepegaContext = new PepegaContext(app);
+    const pepegaContext = new PepegaContext(probot);
 
     return pepegaContext;
 };
