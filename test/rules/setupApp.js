@@ -4,6 +4,7 @@ const nock = require('nock');
 const { Probot, ProbotOctokit } = require('probot');
 
 const app = require('../../src');
+const PepegaContext = require('../../src/builders/PepegaContext');
 
 const privateKey = fs.readFileSync(
     path.join(__dirname, '../fixtures/mock-cert.pem'),
@@ -24,5 +25,7 @@ module.exports = () => {
 
     probot.load(app);
 
-    return probot;
+    const pepegaContext = new PepegaContext(app);
+
+    return pepegaContext;
 };
