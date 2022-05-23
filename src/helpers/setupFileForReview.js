@@ -1,7 +1,7 @@
 /**
  * expands file object with following properties:
  * ```js
- * { commit_id, extension, split_patch }
+ * { commit_id, extension, splitPatch }
  * ```
  *
  * @param {object} file

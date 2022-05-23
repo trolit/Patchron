@@ -1,5 +1,16 @@
-const { describe, expect, it, beforeEach } = require('@jest/globals');
-const MarkedCommentsRule = require('../../../src/rules/common/MarkedComments');
+const nock = require('nock');
+const {
+    describe,
+    expect,
+    it,
+    beforeEach,
+    afterEach
+} = require('@jest/globals');
+
+const {
+    common: { MarkedCommentsRule }
+} = require('../../../src/rules');
+const setupApp = require('../setupApp');
 
 const validConfig = {
     prefixes: [
@@ -30,54 +41,80 @@ const validConfig = {
 };
 
 describe('invoke function', () => {
-    let noUnmarkedCommentsRule;
+    let pepegaContext = null;
 
     beforeEach(() => {
-        noUnmarkedCommentsRule = new MarkedCommentsRule(validConfig);
+        pepegaContext = setupApp();
+    });
+
+    afterEach(() => {
+        nock.cleanAll();
+
+        nock.enableNetConnect();
     });
 
     it('returns empty array on invalid flags config', () => {
-        noUnmarkedCommentsRule = new MarkedCommentsRule({
-            ...validConfig,
-            isAppliedToSingleLineComments: false,
-            isAppliedToMultiLineComments: false,
-            isAppliedToInlineComments: false
-        });
+        const markedCommentsRule = new MarkedCommentsRule(
+            pepegaContext,
+            {
+                ...validConfig,
+                isAppliedToSingleLineComments: false,
+                isAppliedToMultiLineComments: false,
+                isAppliedToInlineComments: false
+            },
+            {
+                ...validConfig,
+                isAppliedToSingleLineComments: false,
+                isAppliedToMultiLineComments: false,
+                isAppliedToInlineComments: false
+            },
+            {
+                filename: '...'
+            }
+        );
 
-        const result = noUnmarkedCommentsRule.invoke({
-            filename: '...'
-        });
+        const result = markedCommentsRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns empty array on empty prefixes', () => {
-        noUnmarkedCommentsRule = new MarkedCommentsRule({
-            ...validConfig,
-            prefixes: []
-        });
+        const markedCommentsRule = new MarkedCommentsRule(
+            pepegaContext,
+            {
+                ...validConfig,
+                prefixes: []
+            },
+            {
+                filename: '...'
+            }
+        );
 
-        const result = noUnmarkedCommentsRule.invoke({
-            filename: '...'
-        });
+        const result = markedCommentsRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid single line comments', () => {
-        const result = noUnmarkedCommentsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +10,7 @@ // this comment shouldn't be counted as it's only hunk header in patch`,
-                `+const payload = require('./fixtures/pull_request.opened');`,
-                `+const fs = require('fs');`,
-                `        // unchanged line comment `,
-                `+`,
-                `+const { expect, test, beforeEach, afterEach } = require('@jest/globals');`,
-                `-// removed comment`,
-                `-// removed comment 2`
-            ]
-        });
+        const markedCommentsRule = new MarkedCommentsRule(
+            pepegaContext,
+            validConfig,
+            {
+                filename: '...',
+                splitPatch: [
+                    `@@ -10,13 +10,7 @@ // this comment shouldn't be counted as it's only hunk header in patch`,
+                    `+const payload = require('./fixtures/pull_request.opened');`,
+                    `+const fs = require('fs');`,
+                    `        // unchanged line comment `,
+                    `+`,
+                    `+const { expect, test, beforeEach, afterEach } = require('@jest/globals');`,
+                    `-// removed comment`,
+                    `-// removed comment 2`
+                ]
+            }
+        );
+
+        const result = markedCommentsRule.invoke();
 
         expect(result).toHaveLength(1);
 
@@ -85,39 +122,51 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid single line comments', () => {
-        const result = noUnmarkedCommentsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +10,7 @@        // TODO: my imports`,
-                `+const payload = require('./fixtures/pull_request.opened');`,
-                `+const fs = require('fs');`,
-                `        // !: unchanged line comment `,
-                `+`,
-                `+const { expect, test, beforeEach, afterEach } = require('@jest/globals');`
-            ]
-        });
+        const markedCommentsRule = new MarkedCommentsRule(
+            pepegaContext,
+            validConfig,
+            {
+                filename: '...',
+                splitPatch: [
+                    `@@ -10,13 +10,7 @@        // TODO: my imports`,
+                    `+const payload = require('./fixtures/pull_request.opened');`,
+                    `+const fs = require('fs');`,
+                    `        // !: unchanged line comment `,
+                    `+`,
+                    `+const { expect, test, beforeEach, afterEach } = require('@jest/globals');`
+                ]
+            }
+        );
+
+        const result = markedCommentsRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid multi-line comments', () => {
-        const result = noUnmarkedCommentsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +5,15 @@`,
-                `+/**`,
-                `+* -> 1`,
-                `+* -> 2`,
-                `+*/`,
-                `+const payload = require('./fixtures/pull_request.opened');`,
-                `+/* multi-line comment as one-liner*/`,
-                `+/******another one-liner*****/`,
-                `+const fs = require('fs');`,
-                `+`,
-                `+const { expect, test, beforeEach, afterEach } = require('@jest/globals');`,
-                `-/* removed comment */`
-            ]
-        });
+        const markedCommentsRule = new MarkedCommentsRule(
+            pepegaContext,
+            validConfig,
+            {
+                filename: '...',
+                splitPatch: [
+                    `@@ -10,13 +5,15 @@`,
+                    `+/**`,
+                    `+* -> 1`,
+                    `+* -> 2`,
+                    `+*/`,
+                    `+const payload = require('./fixtures/pull_request.opened');`,
+                    `+/* multi-line comment as one-liner*/`,
+                    `+/******another one-liner*****/`,
+                    `+const fs = require('fs');`,
+                    `+`,
+                    `+const { expect, test, beforeEach, afterEach } = require('@jest/globals');`,
+                    `-/* removed comment */`
+                ]
+            }
+        );
+
+        const result = markedCommentsRule.invoke();
 
         expect(result).toHaveLength(3);
 
@@ -130,43 +179,55 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid multi-line comments', () => {
-        const result = noUnmarkedCommentsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +5,15 @@`,
-                `+/**`,
-                `+* -> 1`,
-                `+* TMP: -> 2`,
-                `+*/`,
-                `+const payload = require('./fixtures/pull_request.opened');`,
-                `+/* *: multi-line comment as one-liner */`,
-                `+/**: multi-line comment as one-liner */`,
-                `+const fs = require('fs');`,
-                `+`,
-                `+const { expect, test, beforeEach, afterEach } = require('@jest/globals');`,
-                `+* !: in inline flavour`,
-                `+*/`,
-                `-/* removed comment */`
-            ]
-        });
+        const markedCommentsRule = new MarkedCommentsRule(
+            pepegaContext,
+            validConfig,
+            {
+                filename: '...',
+                splitPatch: [
+                    `@@ -10,13 +5,15 @@`,
+                    `+/**`,
+                    `+* -> 1`,
+                    `+* TMP: -> 2`,
+                    `+*/`,
+                    `+const payload = require('./fixtures/pull_request.opened');`,
+                    `+/* *: multi-line comment as one-liner */`,
+                    `+/**: multi-line comment as one-liner */`,
+                    `+const fs = require('fs');`,
+                    `+`,
+                    `+const { expect, test, beforeEach, afterEach } = require('@jest/globals');`,
+                    `+* !: in inline flavour`,
+                    `+*/`,
+                    `-/* removed comment */`
+                ]
+            }
+        );
+
+        const result = markedCommentsRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid inline comments', () => {
-        const result = noUnmarkedCommentsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +2,15 @@`,
-                `+const payload = require('./fixtures/pull_request.opened'); // inline comment 1`,
-                `+const fs = require('fs'); /* inline comment 2 */`,
-                `+`,
-                `+const { expect, test, beforeEach, afterEach } = require('@jest/globals'); /*`,
-                `+* inline comment 3`,
-                `+*/`,
-                `-/* removed comment */`
-            ]
-        });
+        const markedCommentsRule = new MarkedCommentsRule(
+            pepegaContext,
+            validConfig,
+            {
+                filename: '...',
+                splitPatch: [
+                    `@@ -10,13 +2,15 @@`,
+                    `+const payload = require('./fixtures/pull_request.opened'); // inline comment 1`,
+                    `+const fs = require('fs'); /* inline comment 2 */`,
+                    `+`,
+                    `+const { expect, test, beforeEach, afterEach } = require('@jest/globals'); /*`,
+                    `+* inline comment 3`,
+                    `+*/`,
+                    `-/* removed comment */`
+                ]
+            }
+        );
+
+        const result = markedCommentsRule.invoke();
 
         expect(result).toHaveLength(3);
 
@@ -179,41 +240,53 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid inline comments', () => {
-        const result = noUnmarkedCommentsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +2,15 @@`,
-                `+const payload = require('./fixtures/pull_request.opened'); // *: inline comment 1`,
-                `+const fs = require('fs'); /* !: inline comment 2 */`,
-                `+`,
-                `+const { expect, test, beforeEach, afterEach } = require('@jest/globals'); /* `,
-                `+* !: inline comment 3`,
-                `+*/`,
-                `-/* removed comment */`
-            ]
-        });
+        const markedCommentsRule = new MarkedCommentsRule(
+            pepegaContext,
+            validConfig,
+            {
+                filename: '...',
+                splitPatch: [
+                    `@@ -10,13 +2,15 @@`,
+                    `+const payload = require('./fixtures/pull_request.opened'); // *: inline comment 1`,
+                    `+const fs = require('fs'); /* !: inline comment 2 */`,
+                    `+`,
+                    `+const { expect, test, beforeEach, afterEach } = require('@jest/globals'); /* `,
+                    `+* !: inline comment 3`,
+                    `+*/`,
+                    `-/* removed comment */`
+                ]
+            }
+        );
+
+        const result = markedCommentsRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review with correct range on invalid multi-line comments', () => {
-        const result = noUnmarkedCommentsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +2,15 @@`,
-                `/* `,
-                `* line -> 1 (unchanged)`,
-                `+* line -> 2 (added)`,
-                `-* line -> 3 (removed)`,
-                `*/`,
-                `+const payload = require('./fixtures/pull_request.opened'); /*`,
-                `+* invalid comment`,
-                `-* removed line`,
-                `*/`,
-                `+const fs = require('fs'); /* !: inline comment 2 */`,
-                `+`
-            ]
-        });
+        const markedCommentsRule = new MarkedCommentsRule(
+            pepegaContext,
+            validConfig,
+            {
+                filename: '...',
+                splitPatch: [
+                    `@@ -10,13 +2,15 @@`,
+                    `/* `,
+                    `* line -> 1 (unchanged)`,
+                    `+* line -> 2 (added)`,
+                    `-* line -> 3 (removed)`,
+                    `*/`,
+                    `+const payload = require('./fixtures/pull_request.opened'); /*`,
+                    `+* invalid comment`,
+                    `-* removed line`,
+                    `*/`,
+                    `+const fs = require('fs'); /* !: inline comment 2 */`,
+                    `+`
+                ]
+            }
+        );
+
+        const result = markedCommentsRule.invoke();
 
         expect(result).toHaveLength(2);
 
