@@ -11,6 +11,7 @@ const {
     common: { SingleLineBlockRule }
 } = require('../../../src/rules');
 const setupApp = require('../setupApp');
+const initializeFile = require('../initializeFile');
 
 const validConfig = {
     blocks: [
@@ -45,9 +46,12 @@ const validConfig = {
 
 describe('invoke function', () => {
     let pepegaContext = null;
+    let file = {};
 
     beforeEach(() => {
         pepegaContext = setupApp();
+
+        file = initializeFile();
     });
 
     afterEach(() => {
@@ -63,7 +67,7 @@ describe('invoke function', () => {
                 blocks: [],
                 curlyBraces: false
             },
-            { filename: '...' }
+            file
         );
 
         const result = singleLineBlockRule.invoke();
@@ -82,7 +86,7 @@ describe('invoke function', () => {
             pepegaContext,
             validConfig,
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +1,7 @@`,
                     `-const x = 3;`,
@@ -126,7 +130,7 @@ describe('invoke function', () => {
             pepegaContext,
             validConfig,
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +1,7 @@`,
                     `-const x = 3;`,
@@ -184,7 +188,7 @@ describe('invoke function', () => {
             pepegaContext,
             validConfig,
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +1,7 @@`,
                     `+for (let index = 0; index < result; index++) {`,
@@ -210,7 +214,7 @@ describe('invoke function', () => {
             pepegaContext,
             validConfig,
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +1,7 @@`,
                     `+for (let index = 0; index < result; index++) {`,
@@ -241,7 +245,7 @@ describe('invoke function', () => {
                 curlyBraces: false
             },
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +1,7 @@`,
                     `-const x = 3;`,
@@ -282,7 +286,7 @@ describe('invoke function', () => {
                 curlyBraces: false
             },
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +1,7 @@`,
                     `-const x = 3;`,
@@ -349,7 +353,7 @@ describe('invoke function', () => {
                 curlyBraces: false
             },
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +1,7 @@`,
                     `+for (let index = 0; index < result; index++) {`,
@@ -377,7 +381,7 @@ describe('invoke function', () => {
                 curlyBraces: false
             },
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +1,7 @@`,
                     `+for (let index = 0; index < result; index++) {`,
@@ -412,7 +416,7 @@ describe('invoke function', () => {
             pepegaContext,
             validConfig,
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +1,7 @@`,
                     `-const x = 3;`,
@@ -466,7 +470,7 @@ describe('invoke function', () => {
             pepegaContext,
             validConfig,
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +1,7 @@`,
                     `-const x = 3;`,
@@ -534,7 +538,7 @@ describe('invoke function', () => {
             pepegaContext,
             validConfig,
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +1,7 @@`,
                     `+do {`,
@@ -559,7 +563,7 @@ describe('invoke function', () => {
             pepegaContext,
             validConfig,
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +1,7 @@`,
                     `+do {`,
@@ -590,7 +594,7 @@ describe('invoke function', () => {
                 curlyBraces: false
             },
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +1,7 @@`,
                     `-const x = 3;`,
@@ -643,7 +647,7 @@ describe('invoke function', () => {
                 curlyBraces: false
             },
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +1,7 @@`,
                     `-const x = 3;`,
@@ -720,7 +724,7 @@ describe('invoke function', () => {
                 curlyBraces: false
             },
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +1,7 @@`,
                     `+do {`,
@@ -748,7 +752,7 @@ describe('invoke function', () => {
                 curlyBraces: false
             },
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +1,7 @@`,
                     `+do {`,

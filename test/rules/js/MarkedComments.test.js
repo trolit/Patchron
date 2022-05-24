@@ -11,6 +11,7 @@ const {
     common: { MarkedCommentsRule }
 } = require('../../../src/rules');
 const setupApp = require('../setupApp');
+const initializeFile = require('../initializeFile');
 
 const validConfig = {
     prefixes: [
@@ -42,9 +43,12 @@ const validConfig = {
 
 describe('invoke function', () => {
     let pepegaContext = null;
+    let file = {};
 
     beforeEach(() => {
         pepegaContext = setupApp();
+
+        file = initializeFile();
     });
 
     afterEach(() => {
@@ -68,9 +72,7 @@ describe('invoke function', () => {
                 isAppliedToMultiLineComments: false,
                 isAppliedToInlineComments: false
             },
-            {
-                filename: '...'
-            }
+            file
         );
 
         const result = markedCommentsRule.invoke();
@@ -85,9 +87,7 @@ describe('invoke function', () => {
                 ...validConfig,
                 prefixes: []
             },
-            {
-                filename: '...'
-            }
+            file
         );
 
         const result = markedCommentsRule.invoke();
@@ -100,7 +100,7 @@ describe('invoke function', () => {
             pepegaContext,
             validConfig,
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +10,7 @@ // this comment shouldn't be counted as it's only hunk header in patch`,
                     `+const payload = require('./fixtures/pull_request.opened');`,
@@ -126,7 +126,7 @@ describe('invoke function', () => {
             pepegaContext,
             validConfig,
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +10,7 @@        // TODO: my imports`,
                     `+const payload = require('./fixtures/pull_request.opened');`,
@@ -148,7 +148,7 @@ describe('invoke function', () => {
             pepegaContext,
             validConfig,
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +5,15 @@`,
                     `+/**`,
@@ -183,7 +183,7 @@ describe('invoke function', () => {
             pepegaContext,
             validConfig,
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +5,15 @@`,
                     `+/**`,
@@ -213,7 +213,7 @@ describe('invoke function', () => {
             pepegaContext,
             validConfig,
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +2,15 @@`,
                     `+const payload = require('./fixtures/pull_request.opened'); // inline comment 1`,
@@ -244,7 +244,7 @@ describe('invoke function', () => {
             pepegaContext,
             validConfig,
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +2,15 @@`,
                     `+const payload = require('./fixtures/pull_request.opened'); // *: inline comment 1`,
@@ -268,7 +268,7 @@ describe('invoke function', () => {
             pepegaContext,
             validConfig,
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +2,15 @@`,
                     `/* `,

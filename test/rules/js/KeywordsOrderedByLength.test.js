@@ -11,6 +11,7 @@ const {
     common: { KeywordsOrderedByLengthRule }
 } = require('../../../src/rules');
 const setupApp = require('../setupApp');
+const initializeFile = require('../initializeFile');
 
 const importKeywordConfig = {
     name: 'import',
@@ -26,9 +27,12 @@ const validConfig = {
 
 describe('invoke function', () => {
     let pepegaContext = null;
+    let file = {};
 
     beforeEach(() => {
         pepegaContext = setupApp();
+
+        file = initializeFile();
     });
 
     afterEach(() => {
@@ -43,7 +47,7 @@ describe('invoke function', () => {
             {
                 keywords: []
             },
-            { filename: '...' }
+            file
         );
 
         const result = keywordsOrderedByLengthRule.invoke();
@@ -56,7 +60,7 @@ describe('invoke function', () => {
             pepegaContext,
             validConfig,
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +5,7 @@`,
                     `+import getLastNumber from '../helpers/getLastNumber'`,
@@ -84,7 +88,7 @@ describe('invoke function', () => {
             pepegaContext,
             validConfig,
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +5,7 @@`,
                     ` import dedent from 'dedent-js'`,
@@ -109,7 +113,7 @@ describe('invoke function', () => {
             pepegaContext,
             validConfig,
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +5,7 @@`,
                     ` import dedent from 'dedent-js'`,
@@ -136,7 +140,7 @@ describe('invoke function', () => {
             pepegaContext,
             validConfig,
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +5,7 @@`,
                     ` import dedent from 'dedent-js'`,
@@ -167,7 +171,7 @@ describe('invoke function', () => {
                 ]
             },
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +5,7 @@`,
                     `+import usersController from '../controllers/UsersController'`,
@@ -202,7 +206,7 @@ describe('invoke function', () => {
                 ]
             },
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +5,7 @@`,
                     `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`,
@@ -238,7 +242,7 @@ describe('invoke function', () => {
                 ]
             },
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +5,7 @@`,
                     `+import {`,
@@ -282,7 +286,7 @@ describe('invoke function', () => {
                 ]
             },
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +5,7 @@`,
                     `+import {`,
@@ -325,7 +329,7 @@ describe('invoke function', () => {
                 ]
             },
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +5,7 @@`,
                     `+import {`,
@@ -369,7 +373,7 @@ describe('invoke function', () => {
                 ]
             },
             {
-                filename: '...',
+                ...file,
                 splitPatch: [
                     `@@ -10,13 +5,7 @@`,
                     `+import uniq from 'lodash/uniq'`,
