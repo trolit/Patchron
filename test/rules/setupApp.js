@@ -20,7 +20,9 @@ module.exports = () => {
         Octokit: ProbotOctokit.defaults({
             retry: { enabled: false },
             throttle: { enabled: false }
-        })
+        }),
+        // when assigned, output logs only from assigned level and above
+        logLevel: 'fatal'
     });
 
     probot.load(app);
