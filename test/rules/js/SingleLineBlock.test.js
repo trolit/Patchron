@@ -1,5 +1,16 @@
-const { describe, expect, it, beforeEach } = require('@jest/globals');
-const SingleLineBlockRule = require('../../../src/rules/common/SingleLineBlock');
+const nock = require('nock');
+const {
+    describe,
+    expect,
+    it,
+    beforeEach,
+    afterEach
+} = require('@jest/globals');
+
+const {
+    common: { SingleLineBlockRule }
+} = require('../../../src/rules');
+const setupApp = require('../setupApp');
 
 const validConfig = {
     blocks: [
@@ -33,21 +44,29 @@ const validConfig = {
 };
 
 describe('invoke function', () => {
-    let singleLineBlockRule;
+    let pepegaContext = null;
 
     beforeEach(() => {
-        singleLineBlockRule = new SingleLineBlockRule(validConfig);
+        pepegaContext = setupApp();
+    });
+
+    afterEach(() => {
+        nock.cleanAll();
+
+        nock.enableNetConnect();
     });
 
     it('returns empty array on invalid blocks config', () => {
-        singleLineBlockRule = new SingleLineBlockRule({
-            blocks: [],
-            curlyBraces: false
-        });
+        const singleLineBlockRule = new SingleLineBlockRule(
+            pepegaContext,
+            {
+                blocks: [],
+                curlyBraces: false
+            },
+            { filename: '...' }
+        );
 
-        const result = singleLineBlockRule.invoke({
-            filename: '...'
-        });
+        const result = singleLineBlockRule.invoke();
 
         expect(result).toEqual([]);
     });
@@ -59,71 +78,83 @@ describe('invoke function', () => {
      */
 
     it('returns empty array on valid single-line if/else if/else blocks (with curly braces)', () => {
-        const result = singleLineBlockRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                `-const x = 3;`,
-                `+const x = 4;`,
-                `+const y = 5;`,
-                `+if (x === y) { result = x; }`,
-                `+`,
-                `+if (x > y)`,
-                `+{`,
-                `+    result = x + y;`,
-                `+}`,
-                `+else if (x <= y)`,
-                `+{`,
-                `+    result = x - y;`,
-                `+}`,
-                `+else`,
-                `+{`,
-                `+    result = 0;`,
-                `+}`,
-                `+`,
-                `+for (let index = 0; index < result; index++) {`,
-                `+    if (index % 2 === 0) {`,
-                `+        console.log(index);`,
-                `+    } else if (index % 3 === 0) {`,
-                `+        if (result > 18) { continue; }`,
-                `+        else if (result < 6) { result += 2; }`,
-                `+        else { break; }`,
-                `+    }`,
-                `+}`
-            ]
-        });
+        const singleLineBlockRule = new SingleLineBlockRule(
+            pepegaContext,
+            validConfig,
+            {
+                filename: '...',
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    `-const x = 3;`,
+                    `+const x = 4;`,
+                    `+const y = 5;`,
+                    `+if (x === y) { result = x; }`,
+                    `+`,
+                    `+if (x > y)`,
+                    `+{`,
+                    `+    result = x + y;`,
+                    `+}`,
+                    `+else if (x <= y)`,
+                    `+{`,
+                    `+    result = x - y;`,
+                    `+}`,
+                    `+else`,
+                    `+{`,
+                    `+    result = 0;`,
+                    `+}`,
+                    `+`,
+                    `+for (let index = 0; index < result; index++) {`,
+                    `+    if (index % 2 === 0) {`,
+                    `+        console.log(index);`,
+                    `+    } else if (index % 3 === 0) {`,
+                    `+        if (result > 18) { continue; }`,
+                    `+        else if (result < 6) { result += 2; }`,
+                    `+        else { break; }`,
+                    `+    }`,
+                    `+}`
+                ]
+            }
+        );
+
+        const result = singleLineBlockRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid single-line if/else if/else blocks (with curly braces)', () => {
-        const result = singleLineBlockRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                `-const x = 3;`,
-                `+const x = 4;`,
-                `+const y = 5;`,
-                `+if (x === y) result = x;`,
-                `+`,
-                `+if (x > y)`,
-                `+    result = x + y;`,
-                `+else if (x <= y)`,
-                `+    result = x - y;`,
-                `+else`,
-                `+    result = 0;`,
-                `+`,
-                `+for (let index = 0; index < result; index++) {`,
-                `+    if (index % 2 === 0)`,
-                `+        console.log(index);`,
-                `+    else if (index % 3 === 0) {`,
-                `+        if (result > 18) continue;`,
-                `+        else if (result < 6) result += 2;`,
-                `+        else break;`,
-                `+    }`,
-                `+}`
-            ]
-        });
+        const singleLineBlockRule = new SingleLineBlockRule(
+            pepegaContext,
+            validConfig,
+            {
+                filename: '...',
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    `-const x = 3;`,
+                    `+const x = 4;`,
+                    `+const y = 5;`,
+                    `+if (x === y) result = x;`,
+                    `+`,
+                    `+if (x > y)`,
+                    `+    result = x + y;`,
+                    `+else if (x <= y)`,
+                    `+    result = x - y;`,
+                    `+else`,
+                    `+    result = 0;`,
+                    `+`,
+                    `+for (let index = 0; index < result; index++) {`,
+                    `+    if (index % 2 === 0)`,
+                    `+        console.log(index);`,
+                    `+    else if (index % 3 === 0) {`,
+                    `+        if (result > 18) continue;`,
+                    `+        else if (result < 6) result += 2;`,
+                    `+        else break;`,
+                    `+    }`,
+                    `+}`
+                ]
+            }
+        );
+
+        const result = singleLineBlockRule.invoke();
 
         expect(result).toHaveLength(8);
 
@@ -149,40 +180,52 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid nested single-line if block (with curly braces)', () => {
-        const result = singleLineBlockRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                `+for (let index = 0; index < result; index++) {`,
-                `+    if (1) {`,
-                `+        if (2) {`,
-                `+            if (3) {`,
-                `+                console.log('abc');`,
-                `+            }`,
-                `+        }`,
-                `+    }`,
-                `+}`
-            ]
-        });
+        const singleLineBlockRule = new SingleLineBlockRule(
+            pepegaContext,
+            validConfig,
+            {
+                filename: '...',
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    `+for (let index = 0; index < result; index++) {`,
+                    `+    if (1) {`,
+                    `+        if (2) {`,
+                    `+            if (3) {`,
+                    `+                console.log('abc');`,
+                    `+            }`,
+                    `+        }`,
+                    `+    }`,
+                    `+}`
+                ]
+            }
+        );
+
+        const result = singleLineBlockRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid nested single-line if block (with curly braces)', () => {
-        const result = singleLineBlockRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                `+for (let index = 0; index < result; index++) {`,
-                `+    if (1) {`,
-                `+        if (2) {`,
-                `+            if (3)`,
-                `+                console.log('abc');`,
-                `+        }`,
-                `+    }`,
-                `+}`
-            ]
-        });
+        const singleLineBlockRule = new SingleLineBlockRule(
+            pepegaContext,
+            validConfig,
+            {
+                filename: '...',
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    `+for (let index = 0; index < result; index++) {`,
+                    `+    if (1) {`,
+                    `+        if (2) {`,
+                    `+            if (3)`,
+                    `+                console.log('abc');`,
+                    `+        }`,
+                    `+    }`,
+                    `+}`
+                ]
+            }
+        );
+
+        const result = singleLineBlockRule.invoke();
 
         expect(result).toHaveLength(1);
 
@@ -191,81 +234,89 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid single-line if/else if/else blocks (without curly braces)', () => {
-        const singleLineBlockRule = new SingleLineBlockRule({
-            ...validConfig,
-            curlyBraces: false
-        });
+        const singleLineBlockRule = new SingleLineBlockRule(
+            pepegaContext,
+            {
+                ...validConfig,
+                curlyBraces: false
+            },
+            {
+                filename: '...',
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    `-const x = 3;`,
+                    `+const x = 4;`,
+                    `+const y = 5;`,
+                    `+if (x === y) result = x;`,
+                    `+`,
+                    `+if (x > y)`,
+                    `+    result = x + y;`,
+                    `+else if (x <= y)`,
+                    `+    result = x - y;`,
+                    `+else`,
+                    `+    result = 0;`,
+                    `+`,
+                    `+for (let index = 0; index < result; index++) {`,
+                    `+    if (index % 2 === 0)`,
+                    `+        console.log(index);`,
+                    `+    else if (index % 3 === 0) {`,
+                    `+        if (result > 18) continue;`,
+                    `+        else if (result < 6) result += 2;`,
+                    `+        else break;`,
+                    `+    }`,
+                    `+}`
+                ]
+            }
+        );
 
-        const result = singleLineBlockRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                `-const x = 3;`,
-                `+const x = 4;`,
-                `+const y = 5;`,
-                `+if (x === y) result = x;`,
-                `+`,
-                `+if (x > y)`,
-                `+    result = x + y;`,
-                `+else if (x <= y)`,
-                `+    result = x - y;`,
-                `+else`,
-                `+    result = 0;`,
-                `+`,
-                `+for (let index = 0; index < result; index++) {`,
-                `+    if (index % 2 === 0)`,
-                `+        console.log(index);`,
-                `+    else if (index % 3 === 0) {`,
-                `+        if (result > 18) continue;`,
-                `+        else if (result < 6) result += 2;`,
-                `+        else break;`,
-                `+    }`,
-                `+}`
-            ]
-        });
+        const result = singleLineBlockRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid single-line if/else if/else blocks (without curly braces)', () => {
-        const singleLineBlockRule = new SingleLineBlockRule({
-            ...validConfig,
-            curlyBraces: false
-        });
+        const singleLineBlockRule = new SingleLineBlockRule(
+            pepegaContext,
+            {
+                ...validConfig,
+                curlyBraces: false
+            },
+            {
+                filename: '...',
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    `-const x = 3;`,
+                    `+const x = 4;`,
+                    `+const y = 5;`,
+                    `+if (x === y) { result = x; }`,
+                    `+`,
+                    `+if (x > y)`,
+                    `+{`,
+                    `+    result = x + y;`,
+                    `+}`,
+                    `+else if (x <= y)`,
+                    `+{`,
+                    `+    result = x - y;`,
+                    `+}`,
+                    `+else`,
+                    `+{`,
+                    `+    result = 0;`,
+                    `+}`,
+                    `+`,
+                    `+for (let index = 0; index < result; index++) {`,
+                    `+    if (index % 2 === 0) {`,
+                    `+        console.log(index);`,
+                    `+    } else if (index % 3 === 0) {`,
+                    `+        if (result > 18) { continue; }`,
+                    `+        else if (result < 6) { result += 2; }`,
+                    `+        else { break; }`,
+                    `+    }`,
+                    `+}`
+                ]
+            }
+        );
 
-        const result = singleLineBlockRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                `-const x = 3;`,
-                `+const x = 4;`,
-                `+const y = 5;`,
-                `+if (x === y) { result = x; }`,
-                `+`,
-                `+if (x > y)`,
-                `+{`,
-                `+    result = x + y;`,
-                `+}`,
-                `+else if (x <= y)`,
-                `+{`,
-                `+    result = x - y;`,
-                `+}`,
-                `+else`,
-                `+{`,
-                `+    result = 0;`,
-                `+}`,
-                `+`,
-                `+for (let index = 0; index < result; index++) {`,
-                `+    if (index % 2 === 0) {`,
-                `+        console.log(index);`,
-                `+    } else if (index % 3 === 0) {`,
-                `+        if (result > 18) { continue; }`,
-                `+        else if (result < 6) { result += 2; }`,
-                `+        else { break; }`,
-                `+    }`,
-                `+}`
-            ]
-        });
+        const result = singleLineBlockRule.invoke();
 
         expect(result).toHaveLength(8);
 
@@ -291,50 +342,58 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid nested single-line if block (without curly braces)', () => {
-        const singleLineBlockRule = new SingleLineBlockRule({
-            ...validConfig,
-            curlyBraces: false
-        });
+        const singleLineBlockRule = new SingleLineBlockRule(
+            pepegaContext,
+            {
+                ...validConfig,
+                curlyBraces: false
+            },
+            {
+                filename: '...',
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    `+for (let index = 0; index < result; index++) {`,
+                    `+    if (1) {`,
+                    `+        if (2) {`,
+                    `+            if (3)`,
+                    `+                console.log('abc');`,
+                    `+        }`,
+                    `+    }`,
+                    `+}`
+                ]
+            }
+        );
 
-        const result = singleLineBlockRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                `+for (let index = 0; index < result; index++) {`,
-                `+    if (1) {`,
-                `+        if (2) {`,
-                `+            if (3)`,
-                `+                console.log('abc');`,
-                `+        }`,
-                `+    }`,
-                `+}`
-            ]
-        });
+        const result = singleLineBlockRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid nested single-line if block (without curly braces)', () => {
-        const singleLineBlockRule = new SingleLineBlockRule({
-            ...validConfig,
-            curlyBraces: false
-        });
+        const singleLineBlockRule = new SingleLineBlockRule(
+            pepegaContext,
+            {
+                ...validConfig,
+                curlyBraces: false
+            },
+            {
+                filename: '...',
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    `+for (let index = 0; index < result; index++) {`,
+                    `+    if (1) {`,
+                    `+        if (2) {`,
+                    `+            if (3) {`,
+                    `+                console.log('abc');`,
+                    `+            }`,
+                    `+        }`,
+                    `+    }`,
+                    `+}`
+                ]
+            }
+        );
 
-        const result = singleLineBlockRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                `+for (let index = 0; index < result; index++) {`,
-                `+    if (1) {`,
-                `+        if (2) {`,
-                `+            if (3) {`,
-                `+                console.log('abc');`,
-                `+            }`,
-                `+        }`,
-                `+    }`,
-                `+}`
-            ]
-        });
+        const result = singleLineBlockRule.invoke();
 
         expect(result).toHaveLength(1);
 
@@ -349,94 +408,106 @@ describe('invoke function', () => {
      */
 
     it('returns empty array on valid single-line do..while blocks (with curly braces)', () => {
-        const result = singleLineBlockRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                `-const x = 3;`,
-                `+`,
-                ` do result++; { while(result < 9999); }`,
-                `+`,
-                `+do {`,
-                `-    result--;`,
-                `+    result++;`,
-                `+} while (result < 9999);`,
-                `+`,
-                `+do`,
-                `+{`,
-                `-    result--;`,
-                `+    result++;`,
-                `+}`,
-                `+while (result < 9999);`,
-                `+`,
-                `-do { result--; }`,
-                `+do { result++; }`,
-                `+    while (result < 9999);`,
-                `+`,
-                `+if (result) {`,
-                `+    this.increaseResultByValue(10);`,
-                `+    do {`,
-                `-        console.log('test123');`,
-                `+        something();`,
-                `+       }`,
-                `+    while (result < 9999);`,
-                `+}`,
-                `+do {`,
-                `+    console.log('1');`,
-                `+}`,
-                `+while (1);`,
-                `+while (123 === 123) { break; }`,
-                `+do { console.log('1');`,
-                `+} while (1);`,
-                `-`,
-                `-do { console.log('test') } while (1);`
-            ]
-        });
+        const singleLineBlockRule = new SingleLineBlockRule(
+            pepegaContext,
+            validConfig,
+            {
+                filename: '...',
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    `-const x = 3;`,
+                    `+`,
+                    ` do result++; { while(result < 9999); }`,
+                    `+`,
+                    `+do {`,
+                    `-    result--;`,
+                    `+    result++;`,
+                    `+} while (result < 9999);`,
+                    `+`,
+                    `+do`,
+                    `+{`,
+                    `-    result--;`,
+                    `+    result++;`,
+                    `+}`,
+                    `+while (result < 9999);`,
+                    `+`,
+                    `-do { result--; }`,
+                    `+do { result++; }`,
+                    `+    while (result < 9999);`,
+                    `+`,
+                    `+if (result) {`,
+                    `+    this.increaseResultByValue(10);`,
+                    `+    do {`,
+                    `-        console.log('test123');`,
+                    `+        something();`,
+                    `+       }`,
+                    `+    while (result < 9999);`,
+                    `+}`,
+                    `+do {`,
+                    `+    console.log('1');`,
+                    `+}`,
+                    `+while (1);`,
+                    `+while (123 === 123) { break; }`,
+                    `+do { console.log('1');`,
+                    `+} while (1);`,
+                    `-`,
+                    `-do { console.log('test') } while (1);`
+                ]
+            }
+        );
+
+        const result = singleLineBlockRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid single-line do..while blocks (with curly braces)', () => {
-        const result = singleLineBlockRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                `-const x = 3;`,
-                `+`,
-                ` do result++; while(result < 9999);`,
-                `+`,
-                `+do`,
-                `-    result--;`,
-                `+    result++;`,
-                `+while (result < 9999);`,
-                `+`,
-                `+do`,
-                `-    result--;`,
-                `+    result++;`,
-                `+while (result < 9999);`,
-                `+`,
-                `-do result--;`,
-                `+do result++;`,
-                `+    while (result < 9999);`,
-                `+`,
-                `+if (result) {`,
-                `+    this.increaseResultByValue(10);`,
-                `+    do`,
-                `-        console.log('test123');`,
-                `+        something();`,
-                `+    while (result < 9999);`,
-                `+}`,
-                `+do {`,
-                `+    console.log('1');`,
-                `+}`,
-                `+while (1);`,
-                `+while (123 === 123) { break; }`,
-                `+do console.log('1');`,
-                `+    while (1);`,
-                `-`,
-                `-do { console.log('test') } while (1);`
-            ]
-        });
+        const singleLineBlockRule = new SingleLineBlockRule(
+            pepegaContext,
+            validConfig,
+            {
+                filename: '...',
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    `-const x = 3;`,
+                    `+`,
+                    ` do result++; while(result < 9999);`,
+                    `+`,
+                    `+do`,
+                    `-    result--;`,
+                    `+    result++;`,
+                    `+while (result < 9999);`,
+                    `+`,
+                    `+do`,
+                    `-    result--;`,
+                    `+    result++;`,
+                    `+while (result < 9999);`,
+                    `+`,
+                    `-do result--;`,
+                    `+do result++;`,
+                    `+    while (result < 9999);`,
+                    `+`,
+                    `+if (result) {`,
+                    `+    this.increaseResultByValue(10);`,
+                    `+    do`,
+                    `-        console.log('test123');`,
+                    `+        something();`,
+                    `+    while (result < 9999);`,
+                    `+}`,
+                    `+do {`,
+                    `+    console.log('1');`,
+                    `+}`,
+                    `+while (1);`,
+                    `+while (123 === 123) { break; }`,
+                    `+do console.log('1');`,
+                    `+    while (1);`,
+                    `-`,
+                    `-do { console.log('test') } while (1);`
+                ]
+            }
+        );
+
+        const result = singleLineBlockRule.invoke();
 
         expect(result).toHaveLength(6);
 
@@ -459,39 +530,51 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid nested single-line do..while block (with curly braces)', () => {
-        const result = singleLineBlockRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                `+do {`,
-                `+    do`,
-                `+    {`,
-                `+        do {`,
-                `+            console.log('abc');`,
-                `+        } while(3);`,
-                `+    } while(2);`,
-                `+} while (1);`
-            ]
-        });
+        const singleLineBlockRule = new SingleLineBlockRule(
+            pepegaContext,
+            validConfig,
+            {
+                filename: '...',
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    `+do {`,
+                    `+    do`,
+                    `+    {`,
+                    `+        do {`,
+                    `+            console.log('abc');`,
+                    `+        } while(3);`,
+                    `+    } while(2);`,
+                    `+} while (1);`
+                ]
+            }
+        );
+
+        const result = singleLineBlockRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid nested single-line do..while block (with curly braces)', () => {
-        const result = singleLineBlockRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                `+do {`,
-                `+    do`,
-                `+    {`,
-                `+        do`,
-                `+            console.log('abc');`,
-                `+        while(3);`,
-                `+    } while(2);`,
-                `+} while (1);`
-            ]
-        });
+        const singleLineBlockRule = new SingleLineBlockRule(
+            pepegaContext,
+            validConfig,
+            {
+                filename: '...',
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    `+do {`,
+                    `+    do`,
+                    `+    {`,
+                    `+        do`,
+                    `+            console.log('abc');`,
+                    `+        while(3);`,
+                    `+    } while(2);`,
+                    `+} while (1);`
+                ]
+            }
+        );
+
+        const result = singleLineBlockRule.invoke();
 
         expect(result).toHaveLength(1);
 
@@ -500,103 +583,111 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid single-line do..while blocks (without curly braces)', () => {
-        const singleLineBlockRule = new SingleLineBlockRule({
-            ...validConfig,
-            curlyBraces: false
-        });
+        const singleLineBlockRule = new SingleLineBlockRule(
+            pepegaContext,
+            {
+                ...validConfig,
+                curlyBraces: false
+            },
+            {
+                filename: '...',
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    `-const x = 3;`,
+                    `+`,
+                    ` do result++; while(result < 9999);`,
+                    `+`,
+                    `+do`,
+                    `-    result--;`,
+                    `+    result++;`,
+                    `+while (result < 9999);`,
+                    `+`,
+                    `+do`,
+                    `-    result--;`,
+                    `+    result++;`,
+                    `+while (result < 9999);`,
+                    `+`,
+                    `-do { result--; }`,
+                    `+do result++;`,
+                    `+    while (result < 9999);`,
+                    `+`,
+                    `+if (result) {`,
+                    `+    this.increaseResultByValue(10);`,
+                    `+    do`,
+                    `-        console.log('test123');`,
+                    `+        something();`,
+                    `+    while (result < 9999);`,
+                    `+}`,
+                    `+do`,
+                    `+    console.log('1');`,
+                    `+while (1);`,
+                    `+while (123 === 123) break;`,
+                    `+do console.log('1');`,
+                    `+    while (1);`,
+                    `-`,
+                    `-do { console.log('test') } while (1);`
+                ]
+            }
+        );
 
-        const result = singleLineBlockRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                `-const x = 3;`,
-                `+`,
-                ` do result++; while(result < 9999);`,
-                `+`,
-                `+do`,
-                `-    result--;`,
-                `+    result++;`,
-                `+while (result < 9999);`,
-                `+`,
-                `+do`,
-                `-    result--;`,
-                `+    result++;`,
-                `+while (result < 9999);`,
-                `+`,
-                `-do { result--; }`,
-                `+do result++;`,
-                `+    while (result < 9999);`,
-                `+`,
-                `+if (result) {`,
-                `+    this.increaseResultByValue(10);`,
-                `+    do`,
-                `-        console.log('test123');`,
-                `+        something();`,
-                `+    while (result < 9999);`,
-                `+}`,
-                `+do`,
-                `+    console.log('1');`,
-                `+while (1);`,
-                `+while (123 === 123) break;`,
-                `+do console.log('1');`,
-                `+    while (1);`,
-                `-`,
-                `-do { console.log('test') } while (1);`
-            ]
-        });
+        const result = singleLineBlockRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid single-line do..while blocks (without curly braces)', () => {
-        const singleLineBlockRule = new SingleLineBlockRule({
-            ...validConfig,
-            curlyBraces: false
-        });
+        const singleLineBlockRule = new SingleLineBlockRule(
+            pepegaContext,
+            {
+                ...validConfig,
+                curlyBraces: false
+            },
+            {
+                filename: '...',
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    `-const x = 3;`,
+                    `+`,
+                    ` do result++; { while(result < 9999); }`,
+                    `+`,
+                    `+do {`,
+                    `-    result--;`,
+                    `+    result++;`,
+                    `+} while (result < 9999);`,
+                    `+`,
+                    `+do`,
+                    `+{`,
+                    `-    result--;`,
+                    `+    result++;`,
+                    `+}`,
+                    `+while (result < 9999);`,
+                    `+`,
+                    `-do { result--; }`,
+                    `+do { result++; }`,
+                    `+    while (result < 9999);`,
+                    `+`,
+                    `+if (result) {`,
+                    `+    this.increaseResultByValue(10);`,
+                    `+    do {`,
+                    `-        console.log('test123');`,
+                    `+        something();`,
+                    `+       }`,
+                    `+    while (result < 9999);`,
+                    `+}`,
+                    `+do {`,
+                    `+    console.log('1');`,
+                    `+}`,
+                    `+while (1);`,
+                    `+while (123 === 123) break;`,
+                    `+do { console.log('1');`,
+                    `+} while (1);`,
+                    `-`,
+                    `-do { console.log('test') } while (1);`
+                ]
+            }
+        );
 
-        const result = singleLineBlockRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                `-const x = 3;`,
-                `+`,
-                ` do result++; { while(result < 9999); }`,
-                `+`,
-                `+do {`,
-                `-    result--;`,
-                `+    result++;`,
-                `+} while (result < 9999);`,
-                `+`,
-                `+do`,
-                `+{`,
-                `-    result--;`,
-                `+    result++;`,
-                `+}`,
-                `+while (result < 9999);`,
-                `+`,
-                `-do { result--; }`,
-                `+do { result++; }`,
-                `+    while (result < 9999);`,
-                `+`,
-                `+if (result) {`,
-                `+    this.increaseResultByValue(10);`,
-                `+    do {`,
-                `-        console.log('test123');`,
-                `+        something();`,
-                `+       }`,
-                `+    while (result < 9999);`,
-                `+}`,
-                `+do {`,
-                `+    console.log('1');`,
-                `+}`,
-                `+while (1);`,
-                `+while (123 === 123) break;`,
-                `+do { console.log('1');`,
-                `+} while (1);`,
-                `-`,
-                `-do { console.log('test') } while (1);`
-            ]
-        });
+        const result = singleLineBlockRule.invoke();
 
         expect(result).toHaveLength(7);
 
@@ -622,49 +713,57 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid nested single-line do..while block (without curly braces)', () => {
-        const singleLineBlockRule = new SingleLineBlockRule({
-            ...validConfig,
-            curlyBraces: false
-        });
+        const singleLineBlockRule = new SingleLineBlockRule(
+            pepegaContext,
+            {
+                ...validConfig,
+                curlyBraces: false
+            },
+            {
+                filename: '...',
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    `+do {`,
+                    `+    do`,
+                    `+    {`,
+                    `+        do`,
+                    `+            console.log('abc');`,
+                    `+        while(3);`,
+                    `+    } while(2);`,
+                    `+} while (1);`
+                ]
+            }
+        );
 
-        const result = singleLineBlockRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                `+do {`,
-                `+    do`,
-                `+    {`,
-                `+        do`,
-                `+            console.log('abc');`,
-                `+        while(3);`,
-                `+    } while(2);`,
-                `+} while (1);`
-            ]
-        });
+        const result = singleLineBlockRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid nested single-line do..while block (without curly braces)', () => {
-        const singleLineBlockRule = new SingleLineBlockRule({
-            ...validConfig,
-            curlyBraces: false
-        });
+        const singleLineBlockRule = new SingleLineBlockRule(
+            pepegaContext,
+            {
+                ...validConfig,
+                curlyBraces: false
+            },
+            {
+                filename: '...',
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    `+do {`,
+                    `+    do`,
+                    `+    {`,
+                    `+        do {`,
+                    `+            console.log('abc');`,
+                    `+        } while(3);`,
+                    `+    } while(2);`,
+                    `+} while (1);`
+                ]
+            }
+        );
 
-        const result = singleLineBlockRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                `+do {`,
-                `+    do`,
-                `+    {`,
-                `+        do {`,
-                `+            console.log('abc');`,
-                `+        } while(3);`,
-                `+    } while(2);`,
-                `+} while (1);`
-            ]
-        });
+        const result = singleLineBlockRule.invoke();
 
         expect(result).toHaveLength(1);
 
