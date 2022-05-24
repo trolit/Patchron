@@ -1,149 +1,166 @@
-const { describe, expect, it } = require('@jest/globals');
-const ValueComparisionStyleRule = require('../../../src/rules/common/ValueComparisionStyle');
+const nock = require('nock');
+const {
+    describe,
+    expect,
+    it,
+    beforeEach,
+    afterEach
+} = require('@jest/globals');
+
+const {
+    common: { ValueComparisionStyleRule }
+} = require('../../../src/rules');
+const setupApp = require('../setupApp');
+const initializeFile = require('../initializeFile');
 
 describe('invoke function', () => {
-    let valueComparisionStyleRule;
+    let pepegaContext = null;
+    let file = {};
+
+    beforeEach(() => {
+        pepegaContext = setupApp();
+
+        file = initializeFile();
+    });
+
+    afterEach(() => {
+        nock.cleanAll();
+
+        nock.enableNetConnect();
+    });
 
     it('returns empty array on empty allowed levels config', () => {
-        valueComparisionStyleRule = new ValueComparisionStyleRule({
-            allowedLevels: []
-        });
+        const valueComparisionStyleRule = new ValueComparisionStyleRule(
+            pepegaContext,
+            {
+                allowedLevels: []
+            },
+            file
+        );
 
-        const result = valueComparisionStyleRule.invoke({
-            filename: '...'
-        });
+        const result = valueComparisionStyleRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns empty array on all allowed levels', () => {
-        valueComparisionStyleRule = new ValueComparisionStyleRule({
-            allowedLevels: [0, 1, 2]
-        });
+        const valueComparisionStyleRule = new ValueComparisionStyleRule(
+            pepegaContext,
+            {
+                allowedLevels: [0, 1, 2]
+            },
+            file
+        );
 
-        const result = valueComparisionStyleRule.invoke({
-            filename: '...'
-        });
+        const result = valueComparisionStyleRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns empty array on valid comparision style (weak equality)', () => {
-        valueComparisionStyleRule = new ValueComparisionStyleRule({
-            allowedLevels: [0]
-        });
+        const valueComparisionStyleRule = new ValueComparisionStyleRule(
+            pepegaContext,
+            {
+                allowedLevels: [0]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    ` const x = 5;`,
+                    ` const y = 3;`,
+                    ` const z = x == 4 ? 1 : 2;`,
+                    `+`,
+                    `+cost multiLineString = \`text1 text2 text3 \${y != 2 ? 1 : 0}`,
+                    `+ \${x == y ? 'enter' : 'exit'}`,
+                    `+ leave a message containing \\=\\= to stop app`,
+                    `+\``
+                ]
+            }
+        );
 
-        const result = valueComparisionStyleRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                ` const x = 5;`,
-                ` const y = 3;`,
-                ` const z = x == 4 ? 1 : 2;`,
-                `+`,
-                `+cost multiLineString = \`text1 text2 text3 \${y != 2 ? 1 : 0}`,
-                `+ \${x == y ? 'enter' : 'exit'}`,
-                `+ leave a message containing \\=\\= to stop app`,
-                `+\``
-            ]
-        });
+        const result = valueComparisionStyleRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns empty array on valid comparision style (strict equality)', () => {
-        valueComparisionStyleRule = new ValueComparisionStyleRule({
-            allowedLevels: [1]
-        });
+        const valueComparisionStyleRule = new ValueComparisionStyleRule(
+            pepegaContext,
+            {
+                allowedLevels: [1]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    ` const x = 5;`,
+                    ` const y = 3;`,
+                    ` const z = x === 4 ? 1 : 2;`,
+                    `+`,
+                    `+cost multiLineString = \`text1 text2 text3 \${y !== 2 ? 1 : 0}`,
+                    `+ \${x === y ? 'enter' : 'exit'}`,
+                    `+ leave a message containing \\=\\= to stop app`,
+                    `+\``
+                ]
+            }
+        );
 
-        const result = valueComparisionStyleRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                ` const x = 5;`,
-                ` const y = 3;`,
-                ` const z = x === 4 ? 1 : 2;`,
-                `+`,
-                `+cost multiLineString = \`text1 text2 text3 \${y !== 2 ? 1 : 0}`,
-                `+ \${x === y ? 'enter' : 'exit'}`,
-                `+ leave a message containing \\=\\= to stop app`,
-                `+\``
-            ]
-        });
+        const result = valueComparisionStyleRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns empty array on valid comparision style (Object.is)', () => {
-        valueComparisionStyleRule = new ValueComparisionStyleRule({
-            allowedLevels: [2]
-        });
+        const valueComparisionStyleRule = new ValueComparisionStyleRule(
+            pepegaContext,
+            {
+                allowedLevels: [2]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    ` const x = 5;`,
+                    ` const y = 3;`,
+                    ` const z = Object.is(x, 4) ? 1 : 2;`,
+                    `+`,
+                    `+cost multiLineString = \`text1 text2 text3 \${!Object.is(y, 2) ? 1 : 0}`,
+                    `+ \${Object.is(x, y) ? 'enter' : 'exit'}`,
+                    `+ leave a message containing \\=\\= to stop app`,
+                    `+\``
+                ]
+            }
+        );
 
-        const result = valueComparisionStyleRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                ` const x = 5;`,
-                ` const y = 3;`,
-                ` const z = Object.is(x, 4) ? 1 : 2;`,
-                `+`,
-                `+cost multiLineString = \`text1 text2 text3 \${!Object.is(y, 2) ? 1 : 0}`,
-                `+ \${Object.is(x, y) ? 'enter' : 'exit'}`,
-                `+ leave a message containing \\=\\= to stop app`,
-                `+\``
-            ]
-        });
+        const result = valueComparisionStyleRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid comparision style (weak equality)', () => {
-        valueComparisionStyleRule = new ValueComparisionStyleRule({
-            allowedLevels: [0]
-        });
+        const valueComparisionStyleRule = new ValueComparisionStyleRule(
+            pepegaContext,
+            {
+                allowedLevels: [0]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    ` const x = 5;`,
+                    ` const y = 3;`,
+                    ` const z = x === 4 ? 1 : 2;`,
+                    `+`,
+                    `+cost multiLineString = \`text1 text2 text3 \${y !== 2 ? 1 : 0}`,
+                    `+ \${x === y ? 'enter' : 'exit'}`,
+                    `+ leave a message containing \\=\\= to stop app`,
+                    `+\``
+                ]
+            }
+        );
 
-        const result = valueComparisionStyleRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                ` const x = 5;`,
-                ` const y = 3;`,
-                ` const z = x === 4 ? 1 : 2;`,
-                `+`,
-                `+cost multiLineString = \`text1 text2 text3 \${y !== 2 ? 1 : 0}`,
-                `+ \${x === y ? 'enter' : 'exit'}`,
-                `+ leave a message containing \\=\\= to stop app`,
-                `+\``
-            ]
-        });
-
-        expect(result).toHaveLength(2);
-
-        expect(result[0]).toHaveProperty('line', 3);
-
-        expect(result[1]).toHaveProperty('start_line', 5);
-        expect(result[1]).toHaveProperty('position', 8);
-    });
-
-    it('returns review on invalid comparision style (weak equality)', () => {
-        valueComparisionStyleRule = new ValueComparisionStyleRule({
-            allowedLevels: [0]
-        });
-
-        const result = valueComparisionStyleRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                ` const x = 5;`,
-                ` const y = 3;`,
-                ` const z = x === 4 ? 1 : 2;`,
-                `+`,
-                `+cost multiLineString = \`text1 text2 text3 \${y !== 2 ? 1 : 0}`,
-                `+ \${x === y ? 'enter' : 'exit'}`,
-                `+ leave a message containing \\=\\= to stop app`,
-                `+\``
-            ]
-        });
+        const result = valueComparisionStyleRule.invoke();
 
         expect(result).toHaveLength(2);
 
@@ -154,24 +171,28 @@ describe('invoke function', () => {
     });
 
     it('returns review on invalid comparision style (strict equality)', () => {
-        valueComparisionStyleRule = new ValueComparisionStyleRule({
-            allowedLevels: [1]
-        });
+        const valueComparisionStyleRule = new ValueComparisionStyleRule(
+            pepegaContext,
+            {
+                allowedLevels: [1]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    ` const x = 5;`,
+                    ` const y = 3;`,
+                    ` const z = x == 4 ? 1 : 2;`,
+                    `+`,
+                    `+cost multiLineString = \`text1 text2 text3 \${!Object.is(y, 2) ? 1 : 0}`,
+                    `+ \${x == y ? 'enter' : 'exit'}`,
+                    `+ leave a message containing \\=\\= to stop app`,
+                    `+\``
+                ]
+            }
+        );
 
-        const result = valueComparisionStyleRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                ` const x = 5;`,
-                ` const y = 3;`,
-                ` const z = x == 4 ? 1 : 2;`,
-                `+`,
-                `+cost multiLineString = \`text1 text2 text3 \${!Object.is(y, 2) ? 1 : 0}`,
-                `+ \${x == y ? 'enter' : 'exit'}`,
-                `+ leave a message containing \\=\\= to stop app`,
-                `+\``
-            ]
-        });
+        const result = valueComparisionStyleRule.invoke();
 
         expect(result).toHaveLength(2);
 
@@ -182,24 +203,28 @@ describe('invoke function', () => {
     });
 
     it('returns review on invalid comparision style (Object.is)', () => {
-        valueComparisionStyleRule = new ValueComparisionStyleRule({
-            allowedLevels: [2]
-        });
+        const valueComparisionStyleRule = new ValueComparisionStyleRule(
+            pepegaContext,
+            {
+                allowedLevels: [2]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    ` const x = 5;`,
+                    ` const y = 3;`,
+                    ` const z = x == 4 ? 1 : 2;`,
+                    `+`,
+                    `+cost multiLineString = \`text1 text2 text3 \${!Object.is(y, 2) ? 1 : 0}`,
+                    `+ \${x == y ? 'enter' : 'exit'}`,
+                    `+ leave a message containing \\=\\= to stop app`,
+                    `+\``
+                ]
+            }
+        );
 
-        const result = valueComparisionStyleRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                ` const x = 5;`,
-                ` const y = 3;`,
-                ` const z = x == 4 ? 1 : 2;`,
-                `+`,
-                `+cost multiLineString = \`text1 text2 text3 \${!Object.is(y, 2) ? 1 : 0}`,
-                `+ \${x == y ? 'enter' : 'exit'}`,
-                `+ leave a message containing \\=\\= to stop app`,
-                `+\``
-            ]
-        });
+        const result = valueComparisionStyleRule.invoke();
 
         expect(result).toHaveLength(2);
 

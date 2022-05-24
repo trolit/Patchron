@@ -105,7 +105,7 @@ class ValueComparisionStyleRule extends BaseRule {
         for (let index = 0; index < dataLength; index++) {
             const row = data[index];
             const backticks = row?.backticks;
-            const line = { content: row.trimmedContent };
+            const line = { index, content: row.trimmedContent };
 
             if (
                 this.CUSTOM_LINES.includes(line.content) ||
@@ -120,7 +120,7 @@ class ValueComparisionStyleRule extends BaseRule {
 
                 line.content = this.convertMultiLineToSingleLine(
                     data,
-                    index,
+                    line.index,
                     endLineIndex
                 );
 
@@ -135,14 +135,14 @@ class ValueComparisionStyleRule extends BaseRule {
                         ? {
                               ...this.getMultiLineComment({
                                   body: this._getCommentBody(),
-                                  from: index,
+                                  from: line.index,
                                   to: line.endIndex
                               })
                           }
                         : {
                               ...this.getSingleLineComment({
                                   body: this._getCommentBody(),
-                                  index
+                                  index: line.index
                               })
                           }
                 );
