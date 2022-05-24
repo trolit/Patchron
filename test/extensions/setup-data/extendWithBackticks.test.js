@@ -19,12 +19,10 @@ describe('invoke function', () => {
         );
 
         expect(result[1].backticks).toMatchObject({
-            startLineIndex: 1,
             endLineIndex: 1
         });
 
         expect(result[2].backticks).toMatchObject({
-            startLineIndex: 2,
             endLineIndex: 6
         });
     });
