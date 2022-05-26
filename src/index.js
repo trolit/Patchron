@@ -32,9 +32,12 @@
  *
  */
 
+const cloneDeep = require('lodash/cloneDeep');
+
 const {
     settings: { senders, isOwnerAssigningEnabled, isReviewSummaryEnabled }
 } = require('./config');
+
 const addAssignees = require('./github/addAssignees');
 const PepegaContext = require('./builders/PepegaContext');
 const postSummary = require('./pull-request/postSummary');
@@ -63,9 +66,7 @@ module.exports = (app) => {
             return;
         }
 
-        const reviewComments = [];
-
-        reviewComments.push(...reviewContext(pepegaContext));
+        const reviewComments = cloneDeep(reviewContext(pepegaContext));
 
         if (!isReviewAborted(reviewComments)) {
             reviewComments.push(...reviewFiles(pepegaContext));
