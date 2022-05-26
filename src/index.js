@@ -51,43 +51,40 @@ const reviewContext = require('./pull-request/reviewContext');
 module.exports = (app) => {
     const pepegaContext = new PepegaContext(app);
 
-    app.on(
-        ['pull_request.opened', 'pull_request.synchronize'],
-        async (context) => {
-            pepegaContext.initializePullRequestData(context);
+    app.on(['pull_request.opened', 'pull_request.synchronize'], (context) => {
+        pepegaContext.initializePullRequestData(context);
 
-            const {
-                pullRequest: { owner }
-            } = pepegaContext;
+        const {
+            pullRequest: { owner }
+        } = pepegaContext;
 
-            if (isOwnerAssigningEnabled) {
-                addAssignees(pepegaContext, [owner]);
-            }
+        if (isOwnerAssigningEnabled) {
+            addAssignees(pepegaContext, [owner]);
+        }
 
-            if (senders?.length && !senders.includes(owner)) {
-                return;
-            }
+        if (senders?.length && !senders.includes(owner)) {
+            return;
+        }
 
-            const reviewComments = cloneDeep(reviewContext(pepegaContext));
+        const reviewComments = cloneDeep(reviewContext(pepegaContext));
 
-            if (!isReviewAborted(reviewComments)) {
-                reviewComments.push(...reviewFiles(pepegaContext));
+        if (!isReviewAborted(reviewComments)) {
+            reviewComments.push(...reviewFiles(pepegaContext));
 
-                const numberOfPostedComments = postComments(
+            const numberOfPostedComments = postComments(
+                pepegaContext,
+                reviewComments
+            );
+
+            if (isReviewSummaryEnabled) {
+                postSummary(
                     pepegaContext,
+                    numberOfPostedComments,
                     reviewComments
                 );
-
-                if (isReviewSummaryEnabled) {
-                    postSummary(
-                        pepegaContext,
-                        numberOfPostedComments,
-                        reviewComments
-                    );
-                }
             }
         }
-    );
+    });
 };
 
 function isReviewAborted(reviewComments) {
