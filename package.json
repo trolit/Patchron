@@ -1,5 +1,6 @@
 {
   "name": "pepega",
+  "type": "module",
   "version": "1.0.0",
   "private": true,
   "description": "TBA",
@@ -20,6 +21,7 @@
     "trace-warnings": "node --trace-warnings index.js"
   },
   "dependencies": {
+    "app-module-path": "^2.2.0",
     "cron": "^1.8.3",
     "dayjs": "^1.11.1",
     "dedent-js": "^1.0.1",
