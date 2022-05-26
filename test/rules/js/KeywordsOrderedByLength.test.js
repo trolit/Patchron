@@ -10,8 +10,8 @@ const {
 const {
     common: { KeywordsOrderedByLengthRule }
 } = require('../../../src/rules');
-const setupApp = require('../setupApp');
-const initializeFile = require('../initializeFile');
+const setupApp = require('../helpers/setupApp');
+const initializeFile = require('../helpers/initializeFile');
 
 const importKeywordConfig = {
     name: 'import',
