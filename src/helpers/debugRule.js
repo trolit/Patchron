@@ -1,3 +1,7 @@
+// *: ---             ---               ---             ---               ---             ---               ---
+// *: --- ONLY FOR DEVELOPMENT PURPOSES --- ONLY FOR DEVELOPMENT PURPOSES --- ONLY FOR DEVELOPMENT PURPOSES ---
+// *: ---             ---               ---             ---               ---             ---               ---
+
 /* eslint-disable no-console */
 
 const { pull, common } = require('src/rules');
