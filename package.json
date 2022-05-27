@@ -1,6 +1,5 @@
 {
   "name": "pepega",
-  "type": "module",
   "version": "1.0.0",
   "private": true,
   "description": "TBA",
@@ -31,7 +30,7 @@
     "lodash": "^4.17.21",
     "pino-multi-stream": "^6.0.0",
     "pino-tee": "^0.3.0",
-    "probot": "^11.0.1"
+    "probot": "^12.2.3"
   },
   "devDependencies": {
     "eslint": "^8.7.0",
@@ -50,7 +49,7 @@
   "jest": {
     "testEnvironment": "node"
   },
-  "main": "index.js",
+  "main": "src/index.js",
   "directories": {
     "test": "test"
   },
