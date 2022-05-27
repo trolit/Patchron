@@ -1,6 +1,6 @@
 const {
     common: { PositionedKeywordsRule }
-} = require('../rules');
+} = require('src/rules');
 
 module.exports = [
     {

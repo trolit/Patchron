@@ -1,6 +1,6 @@
 const {
     pull: { StrictWorkflowRule }
-} = require('../rules');
+} = require('src/rules');
 
 module.exports = [
     {

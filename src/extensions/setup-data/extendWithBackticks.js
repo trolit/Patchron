@@ -1,4 +1,4 @@
-const { CUSTOM_LINES } = require('../../config/constants');
+const { CUSTOM_LINES } = require('src/config/constants');
 
 /**
  * extends `setupData` collection with information about strings built with backticks (which can contain interpolated fragments). Lines that contain backticks will be expanded with properties mentioned below.

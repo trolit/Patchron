@@ -6,7 +6,7 @@ const {
         ValueComparisionStyleRule,
         KeywordsOrderedByLengthRule
     }
-} = require('../rules');
+} = require('src/rules');
 
 module.exports = [
     {
