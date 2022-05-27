@@ -1,15 +1,11 @@
 const fs = require('fs');
-const path = require('path');
 const nock = require('nock');
 const { Probot, ProbotOctokit } = require('probot');
 
-const app = require('../../../src');
-const PepegaContext = require('../../../src/builders/PepegaContext');
+const app = require('src');
+const PepegaContext = require('src/builders/PepegaContext');
 
-const privateKey = fs.readFileSync(
-    path.join(__dirname, '../../fixtures/mock-cert.pem'),
-    'utf-8'
-);
+const privateKey = fs.readFileSync('test/fixtures/mock-cert.pem', 'utf-8');
 
 module.exports = () => {
     nock.disableNetConnect();

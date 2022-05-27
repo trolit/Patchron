@@ -9,9 +9,9 @@ const {
 
 const {
     common: { SingleLineBlockRule }
-} = require('../../../src/rules');
-const setupApp = require('../helpers/setupApp');
-const initializeFile = require('../helpers/initializeFile');
+} = require('src/rules');
+const setupApp = require('test/rules/helpers/setupApp');
+const initializeFile = require('test/rules/helpers/initializeFile');
 
 const validConfig = {
     blocks: [

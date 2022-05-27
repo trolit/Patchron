@@ -47,9 +47,14 @@
     "node": ">= 16.15.0"
   },
   "jest": {
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^@root(.*)$":"<rootDir>",
+      "^src(.*)$": "<rootDir>/src$1",
+      "^test(.*)$": "<rootDir>/test$1"
+    }
   },
-  "main": "src/index.js",
+"main": "src/index.js",
   "directories": {
     "test": "test"
   },
@@ -61,7 +66,7 @@
     "url": "https://github.com/trolit/Pepega/issues"
   },
   "_moduleAliases": {
-    "root": ".",
+    "@root": ".",
     "src": "./src"
   }
 }

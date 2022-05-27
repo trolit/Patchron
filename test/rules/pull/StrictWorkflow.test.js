@@ -9,9 +9,9 @@ const {
 
 const {
     pull: { StrictWorkflowRule }
-} = require('../../../src/rules');
-const setupApp = require('../helpers/setupApp');
-const instantiateProbotContext = require('../helpers/instantiateProbotContext');
+} = require('src/rules');
+const setupApp = require('test/rules/helpers/setupApp');
+const instantiateProbotContext = require('test/rules/helpers/instantiateProbotContext');
 
 const validConfig = {
     enabled: true,

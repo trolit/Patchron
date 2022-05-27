@@ -1,5 +1,5 @@
 const { describe, expect, it } = require('@jest/globals');
-const extendWithBackticks = require('../../../src/extensions/setup-data/extendWithBackticks');
+const extendWithBackticks = require('src/extensions/setup-data/extendWithBackticks');
 
 describe('invoke function', () => {
     it('returns data extended with backticks', () => {
