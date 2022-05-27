@@ -18,6 +18,7 @@ class ReviewCommentBuilder {
 
     /**
      * builds single line review comment
+     *
      * @param {object} data
      * @param {string} data.body review comment
      * @param {string} data.line line number
@@ -39,6 +40,7 @@ class ReviewCommentBuilder {
 
     /**
      * builds multi line review comment
+     *
      * @param {object} data
      * @param {string} data.body review comment
      * @param {string} data.start_line line number (counted from line after '@@')
