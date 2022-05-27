@@ -1,5 +1,5 @@
 const dedent = require('dedent-js');
-const addComment = require('../github/addComment');
+const addComment = require('src/github/addComment');
 
 /**
  * **POST** pull request review summary

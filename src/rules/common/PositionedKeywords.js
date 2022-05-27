@@ -1,9 +1,6 @@
 /// <reference path="../../config/type-definitions/rules/common/PositionedKeywords.js" />
 
-const dedent = require('dedent-js');
-const BaseRule = require('../Base');
-const getLineNumber = require('../../helpers/getLineNumber');
-const getNearestHunkHeader = require('../../helpers/getNearestHunkHeader');
+const BaseRule = require('src/rules/Base');
 
 class PositionedKeywordsRule extends BaseRule {
     /**
@@ -270,7 +267,7 @@ class PositionedKeywordsRule extends BaseRule {
 
         let index = -1;
         let wasEnforced = false;
-        const topHunkHeader = getNearestHunkHeader(splitPatch, 0);
+        const topHunkHeader = this.helpers.getNearestHunkHeader(splitPatch, 0);
 
         const { line } = topHunkHeader.modifiedFile;
 
@@ -419,8 +416,8 @@ class PositionedKeywordsRule extends BaseRule {
     _getWrongPositionComment(keyword, position) {
         const { rawContent, index } = position;
 
-        const body =
-            dedent(`Expected \`${keyword.name}\` lines to start here but found
+        const body = this
+            .dedent(`Expected \`${keyword.name}\` lines to start here but found
                 \`\`\`
                 ${rawContent}
                 \`\`\`
@@ -441,21 +438,21 @@ class PositionedKeywordsRule extends BaseRule {
             .join(' >> ');
 
         const { order } = keyword;
-        const testedRowLineNumber = getLineNumber(
+        const testedRowLineNumber = this.helpers.getLineNumber(
             splitPatch,
             this.RIGHT,
             testedRow.index
         );
         const { name: testedRowOrder } = order[testedRow.orderIndex];
 
-        const foundRowLineNumber = getLineNumber(
+        const foundRowLineNumber = this.helpers.getLineNumber(
             splitPatch,
             this.RIGHT,
             foundRow.index
         );
         const { name: foundRowOrder } = order[foundRow.orderIndex];
 
-        const body = dedent(`
+        const body = this.dedent(`
                Line ${testedRowLineNumber} (${testedRowOrder}) should appear before line ${foundRowLineNumber} (${foundRowOrder})
                 ----
                 Expected order: 
@@ -543,8 +540,16 @@ class PositionedKeywordsRule extends BaseRule {
         const { from, to, distance, reason } = review;
         const { maxLineBreaks, name } = keyword;
 
-        const fromLineNumber = getLineNumber(splitPatch, this.RIGHT, from);
-        const toLineNumber = getLineNumber(splitPatch, this.RIGHT, to);
+        const fromLineNumber = this.helpers.getLineNumber(
+            splitPatch,
+            this.RIGHT,
+            from
+        );
+        const toLineNumber = this.helpers.getLineNumber(
+            splitPatch,
+            this.RIGHT,
+            to
+        );
 
         let commentBody = '';
 
@@ -566,7 +571,7 @@ class PositionedKeywordsRule extends BaseRule {
                 break;
         }
 
-        return dedent(commentBody);
+        return this.dedent(commentBody);
     }
 }
 

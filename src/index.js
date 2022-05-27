@@ -32,6 +32,8 @@
  *
  */
 
+require('module-alias/register');
+
 const cloneDeep = require('lodash/cloneDeep');
 
 const {

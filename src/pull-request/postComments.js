@@ -1,11 +1,10 @@
 const {
     settings: { maxCommentsPerReview, delayBetweenCommentRequestsInSeconds }
-} = require('../config');
-
-const timer = require('../helpers/loopTimer');
-const addComment = require('../github/addComment');
-const addMultiLineReviewComment = require('../github/addMultiLineReviewComment');
-const addSingleLineReviewComment = require('../github/addSingleLineReviewComment');
+} = require('src/config');
+const timer = require('src/helpers/loopTimer');
+const addComment = require('src/github/addComment');
+const addMultiLineReviewComment = require('src/github/addMultiLineReviewComment');
+const addSingleLineReviewComment = require('src/github/addSingleLineReviewComment');
 
 /**
  * **POST** review comments to GitHub.

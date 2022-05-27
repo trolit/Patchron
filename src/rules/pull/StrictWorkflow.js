@@ -1,7 +1,6 @@
 /// <reference path="../../config/type-definitions/rules/pull/StrictWorkflow.js" />
 
-const dedent = require('dedent-js');
-const BaseRule = require('../Base');
+const BaseRule = require('src/rules/Base');
 
 class StrictWorkflowRule extends BaseRule {
     /**
@@ -104,7 +103,7 @@ class StrictWorkflowRule extends BaseRule {
             });
 
             const workflowSnippet = `<details>
-            <summary> Current allowed workflow </summary> \n\n${dedent(
+            <summary> Current allowed workflow </summary> \n\n${this.dedent(
                 formattedWorkflow
             )}
             </details>`;
@@ -112,7 +111,7 @@ class StrictWorkflowRule extends BaseRule {
             commentBody = commentBody.concat('\n', workflowSnippet);
         }
 
-        return dedent(commentBody);
+        return this.dedent(commentBody);
     }
 }
 

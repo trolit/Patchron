@@ -1,7 +1,6 @@
 /// <reference path="../../config/type-definitions/rules/common/KeywordsOrderedByLength.js" />
 
-const BaseRule = require('../Base');
-const dedent = require('dedent-js');
+const BaseRule = require('src/rules/Base');
 
 class KeywordsOrderedByLengthRule extends BaseRule {
     /**
@@ -296,7 +295,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
 
         const commentBody = `Keep \`${order}\` order for keyword: \`${name}\``;
 
-        return dedent(commentBody);
+        return this.dedent(commentBody);
     }
 }
 

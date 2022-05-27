@@ -1,5 +1,5 @@
 const reviewFile = require('./reviewFile');
-const getFiles = require('../github/getFiles');
+const getFiles = require('src/github/getFiles');
 
 /**
  * triggers `Pepega.js` to review files against configured rules

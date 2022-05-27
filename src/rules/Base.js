@@ -1,11 +1,10 @@
 /// <reference path="../config/type-definitions/common.js" />
 
-const constants = require('../config/constants');
-const getPosition = require('../helpers/getPosition');
-const getLineNumber = require('../helpers/getLineNumber');
-const ReviewCommentBuilder = require('../builders/ReviewComment');
-const removeWhitespaces = require('../helpers/removeWhitespaces');
-const extendWithBackticks = require('../extensions/setup-data/extendWithBackticks');
+const dedent = require('dedent-js');
+const helpers = require('src/helpers');
+const constants = require('src/config/constants');
+const ReviewCommentBuilder = require('src/builders/ReviewComment');
+const extendWithBackticks = require('src/extensions/setup-data/extendWithBackticks');
 
 class BaseRule {
     /**
@@ -51,6 +50,10 @@ class BaseRule {
         this.RIGHT = RIGHT;
 
         this.EMPTY = EMPTY;
+
+        this.dedent = dedent;
+
+        this.helpers = helpers;
     }
 
     /**
@@ -59,7 +62,7 @@ class BaseRule {
     getSingleLineComment({ body, index, side = 'RIGHT' }) {
         const { splitPatch } = this.file;
 
-        const line = getLineNumber(splitPatch, side, index);
+        const line = this.helpers.getLineNumber(splitPatch, side, index);
 
         const comment = this.reviewCommentBuilder.buildSingleLineComment({
             body,
@@ -76,9 +79,9 @@ class BaseRule {
     getMultiLineComment({ body, from, to, side = 'RIGHT' }) {
         const { splitPatch } = this.file;
 
-        const start_line = getLineNumber(splitPatch, side, from);
+        const start_line = this.helpers.getLineNumber(splitPatch, side, from);
 
-        const position = getPosition(splitPatch, to, side);
+        const position = this.helpers.getPosition(splitPatch, to, side);
 
         const comment = this.reviewCommentBuilder.buildMultiLineComment({
             body,
@@ -189,7 +192,9 @@ class BaseRule {
      * @returns {boolean}
      */
     isNewline(line) {
-        return [this.ADDED, this.EMPTY].includes(removeWhitespaces(line));
+        return [this.ADDED, this.EMPTY].includes(
+            this.helpers.removeWhitespaces(line)
+        );
     }
 
     /**

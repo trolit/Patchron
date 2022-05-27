@@ -1,23 +1,10 @@
 /* eslint-disable no-console */
 
-const {
-    common: {
-        MarkedCommentsRule,
-        SingleLineBlockRule,
-        PositionedKeywordsRule,
-        ValueComparisionStyleRule,
-        KeywordsOrderedByLengthRule
-    },
-    pull: { StrictWorkflowRule }
-} = require('../rules');
+const { pull, common } = require('src/rules');
 
 const rules = {
-    MarkedCommentsRule,
-    StrictWorkflowRule,
-    SingleLineBlockRule,
-    PositionedKeywordsRule,
-    ValueComparisionStyleRule,
-    KeywordsOrderedByLengthRule
+    ...pull,
+    ...common
 };
 
 /**

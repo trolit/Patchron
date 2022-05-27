@@ -1,6 +1,6 @@
 const {
     settings: { isGetFilesRequestPaginated }
-} = require('../config');
+} = require('src/config');
 
 /**
  * fetches files from pull request. Unpaginated response includes a maximum of 3000 files

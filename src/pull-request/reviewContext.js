@@ -1,5 +1,5 @@
-const { rules } = require('../config');
-const review = require('../rules/review');
+const { rules } = require('src/config');
+const review = require('src/rules/review');
 
 /**
  * triggers `Pepega.js` to review files against configured rules

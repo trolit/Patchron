@@ -1,7 +1,6 @@
 /// <reference path="../../config/type-definitions/rules/common/MarkedComments.js" />
 
-const BaseRule = require('../Base');
-const dedent = require('dedent-js');
+const BaseRule = require('src/rules/Base');
 
 class MarkedCommentsRule extends BaseRule {
     /**
@@ -235,12 +234,12 @@ class MarkedCommentsRule extends BaseRule {
         const commentBody = `${start} should start with one of the predefined prefixes.
          
         <details>
-            <summary> List of allowed prefixes </summary> \n\n${dedent(
+            <summary> List of allowed prefixes </summary> \n\n${this.dedent(
                 formattedPrefixes
             )}
         </details>`;
 
-        return dedent(commentBody);
+        return this.dedent(commentBody);
     }
 }
 

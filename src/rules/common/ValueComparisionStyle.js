@@ -1,9 +1,7 @@
 /// <reference path="../../config/type-definitions/rules/common/ValueComparisionStyle.js" />
 
-const dedent = require('dedent-js');
 const isEqual = require('lodash/isEqual');
-
-const BaseRule = require('../Base');
+const BaseRule = require('src/rules/Base');
 
 class ValueComparisionStyleRule extends BaseRule {
     /**
@@ -189,7 +187,8 @@ class ValueComparisionStyleRule extends BaseRule {
             })
             .filter((text) => text);
 
-        return dedent(`It seems that marked fragment includes comparision pattern. If it's raw text, ignore this comment or consider using unicode representation of = character or escape it with backslash.
+        return this
+            .dedent(`It seems that marked fragment includes comparision pattern. If it's raw text, ignore this comment or consider using unicode representation of = character or escape it with backslash.
 
         Allowed comparision patterns: (${allowedPatterns.join(', ')})`);
     }

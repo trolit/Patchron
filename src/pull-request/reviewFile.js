@@ -1,6 +1,6 @@
-const { rules } = require('../config');
-const review = require('../rules/review');
-const setupFileForReview = require('../helpers/setupFileForReview');
+const { rules } = require('src/config');
+const review = require('src/rules/review');
+const setupFileForReview = require('src/helpers/setupFileForReview');
 
 /**
  * triggers `Pepega.js` to review files against configured rules

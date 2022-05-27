@@ -1,7 +1,6 @@
 /// <reference path="../../config/type-definitions/rules/common/SingleLineBlock.js" />
 
-const BaseRule = require('../Base');
-const getContentNesting = require('../../helpers/getContentNesting');
+const BaseRule = require('src/rules/Base');
 
 class SingleLineBlockRule extends BaseRule {
     /**
@@ -43,7 +42,7 @@ class SingleLineBlockRule extends BaseRule {
             return [];
         }
 
-        const contentNesting = getContentNesting(data);
+        const contentNesting = this.helpers.getContentNesting(data);
 
         const singleLineBlocks = this._getSingleLineBlocks(
             data,

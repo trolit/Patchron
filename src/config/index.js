@@ -5,7 +5,7 @@ const vue = require('./vueRules');
 const pull = require('./pullRules');
 
 require('dotenv').config({
-    path: '../../.env'
+    path: 'root/.env'
 });
 
 module.exports = {
