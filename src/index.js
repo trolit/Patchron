@@ -10,28 +10,6 @@
 // *
 // ***********************************************************************
 
-/**
- *
- * ?: Deployments API example (learn more)
- * https://developer.github.com/v3/repos/deployments/
- *
- * ?: For more information on building apps:
- * https://probot.github.io/docs/
- *
- * ?: To get your app running, see:
- * https://probot.github.io/docs/development/
- *
- * ?: GitHub Rest API - best practices
- * https://docs.github.com/en/rest/guides/best-practices-for-integrators
- *
- * ?: GitHub Rest API - rate limits
- * https://docs.github.com/en/developers/apps/building-github-apps/rate-limits-for-github-apps
- *
- * ?: GitHub Rest API - pulls
- * https://docs.github.com/en/rest/reference/pulls
- *
- */
-
 require('module-alias/register');
 const cloneDeep = require('lodash/cloneDeep');
 
