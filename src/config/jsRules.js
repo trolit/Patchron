@@ -1,5 +1,6 @@
 const {
     common: {
+        DirectImportRule,
         MarkedCommentsRule,
         SingleLineBlockRule,
         PositionedKeywordsRule,
@@ -9,6 +10,19 @@ const {
 } = require('src/rules');
 
 module.exports = [
+    {
+        enabled: false,
+        reference: DirectImportRule,
+        config: {
+            packages: [
+                {
+                    name: 'lodash',
+                    exceptions: [],
+                    expressions: [/[(|']lodash.*/]
+                }
+            ]
+        }
+    },
     {
         enabled: false,
         reference: MarkedCommentsRule,
