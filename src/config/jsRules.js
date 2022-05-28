@@ -1,17 +1,18 @@
 const {
     common: {
+        MarkedCommentsRule,
         SingleLineBlockRule,
         PositionedKeywordsRule,
-        NoUnmarkedCommentsRule,
         ValueComparisionStyleRule,
         KeywordsOrderedByLengthRule
     }
-} = require('../rules');
+} = require('src/rules');
 
 module.exports = [
     {
         enabled: false,
-        instance: new NoUnmarkedCommentsRule({
+        reference: MarkedCommentsRule,
+        config: {
             prefixes: [
                 {
                     value: 'TODO:',
@@ -37,52 +38,55 @@ module.exports = [
             isAppliedToSingleLineComments: true,
             isAppliedToMultiLineComments: true,
             isAppliedToInlineComments: true
-        })
+        }
     },
     {
         enabled: false,
-        instance: new KeywordsOrderedByLengthRule({
+        reference: KeywordsOrderedByLengthRule,
+        config: {
             keywords: [
                 {
                     name: 'import (packages)',
                     regex: /import(?!.*@).*/,
-                    multilineOptions: ['from'],
+                    multiLineOptions: ['from'],
                     order: 'ascending',
                     ignoreNewline: false
                 },
                 {
                     name: 'import (components)',
                     regex: /import.*@\/components.*/,
-                    multilineOptions: ['from'],
+                    multiLineOptions: ['from'],
                     order: 'ascending',
                     ignoreNewline: false
                 }
             ]
-        })
+        }
     },
     {
         enabled: false,
-        instance: new PositionedKeywordsRule({
+        reference: PositionedKeywordsRule,
+        config: {
             keywords: [
                 {
                     name: 'const',
                     regex: /const.*require.*/,
-                    multilineOptions: ['require'],
+                    multiLineOptions: ['require'],
                     position: {
                         custom: null,
-                        BOF: true,
-                        EOF: false
+                        BOF: true
                     },
                     maxLineBreaks: 1,
                     enforced: true,
-                    breakOnFirstOccurence: false
+                    breakOnFirstOccurence: false,
+                    countDifferentCodeAsLineBreak: false
                 }
             ]
-        })
+        }
     },
     {
         enabled: false,
-        instance: new SingleLineBlockRule({
+        reference: SingleLineBlockRule,
+        config: {
             blocks: [
                 {
                     name: 'if',
@@ -111,12 +115,13 @@ module.exports = [
                 }
             ],
             curlyBraces: true
-        })
+        }
     },
     {
         enabled: false,
-        instance: new ValueComparisionStyleRule({
+        reference: ValueComparisionStyleRule,
+        config: {
             allowedLevels: [2]
-        })
+        }
     }
 ];

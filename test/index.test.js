@@ -2,11 +2,11 @@ const nock = require('nock');
 const { StatusCodes: HTTP } = require('http-status-codes');
 
 // Requiring our app implementation
-const myProbotApp = require('../src/index');
+const myProbotApp = require('src');
 const { Probot, ProbotOctokit } = require('probot');
 
 // Requiring our fixtures
-const payload = require('./fixtures/pull_request.opened');
+const payload = require('test/fixtures/pull_request.opened');
 const fs = require('fs');
 const path = require('path');
 

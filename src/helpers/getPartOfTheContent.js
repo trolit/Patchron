@@ -1,19 +1,17 @@
-const { logWarning } = require('../utilities/EventLog');
-
 /**
  * attempts to extract specified part of data which can be either string or array of objects
+ *
  * @param {Array<{index: number, content: string}> | string} data content
  * @param {object} restriction
  * @param {string|number} restriction.from start of the substring
  * @param {string|number} restriction.to end of the substring
+ *
  * @returns {string} part of the content (or unchanged if indexes were not found)
  */
 module.exports = (data, restriction) => {
     const { fromIndex, toIndex } = getIndexes(data, restriction);
 
     if (fromIndex === -1 || toIndex === -1) {
-        logWarning(__filename, `Couldn't extract part of the content.`);
-
         return data;
     }
 

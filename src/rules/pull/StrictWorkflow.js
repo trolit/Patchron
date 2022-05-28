@@ -1,9 +1,15 @@
-const dedent = require('dedent-js');
-const BaseRule = require('../Base');
+/// <reference path="../../config/type-definitions/rules/pull/StrictWorkflow.js" />
+
+const BaseRule = require('src/rules/Base');
 
 class StrictWorkflowRule extends BaseRule {
-    constructor(config) {
-        super();
+    /**
+     * @param {PepegaContext} pepegaContext
+     * @param {StrictWorkflowConfig} config
+     * @param {Patch} file
+     */
+    constructor(pepegaContext, config, file) {
+        super(pepegaContext, file);
 
         const {
             enabled,
@@ -19,16 +25,18 @@ class StrictWorkflowRule extends BaseRule {
             abortReviewOnInvalidBranchPrefix;
     }
 
-    invoke(payload) {
-        if (!this.enabled) {
-            return null;
-        }
-
+    invoke() {
         if (this.workflowArray.length === 0) {
-            this.logError(__filename, 'Could not run rule. Empty workflow.');
+            this.log.warning(__filename, 'Could not run rule. Empty workflow.');
 
             return null;
         }
+
+        const {
+            pullRequest: { context }
+        } = this.pepegaContext;
+
+        const payload = context.payload;
 
         const { head, base } = payload.pull_request;
         const { ref: mergeFrom } = head;
@@ -51,16 +59,17 @@ class StrictWorkflowRule extends BaseRule {
             return null;
         }
 
+        const isReviewAborted =
+            this.abortReviewOnInvalidBranchPrefix ||
+            this.abortReviewOnInvalidFlow;
+
         const body = this._getComment(
             mergeFrom,
             mergeTo,
             hasMergeFromValidPrefx,
-            isMergeToValid
+            isMergeToValid,
+            isReviewAborted
         );
-
-        const isReviewAborted =
-            this.abortReviewOnInvalidBranchPrefix ||
-            this.abortReviewOnInvalidFlow;
 
         return {
             body,
@@ -68,14 +77,22 @@ class StrictWorkflowRule extends BaseRule {
         };
     }
 
-    _getComment(mergeFrom, mergeTo, hasMergeFromValidPrefix, isMergeToValid) {
+    _getComment(
+        mergeFrom,
+        mergeTo,
+        hasMergeFromValidPrefix,
+        isMergeToValid,
+        isReviewAborted
+    ) {
         let commentBody = null;
 
         if (!isMergeToValid && hasMergeFromValidPrefix) {
-            commentBody = `Invalid flow (\`base: ${mergeTo}\` <- \`head: ${mergeFrom}\`). Change base branch?`;
+            commentBody = `Invalid flow (\`base: ${mergeTo}\` <- \`head: ${mergeFrom}\`)`;
         } else {
             commentBody = `Unrecognized head prefix (\`${mergeFrom}\`).`;
         }
+
+        commentBody.concat(`${isReviewAborted ? ' (review aborted)' : ''}`);
 
         if (!hasMergeFromValidPrefix) {
             let formattedWorkflow = '';
@@ -86,7 +103,7 @@ class StrictWorkflowRule extends BaseRule {
             });
 
             const workflowSnippet = `<details>
-            <summary> Current allowed workflow </summary> \n\n${dedent(
+            <summary> Current allowed workflow </summary> \n\n${this.dedent(
                 formattedWorkflow
             )}
             </details>`;
@@ -94,7 +111,7 @@ class StrictWorkflowRule extends BaseRule {
             commentBody = commentBody.concat('\n', workflowSnippet);
         }
 
-        return dedent(commentBody);
+        return this.dedent(commentBody);
     }
 }
 

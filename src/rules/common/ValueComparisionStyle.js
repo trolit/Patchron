@@ -1,26 +1,27 @@
-const dedent = require('dedent-js');
-const isEqual = require('lodash/isEqual');
+/// <reference path="../../config/type-definitions/rules/common/ValueComparisionStyle.js" />
 
-const BaseRule = require('../Base');
+const isEqual = require('lodash/isEqual');
+const BaseRule = require('src/rules/Base');
 
 class ValueComparisionStyleRule extends BaseRule {
     /**
      * Allows to set expected equality/inequality comparement convention. Rule is based on patch and currently does not implement any way to deduce whether part of patch is pure text or part of code (e.g. in case of Vue). An workaround to that could be to escape `=` characters in strings and use `=` unicode representation in HTML.
      *
-     *
      * **allowedLevels** options:
      * - 0 - weak equality/inequality (==, !=)
      * - 1 - strict equality/inequality (===, !==)
      * - 2 - strict equality/inequality via `Object.is` (ES6)
-     * @param {object} config
-     * @param {Array<number>} config.allowedLevels pass which levels are allowed
      *
-     * @link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals
-     * @link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Equality_comparisons_and_sameness
-     * @link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_inequality
+     * @param {PepegaContext} pepegaContext
+     * @param {ValueComparisionStyleConfig} config
+     * @param {Patch} file
+     *
+     * {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals}
+     * {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Equality_comparisons_and_sameness}
+     * {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_inequality}
      */
-    constructor(config) {
-        super();
+    constructor(pepegaContext, config, file) {
+        super(pepegaContext, file);
 
         const { allowedLevels } = config;
         allowedLevels.sort();
@@ -53,22 +54,22 @@ class ValueComparisionStyleRule extends BaseRule {
         this.defaultPatterns = defaultPatterns;
     }
 
-    invoke(file) {
+    invoke() {
         if (!this.allowedLevels?.length) {
             return [];
         }
 
         if (isEqual(this.allowedLevels, [0, 1, 2])) {
-            this.logWarning(
+            this.log.warning(
                 __filename,
                 `All comparision styles are allowed, nothing to do.`,
-                file
+                this.file
             );
 
             return [];
         }
 
-        const { split_patch: splitPatch } = file;
+        const { splitPatch } = this.file;
 
         const data = this.setupData(splitPatch, {
             withBackticks: {
@@ -82,7 +83,7 @@ class ValueComparisionStyleRule extends BaseRule {
             return [];
         }
 
-        const reviewComments = this._reviewData(file, data);
+        const reviewComments = this._reviewData(data);
 
         return reviewComments;
     }
@@ -95,14 +96,14 @@ class ValueComparisionStyleRule extends BaseRule {
         );
     }
 
-    _reviewData(file, data) {
+    _reviewData(data) {
         const reviewComments = [];
         const dataLength = data.length;
 
         for (let index = 0; index < dataLength; index++) {
             const row = data[index];
             const backticks = row?.backticks;
-            const line = { content: row.trimmedContent, startIndex: index };
+            const line = { index, content: row.trimmedContent };
 
             if (
                 this.CUSTOM_LINES.includes(line.content) ||
@@ -111,17 +112,13 @@ class ValueComparisionStyleRule extends BaseRule {
                 continue;
             }
 
-            if (
-                backticks &&
-                backticks.startLineIndex !== backticks.endLineIndex
-            ) {
-                const { startLineIndex, endLineIndex } = backticks;
-                line.startIndex = startLineIndex;
+            if (backticks && backticks.index !== backticks.endLineIndex) {
+                const { endLineIndex } = backticks;
                 line.endIndex = endLineIndex;
 
                 line.content = this.convertMultiLineToSingleLine(
                     data,
-                    startLineIndex,
+                    line.index,
                     endLineIndex
                 );
 
@@ -135,17 +132,15 @@ class ValueComparisionStyleRule extends BaseRule {
                     line?.endIndex
                         ? {
                               ...this.getMultiLineComment({
-                                  file,
                                   body: this._getCommentBody(),
-                                  from: line.startIndex,
+                                  from: line.index,
                                   to: line.endIndex
                               })
                           }
                         : {
                               ...this.getSingleLineComment({
-                                  file,
                                   body: this._getCommentBody(),
-                                  index: line.startIndex
+                                  index: line.index
                               })
                           }
                 );
@@ -192,7 +187,8 @@ class ValueComparisionStyleRule extends BaseRule {
             })
             .filter((text) => text);
 
-        return dedent(`It seems that marked fragment includes comparision pattern. If it's raw text, ignore this comment or consider using unicode representation of = character or escape it with backslash.
+        return this
+            .dedent(`It seems that marked fragment includes comparision pattern. If it's raw text, ignore this comment or consider using unicode representation of = character or escape it with backslash.
 
         Allowed comparision patterns: (${allowedPatterns.join(', ')})`);
     }

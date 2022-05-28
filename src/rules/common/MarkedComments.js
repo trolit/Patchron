@@ -1,16 +1,15 @@
-const BaseRule = require('../Base');
-const dedent = require('dedent-js');
+/// <reference path="../../config/type-definitions/rules/common/MarkedComments.js" />
 
-class NoUnmarkedCommentsRule extends BaseRule {
+const BaseRule = require('src/rules/Base');
+
+class MarkedCommentsRule extends BaseRule {
     /**
-     * @param {Array<{prefixes: Array<object>, isAppliedToSingleLineComments: boolean, isAppliedToMultiLineComments: boolean, isAppliedToInlineComments: boolean }>} config
-     * @param {Array<object>} config.prefixes - array of prefixes that should be used in comments
-     * @param {boolean} config.isAppliedToSingleLineComments
-     * @param {boolean} config.isAppliedToMultiLineComments
-     * @param {boolean} config.isAppliedToInlineComments
+     * @param {PepegaContext} pepegaContext
+     * @param {MarkedCommentsConfig} config
+     * @param {Patch} file
      */
-    constructor(config) {
-        super();
+    constructor(pepegaContext, config, file) {
+        super(pepegaContext, file);
 
         const {
             prefixes,
@@ -25,15 +24,15 @@ class NoUnmarkedCommentsRule extends BaseRule {
         this.isAppliedToInlineComments = isAppliedToInlineComments;
     }
 
-    invoke(file) {
+    invoke() {
         if (this._hasInvalidConfig()) {
-            this.logWarning(__filename, 'Invalid config!', file);
+            this.log.warning(__filename, 'Invalid config!', this.file);
 
             return [];
         }
 
         const unmarkedComments = [];
-        const { split_patch: splitPatch } = file;
+        const { splitPatch } = this.file;
         const splitPatchLength = splitPatch.length;
 
         for (let index = 0; index < splitPatchLength; index++) {
@@ -53,7 +52,6 @@ class NoUnmarkedCommentsRule extends BaseRule {
                 if (!this._startsWithPrefix(rawRow)) {
                     unmarkedComments.push(
                         this.getSingleLineComment({
-                            file,
                             body: this._getCommentBody(),
                             index
                         })
@@ -64,11 +62,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
             }
 
             if (this.isAppliedToMultiLineComments && rawRow.startsWith('/*')) {
-                const comment = this._resolveMultiLineComment(
-                    file,
-                    index,
-                    rawRow
-                );
+                const comment = this._resolveMultiLineComment(index, rawRow);
 
                 if (comment) {
                     unmarkedComments.push(comment);
@@ -83,7 +77,7 @@ class NoUnmarkedCommentsRule extends BaseRule {
                 this.isAppliedToInlineComments &&
                 (rawRow.includes('//') || rawRow.includes('/*'))
             ) {
-                const comment = this._resolveInlineComment(file, index, rawRow);
+                const comment = this._resolveInlineComment(index, rawRow);
 
                 if (comment) {
                     unmarkedComments.push(comment);
@@ -96,13 +90,11 @@ class NoUnmarkedCommentsRule extends BaseRule {
         return unmarkedComments;
     }
 
-    _resolveMultiLineComment(file, index, rawRow) {
-        const { split_patch: splitPatch } = file;
+    _resolveMultiLineComment(index, rawRow) {
         let comment = null;
 
         if (rawRow.includes('*/') && !this._startsWithPrefix(rawRow)) {
             comment = this.getSingleLineComment({
-                file,
                 body: this._getCommentBody(),
                 index
             });
@@ -110,11 +102,10 @@ class NoUnmarkedCommentsRule extends BaseRule {
             return comment;
         }
 
-        const result = this._verifyMultiLineComment(splitPatch, index);
+        const result = this._verifyMultiLineComment(index);
 
         if (!result.hasValidPrefix && result?.endIndex) {
             comment = this.getMultiLineComment({
-                file,
                 body: this._getCommentBody(true),
                 from: index,
                 to: result.endIndex
@@ -124,9 +115,8 @@ class NoUnmarkedCommentsRule extends BaseRule {
         return comment;
     }
 
-    _resolveInlineComment(file, index, rawRow) {
+    _resolveInlineComment(index, rawRow) {
         const commentInString = this._findCommentInString(rawRow);
-        const { split_patch: splitPatch } = file;
         let clearedRow = rawRow;
         let comment = null;
 
@@ -145,16 +135,14 @@ class NoUnmarkedCommentsRule extends BaseRule {
             !this._startsWithPrefix(result)
         ) {
             comment = this.getSingleLineComment({
-                file,
                 body: this._getCommentBody(),
                 index
             });
         } else if (!this._startsWithPrefix(result)) {
-            const result = this._verifyMultiLineComment(splitPatch, index);
+            const result = this._verifyMultiLineComment(index);
 
             if (!result.hasValidPrefix && result?.endIndex) {
                 comment = this.getMultiLineComment({
-                    file,
                     body: this._getCommentBody(true),
                     from: index,
                     to: result.endIndex
@@ -165,8 +153,10 @@ class NoUnmarkedCommentsRule extends BaseRule {
         return comment;
     }
 
-    _verifyMultiLineComment(splitPatch, multiLineStartIndex) {
+    _verifyMultiLineComment(multiLineStartIndex) {
+        const { splitPatch } = this.file;
         const splitPatchLength = splitPatch.length;
+
         let hasValidPrefix = false;
         let endIndex = null;
 
@@ -244,13 +234,13 @@ class NoUnmarkedCommentsRule extends BaseRule {
         const commentBody = `${start} should start with one of the predefined prefixes.
          
         <details>
-            <summary> List of allowed prefixes </summary> \n\n${dedent(
+            <summary> List of allowed prefixes </summary> \n\n${this.dedent(
                 formattedPrefixes
             )}
         </details>`;
 
-        return dedent(commentBody);
+        return this.dedent(commentBody);
     }
 }
 
-module.exports = NoUnmarkedCommentsRule;
+module.exports = MarkedCommentsRule;

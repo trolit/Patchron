@@ -1,28 +1,26 @@
 const dedent = require('dedent-js');
-const addComment = require('../github/addComment');
-const { logFatal } = require('../utilities/EventLog');
+const addComment = require('src/github/addComment');
 
 /**
  * **POST** pull request review summary
- * @param {WebhookEvent<EventPayloads.WebhookPayloadPullRequest>} context WebhookEvent instance.
+ *
+ * @param {PepegaContext} pepegaContext
  * @param {number} successfullyPostedComments number of comments posted to the GitHub
- * @param {Array<object>} reviewComments
- * @param {object} payload
  */
 module.exports = async (
-    context,
+    pepegaContext,
     successfullyPostedComments,
-    reviewComments,
-    payload
+    reviewComments
 ) => {
-    const { commits, additions, deletions, changed_files } =
-        payload.pull_request;
+    const { pullRequest, log } = pepegaContext;
+    const { pull_request } = pullRequest.context.payload;
+    const { commits, additions, deletions, changed_files } = pull_request;
 
     const unpostedComments = reviewComments.length - successfullyPostedComments;
-
     const postedCommentsStatus = `:warning: ${unpostedComments} comments were not posted. Check logs for details.`;
 
     const commentBody = `<em>pull request review completed</em>
+
     ${unpostedComments > 0 ? postedCommentsStatus : ' '}
     :speech_balloon: ${
         reviewComments.length
@@ -36,8 +34,8 @@ module.exports = async (
     `;
 
     try {
-        await addComment(context, dedent(commentBody));
+        await addComment(pepegaContext, dedent(commentBody));
     } catch (error) {
-        logFatal(__filename, error);
+        log.fatal(error);
     }
 };

@@ -1,5 +1,6 @@
 const { describe, expect, it } = require('@jest/globals');
-const extendWithBackticks = require('../../../src/extensions/setup-data/extendWithBackticks');
+
+const extendWithBackticks = require('src/extensions/setup-data/extendWithBackticks');
 
 describe('invoke function', () => {
     it('returns data extended with backticks', () => {
@@ -19,12 +20,10 @@ describe('invoke function', () => {
         );
 
         expect(result[1].backticks).toMatchObject({
-            startLineIndex: 1,
             endLineIndex: 1
         });
 
         expect(result[2].backticks).toMatchObject({
-            startLineIndex: 2,
             endLineIndex: 6
         });
     });

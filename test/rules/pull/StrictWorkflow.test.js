@@ -1,5 +1,17 @@
-const { describe, expect, it, beforeEach } = require('@jest/globals');
-const StrictWorkflowRule = require('../../../src/rules/pull/StrictWorkflow');
+const nock = require('nock');
+const {
+    describe,
+    expect,
+    it,
+    beforeEach,
+    afterEach
+} = require('@jest/globals');
+
+const {
+    pull: { StrictWorkflowRule }
+} = require('src/rules');
+const setupApp = require('test/rules/helpers/setupApp');
+const instantiateProbotContext = require('test/rules/helpers/instantiateProbotContext');
 
 const validConfig = {
     enabled: true,
@@ -34,79 +46,104 @@ const validConfig = {
 };
 
 describe('invoke function', () => {
-    let strictWorkflowRule;
+    let pepegaContext = null;
 
     beforeEach(() => {
-        strictWorkflowRule = new StrictWorkflowRule(validConfig);
+        pepegaContext = setupApp();
     });
 
-    it('returns null when rule is not enabled', () => {
-        strictWorkflowRule = new StrictWorkflowRule({
-            ...validConfig,
-            enabled: false
-        });
+    afterEach(() => {
+        nock.cleanAll();
 
-        const result = strictWorkflowRule.invoke({
-            filename: '...'
-        });
-
-        expect(result).toEqual(null);
+        nock.enableNetConnect();
     });
 
     it('returns null when rule workflow is empty', () => {
-        strictWorkflowRule = new StrictWorkflowRule({
-            ...validConfig,
-            workflow: []
-        });
+        const strictWorkflowRule = new StrictWorkflowRule(
+            pepegaContext,
+            {
+                ...validConfig,
+                workflow: []
+            },
+            null
+        );
 
-        const result = strictWorkflowRule.invoke({
-            filename: '...'
-        });
+        const result = strictWorkflowRule.invoke();
 
         expect(result).toEqual(null);
     });
 
     it('returns null when workflow is valid', () => {
-        const result = strictWorkflowRule.invoke({
-            pull_request: {
-                head: {
-                    ref: 'feature/do-something-1'
-                },
-                base: {
-                    ref: 'develop'
+        instantiateProbotContext(pepegaContext, {
+            payload: {
+                pull_request: {
+                    head: {
+                        ref: 'feature/do-something-1'
+                    },
+                    base: {
+                        ref: 'develop'
+                    }
                 }
             }
         });
+
+        const strictWorkflowRule = new StrictWorkflowRule(
+            pepegaContext,
+            validConfig,
+            null
+        );
+
+        const result = strictWorkflowRule.invoke();
 
         expect(result).toEqual(null);
     });
 
     it('returns object when flow is invalid (wrong head prefix)', () => {
-        const result = strictWorkflowRule.invoke({
-            pull_request: {
-                head: {
-                    ref: 'not/do-something-1'
-                },
-                base: {
-                    ref: 'develop'
+        instantiateProbotContext(pepegaContext, {
+            payload: {
+                pull_request: {
+                    head: {
+                        ref: 'not/do-something-1'
+                    },
+                    base: {
+                        ref: 'develop'
+                    }
                 }
             }
         });
+
+        const strictWorkflowRule = new StrictWorkflowRule(
+            pepegaContext,
+            validConfig,
+            null
+        );
+
+        const result = strictWorkflowRule.invoke();
 
         expect(result).toHaveProperty('body');
     });
 
     it('returns object when flow is invalid (valid head prefix)', () => {
-        const result = strictWorkflowRule.invoke({
-            pull_request: {
-                head: {
-                    ref: 'feature/do-something-1'
-                },
-                base: {
-                    ref: 'master'
+        instantiateProbotContext(pepegaContext, {
+            payload: {
+                pull_request: {
+                    head: {
+                        ref: 'feature/do-something-1'
+                    },
+                    base: {
+                        ref: 'master'
+                    }
                 }
             }
         });
+
+        const strictWorkflowRule = new StrictWorkflowRule(
+            pepegaContext,
+            validConfig,
+            null
+        );
+
+        const result = strictWorkflowRule.invoke();
 
         expect(result).toHaveProperty('body');
     });

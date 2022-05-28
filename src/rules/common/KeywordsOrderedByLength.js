@@ -1,40 +1,33 @@
-const BaseRule = require('../Base');
-const dedent = require('dedent-js');
+/// <reference path="../../config/type-definitions/rules/common/KeywordsOrderedByLength.js" />
+
+const BaseRule = require('src/rules/Base');
 
 class KeywordsOrderedByLengthRule extends BaseRule {
     /**
-     * @param {object} config
-     * @param {Array<{name: string, regex: object, order: 'ascending'|'descending', ignoreNewline: boolean }>} config.keywords
-     * @param {string} config.keywords[].name - readable name
-     * @param {object} config.keywords[].regex - regular expression to match line with keyword
-     * @param {string} config.keywords[].order - ascending/descending
-     * @param {string} config.keywords[].ignoreNewline - when set to 'true' **(not recommended)**, rule is tested against all keywords
-     * matched in given data and when 'false' **(recommended)**, only adjacent ones.
-     *
-     * e.g. when keywords are at lines: 0, 1, 2, 5, 6, 10, 'false' makes that rule apply only across group:
-     * [0, 1, 2] and [5, 6].
+     * @param {PepegaContext} pepegaContext
+     * @param {KeywordsOrderedByLengthConfig} config
+     * @param {Patch} file
      */
-    constructor(config) {
-        super();
+    constructor(pepegaContext, config, file) {
+        super(pepegaContext, file);
 
         const { keywords } = config;
 
         this.keywords = keywords;
     }
 
-    invoke(file) {
+    invoke() {
         const keywords = this.keywords;
 
         if (!keywords.length) {
-            this.logWarning(__filename, 'No keywords defined.', file);
+            this.log.warning(__filename, 'No keywords defined.', this.file);
 
             return [];
         }
 
         const reviewComments = [];
-        const { split_patch: splitPatch } = file;
 
-        const data = this.setupData(splitPatch);
+        const data = this.setupData(this.file.splitPatch);
 
         for (const keyword of keywords) {
             const { matchedRows, unchangedRows } = this._matchKeywordData(
@@ -49,7 +42,6 @@ class KeywordsOrderedByLengthRule extends BaseRule {
             if (keyword.ignoreNewline) {
                 reviewComments.push(
                     ...this._reviewLinesOrderIgnoringNewline({
-                        file,
                         keyword,
                         matchedRows
                     })
@@ -57,7 +49,6 @@ class KeywordsOrderedByLengthRule extends BaseRule {
             } else {
                 reviewComments.push(
                     ...this._reviewLinesOrder({
-                        file,
                         keyword,
                         matchedRows,
                         unchangedRows
@@ -95,25 +86,25 @@ class KeywordsOrderedByLengthRule extends BaseRule {
             const matchResultTrimmedContent = matchResult[0].trim();
 
             if (
-                keyword?.multilineOptions &&
+                keyword?.multiLineOptions &&
                 this.isPartOfMultiLine(keyword, matchResultTrimmedContent)
             ) {
-                const multilineEndIndex = this.getMultiLineEndIndex(
+                const multiLineEndIndex = this.getMultiLineEndIndex(
                     data,
                     keyword,
                     index
                 );
 
                 const { trimmedContent: endRowTrimmedContent } =
-                    data[multilineEndIndex];
+                    data[multiLineEndIndex];
 
                 matchedRows.push({
                     index,
                     trimmedContent: endRowTrimmedContent,
-                    length: multilineEndIndex - index
+                    length: multiLineEndIndex - index
                 });
 
-                index = multilineEndIndex;
+                index = multiLineEndIndex;
 
                 continue;
             }
@@ -149,7 +140,6 @@ class KeywordsOrderedByLengthRule extends BaseRule {
             if (baseRow.trimmedContent !== expectedRow.trimmedContent) {
                 reviewComments.push(
                     this.getSingleLineComment({
-                        ...data,
                         body: this._getCommentBody(keyword),
                         index: baseRow.index
                     })
@@ -207,7 +197,6 @@ class KeywordsOrderedByLengthRule extends BaseRule {
 
                     reviewComments.push(
                         this.getMultiLineComment({
-                            ...data,
                             body: this._getCommentBody(keyword),
                             from: firstElementIndex,
                             to: lastElementIndex
@@ -306,7 +295,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
 
         const commentBody = `Keep \`${order}\` order for keyword: \`${name}\``;
 
-        return dedent(commentBody);
+        return this.dedent(commentBody);
     }
 }
 

@@ -3,13 +3,14 @@ const getNearestHunkHeader = require('./getNearestHunkHeader');
 
 /**
  * translates row index into GitHub line number
+ *
  * @param {Array<string>} content file content split by \n
  * @param {string} side left | right
  * @param {number} rowIndex index of row to get GitHub line number
  *
  * @example
- *  * getLineNumber(content, 'right', 5) => 29
- *  * getLineNumber(content, 'left', 2) => 26
+ *  getLineNumber(content, 'right', 5) => 29
+ *  getLineNumber(content, 'left', 2) => 26
  * ┌─────────┬─────────────────────────┐
  * │ (index) │          Values         │
  * ├─────────┼─────────────────────────┤

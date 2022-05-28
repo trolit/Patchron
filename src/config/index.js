@@ -2,60 +2,25 @@
 
 const js = require('./jsRules');
 const vue = require('./vueRules');
-
-const {
-    pull: { StrictWorkflowRule }
-} = require('../rules');
+const pull = require('./pullRules');
 
 require('dotenv').config({
-    path: '../../.env'
+    path: '@root/.env'
 });
 
 module.exports = {
-    env: {},
+    nodeEnvironment: process.env.NODE_ENV,
     settings: {
         isGetFilesRequestPaginated: false, // when `false`, getFiles can receive up to 3000 files
         delayBetweenCommentRequestsInSeconds: 3,
         isOwnerAssigningEnabled: false,
         isReviewSummaryEnabled: false,
-        isStoringLogsEnabled: false,
+        isStoringLogsEnabled: true,
         maxCommentsPerReview: 50, // limit number of comments that can be added per single review
-        senders: [] // (optional) limit people whose pull requests will be reviewed (pass GitHub usernames)
+        senders: [] // limit people whose pull requests will be reviewed (pass GitHub usernames)
     },
     rules: {
-        pull: {
-            strictWorkflow: new StrictWorkflowRule({
-                enabled: false,
-                workflow: [
-                    {
-                        base: 'master',
-                        head: 'release'
-                    },
-                    {
-                        base: 'develop',
-                        head: 'release'
-                    },
-                    {
-                        base: 'develop',
-                        head: 'feature'
-                    },
-                    {
-                        base: 'master',
-                        head: 'develop'
-                    },
-                    {
-                        base: 'master',
-                        head: 'hotfix'
-                    },
-                    {
-                        base: 'develop',
-                        head: 'hotfix'
-                    }
-                ],
-                abortReviewOnInvalidBranchPrefix: false,
-                abortReviewOnInvalidFlow: true
-            })
-        },
+        pull,
         files: {
             js,
             vue

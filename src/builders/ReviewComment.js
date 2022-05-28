@@ -1,19 +1,24 @@
 /** Class representing review comment builder. */
 class ReviewCommentBuilder {
-    constructor(file) {
-        const { owner, repo, pull_number, path, commit_id } = file;
+    /**
+     *
+     * @param {PepegaContext} pepegaContext
+     * @param {Patch} file
+     */
+    constructor(pepegaContext, file) {
+        const { pullRequest, repo } = pepegaContext;
+        const { commitId: commit_id } = file;
 
         this.basicInformation = {
-            owner,
-            repo,
-            pull_number,
-            path,
+            ...repo,
             commit_id,
+            pull_number: pullRequest.id
         };
     }
 
     /**
      * builds single line review comment
+     *
      * @param {object} data
      * @param {string} data.body review comment
      * @param {string} data.line line number
@@ -27,7 +32,7 @@ class ReviewCommentBuilder {
             ...this.basicInformation,
             body,
             line,
-            side,
+            side
         };
 
         return comment;
@@ -35,6 +40,7 @@ class ReviewCommentBuilder {
 
     /**
      * builds multi line review comment
+     *
      * @param {object} data
      * @param {string} data.body review comment
      * @param {string} data.start_line line number (counted from line after '@@')
@@ -50,7 +56,7 @@ class ReviewCommentBuilder {
             body,
             start_line,
             start_side,
-            position,
+            position
         };
 
         return comment;

@@ -1,50 +1,42 @@
-const dedent = require('dedent-js');
-const BaseRule = require('../Base');
-const getLineNumber = require('../../helpers/getLineNumber');
-const getNearestHunkHeader = require('../../helpers/getNearestHunkHeader');
+/// <reference path="../../config/type-definitions/rules/common/PositionedKeywords.js" />
+
+const BaseRule = require('src/rules/Base');
 
 class PositionedKeywordsRule extends BaseRule {
     /**
-     * @param {object} config
-     * @param {Array<{name: string, regex: object, position: { custom: { name: string, expression: string|object }, BOF: boolean }, ignoreNewline: boolean, enforced: boolean, breakOnFirstOccurence: boolean, countDifferentCodeAsLineBreak: boolean, order: Array<{ name: string, expression: object}>}>} config.keywords
-     * @param {string} config.keywords[].name - readable name
-     * @param {object} config.keywords[].regex - matches line(s) that should be validated against rule
-     * @param {Array<string>} config.keywords[].multilineOptions - if none of them will be included in matched line, line will be treated as multiline.
-     * @param {object} config.keywords[].position - defines keyword expected position (custom or BOF). Configure each keyword with **only** one way of determining position.
-     * @param {number} config.keywords[].maxLineBreaks - defines maximum allowed line breaks between each keyword. When 0, spaces between matched line(s) are counted as rule break
-     * @param {boolean} config.keywords[].enforced - when **enabled**, it basically means that when patch does not have expected position that was provided within configuration - but it has at least two keywords - first occurence will be counted as expected position, which means, remaining ones must be positioned in relation to first one.
-     * @param {boolean} config.keywords[].breakOnFirstOccurence - when **true**, stops keyword review on first invalid occurence
-     * @param {boolean} config.keywords[].countDifferentCodeAsLineBreak - when **disabled**, code other than line break (\n), found between matched keywords is counted as rule break.
-     * @param {Array<object>} config.keywords[].order - allows to provide second layer of keyword positioning. Requires at least two objects to compare matched lines against themselves. For instance, for `import` keyword, second layer could enforce following positioning: `packages -> components -> helpers`
+     * @param {PepegaContext} pepegaContext
+     * @param {PositionedKeywordsConfig} config
+     * @param {Patch} file
      */
-    constructor(config) {
-        super();
+    constructor(pepegaContext, config, file) {
+        super(pepegaContext, file);
 
         const { keywords } = config;
 
         this.keywords = keywords;
     }
 
-    invoke(file) {
+    invoke() {
         const keywords = this.keywords;
 
         if (!keywords.length) {
-            this.logWarning(__filename, 'No keywords defined.', file);
+            this.log.warning(__filename, 'No keywords defined', this.file);
 
             return [];
         }
 
-        const { split_patch: splitPatch } = file;
+        const { splitPatch } = this.file;
         const data = this.setupData(splitPatch);
 
         let reviewComments = [];
 
         for (const keyword of keywords) {
             if (!this._hasKeywordValidConfig(keyword)) {
-                this.logWarning(
+                this.log.warning(
                     __filename,
-                    'Keyword review skipped due to invalid [ position ] config',
-                    file
+                    `Keyword ${
+                        keyword.name || 'undefined'
+                    } review skipped due to invalid config`
                 );
 
                 continue;
@@ -57,7 +49,6 @@ class PositionedKeywordsRule extends BaseRule {
             }
 
             const firstLayerReview = this._reviewFirstLayer({
-                file,
                 data,
                 keyword,
                 keywords,
@@ -72,7 +63,6 @@ class PositionedKeywordsRule extends BaseRule {
 
             if (keyword.order?.length > 1) {
                 const secondLayerReview = this._reviewSecondLayer({
-                    file,
                     keyword,
                     matchedData
                 });
@@ -103,7 +93,7 @@ class PositionedKeywordsRule extends BaseRule {
                 const matchedContent = matchResult[0];
 
                 const isMultiLine =
-                    keyword?.multilineOptions?.length &&
+                    keyword?.multiLineOptions?.length &&
                     this.isPartOfMultiLine(keyword, matchedContent);
 
                 if (isMultiLine) {
@@ -139,8 +129,7 @@ class PositionedKeywordsRule extends BaseRule {
     }
 
     _reviewFirstLayer(parameters) {
-        const { file, data, keyword, keywords, matchedData } = parameters;
-        const { split_patch: splitPatch } = file;
+        const { data, keyword, keywords, matchedData } = parameters;
         let reviewComments = [];
 
         const { position: keywordPosition } = keyword;
@@ -159,14 +148,13 @@ class PositionedKeywordsRule extends BaseRule {
             position = this._findBOFPosition({
                 data,
                 keyword,
-                splitPatch,
                 matchedData,
                 keywordsWithBOF
             });
 
             if (position && !position?.wasEnforced && !position?.isMatched) {
                 reviewComments = [
-                    this._getWrongPositionComment(file, keyword, position)
+                    this._getWrongPositionComment(keyword, position)
                 ];
 
                 this._removeKeywords(keywords, keywordsWithBOF);
@@ -180,7 +168,6 @@ class PositionedKeywordsRule extends BaseRule {
         }
 
         reviewComments = this._reviewPosition({
-            file,
             data,
             keyword,
             position,
@@ -191,7 +178,7 @@ class PositionedKeywordsRule extends BaseRule {
     }
 
     _reviewSecondLayer(parameters) {
-        const { file, matchedData, keyword } = parameters;
+        const { matchedData, keyword } = parameters;
         const { order } = keyword;
         let reviewComments = [];
 
@@ -221,7 +208,6 @@ class PositionedKeywordsRule extends BaseRule {
                 reviewComments.push(
                     this._getWrongOrderComment(
                         keyword,
-                        file,
                         row,
                         rowWithGreaterOrderIndex
                     )
@@ -259,13 +245,13 @@ class PositionedKeywordsRule extends BaseRule {
         let length = null;
 
         if (this.isPartOfMultiLine(keyword, data[index].trimmedContent)) {
-            const multilineEndIndex = this.getMultiLineEndIndex(
+            const multiLineEndIndex = this.getMultiLineEndIndex(
                 data,
                 keyword,
                 index
             );
 
-            length = multilineEndIndex - index;
+            length = multiLineEndIndex - index;
         }
 
         return {
@@ -276,12 +262,12 @@ class PositionedKeywordsRule extends BaseRule {
     }
 
     _findBOFPosition(parameters) {
-        const { splitPatch, data, matchedData, keyword, keywordsWithBOF } =
-            parameters;
+        const { data, matchedData, keyword, keywordsWithBOF } = parameters;
+        const { splitPatch } = this.file;
 
         let index = -1;
         let wasEnforced = false;
-        const topHunkHeader = getNearestHunkHeader(splitPatch, 0);
+        const topHunkHeader = this.helpers.getNearestHunkHeader(splitPatch, 0);
 
         const { line } = topHunkHeader.modifiedFile;
 
@@ -312,20 +298,20 @@ class PositionedKeywordsRule extends BaseRule {
 
         let length = null;
 
-        if (keyword.multilineOptions?.length) {
+        if (keyword.multiLineOptions?.length) {
             const isMultiLine = this.isPartOfMultiLine(
                 keyword,
                 data[index].trimmedContent
             );
 
             if (isMultiLine) {
-                const multilineEndIndex = this.getMultiLineEndIndex(
+                const multiLineEndIndex = this.getMultiLineEndIndex(
                     data,
                     keyword,
                     index
                 );
 
-                length = multilineEndIndex - index;
+                length = multiLineEndIndex - index;
             }
         }
 
@@ -341,10 +327,10 @@ class PositionedKeywordsRule extends BaseRule {
     }
 
     /**
-     * @param {{ file: object, data: Array<object>, matchedData: Array<object>, keyword: object, position: object }} parameters
+     * @param {{ data: Array<object>, matchedData: Array<object>, keyword: object, position: object }} parameters
      */
     _reviewPosition(parameters) {
-        const { file, data, matchedData, keyword, position } = parameters;
+        const { data, matchedData, keyword, position } = parameters;
 
         const {
             breakOnFirstOccurence,
@@ -352,7 +338,6 @@ class PositionedKeywordsRule extends BaseRule {
             countDifferentCodeAsLineBreak
         } = keyword;
 
-        const { split_patch: splitPatch } = file;
         const matchedDataLength = matchedData.length;
 
         let recentRow = position;
@@ -402,13 +387,16 @@ class PositionedKeywordsRule extends BaseRule {
 
                 reviewComments.push(
                     this.getMultiLineComment({
-                        file,
-                        body: this._getCommentBody(keyword, splitPatch, {
-                            from,
-                            to,
-                            distance,
-                            reason
-                        }),
+                        body: this._getCommentBody(
+                            keyword,
+                            this.file.splitPatch,
+                            {
+                                from,
+                                to,
+                                distance,
+                                reason
+                            }
+                        ),
                         from,
                         to
                     })
@@ -425,47 +413,46 @@ class PositionedKeywordsRule extends BaseRule {
         return reviewComments;
     }
 
-    _getWrongPositionComment(file, keyword, position) {
+    _getWrongPositionComment(keyword, position) {
         const { rawContent, index } = position;
 
-        const body =
-            dedent(`Expected \`${keyword.name}\` lines to start here but found
+        const body = this
+            .dedent(`Expected \`${keyword.name}\` lines to start here but found
                 \`\`\`
                 ${rawContent}
                 \`\`\`
                 `);
 
         return this.getSingleLineComment({
-            file,
             body,
             index
         });
     }
 
-    _getWrongOrderComment(keyword, file, testedRow, foundRow) {
+    _getWrongOrderComment(keyword, testedRow, foundRow) {
         const { index: testedRowIndex } = testedRow;
-        const { split_patch: splitPatch } = file;
+        const { splitPatch } = this.file;
 
         const expectedOrder = keyword.order
             .map(({ name }) => name)
             .join(' >> ');
 
         const { order } = keyword;
-        const testedRowLineNumber = getLineNumber(
+        const testedRowLineNumber = this.helpers.getLineNumber(
             splitPatch,
             this.RIGHT,
             testedRow.index
         );
         const { name: testedRowOrder } = order[testedRow.orderIndex];
 
-        const foundRowLineNumber = getLineNumber(
+        const foundRowLineNumber = this.helpers.getLineNumber(
             splitPatch,
             this.RIGHT,
             foundRow.index
         );
         const { name: foundRowOrder } = order[foundRow.orderIndex];
 
-        const body = dedent(`
+        const body = this.dedent(`
                Line ${testedRowLineNumber} (${testedRowOrder}) should appear before line ${foundRowLineNumber} (${foundRowOrder})
                 ----
                 Expected order: 
@@ -473,7 +460,6 @@ class PositionedKeywordsRule extends BaseRule {
                 `);
 
         return this.getSingleLineComment({
-            file,
             body,
             index: testedRowIndex
         });
@@ -554,8 +540,16 @@ class PositionedKeywordsRule extends BaseRule {
         const { from, to, distance, reason } = review;
         const { maxLineBreaks, name } = keyword;
 
-        const fromLineNumber = getLineNumber(splitPatch, this.RIGHT, from);
-        const toLineNumber = getLineNumber(splitPatch, this.RIGHT, to);
+        const fromLineNumber = this.helpers.getLineNumber(
+            splitPatch,
+            this.RIGHT,
+            from
+        );
+        const toLineNumber = this.helpers.getLineNumber(
+            splitPatch,
+            this.RIGHT,
+            to
+        );
 
         let commentBody = '';
 
@@ -577,7 +571,7 @@ class PositionedKeywordsRule extends BaseRule {
                 break;
         }
 
-        return dedent(commentBody);
+        return this.dedent(commentBody);
     }
 }
 

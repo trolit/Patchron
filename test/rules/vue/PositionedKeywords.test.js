@@ -1,10 +1,22 @@
-const { describe, expect, it, beforeEach } = require('@jest/globals');
-const PositionedKeywordsRule = require('../../../src/rules/common/PositionedKeywords');
+const nock = require('nock');
+const {
+    describe,
+    expect,
+    it,
+    beforeEach,
+    afterEach
+} = require('@jest/globals');
+
+const {
+    common: { PositionedKeywordsRule }
+} = require('src/rules');
+const setupApp = require('test/rules/helpers/setupApp');
+const initializeFile = require('test/rules/helpers/initializeFile');
 
 const importKeywordCustomConfig = {
     name: 'import',
     regex: /import.*/,
-    multilineOptions: ['from'],
+    multiLineOptions: ['from'],
     position: {
         custom: {
             name: '<script>',
@@ -21,7 +33,7 @@ const importKeywordCustomConfig = {
 const importKeywordBOFConfig = {
     name: 'import',
     regex: /import.*/,
-    multilineOptions: ['from'],
+    multiLineOptions: ['from'],
     position: {
         custom: null,
         BOF: true,
@@ -37,7 +49,7 @@ const constKeywordConfig = (position, override = null) => {
     return {
         name: 'const',
         regex: /const.*require.*/,
-        multilineOptions: [],
+        multiLineOptions: [],
         maxLineBreaks: 0,
         enforced: true,
         breakOnFirstOccurence: false,
@@ -52,20 +64,31 @@ const validConfig = {
 };
 
 describe('invoke function', () => {
-    let positionedKeywordsRule;
+    let pepegaContext = null;
+    let file = {};
 
     beforeEach(() => {
-        positionedKeywordsRule = new PositionedKeywordsRule(validConfig);
+        pepegaContext = setupApp();
+
+        file = initializeFile();
+    });
+
+    afterEach(() => {
+        nock.cleanAll();
+
+        nock.enableNetConnect();
     });
 
     it('returns empty array on empty keywords', () => {
-        positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: []
-        });
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            pepegaContext,
+            {
+                keywords: []
+            },
+            file
+        );
 
-        const result = positionedKeywordsRule.invoke({
-            filename: '...'
-        });
+        const result = positionedKeywordsRule.invoke();
 
         expect(result).toEqual([]);
     });
@@ -77,224 +100,260 @@ describe('invoke function', () => {
      */
 
     it('returns empty array on missing custom position', () => {
-        positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [
-                {
-                    ...importKeywordCustomConfig,
-                    enforced: false
-                }
-            ]
-        });
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            pepegaContext,
+            {
+                keywords: [
+                    {
+                        ...importKeywordCustomConfig,
+                        enforced: false
+                    }
+                ]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    `+<scwddwdwript>`,
+                    `+import method1 from '@/helpers/methods`,
+                    `-`,
+                    `+`,
+                    `+import method2 from '@/helpers/methods'`,
+                    `+`,
+                    `+import method3 from '@/helpers/methods'`
+                ]
+            }
+        );
 
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +5,7 @@`,
-                `+<scwddwdwript>`,
-                `+import method1 from '@/helpers/methods`,
-                `-`,
-                `+`,
-                `+import method2 from '@/helpers/methods'`,
-                `+`,
-                `+import method3 from '@/helpers/methods'`
-            ]
-        });
+        const result = positionedKeywordsRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns empty array on valid custom positioning', () => {
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +5,7 @@`,
-                `+<script>`,
-                ` import {`,
-                `     method4,`,
-                `     method5,`,
-                ` from '@/helpers/methods'`,
-                `+import method1 from '@/helpers/methods`,
-                `-`,
-                ` import {`,
-                `     method24,`,
-                ` from '@/helpers/methods'`,
-                `+import method2 from '@/helpers/methods'`,
-                `+import method3 from '@/helpers/methods'`,
-                ` import {`,
-                `     method34,`,
-                ` from '@/helpers/methods'`,
-                `-`,
-                `-import method6 from '@/helpers/methods'`
-            ]
-        });
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            pepegaContext,
+            validConfig,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    `+<script>`,
+                    ` import {`,
+                    `     method4,`,
+                    `     method5,`,
+                    ` from '@/helpers/methods'`,
+                    `+import method1 from '@/helpers/methods`,
+                    `-`,
+                    ` import {`,
+                    `     method24,`,
+                    ` from '@/helpers/methods'`,
+                    `+import method2 from '@/helpers/methods'`,
+                    `+import method3 from '@/helpers/methods'`,
+                    ` import {`,
+                    `     method34,`,
+                    ` from '@/helpers/methods'`,
+                    `-`,
+                    `-import method6 from '@/helpers/methods'`
+                ]
+            }
+        );
+
+        const result = positionedKeywordsRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns empty array on valid custom positioning (enforced)', () => {
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                `+<scrdwwddwdipt>`,
-                ` import {`,
-                `     method4,`,
-                `     method5,`,
-                ` from '@/helpers/methods'`,
-                `+import method1 from '@/helpers/methods`,
-                `-`,
-                ` import {`,
-                `     method24,`,
-                ` from '@/helpers/methods'`,
-                `+import method2 from '@/helpers/methods'`,
-                `+import method3 from '@/helpers/methods'`,
-                ` import {`,
-                `     method34,`,
-                ` from '@/helpers/methods'`,
-                `-`,
-                `-import method6 from '@/helpers/methods'`
-            ]
-        });
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            pepegaContext,
+            validConfig,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    `+<scrdwwddwdipt>`,
+                    ` import {`,
+                    `     method4,`,
+                    `     method5,`,
+                    ` from '@/helpers/methods'`,
+                    `+import method1 from '@/helpers/methods`,
+                    `-`,
+                    ` import {`,
+                    `     method24,`,
+                    ` from '@/helpers/methods'`,
+                    `+import method2 from '@/helpers/methods'`,
+                    `+import method3 from '@/helpers/methods'`,
+                    ` import {`,
+                    `     method34,`,
+                    ` from '@/helpers/methods'`,
+                    `-`,
+                    `-import method6 from '@/helpers/methods'`
+                ]
+            }
+        );
+
+        const result = positionedKeywordsRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns empty array on valid custom positioning (maxLineBreaks = 2, countDifferentCodeAsLineBreak = true)', () => {
-        positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [
-                {
-                    ...importKeywordCustomConfig,
-                    maxLineBreaks: 2,
-                    countDifferentCodeAsLineBreak: true
-                }
-            ]
-        });
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            pepegaContext,
+            {
+                keywords: [
+                    {
+                        ...importKeywordCustomConfig,
+                        maxLineBreaks: 2,
+                        countDifferentCodeAsLineBreak: true
+                    }
+                ]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    `+<script>`,
+                    ` import {`,
+                    `     method4,`,
+                    `     method5,`,
+                    ` from '@/helpers/methods'`,
+                    ` const x = 2;`,
+                    `+import method1 from '@/helpers/methods`,
+                    `-`,
+                    ` import {`,
+                    `     method24,`,
+                    ` from '@/helpers/methods'`,
+                    `+import method2 from '@/helpers/methods'`,
+                    `+const y = 3;`,
+                    `+import method3 from '@/helpers/methods'`,
+                    ` import {`,
+                    `     method34,`,
+                    ` from '@/helpers/methods'`,
+                    `-`,
+                    `-import method6 from '@/helpers/methods'`
+                ]
+            }
+        );
 
         const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +5,7 @@`,
-                `+<script>`,
-                ` import {`,
-                `     method4,`,
-                `     method5,`,
-                ` from '@/helpers/methods'`,
-                ` const x = 2;`,
-                `+import method1 from '@/helpers/methods`,
-                `-`,
-                ` import {`,
-                `     method24,`,
-                ` from '@/helpers/methods'`,
-                `+import method2 from '@/helpers/methods'`,
-                `+const y = 3;`,
-                `+import method3 from '@/helpers/methods'`,
-                ` import {`,
-                `     method34,`,
-                ` from '@/helpers/methods'`,
-                `-`,
-                `-import method6 from '@/helpers/methods'`
-            ]
+            filename: '...'
         });
 
         expect(result).toEqual([]);
     });
 
     it('returns empty array on valid `import`custom positioning (second layer order)', () => {
-        positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [
-                {
-                    ...importKeywordCustomConfig,
-                    order: [
-                        {
-                            name: 'packages',
-                            expression: /import(?!.*@).*/
-                        },
-                        {
-                            name: 'components',
-                            expression: /import.*@\/components.*/
-                        }
-                    ]
-                }
-            ]
-        });
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            pepegaContext,
+            {
+                keywords: [
+                    {
+                        ...importKeywordCustomConfig,
+                        order: [
+                            {
+                                name: 'packages',
+                                expression: /import(?!.*@).*/
+                            },
+                            {
+                                name: 'components',
+                                expression: /import.*@\/components.*/
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    `+import uniq from 'lodash/uniq'`,
+                    `+import {`,
+                    `+    dedent,`,
+                    `+    dedent2`,
+                    `+} from 'dedent-js'`,
+                    `+import { mapGetters } from 'vuex'`,
+                    `+import Component1 from '@/components/Component1'`,
+                    `+import Component12542 from '@/components/Component12542'`,
+                    `+import Component3 from '@/components/Component3'`
+                ]
+            }
+        );
 
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +5,7 @@`,
-                `+import uniq from 'lodash/uniq'`,
-                `+import {`,
-                `+    dedent,`,
-                `+    dedent2`,
-                `+} from 'dedent-js'`,
-                `+import { mapGetters } from 'vuex'`,
-                `+import Component1 from '@/components/Component1'`,
-                `+import Component12542 from '@/components/Component12542'`,
-                `+import Component3 from '@/components/Component3'`
-            ]
-        });
+        const result = positionedKeywordsRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns empty array on only one order type of custom positioning (second layer order)', () => {
-        positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [
-                {
-                    ...importKeywordCustomConfig,
-                    order: [
-                        {
-                            name: 'packages',
-                            expression: /import(?!.*@).*/
-                        },
-                        {
-                            name: 'components',
-                            expression: /import.*@\/components.*/
-                        }
-                    ]
-                }
-            ]
-        });
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            pepegaContext,
+            {
+                keywords: [
+                    {
+                        ...importKeywordCustomConfig,
+                        order: [
+                            {
+                                name: 'packages',
+                                expression: /import(?!.*@).*/
+                            },
+                            {
+                                name: 'components',
+                                expression: /import.*@\/components.*/
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    `+import Component1 from '@/components/Component1'`,
+                    `+import Component12542 from '@/components/Component12542'`,
+                    `+import Component3 from '@/components/Component3'`
+                ]
+            }
+        );
 
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +5,7 @@`,
-                `+import Component1 from '@/components/Component1'`,
-                `+import Component12542 from '@/components/Component12542'`,
-                `+import Component3 from '@/components/Component3'`
-            ]
-        });
+        const result = positionedKeywordsRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid custom positioning (maxLineBreaks = 0)', () => {
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +5,7 @@`,
-                `+<script>`,
-                ` import {`,
-                `     method4,`,
-                `     method5,`,
-                ` from '@/helpers/methods'`,
-                ` `,
-                `+import method1 from '@/helpers/methods`,
-                `-`,
-                ` import {`,
-                `     method24,`,
-                ` from '@/helpers/methods'`,
-                `+import method2 from '@/helpers/methods'`,
-                `+`,
-                `+import method3 from '@/helpers/methods'`,
-                ` import {`,
-                `     method34,`,
-                ` from '@/helpers/methods'`,
-                `-`,
-                `-import method6 from '@/helpers/methods'`
-            ]
-        });
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            pepegaContext,
+            validConfig,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    `+<script>`,
+                    ` import {`,
+                    `     method4,`,
+                    `     method5,`,
+                    ` from '@/helpers/methods'`,
+                    ` `,
+                    `+import method1 from '@/helpers/methods`,
+                    `-`,
+                    ` import {`,
+                    `     method24,`,
+                    ` from '@/helpers/methods'`,
+                    `+import method2 from '@/helpers/methods'`,
+                    `+`,
+                    `+import method3 from '@/helpers/methods'`,
+                    ` import {`,
+                    `     method34,`,
+                    ` from '@/helpers/methods'`,
+                    `-`,
+                    `-import method6 from '@/helpers/methods'`
+                ]
+            }
+        );
+
+        const result = positionedKeywordsRule.invoke();
 
         expect(result).toHaveLength(2);
 
@@ -306,31 +365,37 @@ describe('invoke function', () => {
     });
 
     it('returns review on invalid custom positioning (enforced, maxLineBreaks = 0)', () => {
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +5,7 @@`,
-                `+<scridwdwwdpt>`,
-                ` import {`,
-                `     method4,`,
-                `     method5,`,
-                ` from '@/helpers/methods'`,
-                ` const x = 2;`,
-                `+import method1 from '@/helpers/methods`,
-                `-`,
-                ` import {`,
-                `     method24,`,
-                ` from '@/helpers/methods'`,
-                `+import method2 from '@/helpers/methods'`,
-                `+const y = 3;`,
-                `+import method3 from '@/helpers/methods'`,
-                ` import {`,
-                `     method34,`,
-                ` from '@/helpers/methods'`,
-                `-`,
-                `-import method6 from '@/helpers/methods'`
-            ]
-        });
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            pepegaContext,
+            validConfig,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    `+<scridwdwwdpt>`,
+                    ` import {`,
+                    `     method4,`,
+                    `     method5,`,
+                    ` from '@/helpers/methods'`,
+                    ` const x = 2;`,
+                    `+import method1 from '@/helpers/methods`,
+                    `-`,
+                    ` import {`,
+                    `     method24,`,
+                    ` from '@/helpers/methods'`,
+                    `+import method2 from '@/helpers/methods'`,
+                    `+const y = 3;`,
+                    `+import method3 from '@/helpers/methods'`,
+                    ` import {`,
+                    `     method34,`,
+                    ` from '@/helpers/methods'`,
+                    `-`,
+                    `-import method6 from '@/helpers/methods'`
+                ]
+            }
+        );
+
+        const result = positionedKeywordsRule.invoke();
 
         expect(result).toHaveLength(2);
 
@@ -342,40 +407,44 @@ describe('invoke function', () => {
     });
 
     it('returns review on invalid custom positioning (maxLineBreaks = 2, countDifferentCodeAsLineBreak = false)', () => {
-        positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [
-                {
-                    ...importKeywordCustomConfig,
-                    maxLineBreaks: 2
-                }
-            ]
-        });
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            pepegaContext,
+            {
+                keywords: [
+                    {
+                        ...importKeywordCustomConfig,
+                        maxLineBreaks: 2
+                    }
+                ]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    `+<script>`,
+                    ` import {`,
+                    `     method4,`,
+                    `     method5,`,
+                    ` from '@/helpers/methods'`,
+                    ` const x = 2;`,
+                    `+import method1 from '@/helpers/methods`,
+                    `-`,
+                    ` import {`,
+                    `     method24,`,
+                    ` from '@/helpers/methods'`,
+                    `+import method2 from '@/helpers/methods'`,
+                    `+const y = 3;`,
+                    `+import method3 from '@/helpers/methods'`,
+                    ` import {`,
+                    `     method34,`,
+                    ` from '@/helpers/methods'`,
+                    `-`,
+                    `-import method6 from '@/helpers/methods'`
+                ]
+            }
+        );
 
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +5,7 @@`,
-                `+<script>`,
-                ` import {`,
-                `     method4,`,
-                `     method5,`,
-                ` from '@/helpers/methods'`,
-                ` const x = 2;`,
-                `+import method1 from '@/helpers/methods`,
-                `-`,
-                ` import {`,
-                `     method24,`,
-                ` from '@/helpers/methods'`,
-                `+import method2 from '@/helpers/methods'`,
-                `+const y = 3;`,
-                `+import method3 from '@/helpers/methods'`,
-                ` import {`,
-                `     method34,`,
-                ` from '@/helpers/methods'`,
-                `-`,
-                `-import method6 from '@/helpers/methods'`
-            ]
-        });
+        const result = positionedKeywordsRule.invoke();
 
         expect(result).toHaveLength(2);
 
@@ -387,39 +456,43 @@ describe('invoke function', () => {
     });
 
     it('returns review on invalid `import` custom positioning (second layer order)', () => {
-        positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [
-                {
-                    ...importKeywordCustomConfig,
-                    order: [
-                        {
-                            name: 'packages',
-                            expression: /import(?!.*@).*/
-                        },
-                        {
-                            name: 'components',
-                            expression: /import.*@\/components.*/
-                        }
-                    ]
-                }
-            ]
-        });
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            pepegaContext,
+            {
+                keywords: [
+                    {
+                        ...importKeywordCustomConfig,
+                        order: [
+                            {
+                                name: 'packages',
+                                expression: /import(?!.*@).*/
+                            },
+                            {
+                                name: 'components',
+                                expression: /import.*@\/components.*/
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    `+import uniq from 'lodash/uniq'`,
+                    `+import {`,
+                    `+    dedent,`,
+                    `+    dedent2`,
+                    `+} from 'dedent-js'`,
+                    `+import Component3 from '@/components/Component3'`,
+                    `+import { mapGetters } from 'vuex'`,
+                    `+import Component1 from '@/components/Component1'`,
+                    `+import Component12542 from '@/components/Component12542'`
+                ]
+            }
+        );
 
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +5,7 @@`,
-                `+import uniq from 'lodash/uniq'`,
-                `+import {`,
-                `+    dedent,`,
-                `+    dedent2`,
-                `+} from 'dedent-js'`,
-                `+import Component3 from '@/components/Component3'`,
-                `+import { mapGetters } from 'vuex'`,
-                `+import Component1 from '@/components/Component1'`,
-                `+import Component12542 from '@/components/Component12542'`
-            ]
-        });
+        const result = positionedKeywordsRule.invoke();
 
         expect(result).toHaveLength(1);
 
@@ -427,40 +500,44 @@ describe('invoke function', () => {
     });
 
     it('returns single comment on invalid custom positioning (breakOnFirstOccurence)', () => {
-        positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [
-                {
-                    ...importKeywordCustomConfig,
-                    breakOnFirstOccurence: true
-                }
-            ]
-        });
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            pepegaContext,
+            {
+                keywords: [
+                    {
+                        ...importKeywordCustomConfig,
+                        breakOnFirstOccurence: true
+                    }
+                ]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    `+<script>`,
+                    ` import {`,
+                    `     method4,`,
+                    `     method5,`,
+                    ` from '@/helpers/methods'`,
+                    ` const x = 2;`,
+                    `+import method1 from '@/helpers/methods`,
+                    `-`,
+                    ` import {`,
+                    `     method24,`,
+                    ` from '@/helpers/methods'`,
+                    `+import method2 from '@/helpers/methods'`,
+                    `+const y = 3;`,
+                    `+import method3 from '@/helpers/methods'`,
+                    ` import {`,
+                    `     method34,`,
+                    ` from '@/helpers/methods'`,
+                    `-`,
+                    `-import method6 from '@/helpers/methods'`
+                ]
+            }
+        );
 
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +5,7 @@`,
-                `+<script>`,
-                ` import {`,
-                `     method4,`,
-                `     method5,`,
-                ` from '@/helpers/methods'`,
-                ` const x = 2;`,
-                `+import method1 from '@/helpers/methods`,
-                `-`,
-                ` import {`,
-                `     method24,`,
-                ` from '@/helpers/methods'`,
-                `+import method2 from '@/helpers/methods'`,
-                `+const y = 3;`,
-                `+import method3 from '@/helpers/methods'`,
-                ` import {`,
-                `     method34,`,
-                ` from '@/helpers/methods'`,
-                `-`,
-                `-import method6 from '@/helpers/methods'`
-            ]
-        });
+        const result = positionedKeywordsRule.invoke();
 
         expect(result).toHaveLength(1);
 
@@ -475,240 +552,267 @@ describe('invoke function', () => {
      */
 
     it('returns empty array on missing BOF position', () => {
-        positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [
-                {
-                    ...importKeywordBOFConfig,
-                    enforced: false
-                }
-            ]
-        });
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            pepegaContext,
+            {
+                keywords: [
+                    {
+                        ...importKeywordBOFConfig,
+                        enforced: false
+                    }
+                ]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    `+<scwddwdwript>`,
+                    `+import method1 from '@/helpers/methods`,
+                    `-`,
+                    `+`,
+                    `+import method2 from '@/helpers/methods'`,
+                    `+`,
+                    `+import method3 from '@/helpers/methods'`
+                ]
+            }
+        );
 
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +5,7 @@`,
-                `+<scwddwdwript>`,
-                `+import method1 from '@/helpers/methods`,
-                `-`,
-                `+`,
-                `+import method2 from '@/helpers/methods'`,
-                `+`,
-                `+import method3 from '@/helpers/methods'`
-            ]
-        });
+        const result = positionedKeywordsRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns empty array on valid BOF positioning', () => {
-        positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [importKeywordBOFConfig]
-        });
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            pepegaContext,
+            {
+                keywords: [importKeywordBOFConfig]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    ` import {`,
+                    `     method4,`,
+                    `     method5,`,
+                    ` from '@/helpers/methods'`,
+                    `+import method1 from '@/helpers/methods`,
+                    `-`,
+                    ` import {`,
+                    `     method24,`,
+                    ` from '@/helpers/methods'`,
+                    `+import method2 from '@/helpers/methods'`,
+                    `+import method3 from '@/helpers/methods'`,
+                    ` import {`,
+                    `     method34,`,
+                    ` from '@/helpers/methods'`,
+                    `-`,
+                    `-import method6 from '@/helpers/methods'`
+                ]
+            }
+        );
 
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                ` import {`,
-                `     method4,`,
-                `     method5,`,
-                ` from '@/helpers/methods'`,
-                `+import method1 from '@/helpers/methods`,
-                `-`,
-                ` import {`,
-                `     method24,`,
-                ` from '@/helpers/methods'`,
-                `+import method2 from '@/helpers/methods'`,
-                `+import method3 from '@/helpers/methods'`,
-                ` import {`,
-                `     method34,`,
-                ` from '@/helpers/methods'`,
-                `-`,
-                `-import method6 from '@/helpers/methods'`
-            ]
-        });
+        const result = positionedKeywordsRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns empty array on valid BOF positioning (enforced)', () => {
-        positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [importKeywordBOFConfig]
-        });
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            pepegaContext,
+            {
+                keywords: [importKeywordBOFConfig]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +4,7 @@`,
+                    `+<scrdwwddwdipt>`,
+                    ` import {`,
+                    `     method4,`,
+                    `     method5,`,
+                    ` from '@/helpers/methods'`,
+                    `+import method1 from '@/helpers/methods`,
+                    `-`,
+                    ` import {`,
+                    `     method24,`,
+                    ` from '@/helpers/methods'`,
+                    `+import method2 from '@/helpers/methods'`,
+                    `+import method3 from '@/helpers/methods'`,
+                    ` import {`,
+                    `     method34,`,
+                    ` from '@/helpers/methods'`,
+                    `-`,
+                    `-import method6 from '@/helpers/methods'`
+                ]
+            }
+        );
 
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +4,7 @@`,
-                `+<scrdwwddwdipt>`,
-                ` import {`,
-                `     method4,`,
-                `     method5,`,
-                ` from '@/helpers/methods'`,
-                `+import method1 from '@/helpers/methods`,
-                `-`,
-                ` import {`,
-                `     method24,`,
-                ` from '@/helpers/methods'`,
-                `+import method2 from '@/helpers/methods'`,
-                `+import method3 from '@/helpers/methods'`,
-                ` import {`,
-                `     method34,`,
-                ` from '@/helpers/methods'`,
-                `-`,
-                `-import method6 from '@/helpers/methods'`
-            ]
-        });
+        const result = positionedKeywordsRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns empty array on valid BOF positioning (maxLineBreaks = 2, countDifferentCodeAsLineBreak = true)', () => {
-        positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [
-                {
-                    ...importKeywordBOFConfig,
-                    maxLineBreaks: 2,
-                    countDifferentCodeAsLineBreak: true
-                }
-            ]
-        });
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            pepegaContext,
+            {
+                keywords: [
+                    {
+                        ...importKeywordBOFConfig,
+                        maxLineBreaks: 2,
+                        countDifferentCodeAsLineBreak: true
+                    }
+                ]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    ` import {`,
+                    `     method4,`,
+                    `     method5,`,
+                    ` from '@/helpers/methods'`,
+                    ` const x = 2;`,
+                    `+import method1 from '@/helpers/methods`,
+                    `-`,
+                    ` import {`,
+                    `     method24,`,
+                    ` from '@/helpers/methods'`,
+                    `+import method2 from '@/helpers/methods'`,
+                    `+const y = 3;`,
+                    `+import method3 from '@/helpers/methods'`,
+                    ` import {`,
+                    `     method34,`,
+                    ` from '@/helpers/methods'`,
+                    `-`,
+                    `-import method6 from '@/helpers/methods'`
+                ]
+            }
+        );
 
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                ` import {`,
-                `     method4,`,
-                `     method5,`,
-                ` from '@/helpers/methods'`,
-                ` const x = 2;`,
-                `+import method1 from '@/helpers/methods`,
-                `-`,
-                ` import {`,
-                `     method24,`,
-                ` from '@/helpers/methods'`,
-                `+import method2 from '@/helpers/methods'`,
-                `+const y = 3;`,
-                `+import method3 from '@/helpers/methods'`,
-                ` import {`,
-                `     method34,`,
-                ` from '@/helpers/methods'`,
-                `-`,
-                `-import method6 from '@/helpers/methods'`
-            ]
-        });
+        const result = positionedKeywordsRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns empty array on valid `import` BOF positioning (second layer order)', () => {
-        positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [
-                {
-                    ...importKeywordBOFConfig,
-                    order: [
-                        {
-                            name: 'packages',
-                            expression: /import(?!.*@).*/
-                        },
-                        {
-                            name: 'components',
-                            expression: /import.*@\/components.*/
-                        }
-                    ]
-                }
-            ]
-        });
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            pepegaContext,
+            {
+                keywords: [
+                    {
+                        ...importKeywordBOFConfig,
+                        order: [
+                            {
+                                name: 'packages',
+                                expression: /import(?!.*@).*/
+                            },
+                            {
+                                name: 'components',
+                                expression: /import.*@\/components.*/
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    `+import uniq from 'lodash/uniq'`,
+                    `+import {`,
+                    `+    dedent,`,
+                    `+    dedent2`,
+                    `+} from 'dedent-js'`,
+                    `+import { mapGetters } from 'vuex'`,
+                    `+import Component1 from '@/components/Component1'`,
+                    `+import Component12542 from '@/components/Component12542'`,
+                    `+import Component3 from '@/components/Component3'`
+                ]
+            }
+        );
 
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                `+import uniq from 'lodash/uniq'`,
-                `+import {`,
-                `+    dedent,`,
-                `+    dedent2`,
-                `+} from 'dedent-js'`,
-                `+import { mapGetters } from 'vuex'`,
-                `+import Component1 from '@/components/Component1'`,
-                `+import Component12542 from '@/components/Component12542'`,
-                `+import Component3 from '@/components/Component3'`
-            ]
-        });
+        const result = positionedKeywordsRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns empty array on only one order type of BOF positioning (second layer order)', () => {
-        positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [
-                {
-                    ...importKeywordBOFConfig,
-                    order: [
-                        {
-                            name: 'packages',
-                            expression: /import(?!.*@).*/
-                        },
-                        {
-                            name: 'components',
-                            expression: /import.*@\/components.*/
-                        }
-                    ]
-                }
-            ]
-        });
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            pepegaContext,
+            {
+                keywords: [
+                    {
+                        ...importKeywordBOFConfig,
+                        order: [
+                            {
+                                name: 'packages',
+                                expression: /import(?!.*@).*/
+                            },
+                            {
+                                name: 'components',
+                                expression: /import.*@\/components.*/
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    `+import Component3 from '@/components/Component3'`,
+                    `+import Component1 from '@/components/Component1'`,
+                    `+import Component12542 from '@/components/Component12542'`
+                ]
+            }
+        );
 
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                `+import Component3 from '@/components/Component3'`,
-                `+import Component1 from '@/components/Component1'`,
-                `+import Component12542 from '@/components/Component12542'`
-            ]
-        });
+        const result = positionedKeywordsRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid BOF position', () => {
-        positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [
-                {
-                    ...importKeywordBOFConfig,
-                    maxLineBreaks: 2,
-                    countDifferentCodeAsLineBreak: true
-                }
-            ]
-        });
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            pepegaContext,
+            {
+                keywords: [
+                    {
+                        ...importKeywordBOFConfig,
+                        maxLineBreaks: 2,
+                        countDifferentCodeAsLineBreak: true
+                    }
+                ]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    `const abc = 5;`,
+                    ` import {`,
+                    `     method4,`,
+                    `     method5,`,
+                    ` from '@/helpers/methods'`,
+                    ` const x = 2;`,
+                    `+import method1 from '@/helpers/methods`,
+                    `-`,
+                    ` import {`,
+                    `     method24,`,
+                    ` from '@/helpers/methods'`,
+                    `+import method2 from '@/helpers/methods'`,
+                    `+const y = 3;`,
+                    `+import method3 from '@/helpers/methods'`,
+                    ` import {`,
+                    `     method34,`,
+                    ` from '@/helpers/methods'`,
+                    `-`,
+                    `-import method6 from '@/helpers/methods'`
+                ]
+            }
+        );
 
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                `const abc = 5;`,
-                ` import {`,
-                `     method4,`,
-                `     method5,`,
-                ` from '@/helpers/methods'`,
-                ` const x = 2;`,
-                `+import method1 from '@/helpers/methods`,
-                `-`,
-                ` import {`,
-                `     method24,`,
-                ` from '@/helpers/methods'`,
-                `+import method2 from '@/helpers/methods'`,
-                `+const y = 3;`,
-                `+import method3 from '@/helpers/methods'`,
-                ` import {`,
-                `     method34,`,
-                ` from '@/helpers/methods'`,
-                `-`,
-                `-import method6 from '@/helpers/methods'`
-            ]
-        });
+        const result = positionedKeywordsRule.invoke();
 
         expect(result).toHaveLength(1);
 
@@ -716,30 +820,38 @@ describe('invoke function', () => {
     });
 
     it('returns review on invalid BOF positioning (maxLineBreaks = 0)', () => {
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                ` import {`,
-                `     method4,`,
-                `     method5,`,
-                ` from '@/helpers/methods'`,
-                ` `,
-                `+import method1 from '@/helpers/methods`,
-                `-`,
-                ` import {`,
-                `     method24,`,
-                ` from '@/helpers/methods'`,
-                `+import method2 from '@/helpers/methods'`,
-                `+`,
-                `+import method3 from '@/helpers/methods'`,
-                ` import {`,
-                `     method34,`,
-                ` from '@/helpers/methods'`,
-                `-`,
-                `-import method6 from '@/helpers/methods'`
-            ]
-        });
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            pepegaContext,
+            {
+                keywords: [importKeywordBOFConfig]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    ` import {`,
+                    `     method4,`,
+                    `     method5,`,
+                    ` from '@/helpers/methods'`,
+                    ` `,
+                    `+import method1 from '@/helpers/methods`,
+                    `-`,
+                    ` import {`,
+                    `     method24,`,
+                    ` from '@/helpers/methods'`,
+                    `+import method2 from '@/helpers/methods'`,
+                    `+`,
+                    `+import method3 from '@/helpers/methods'`,
+                    ` import {`,
+                    `     method34,`,
+                    ` from '@/helpers/methods'`,
+                    `-`,
+                    `-import method6 from '@/helpers/methods'`
+                ]
+            }
+        );
+
+        const result = positionedKeywordsRule.invoke();
 
         expect(result).toHaveLength(2);
 
@@ -751,36 +863,40 @@ describe('invoke function', () => {
     });
 
     it('returns review on invalid BOF positioning (enforced, maxLineBreaks = 0)', () => {
-        positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [importKeywordBOFConfig]
-        });
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            pepegaContext,
+            {
+                keywords: [importKeywordBOFConfig]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    `+const a = 2;`,
+                    `+const b = 6;`,
+                    ` import {`,
+                    `     method4,`,
+                    `     method5,`,
+                    ` from '@/helpers/methods'`,
+                    `const x = 2;`,
+                    `+import method1 from '@/helpers/methods`,
+                    `-`,
+                    ` import {`,
+                    `     method24,`,
+                    ` from '@/helpers/methods'`,
+                    `+import method2 from '@/helpers/methods'`,
+                    `+const y = 3;`,
+                    `+import method3 from '@/helpers/methods'`,
+                    ` import {`,
+                    `     method34,`,
+                    ` from '@/helpers/methods'`,
+                    `-`,
+                    `-import method6 from '@/helpers/methods'`
+                ]
+            }
+        );
 
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +5,7 @@`,
-                `+const a = 2;`,
-                `+const b = 6;`,
-                ` import {`,
-                `     method4,`,
-                `     method5,`,
-                ` from '@/helpers/methods'`,
-                `const x = 2;`,
-                `+import method1 from '@/helpers/methods`,
-                `-`,
-                ` import {`,
-                `     method24,`,
-                ` from '@/helpers/methods'`,
-                `+import method2 from '@/helpers/methods'`,
-                `+const y = 3;`,
-                `+import method3 from '@/helpers/methods'`,
-                ` import {`,
-                `     method34,`,
-                ` from '@/helpers/methods'`,
-                `-`,
-                `-import method6 from '@/helpers/methods'`
-            ]
-        });
+        const result = positionedKeywordsRule.invoke();
 
         expect(result).toHaveLength(2);
 
@@ -792,41 +908,45 @@ describe('invoke function', () => {
     });
 
     it('returns review on invalid BOF positioning (maxLineBreaks = 2, countDifferentCodeAsLineBreak = false)', () => {
-        positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [
-                {
-                    ...importKeywordBOFConfig,
-                    maxLineBreaks: 2
-                }
-            ]
-        });
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            pepegaContext,
+            {
+                keywords: [
+                    {
+                        ...importKeywordBOFConfig,
+                        maxLineBreaks: 2
+                    }
+                ]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    `+const a = 2;`,
+                    `+const b = 6;`,
+                    ` import {`,
+                    `     method4,`,
+                    `     method5,`,
+                    ` from '@/helpers/methods'`,
+                    ` const x = 2;`,
+                    `+import method1 from '@/helpers/methods`,
+                    `-`,
+                    ` import {`,
+                    `     method24,`,
+                    ` from '@/helpers/methods'`,
+                    `+import method2 from '@/helpers/methods'`,
+                    `+const y = 3;`,
+                    `+import method3 from '@/helpers/methods'`,
+                    ` import {`,
+                    `     method34,`,
+                    ` from '@/helpers/methods'`,
+                    `-`,
+                    `-import method6 from '@/helpers/methods'`
+                ]
+            }
+        );
 
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +5,7 @@`,
-                `+const a = 2;`,
-                `+const b = 6;`,
-                ` import {`,
-                `     method4,`,
-                `     method5,`,
-                ` from '@/helpers/methods'`,
-                ` const x = 2;`,
-                `+import method1 from '@/helpers/methods`,
-                `-`,
-                ` import {`,
-                `     method24,`,
-                ` from '@/helpers/methods'`,
-                `+import method2 from '@/helpers/methods'`,
-                `+const y = 3;`,
-                `+import method3 from '@/helpers/methods'`,
-                ` import {`,
-                `     method34,`,
-                ` from '@/helpers/methods'`,
-                `-`,
-                `-import method6 from '@/helpers/methods'`
-            ]
-        });
+        const result = positionedKeywordsRule.invoke();
 
         expect(result).toHaveLength(2);
 
@@ -838,74 +958,82 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid BOF positioning (two BOF keywords)', () => {
-        positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [
-                importKeywordBOFConfig,
-                constKeywordConfig({ custom: null, BOF: true })
-            ]
-        });
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            pepegaContext,
+            {
+                keywords: [
+                    importKeywordBOFConfig,
+                    constKeywordConfig({ custom: null, BOF: true })
+                ]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +1,17 @@`,
+                    `+const gamma = require('...')`,
+                    `+const beta = require('...');`,
+                    `+const alpha = require('...');`,
+                    `+`,
+                    ` import {`,
+                    `     method4,`,
+                    `     method5,`,
+                    ` from '@/helpers/methods'`,
+                    `+import method1 from '@/helpers/methods`,
+                    `-`,
+                    ` import {`,
+                    `     method24,`,
+                    ` from '@/helpers/methods'`,
+                    `+import method2 from '@/helpers/methods'`,
+                    `+import method3 from '@/helpers/methods'`,
+                    ` import {`,
+                    `     method34,`,
+                    ` from '@/helpers/methods'`
+                ]
+            }
+        );
 
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,17 @@`,
-                `+const gamma = require('...')`,
-                `+const beta = require('...');`,
-                `+const alpha = require('...');`,
-                `+`,
-                ` import {`,
-                `     method4,`,
-                `     method5,`,
-                ` from '@/helpers/methods'`,
-                `+import method1 from '@/helpers/methods`,
-                `-`,
-                ` import {`,
-                `     method24,`,
-                ` from '@/helpers/methods'`,
-                `+import method2 from '@/helpers/methods'`,
-                `+import method3 from '@/helpers/methods'`,
-                ` import {`,
-                `     method34,`,
-                ` from '@/helpers/methods'`
-            ]
-        });
+        const result = positionedKeywordsRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid `import` BOF positioning (two BOF keywords)', () => {
-        positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [
-                importKeywordBOFConfig,
-                constKeywordConfig({ custom: null, BOF: true })
-            ]
-        });
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            pepegaContext,
+            {
+                keywords: [
+                    importKeywordBOFConfig,
+                    constKeywordConfig({ custom: null, BOF: true })
+                ]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +1,19 @@`,
+                    `+const gamma = require('...')`,
+                    `+const beta = require('...');`,
+                    `+const alpha = require('...');`,
+                    `+const b = () => { ... }`,
+                    `+const a = () => { ... }`,
+                    ` import {`,
+                    `     method4,`,
+                    `     method5,`,
+                    ` from '@/helpers/methods'`,
+                    `+import method1 from '@/helpers/methods`,
+                    `-`,
+                    ` import {`,
+                    `     method24,`,
+                    ` from '@/helpers/methods'`,
+                    `+import method2 from '@/helpers/methods'`,
+                    `+import method3 from '@/helpers/methods'`,
+                    ` import {`,
+                    `     method34,`,
+                    ` from '@/helpers/methods'`
+                ]
+            }
+        );
 
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,19 @@`,
-                `+const gamma = require('...')`,
-                `+const beta = require('...');`,
-                `+const alpha = require('...');`,
-                `+const b = () => { ... }`,
-                `+const a = () => { ... }`,
-                ` import {`,
-                `     method4,`,
-                `     method5,`,
-                ` from '@/helpers/methods'`,
-                `+import method1 from '@/helpers/methods`,
-                `-`,
-                ` import {`,
-                `     method24,`,
-                ` from '@/helpers/methods'`,
-                `+import method2 from '@/helpers/methods'`,
-                `+import method3 from '@/helpers/methods'`,
-                ` import {`,
-                `     method34,`,
-                ` from '@/helpers/methods'`
-            ]
-        });
+        const result = positionedKeywordsRule.invoke();
 
         expect(result).toHaveLength(1);
 
@@ -913,38 +1041,42 @@ describe('invoke function', () => {
     });
 
     it('returns review on invalid `import` BOF positioning (two BOF keywords)', () => {
-        positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [
-                importKeywordBOFConfig,
-                constKeywordConfig({ custom: null, BOF: true })
-            ]
-        });
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            pepegaContext,
+            {
+                keywords: [
+                    importKeywordBOFConfig,
+                    constKeywordConfig({ custom: null, BOF: true })
+                ]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +1,19 @@`,
+                    `+const gamma = require('...')`,
+                    `+const beta = require('...');`,
+                    `+const alpha = require('...');`,
+                    `+const b = () => { ... }`,
+                    `+const a = () => { ... }`,
+                    ` import {`,
+                    `     method4,`,
+                    `     method5,`,
+                    ` from '@/helpers/methods'`,
+                    `+import method1 from '@/helpers/methods`,
+                    `-`,
+                    ` import {`,
+                    `     method24,`,
+                    ` from '@/helpers/methods'`,
+                    `+import method2 from '@/helpers/methods'`,
+                    `+import method3 from '@/helpers/methods'`,
+                    ` import {`,
+                    `     method34,`,
+                    ` from '@/helpers/methods'`
+                ]
+            }
+        );
 
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,19 @@`,
-                `+const gamma = require('...')`,
-                `+const beta = require('...');`,
-                `+const alpha = require('...');`,
-                `+const b = () => { ... }`,
-                `+const a = () => { ... }`,
-                ` import {`,
-                `     method4,`,
-                `     method5,`,
-                ` from '@/helpers/methods'`,
-                `+import method1 from '@/helpers/methods`,
-                `-`,
-                ` import {`,
-                `     method24,`,
-                ` from '@/helpers/methods'`,
-                `+import method2 from '@/helpers/methods'`,
-                `+import method3 from '@/helpers/methods'`,
-                ` import {`,
-                `     method34,`,
-                ` from '@/helpers/methods'`
-            ]
-        });
+        const result = positionedKeywordsRule.invoke();
 
         expect(result).toHaveLength(1);
 
@@ -952,39 +1084,43 @@ describe('invoke function', () => {
     });
 
     it('returns review on invalid `import` BOF positioning (second layer order)', () => {
-        positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [
-                {
-                    ...importKeywordBOFConfig,
-                    order: [
-                        {
-                            name: 'packages',
-                            expression: /import(?!.*@).*/
-                        },
-                        {
-                            name: 'components',
-                            expression: /import.*@\/components.*/
-                        }
-                    ]
-                }
-            ]
-        });
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            pepegaContext,
+            {
+                keywords: [
+                    {
+                        ...importKeywordBOFConfig,
+                        order: [
+                            {
+                                name: 'packages',
+                                expression: /import(?!.*@).*/
+                            },
+                            {
+                                name: 'components',
+                                expression: /import.*@\/components.*/
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    `+import uniq from 'lodash/uniq'`,
+                    `+import {`,
+                    `+    dedent,`,
+                    `+    dedent2`,
+                    `+} from 'dedent-js'`,
+                    `+import Component3 from '@/components/Component3'`,
+                    `+import { mapGetters } from 'vuex'`,
+                    `+import Component1 from '@/components/Component1'`,
+                    `+import Component12542 from '@/components/Component12542'`
+                ]
+            }
+        );
 
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                `+import uniq from 'lodash/uniq'`,
-                `+import {`,
-                `+    dedent,`,
-                `+    dedent2`,
-                `+} from 'dedent-js'`,
-                `+import Component3 from '@/components/Component3'`,
-                `+import { mapGetters } from 'vuex'`,
-                `+import Component1 from '@/components/Component1'`,
-                `+import Component12542 from '@/components/Component12542'`
-            ]
-        });
+        const result = positionedKeywordsRule.invoke();
 
         expect(result).toHaveLength(1);
 
@@ -992,39 +1128,43 @@ describe('invoke function', () => {
     });
 
     it('returns single comment on invalid BOF positioning (breakOnFirstOccurence)', () => {
-        positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [
-                {
-                    ...importKeywordBOFConfig,
-                    breakOnFirstOccurence: true
-                }
-            ]
-        });
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            pepegaContext,
+            {
+                keywords: [
+                    {
+                        ...importKeywordBOFConfig,
+                        breakOnFirstOccurence: true
+                    }
+                ]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +1,7 @@`,
+                    ` import {`,
+                    `     method4,`,
+                    `     method5,`,
+                    ` from '@/helpers/methods'`,
+                    ` const x = 2;`,
+                    `+import method1 from '@/helpers/methods`,
+                    `-`,
+                    ` import {`,
+                    `     method24,`,
+                    ` from '@/helpers/methods'`,
+                    `+import method2 from '@/helpers/methods'`,
+                    `+const y = 3;`,
+                    `+import method3 from '@/helpers/methods'`,
+                    ` import {`,
+                    `     method34,`,
+                    ` from '@/helpers/methods'`,
+                    `-`,
+                    `-import method6 from '@/helpers/methods'`
+                ]
+            }
+        );
 
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,7 @@`,
-                ` import {`,
-                `     method4,`,
-                `     method5,`,
-                ` from '@/helpers/methods'`,
-                ` const x = 2;`,
-                `+import method1 from '@/helpers/methods`,
-                `-`,
-                ` import {`,
-                `     method24,`,
-                ` from '@/helpers/methods'`,
-                `+import method2 from '@/helpers/methods'`,
-                `+const y = 3;`,
-                `+import method3 from '@/helpers/methods'`,
-                ` import {`,
-                `     method34,`,
-                ` from '@/helpers/methods'`,
-                `-`,
-                `-import method6 from '@/helpers/methods'`
-            ]
-        });
+        const result = positionedKeywordsRule.invoke();
 
         expect(result).toHaveLength(1);
 
@@ -1033,39 +1173,43 @@ describe('invoke function', () => {
     });
 
     it('returns single comment on invalid `import` and `const` BOF positioning (two BOF keywords)', () => {
-        positionedKeywordsRule = new PositionedKeywordsRule({
-            keywords: [
-                importKeywordBOFConfig,
-                constKeywordConfig({ custom: null, BOF: true })
-            ]
-        });
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            pepegaContext,
+            {
+                keywords: [
+                    importKeywordBOFConfig,
+                    constKeywordConfig({ custom: null, BOF: true })
+                ]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +1,19 @@`,
+                    `+kappa`,
+                    `+const gamma = require('...')`,
+                    `+const beta = require('...');`,
+                    `+const alpha = require('...');`,
+                    `+const b = () => { ... }`,
+                    `+const a = () => { ... }`,
+                    ` import {`,
+                    `     method4,`,
+                    `     method5,`,
+                    ` from '@/helpers/methods'`,
+                    `+import method1 from '@/helpers/methods`,
+                    `-`,
+                    ` import {`,
+                    `     method24,`,
+                    `     from '@/helpers/methods'`,
+                    `+import method2 from '@/helpers/methods'`,
+                    `+import method3 from '@/helpers/methods'`,
+                    ` import {`,
+                    `     method34,`,
+                    ` from '@/helpers/methods'`
+                ]
+            }
+        );
 
-        const result = positionedKeywordsRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +1,19 @@`,
-                `+kappa`,
-                `+const gamma = require('...')`,
-                `+const beta = require('...');`,
-                `+const alpha = require('...');`,
-                `+const b = () => { ... }`,
-                `+const a = () => { ... }`,
-                ` import {`,
-                `     method4,`,
-                `     method5,`,
-                ` from '@/helpers/methods'`,
-                `+import method1 from '@/helpers/methods`,
-                `-`,
-                ` import {`,
-                `     method24,`,
-                `     from '@/helpers/methods'`,
-                `+import method2 from '@/helpers/methods'`,
-                `+import method3 from '@/helpers/methods'`,
-                ` import {`,
-                `     method34,`,
-                ` from '@/helpers/methods'`
-            ]
-        });
+        const result = positionedKeywordsRule.invoke();
 
         expect(result).toHaveLength(1);
 

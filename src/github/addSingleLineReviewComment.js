@@ -1,30 +1,24 @@
-const { logFatal } = require('../utilities/EventLog');
-
 /**
  * sends request to add single line review comment.
- * @param {WebhookEvent<EventPayloads.WebhookPayloadPullRequest>} context WebhookEvent instance.
- * @param {object} payload review details.
- * @param {string} payload.owner repository owner's name
- * @param {string} payload.repo repository name
- * @param {string} payload.pull_number pull request Id
- * @param {string} payload.body review comment
- * @param {string} payload.line line number (counted from the start of the file)
- * @param {string} payload.side which side line refers to (LEFT=deletion, RIGHT=addition)
- * @param {string} payload.path relative path to the file (tl;dr; - filename)
- * @param {string} payload.commit_id
  *
- * @link
- * https://octokit.github.io/rest.js/v18#pulls-create-review-comment
+ * @param {PepegaContext} pepegaContext
+ * @param {SingleLineComment} singleLineComment
+ *
+ * {@link https://octokit.github.io/rest.js/v18#pulls-create-review-comment}
  *
  * @returns {object} request response
  */
-module.exports = async (context, payload) => {
+module.exports = async (pepegaContext, singleLineComment) => {
+    const { pullRequest, log } = pepegaContext;
+    const { context } = pullRequest;
     let result = null;
 
     try {
-        result = await context.octokit.pulls.createReviewComment(payload);
+        result = await context.octokit.pulls.createReviewComment(
+            singleLineComment
+        );
     } catch (error) {
-        logFatal(__filename, error);
+        log.fatal(error);
     }
 
     return result;

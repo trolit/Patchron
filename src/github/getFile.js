@@ -1,24 +1,27 @@
-const { logFatal } = require('../utilities/EventLog');
-
 /**
  * fetches specified file from pull request from particular commit, within it's content (encoded in base64).
- * @param {WebhookEvent<EventPayloads.WebhookPayloadPullRequest>} context WebhookEvent instance.
- * @param {string} contents_url path to file's content URL.
- * @param {object} payload repository details.
- * @param {string} payload.owner repository owner's name
- * @param {string} payload.repo repository name
- * @param {string} payload.pull_number pull request Id
  *
- * @link
- * https://octokit.github.io/rest.js/v18#custom-requests
+ * @param {PepegaContext} pepegaContext
+ * @param {string} contents_url path to file's content URL.
+ * @param {object} options pass payload optional params (or params to overwrite used ones)
+ *
+ * {@link https://octokit.github.io/rest.js/v18#custom-requests}
  *
  * @example
  * contentsUrlPath = '/repos/<username>/<repoName>/contents/<filename>?ref=<commitId>'
  *
  * @returns {object} file details and it's content encoded in base64.
  */
-module.exports = async (context, contents_url, payload) => {
+module.exports = async (pepegaContext, contents_url, options = {}) => {
+    const { pullRequest, log, repo } = pepegaContext;
+    const { context } = pullRequest;
     let result = null;
+
+    const payload = {
+        ...repo,
+        pull_number: pullRequest.id,
+        ...options
+    };
 
     const contentsUrlPath = contents_url.replace('https://api.github.com', '');
 
@@ -28,7 +31,7 @@ module.exports = async (context, contents_url, payload) => {
             payload
         );
     } catch (error) {
-        logFatal(__filename, error);
+        log.fatal(error);
     }
 
     return result;

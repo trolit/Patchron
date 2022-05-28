@@ -1,10 +1,22 @@
-const { describe, expect, it, beforeEach } = require('@jest/globals');
-const KeywordsOrderedByLengthRule = require('../../../src/rules/common/KeywordsOrderedByLength');
+const nock = require('nock');
+const {
+    describe,
+    expect,
+    it,
+    beforeEach,
+    afterEach
+} = require('@jest/globals');
+
+const {
+    common: { KeywordsOrderedByLengthRule }
+} = require('src/rules');
+const setupApp = require('test/rules/helpers/setupApp');
+const initializeFile = require('test/rules/helpers/initializeFile');
 
 const importKeywordConfig = {
     name: 'import',
     regex: /import.*/,
-    multilineOptions: ['from'],
+    multiLineOptions: ['from'],
     order: 'ascending',
     ignoreNewline: false
 };
@@ -14,41 +26,56 @@ const validConfig = {
 };
 
 describe('invoke function', () => {
-    let keywordsOrderedByLengthRule;
+    let pepegaContext = null;
+    let file = {};
 
     beforeEach(() => {
-        keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
-            validConfig
-        );
+        pepegaContext = setupApp();
+
+        file = initializeFile();
+    });
+
+    afterEach(() => {
+        nock.cleanAll();
+
+        nock.enableNetConnect();
     });
 
     it('returns empty array on empty keywords', () => {
-        keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule({
-            keywords: []
-        });
+        const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
+            pepegaContext,
+            {
+                keywords: []
+            },
+            file
+        );
 
-        const result = keywordsOrderedByLengthRule.invoke({
-            filename: '...'
-        });
+        const result = keywordsOrderedByLengthRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid `import` group order', () => {
-        const result = keywordsOrderedByLengthRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +5,7 @@`,
-                `+import getLastNumber from '../helpers/getLastNumber'`,
-                `+import usersController from '../controllers/UsersController'`,
-                ` import dedent from 'dedent-js'`,
-                `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`,
-                `+`,
-                `+import baseHelper from 'helpers/base'`,
-                `+`,
-                `+import staticFiles from '../../assets'`
-            ]
-        });
+        const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
+            pepegaContext,
+            validConfig,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    `+import getLastNumber from '../helpers/getLastNumber'`,
+                    `+import usersController from '../controllers/UsersController'`,
+                    ` import dedent from 'dedent-js'`,
+                    `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`,
+                    `+`,
+                    `+import baseHelper from 'helpers/base'`,
+                    `+`,
+                    `+import staticFiles from '../../assets'`
+                ]
+            }
+        );
+
+        const result = keywordsOrderedByLengthRule.invoke();
 
         expect(result).toHaveLength(1);
 
@@ -57,38 +84,50 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid ascending `import` group order', () => {
-        const result = keywordsOrderedByLengthRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +5,7 @@`,
-                ` import dedent from 'dedent-js'`,
-                `+import getLastNumber from '../helpers/getLastNumber'`,
-                `+import usersController from '../controllers/UsersController'`,
-                `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`,
-                `+`,
-                `+import baseHelper from 'helpers/base'`,
-                `+`,
-                `+import staticFiles from '../../assets'`
-            ]
-        });
+        const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
+            pepegaContext,
+            validConfig,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    ` import dedent from 'dedent-js'`,
+                    `+import getLastNumber from '../helpers/getLastNumber'`,
+                    `+import usersController from '../controllers/UsersController'`,
+                    `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`,
+                    `+`,
+                    `+import baseHelper from 'helpers/base'`,
+                    `+`,
+                    `+import staticFiles from '../../assets'`
+                ]
+            }
+        );
+
+        const result = keywordsOrderedByLengthRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid ascending `import` groups order', () => {
-        const result = keywordsOrderedByLengthRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +5,7 @@`,
-                ` import dedent from 'dedent-js'`,
-                `+import usersController from '../controllers/UsersController'`,
-                `-import getLastNumber from '../helpers/getLastNumber'`,
-                `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`,
-                `+`,
-                `+import staticFiles from '../../assets'`,
-                `+import baseHelper from 'helpers/base'`
-            ]
-        });
+        const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
+            pepegaContext,
+            validConfig,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    ` import dedent from 'dedent-js'`,
+                    `+import usersController from '../controllers/UsersController'`,
+                    `-import getLastNumber from '../helpers/getLastNumber'`,
+                    `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`,
+                    `+`,
+                    `+import staticFiles from '../../assets'`,
+                    `+import baseHelper from 'helpers/base'`
+                ]
+            }
+        );
+
+        const result = keywordsOrderedByLengthRule.invoke();
 
         expect(result).toHaveLength(1);
 
@@ -97,47 +136,57 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid ascending `import` groups order', () => {
-        const result = keywordsOrderedByLengthRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +5,7 @@`,
-                ` import dedent from 'dedent-js'`,
-                `+import getLastNumber from '../helpers/getLastNumber'`,
-                `+import usersController from '../controllers/UsersController'`,
-                `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`,
-                `+`,
-                `+import baseHelper from 'helpers/base'`,
-                `+import staticFiles from '../../assets'`
-            ]
-        });
+        const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
+            pepegaContext,
+            validConfig,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    ` import dedent from 'dedent-js'`,
+                    `+import getLastNumber from '../helpers/getLastNumber'`,
+                    `+import usersController from '../controllers/UsersController'`,
+                    `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`,
+                    `+`,
+                    `+import baseHelper from 'helpers/base'`,
+                    `+import staticFiles from '../../assets'`
+                ]
+            }
+        );
+
+        const result = keywordsOrderedByLengthRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid descending `import` group order', () => {
-        keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule({
-            keywords: [
-                {
-                    ...importKeywordConfig,
-                    order: 'descending'
-                }
-            ]
-        });
+        const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
+            pepegaContext,
+            {
+                keywords: [
+                    {
+                        ...importKeywordConfig,
+                        order: 'descending'
+                    }
+                ]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    `+import usersController from '../controllers/UsersController'`,
+                    `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`,
+                    ` import dedent from 'dedent-js'`,
+                    `+import getLastNumber from '../helpers/getLastNumber'`,
+                    `+`,
+                    `+import baseHelper from 'helpers/base'`,
+                    `+`,
+                    `+import staticFiles from '../../assets'`
+                ]
+            }
+        );
 
-        const result = keywordsOrderedByLengthRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +5,7 @@`,
-                `+import usersController from '../controllers/UsersController'`,
-                `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`,
-                ` import dedent from 'dedent-js'`,
-                `+import getLastNumber from '../helpers/getLastNumber'`,
-                `+`,
-                `+import baseHelper from 'helpers/base'`,
-                `+`,
-                `+import staticFiles from '../../assets'`
-            ]
-        });
+        const result = keywordsOrderedByLengthRule.invoke();
 
         expect(result).toHaveLength(1);
 
@@ -146,64 +195,72 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid descending `import` group order', () => {
-        keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule({
-            keywords: [
-                {
-                    ...importKeywordConfig,
-                    order: 'descending'
-                }
-            ]
-        });
+        const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
+            pepegaContext,
+            {
+                keywords: [
+                    {
+                        ...importKeywordConfig,
+                        order: 'descending'
+                    }
+                ]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`,
+                    `+import usersController from '../controllers/UsersController'`,
+                    `+import getLastNumber from '../helpers/getLastNumber'`,
+                    `+import {`,
+                    `+    dedent,`,
+                    `+    dedent2`,
+                    `+} from 'dedent-js'`,
+                    `+`,
+                    `+import baseHelper from 'helpers/base'`,
+                    `+`,
+                    `+import staticFiles from '../../assets'`
+                ]
+            }
+        );
 
-        const result = keywordsOrderedByLengthRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +5,7 @@`,
-                `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`,
-                `+import usersController from '../controllers/UsersController'`,
-                `+import getLastNumber from '../helpers/getLastNumber'`,
-                `+import {`,
-                `+    dedent,`,
-                `+    dedent2`,
-                `+} from 'dedent-js'`,
-                `+`,
-                `+import baseHelper from 'helpers/base'`,
-                `+`,
-                `+import staticFiles from '../../assets'`
-            ]
-        });
+        const result = keywordsOrderedByLengthRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid `import` order with ignoreNewline enabled', () => {
-        keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule({
-            keywords: [
-                {
-                    ...importKeywordConfig,
-                    order: 'ascending',
-                    ignoreNewline: true
-                }
-            ]
-        });
+        const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
+            pepegaContext,
+            {
+                keywords: [
+                    {
+                        ...importKeywordConfig,
+                        order: 'ascending',
+                        ignoreNewline: true
+                    }
+                ]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    `+import {`,
+                    `+    dedent,`,
+                    `+    dedent2`,
+                    `+} from 'dedent-js'`,
+                    `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`,
+                    `+import usersController from '../controllers/UsersController'`,
+                    `+import getLastNumber from '../helpers/getLastNumber'`,
+                    `+`,
+                    `+import baseHelper from 'helpers/base'`,
+                    `+`,
+                    `+import staticFiles from '../../assets'`
+                ]
+            }
+        );
 
-        const result = keywordsOrderedByLengthRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +5,7 @@`,
-                `+import {`,
-                `+    dedent,`,
-                `+    dedent2`,
-                `+} from 'dedent-js'`,
-                `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`,
-                `+import usersController from '../controllers/UsersController'`,
-                `+import getLastNumber from '../helpers/getLastNumber'`,
-                `+`,
-                `+import baseHelper from 'helpers/base'`,
-                `+`,
-                `+import staticFiles from '../../assets'`
-            ]
-        });
+        const result = keywordsOrderedByLengthRule.invoke();
 
         expect(result).toHaveLength(4);
 
@@ -217,111 +274,123 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid `import` order with ignoreNewline enabled', () => {
-        keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule({
-            keywords: [
-                {
-                    ...importKeywordConfig,
-                    order: 'ascending',
-                    ignoreNewline: true
-                }
-            ]
-        });
+        const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
+            pepegaContext,
+            {
+                keywords: [
+                    {
+                        ...importKeywordConfig,
+                        order: 'ascending',
+                        ignoreNewline: true
+                    }
+                ]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    `+import {`,
+                    `+    dedent,`,
+                    `+    dedent2`,
+                    `+} from 'dedent-js'`,
+                    `+import baseHelper from 'helpers/base'`,
+                    `+import staticFiles from '../../assets'`,
+                    `+import getLastNumber from '../helpers/getLastNumber'`,
+                    `+import usersController from '../controllers/UsersController'`,
+                    `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`
+                ]
+            }
+        );
 
-        const result = keywordsOrderedByLengthRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +5,7 @@`,
-                `+import {`,
-                `+    dedent,`,
-                `+    dedent2`,
-                `+} from 'dedent-js'`,
-                `+import baseHelper from 'helpers/base'`,
-                `+import staticFiles from '../../assets'`,
-                `+import getLastNumber from '../helpers/getLastNumber'`,
-                `+import usersController from '../controllers/UsersController'`,
-                `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`
-            ]
-        });
+        const result = keywordsOrderedByLengthRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns empty array on valid `import` order split into packages and components', () => {
-        keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule({
-            keywords: [
-                {
-                    name: 'import (packages)',
-                    regex: /import(?!.*@).*/,
-                    multilineOptions: ['from'],
-                    order: 'ascending',
-                    ignoreNewline: false
-                },
-                {
-                    name: 'import (components)',
-                    regex: /import.*@\/components.*/,
-                    multilineOptions: ['from'],
-                    order: 'ascending',
-                    ignoreNewline: false
-                }
-            ]
-        });
+        const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
+            pepegaContext,
+            {
+                keywords: [
+                    {
+                        name: 'import (packages)',
+                        regex: /import(?!.*@).*/,
+                        multiLineOptions: ['from'],
+                        order: 'ascending',
+                        ignoreNewline: false
+                    },
+                    {
+                        name: 'import (components)',
+                        regex: /import.*@\/components.*/,
+                        multiLineOptions: ['from'],
+                        order: 'ascending',
+                        ignoreNewline: false
+                    }
+                ]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    `+import {`,
+                    `+    dedent,`,
+                    `+    dedent2`,
+                    `+} from 'dedent-js'`,
+                    `+import uniq from 'lodash/uniq'`,
+                    `+import { mapGetters } from 'vuex'`,
+                    `+`,
+                    `+import Component1 from '@/components/Component1'`,
+                    `+import Component2 from '@/components/Component2'`,
+                    `+import Component3 from '@/components/Component3'`
+                ]
+            }
+        );
 
-        const result = keywordsOrderedByLengthRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +5,7 @@`,
-                `+import {`,
-                `+    dedent,`,
-                `+    dedent2`,
-                `+} from 'dedent-js'`,
-                `+import uniq from 'lodash/uniq'`,
-                `+import { mapGetters } from 'vuex'`,
-                `+`,
-                `+import Component1 from '@/components/Component1'`,
-                `+import Component2 from '@/components/Component2'`,
-                `+import Component3 from '@/components/Component3'`
-            ]
-        });
+        const result = keywordsOrderedByLengthRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid `import` order split into packages and components', () => {
-        keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule({
-            keywords: [
-                {
-                    name: 'import (packages)',
-                    regex: /import(?!.*@).*/,
-                    multilineOptions: ['from'],
-                    order: 'ascending',
-                    ignoreNewline: false
-                },
-                {
-                    name: 'import (components)',
-                    regex: /import.*@\/components.*/,
-                    multilineOptions: ['from'],
-                    order: 'ascending',
-                    ignoreNewline: false
-                }
-            ]
-        });
+        const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
+            pepegaContext,
+            {
+                keywords: [
+                    {
+                        name: 'import (packages)',
+                        regex: /import(?!.*@).*/,
+                        multiLineOptions: ['from'],
+                        order: 'ascending',
+                        ignoreNewline: false
+                    },
+                    {
+                        name: 'import (components)',
+                        regex: /import.*@\/components.*/,
+                        multiLineOptions: ['from'],
+                        order: 'ascending',
+                        ignoreNewline: false
+                    }
+                ]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    `+import uniq from 'lodash/uniq'`,
+                    `+import {`,
+                    `+    dedent,`,
+                    `+    dedent2`,
+                    `+} from 'dedent-js'`,
+                    `+import { mapGetters } from 'vuex'`,
+                    `+`,
+                    `+import Component1 from '@/components/Component1'`,
+                    `+import Component12542 from '@/components/Component12542'`,
+                    `+import Component3 from '@/components/Component3'`
+                ]
+            }
+        );
 
-        const result = keywordsOrderedByLengthRule.invoke({
-            filename: '...',
-            split_patch: [
-                `@@ -10,13 +5,7 @@`,
-                `+import uniq from 'lodash/uniq'`,
-                `+import {`,
-                `+    dedent,`,
-                `+    dedent2`,
-                `+} from 'dedent-js'`,
-                `+import { mapGetters } from 'vuex'`,
-                `+`,
-                `+import Component1 from '@/components/Component1'`,
-                `+import Component12542 from '@/components/Component12542'`,
-                `+import Component3 from '@/components/Component3'`
-            ]
-        });
+        const result = keywordsOrderedByLengthRule.invoke();
 
         expect(result).toHaveLength(2);
 

@@ -1,13 +1,29 @@
-const constants = require('../config/constants');
-const EventLog = require('../utilities/EventLog');
-const getPosition = require('../helpers/getPosition');
-const getLineNumber = require('../helpers/getLineNumber');
-const ReviewCommentBuilder = require('../builders/ReviewComment');
-const removeWhitespaces = require('../helpers/removeWhitespaces');
-const extendWithBackticks = require('../extensions/setup-data/extendWithBackticks');
+/// <reference path="../config/type-definitions/common.js" />
+
+const dedent = require('dedent-js');
+const helpers = require('src/helpers');
+const constants = require('src/config/constants');
+const ReviewCommentBuilder = require('src/builders/ReviewComment');
+const extendWithBackticks = require('src/extensions/setup-data/extendWithBackticks');
 
 class BaseRule {
-    constructor() {
+    /**
+     * @param {PepegaContext} pepegaContext
+     * @param {Patch} file
+     */
+    constructor(pepegaContext, file = null) {
+        this.pepegaContext = pepegaContext;
+        this.log = this.pepegaContext.log;
+
+        if (file) {
+            this.file = file;
+
+            this.reviewCommentBuilder = new ReviewCommentBuilder(
+                pepegaContext,
+                file
+            );
+        }
+
         const {
             ADDED,
             EMPTY,
@@ -35,23 +51,20 @@ class BaseRule {
 
         this.EMPTY = EMPTY;
 
-        this.logFatal = EventLog.logFatal;
-        this.logError = EventLog.logError;
-        this.logWarning = EventLog.logWarning;
-        this.logInformation = EventLog.logInformation;
+        this.dedent = dedent;
+
+        this.helpers = helpers;
     }
 
     /**
      * @returns {object}
      */
-    getSingleLineComment({ file, body, index, side = 'RIGHT' }) {
-        const { split_patch: splitPatch } = file;
+    getSingleLineComment({ body, index, side = 'RIGHT' }) {
+        const { splitPatch } = this.file;
 
-        const line = getLineNumber(splitPatch, side, index);
+        const line = this.helpers.getLineNumber(splitPatch, side, index);
 
-        const reviewCommentBuilder = new ReviewCommentBuilder(file);
-
-        const comment = reviewCommentBuilder.buildSingleLineComment({
+        const comment = this.reviewCommentBuilder.buildSingleLineComment({
             body,
             line,
             side
@@ -63,16 +76,14 @@ class BaseRule {
     /**
      * @returns {object}
      */
-    getMultiLineComment({ file, body, from, to, side = 'RIGHT' }) {
-        const { split_patch: splitPatch } = file;
+    getMultiLineComment({ body, from, to, side = 'RIGHT' }) {
+        const { splitPatch } = this.file;
 
-        const start_line = getLineNumber(splitPatch, side, from);
+        const start_line = this.helpers.getLineNumber(splitPatch, side, from);
 
-        const position = getPosition(splitPatch, to, side);
+        const position = this.helpers.getPosition(splitPatch, to, side);
 
-        const reviewCommentBuilder = new ReviewCommentBuilder(file);
-
-        const comment = reviewCommentBuilder.buildMultiLineComment({
+        const comment = this.reviewCommentBuilder.buildMultiLineComment({
             body,
             start_line,
             start_side: side,
@@ -83,7 +94,9 @@ class BaseRule {
     }
 
     /**
-     * Cleans received patch
+     * sets up received patch
+     *
+     * @returns {Array<SplitPatchRow>}
      */
     setupData(
         splitPatch,
@@ -153,6 +166,7 @@ class BaseRule {
 
     /**
      * Removes from row indicators added by Git (added, deleted, unchanged)
+     *
      * @param {string} row
      */
     getRawContent(row) {
@@ -173,11 +187,14 @@ class BaseRule {
      * tests if given line is newline
      *
      * **\/\/ apply only to lines that are coming directly from splitPatch**
+     *
      * @param {string} line to check
      * @returns {boolean}
      */
     isNewline(line) {
-        return [this.ADDED, this.EMPTY].includes(removeWhitespaces(line));
+        return [this.ADDED, this.EMPTY].includes(
+            this.helpers.removeWhitespaces(line)
+        );
     }
 
     /**
@@ -185,15 +202,16 @@ class BaseRule {
      *
      * - start of multi-line (fragment = start) (default)
      * - end of multi-line (fragment = end)
+     *
      * @param {object} keyword - keyword, **must** contain **multiLineOptions** array
      * @param {string} line - text of line
      * @param {string} fragment - start/end (start is default value)
      * @returns {boolean}
      */
     isPartOfMultiLine(keyword, line, fragment = 'start') {
-        const { multilineOptions } = keyword;
+        const { multiLineOptions } = keyword;
 
-        const includesMultiLineOption = multilineOptions.some((option) =>
+        const includesMultiLineOption = multiLineOptions.some((option) =>
             line.includes(option)
         );
 
@@ -209,7 +227,7 @@ class BaseRule {
      * @returns {number}
      */
     getMultiLineStartIndex(data, keyword, endIndex) {
-        let multilineStartIndex = -1;
+        let multiLineStartIndex = -1;
 
         for (let index = endIndex - 1; index >= 0; index--) {
             const { trimmedContent } = data[index];
@@ -218,13 +236,13 @@ class BaseRule {
                 trimmedContent !== this.MERGE &&
                 this.isPartOfMultiLine(keyword, trimmedContent)
             ) {
-                multilineStartIndex = index;
+                multiLineStartIndex = index;
 
                 break;
             }
         }
 
-        return multilineStartIndex;
+        return multiLineStartIndex;
     }
 
     /**
@@ -234,7 +252,7 @@ class BaseRule {
      * @returns {number}
      */
     getMultiLineEndIndex(data, keyword, startIndex) {
-        let multilineEndIndex = -1;
+        let multiLineEndIndex = -1;
         const dataLength = data.length;
 
         for (let index = startIndex + 1; index < dataLength; index++) {
@@ -244,13 +262,13 @@ class BaseRule {
                 trimmedContent !== this.MERGE &&
                 this.isPartOfMultiLine(keyword, trimmedContent, 'end')
             ) {
-                multilineEndIndex = index;
+                multiLineEndIndex = index;
 
                 break;
             }
         }
 
-        return multilineEndIndex;
+        return multiLineEndIndex;
     }
 
     /**
@@ -267,6 +285,7 @@ class BaseRule {
 
     /**
      * determines whether passed line starts with //, /*, * or *\/
+     *
      * @param {string} line
      * @returns {boolean}
      */
