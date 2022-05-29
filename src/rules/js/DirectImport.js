@@ -78,8 +78,8 @@ class DirectImportRule extends BaseRule {
     /**
      * @returns {string}
      */
-    _getCommentBody() {
-        return `xDD.`;
+    _getCommentBody(myPackage) {
+        return `Please, import ${myPackage.name} features one-by-one, directly from the bundle`;
     }
 }
 
