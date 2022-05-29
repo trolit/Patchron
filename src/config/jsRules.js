@@ -17,7 +17,7 @@ module.exports = [
             packages: [
                 {
                     name: 'lodash',
-                    expression: /[(|']lodash.*/
+                    expression: /[(|'|"]lodash[)|'|"]/
                 }
             ]
         }
