@@ -6,6 +6,8 @@ const PositionedKeywordsRule = require('./common/PositionedKeywords');
 const ValueComparisionStyleRule = require('./common/ValueComparisionStyle');
 const KeywordsOrderedByLengthRule = require('./common/KeywordsOrderedByLength');
 
+const DirectImportRule = require('./js/DirectImport');
+
 module.exports = {
     common: {
         MarkedCommentsRule,
@@ -16,5 +18,8 @@ module.exports = {
     },
     pull: {
         StrictWorkflowRule
+    },
+    js: {
+        DirectImportRule
     }
 };
