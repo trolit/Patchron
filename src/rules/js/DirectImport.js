@@ -4,6 +4,16 @@ const BaseRule = require('src/rules/Base');
 
 class DirectImportRule extends BaseRule {
     /**
+     * Simple rule that allows to define packages which (when imported) should be used directly. For instance, when we consider **lodash** library, first two ways are considered wrong by `DirectImportRule`.
+     *
+     * ```js
+     * import _ from 'lodash'; // then _.uniq
+     * import { uniq } from 'lodash';
+     * import uniq from 'lodash/uniq';
+     * ```
+     *
+     * {@link https://www.blazemeter.com/blog/the-correct-way-to-import-lodash-libraries-a-benchmark}
+     *
      * @param {PepegaContext} pepegaContext
      * @param {DirectImportConfig} config
      * @param {Patch} file
