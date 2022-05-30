@@ -67,7 +67,8 @@ describe('invoke function', () => {
                     `+    cloneDeep,`,
                     `+    uniq,`,
                     `+    isEqual`,
-                    `+} = require('lodash')`
+                    `+} = require('lodash')`,
+                    `-const { cloneDeep } = require('lodash')`
                 ]
             }
         );
@@ -116,7 +117,8 @@ describe('invoke function', () => {
                     `+    cloneDeep,`,
                     `+    uniq,`,
                     `+    isEqual`,
-                    `+} from 'lodash'`
+                    `+} from 'lodash'`,
+                    `-import { cloneDeep } from 'lodash'`
                 ]
             }
         );

@@ -4,7 +4,7 @@ const BaseRule = require('src/rules/Base');
 
 class DirectImportRule extends BaseRule {
     /**
-     * Simple rule that allows to define packages which (when imported) should be used directly. For instance, when we consider **lodash** library, first two ways are considered wrong by `DirectImportRule`.
+     * Simple rule that allows to define packages which (when imported) should be used directly. For instance, when we consider **lodash** library, first two ways of `import` should be avoided.
      *
      * ```js
      * import _ from 'lodash'; // then _.uniq
@@ -79,7 +79,7 @@ class DirectImportRule extends BaseRule {
      * @returns {string}
      */
     _getCommentBody(myPackage) {
-        return `Please, import ${myPackage.name} features one-by-one, directly from the bundle`;
+        return `Please, import ${myPackage.name} features one-by-one, directly from the bundle.`;
     }
 }
 
