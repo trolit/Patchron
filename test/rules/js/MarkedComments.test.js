@@ -66,12 +66,6 @@ describe('invoke function', () => {
                 isAppliedToMultiLineComments: false,
                 isAppliedToInlineComments: false
             },
-            {
-                ...validConfig,
-                isAppliedToSingleLineComments: false,
-                isAppliedToMultiLineComments: false,
-                isAppliedToInlineComments: false
-            },
             file
         );
 
