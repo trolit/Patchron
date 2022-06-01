@@ -8,7 +8,7 @@ const {
 } = require('@jest/globals');
 
 const {
-    js: { LineBreakBeforeReturnRule }
+    common: { LineBreakBeforeReturnRule }
 } = require('src/rules');
 const setupApp = require('test/rules/helpers/setupApp');
 const initializeFile = require('test/rules/helpers/initializeFile');
