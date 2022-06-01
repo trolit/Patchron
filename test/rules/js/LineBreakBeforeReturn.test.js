@@ -222,27 +222,6 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
-    it('returns empty array on return that is part of string', () => {
-        const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
-            pepegaContext,
-            null,
-            {
-                ...file,
-                splitPatch: [
-                    `@@ -10,13 +10,5 @@`,
-                    `+const myFirstMessage = \``,
-                    `+    my first message okay? Do not`,
-                    `+    return anything`,
-                    `+\``
-                ]
-            }
-        );
-
-        const result = lineBreakBeforeReturnRule.invoke();
-
-        expect(result).toEqual([]);
-    });
-
     it('returns review on invalid return', () => {
         const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
             pepegaContext,
