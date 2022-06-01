@@ -57,22 +57,21 @@ class LineBreakBeforeReturnRule extends BaseRule {
 
             const returnNestBlock = this._findNearestNesting(
                 contentNesting,
+                index,
                 trimmedContent
             );
 
-            if (returnNestBlock) {
+            if (
+                this._startsWithStatement(trimmedContent) ||
+                this._startsWithStatement(previousContent)
+            ) {
+                continue;
+            } else if (returnNestBlock) {
                 const { from, to } = returnNestBlock;
 
                 if (
                     from === to ||
                     this._countNestedBlockLength(data, returnNestBlock) === 1
-                ) {
-                    continue;
-                }
-            } else {
-                if (
-                    this._startsWithStatement(trimmedContent) ||
-                    this._startsWithStatement(previousContent)
                 ) {
                     continue;
                 }
@@ -91,16 +90,16 @@ class LineBreakBeforeReturnRule extends BaseRule {
         return reviewComments;
     }
 
-    _findNearestNesting(contentNesting, rowContent) {
+    _findNearestNesting(contentNesting, rowIndex, rowContent) {
         const leftBraceIndex = rowContent.indexOf('{');
 
-        for (let index = contentNesting.length - 1; index > 0; index--) {
+        for (let index = contentNesting.length - 1; index >= 0; index--) {
             const nesting = contentNesting[index];
             const { from, to } = nesting;
 
             if (
-                (from === index && leftBraceIndex === 0) ||
-                (from < index && to >= index)
+                (from === rowIndex && leftBraceIndex === 0) ||
+                (from < rowIndex && to >= rowIndex)
             ) {
                 return nesting;
             }
