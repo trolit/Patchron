@@ -4,6 +4,7 @@ const {
         MarkedCommentsRule,
         SingleLineBlockRule,
         PositionedKeywordsRule,
+        LineBreakBeforeReturnRule,
         ValueComparisionStyleRule,
         KeywordsOrderedByLengthRule
     }
@@ -135,6 +136,13 @@ module.exports = [
         reference: ValueComparisionStyleRule,
         config: {
             allowedLevels: [2]
+        }
+    },
+    {
+        enabled: false,
+        reference: LineBreakBeforeReturnRule,
+        config: {
+            beforeReturnExceptions: []
         }
     }
 ];

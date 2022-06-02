@@ -8,29 +8,20 @@ const BaseRule = require('src/rules/Base');
  */
 class LineBreakBeforeReturnRule extends BaseRule {
     /**
+     * Checks whether line before return is line-break. Custom exceptions can be passed via `beforeReturnExceptions` property. Note that edge case (part of string starting with return) isn't covered since amount of intel in received patch can be not enough to determine that and on the other hand it's still rare case.
+     *
      * @param {PepegaContext} pepegaContext
-     * @param {LineBreakBeforeReturnConfig} _
+     * @param {LineBreakBeforeReturnConfig} config
      * @param {Patch} file
      */
-    constructor(pepegaContext, _, file) {
+    constructor(pepegaContext, config, file) {
         super(pepegaContext, file);
+
+        const { beforeReturnExceptions } = config;
+
+        this.beforeReturnExceptions = beforeReturnExceptions;
     }
 
-    // cases to handle
-    /**
-     * IF NEW_LINE ABOVE RETURN -> DON'T CARE
-     * IF NOT NEW LINE ABOVE RETURN:
-     * - use regex pattern to exclude string possibility on trimmedContent
-     * --- return blablabla
-     *
-     * if (...) {
-     *  return 2;
-     * }
-     *
-     * // get content Nesting
-     * - if from === to then return it's singleLiner
-     * - if from !== to we need to count number of lines
-     */
     invoke() {
         const data = this.setupData(this.file.splitPatch);
         const dataLength = data.length;
