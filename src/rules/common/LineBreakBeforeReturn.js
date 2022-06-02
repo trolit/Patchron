@@ -9,7 +9,7 @@ const BaseRule = require('src/rules/Base');
 class LineBreakBeforeReturnRule extends BaseRule {
     /**
      * @param {PepegaContext} pepegaContext
-     * @param {LineBreakBeforeReturnConfig} config
+     * @param {LineBreakBeforeReturnConfig} _
      * @param {Patch} file
      */
     constructor(pepegaContext, _, file) {
@@ -36,6 +36,7 @@ class LineBreakBeforeReturnRule extends BaseRule {
         const dataLength = data.length;
 
         const contentNesting = this.helpers.getContentNesting(data);
+        const contentNestingLength = contentNesting.length;
 
         let previousContent = null;
         const reviewComments = [];
@@ -55,24 +56,34 @@ class LineBreakBeforeReturnRule extends BaseRule {
                 continue;
             }
 
-            const returnNestBlock = this._findNearestNesting(
-                contentNesting,
-                index,
-                trimmedContent
-            );
-
             if (
                 this._startsWithStatement(trimmedContent) ||
-                this._startsWithStatement(previousContent)
+                this._startsWithStatement(previousContent) ||
+                previousContent.startsWith('{')
             ) {
+                previousContent = trimmedContent;
+
                 continue;
-            } else if (returnNestBlock) {
+            }
+
+            const returnNestBlock =
+                contentNestingLength === 1 || contentNestingLength % 2 === 0
+                    ? this._findNearestNesting(
+                          contentNesting,
+                          index,
+                          trimmedContent
+                      )
+                    : null;
+
+            if (returnNestBlock) {
                 const { from, to } = returnNestBlock;
 
                 if (
                     from === to ||
                     this._countNestedBlockLength(data, returnNestBlock) === 1
                 ) {
+                    previousContent = trimmedContent;
+
                     continue;
                 }
             }
