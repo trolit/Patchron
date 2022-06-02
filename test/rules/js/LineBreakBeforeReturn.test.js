@@ -222,6 +222,49 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
+    it('returns empty array on valid return (example 8)', () => {
+        const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
+            pepegaContext,
+            null,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +10,5 @@`,
+                    `+ module.exports = () => {`,
+                    `+    const x = 2;`,
+                    `+`,
+                    `+    return x;`
+                ]
+            }
+        );
+
+        const result = lineBreakBeforeReturnRule.invoke();
+
+        expect(result).toEqual([]);
+    });
+
+    it('returns empty array on valid return (example 9)', () => {
+        const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
+            pepegaContext,
+            null,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +10,5 @@`,
+                    `+    {`,
+                    `+        return x;`,
+                    `+        `,
+                    `+        if (x === 2)`,
+                    `+            console.log(x);`
+                ]
+            }
+        );
+
+        const result = lineBreakBeforeReturnRule.invoke();
+
+        expect(result).toEqual([]);
+    });
+
     it('returns review on invalid return', () => {
         const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
             pepegaContext,
@@ -258,5 +301,27 @@ describe('invoke function', () => {
         expect(result[2]).toHaveProperty('line', 19);
 
         expect(result[3]).toHaveProperty('line', 21);
+    });
+
+    it('returns review on return that is part of multi-line string (edge case)', () => {
+        const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
+            pepegaContext,
+            null,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +10,5 @@`,
+                    `+const multiLineText = \``,
+                    `+return 2 informs to invoke function45`,
+                    `+\``
+                ]
+            }
+        );
+
+        const result = lineBreakBeforeReturnRule.invoke();
+
+        expect(result).toHaveLength(1);
+
+        expect(result[0]).toHaveProperty('line', 11);
     });
 });
