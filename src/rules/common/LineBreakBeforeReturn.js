@@ -139,7 +139,7 @@ class LineBreakBeforeReturnRule extends BaseRule {
      * @returns {string}
      */
     _getCommentBody() {
-        return `TBA`;
+        return `It seems that line-break is missing before \`return\` :thinking:`;
     }
 }
 
