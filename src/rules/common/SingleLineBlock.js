@@ -33,7 +33,7 @@ class SingleLineBlockRule extends BaseRule {
         const data = this.setupData(splitPatch);
 
         if (!this._includesAnyMatch(data)) {
-            this.log.warning(
+            this.log.information(
                 __filename,
                 'Review skipped due to no single line blocks.',
                 this.file

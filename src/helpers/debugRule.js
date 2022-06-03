@@ -22,9 +22,9 @@ const rules = {
 module.exports = (ruleName, config, file, pepegaContext) => {
     const Rule = rules[ruleName];
 
-    const rule = new Rule(pepegaContext, config);
+    const rule = new Rule(pepegaContext, config, file);
 
-    const result = rule.invoke(file);
+    const result = rule.invoke();
 
     console.log(`***************************************************`);
     console.log(`${ruleName} rule result`);
