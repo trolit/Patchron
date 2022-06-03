@@ -8,19 +8,14 @@ const BaseRule = require('src/rules/Base');
  */
 class LineBreakBeforeReturnRule extends BaseRule {
     /**
-     * Checks whether line before return is line-break. Custom exceptions can be passed via `beforeReturnExceptions` property. Note that edge case (part of string starting with return) isn't covered since amount of intel in received patch can be not enough to determine that and on the other hand it's still rare case.
+     * Checks whether line before return is line-break. Note that edge case (part of string starting with return) isn't covered since amount of intel in received patch can be not enough to determine that and on the other hand it's still rare case.
      *
      * @param {PepegaContext} pepegaContext
      * @param {LineBreakBeforeReturnConfig} config
      * @param {Patch} file
      */
-    constructor(pepegaContext, config, file) {
+    constructor(pepegaContext, _, file) {
         super(pepegaContext, file);
-
-        const { beforeReturnExceptions } = config;
-
-        this.beforeReturnExceptions = beforeReturnExceptions;
-        this.beforeReturnExceptionsLength = this.beforeReturnExceptions.length;
     }
 
     invoke() {
@@ -78,17 +73,6 @@ class LineBreakBeforeReturnRule extends BaseRule {
 
                     continue;
                 }
-            }
-
-            if (
-                this.beforeReturnExceptionsLength &&
-                this.beforeReturnExceptions.some((exception) =>
-                    previousContent.match(exception)
-                )
-            ) {
-                previousContent = trimmedContent;
-
-                continue;
             }
 
             if (previousContent !== this.NEWLINE) {

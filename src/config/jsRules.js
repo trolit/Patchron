@@ -140,9 +140,6 @@ module.exports = [
     },
     {
         enabled: false,
-        reference: LineBreakBeforeReturnRule,
-        config: {
-            beforeReturnExceptions: []
-        }
+        reference: LineBreakBeforeReturnRule
     }
 ];
