@@ -13,6 +13,10 @@ const {
 const setupApp = require('test/rules/helpers/setupApp');
 const initializeFile = require('test/rules/helpers/initializeFile');
 
+const config = {
+    beforeReturnExceptions: []
+};
+
 describe('invoke function', () => {
     let pepegaContext = null;
     let file = {};
@@ -32,7 +36,7 @@ describe('invoke function', () => {
     it('returns empty array on valid return', () => {
         const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
             pepegaContext,
-            null,
+            config,
             {
                 ...file,
                 splitPatch: [
@@ -66,7 +70,7 @@ describe('invoke function', () => {
     it('returns empty array on valid return (example 1)', () => {
         const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
             pepegaContext,
-            null,
+            config,
             {
                 ...file,
                 splitPatch: [
@@ -86,7 +90,7 @@ describe('invoke function', () => {
     it('returns empty array on valid return (example 2)', () => {
         const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
             pepegaContext,
-            null,
+            config,
             {
                 ...file,
                 splitPatch: [
@@ -110,7 +114,7 @@ describe('invoke function', () => {
     it('returns empty array on valid return (example 3)', () => {
         const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
             pepegaContext,
-            null,
+            config,
             {
                 ...file,
                 splitPatch: [
@@ -132,7 +136,7 @@ describe('invoke function', () => {
     it('returns empty array on valid return (example 4)', () => {
         const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
             pepegaContext,
-            null,
+            config,
             {
                 ...file,
                 splitPatch: [
@@ -154,7 +158,7 @@ describe('invoke function', () => {
     it('returns empty array on valid return (example 5)', () => {
         const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
             pepegaContext,
-            null,
+            config,
             {
                 ...file,
                 splitPatch: [
@@ -180,7 +184,7 @@ describe('invoke function', () => {
     it('returns empty array on valid return (example 6)', () => {
         const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
             pepegaContext,
-            null,
+            config,
             {
                 ...file,
                 splitPatch: [
@@ -203,7 +207,7 @@ describe('invoke function', () => {
     it('returns empty array on valid return (example 7)', () => {
         const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
             pepegaContext,
-            null,
+            config,
             {
                 ...file,
                 splitPatch: [
@@ -225,7 +229,7 @@ describe('invoke function', () => {
     it('returns empty array on valid return (example 8)', () => {
         const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
             pepegaContext,
-            null,
+            config,
             {
                 ...file,
                 splitPatch: [
@@ -246,7 +250,7 @@ describe('invoke function', () => {
     it('returns empty array on valid return (example 9)', () => {
         const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
             pepegaContext,
-            null,
+            config,
             {
                 ...file,
                 splitPatch: [
@@ -268,7 +272,7 @@ describe('invoke function', () => {
     it('returns review on invalid return', () => {
         const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
             pepegaContext,
-            null,
+            config,
             {
                 ...file,
                 splitPatch: [
@@ -306,7 +310,7 @@ describe('invoke function', () => {
     it('returns review on return that is part of multi-line string (edge case)', () => {
         const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
             pepegaContext,
-            null,
+            config,
             {
                 ...file,
                 splitPatch: [
@@ -323,5 +327,27 @@ describe('invoke function', () => {
         expect(result).toHaveLength(1);
 
         expect(result[0]).toHaveProperty('line', 11);
+    });
+
+    it('returns empty array on valid return after exception', () => {
+        const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
+            pepegaContext,
+            {
+                beforeReturnExceptions: [/const.*/]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +10,5 @@`,
+                    `+const multiLineText = \``,
+                    `+return 2 informs to invoke function45`,
+                    `+\``
+                ]
+            }
+        );
+
+        const result = lineBreakBeforeReturnRule.invoke();
+
+        expect(result).toEqual([]);
     });
 });

@@ -20,6 +20,7 @@ class LineBreakBeforeReturnRule extends BaseRule {
         const { beforeReturnExceptions } = config;
 
         this.beforeReturnExceptions = beforeReturnExceptions;
+        this.beforeReturnExceptionsLength = this.beforeReturnExceptions.length;
     }
 
     invoke() {
@@ -77,6 +78,17 @@ class LineBreakBeforeReturnRule extends BaseRule {
 
                     continue;
                 }
+            }
+
+            if (
+                this.beforeReturnExceptionsLength &&
+                this.beforeReturnExceptions.some((exception) =>
+                    previousContent.match(exception)
+                )
+            ) {
+                previousContent = trimmedContent;
+
+                continue;
             }
 
             if (previousContent !== this.NEWLINE) {
