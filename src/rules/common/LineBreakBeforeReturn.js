@@ -107,7 +107,7 @@ class LineBreakBeforeReturnRule extends BaseRule {
         for (let index = from + 1; index < to; index++) {
             const { trimmedContent } = data[index];
 
-            if ([this.DELETED, this.MERGED].includes(trimmedContent)) {
+            if (trimmedContent === this.MERGE) {
                 continue;
             }
 
