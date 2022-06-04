@@ -20,8 +20,7 @@ class LineBreakBeforeReturnRule extends BaseRule {
         const data = this.setupData(this.file.splitPatch);
         const dataLength = data.length;
 
-        const contentNesting = this.helpers.getContentNesting(data);
-        const contentNestingLength = contentNesting.length;
+        const dataStructure = this.helpers.getDataStructure(data);
 
         let previousContent = null;
         const reviewComments = [];
@@ -51,21 +50,18 @@ class LineBreakBeforeReturnRule extends BaseRule {
                 continue;
             }
 
-            const returnNestBlock =
-                contentNestingLength === 1 || contentNestingLength % 2 === 0
-                    ? this._findNearestNesting(
-                          contentNesting,
-                          index,
-                          trimmedContent
-                      )
-                    : null;
+            const rowStructure = this._findRowStructure(
+                dataStructure,
+                index,
+                trimmedContent
+            );
 
-            if (returnNestBlock) {
-                const { from, to } = returnNestBlock;
+            if (rowStructure) {
+                const { from, to } = rowStructure;
 
                 if (
                     from === to ||
-                    this._countNestedBlockLength(data, returnNestBlock) === 1
+                    this._countBlockLength(data, rowStructure) === 1
                 ) {
                     previousContent = trimmedContent;
 
@@ -86,11 +82,11 @@ class LineBreakBeforeReturnRule extends BaseRule {
         return reviewComments;
     }
 
-    _findNearestNesting(contentNesting, rowIndex, rowContent) {
+    _findRowStructure(dataStructure, rowIndex, rowContent) {
         const leftBraceIndex = rowContent.indexOf('{');
 
-        for (let index = contentNesting.length - 1; index >= 0; index--) {
-            const nesting = contentNesting[index];
+        for (let index = dataStructure.length - 1; index >= 0; index--) {
+            const nesting = dataStructure[index];
             const { from, to } = nesting;
 
             if (
@@ -104,7 +100,7 @@ class LineBreakBeforeReturnRule extends BaseRule {
         return null;
     }
 
-    _countNestedBlockLength(data, block) {
+    _countBlockLength(data, block) {
         let length = 0;
         const { from, to } = block;
 
@@ -121,11 +117,11 @@ class LineBreakBeforeReturnRule extends BaseRule {
         return length;
     }
 
-    _startsWithStatement(rowContent) {
+    _startsWithStatement(content) {
         const statements = ['if', 'else', 'for', 'do', 'while'];
 
         for (const statement of statements) {
-            if (rowContent.startsWith(statement)) {
+            if (content.startsWith(statement)) {
                 return true;
             }
         }
