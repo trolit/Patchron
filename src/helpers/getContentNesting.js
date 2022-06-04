@@ -1,7 +1,10 @@
+/// <reference path="../config/type-definitions/common.js" />
+
 /**
- * returns array that gives information about content structure **(based on curly brackets)**
+ * returns braces structure. **By default** does not return structures that are incomplete due to lack of information.
  *
- * @param {Array<index: number, content: string>} data
+ * @param {Array<SplitPatchRow>} data
+ * @param {boolean} keepIncompleteBlocks when true blocks that aren't completed will be included in result
  * @example
  *
  * ```
@@ -23,28 +26,32 @@
  *
  * @returns {Array<{from, to}>}
  */
-module.exports = (data) => {
-    let contentNests = [];
+module.exports = (data, keepIncompleteBlocks = false) => {
+    const blocks = [];
     const dataLength = data.length;
 
-    for (let row = 0; row < dataLength; row++) {
-        const { content: rowContent } = data[row];
-        const rowContentLength = rowContent.length;
+    for (let index = 0; index < dataLength; index++) {
+        const { trimmedContent } = data[index];
+        const trimmedContentLength = trimmedContent.length;
 
-        for (let charIndex = 0; charIndex < rowContentLength; charIndex++) {
-            const char = rowContent[charIndex];
+        for (
+            let characterIndex = 0;
+            characterIndex < trimmedContentLength;
+            characterIndex++
+        ) {
+            const character = trimmedContent[characterIndex];
 
-            if (char === '{') {
-                contentNests.push({
-                    from: row
+            if (character === '{') {
+                blocks.push({
+                    from: index
                 });
-            } else if (char === '}') {
-                for (let i = contentNests.length - 1; i >= 0; i--) {
-                    if (contentNests[i].to) {
+            } else if (character === '}') {
+                for (let i = blocks.length - 1; i >= 0; i--) {
+                    if (blocks[i].to) {
                         continue;
                     }
 
-                    contentNests[i].to = row;
+                    blocks[i].to = index;
 
                     break;
                 }
@@ -52,5 +59,7 @@ module.exports = (data) => {
         }
     }
 
-    return contentNests;
+    return keepIncompleteBlocks
+        ? blocks
+        : blocks.filter(({ from, to }) => from && to);
 };
