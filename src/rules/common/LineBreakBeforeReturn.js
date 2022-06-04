@@ -20,21 +20,18 @@ class LineBreakBeforeReturnRule extends BaseRule {
         const data = this.setupData(this.file.splitPatch);
         const dataLength = data.length;
 
-        const dataStructure = this.helpers.getDataStructure(data);
-
         let previousContent = null;
         const reviewComments = [];
+        const dataStructure = this.helpers.getDataStructure(data);
 
         for (let index = 0; index < dataLength; index++) {
-            const { trimmedContent } = data[index];
+            const row = data[index];
+            const { trimmedContent } = row;
 
-            if (!trimmedContent.startsWith('return')) {
-                previousContent = trimmedContent;
-
-                continue;
-            }
-
-            if (previousContent === this.NEWLINE) {
+            if (
+                !trimmedContent.startsWith('return') ||
+                previousContent === this.NEWLINE
+            ) {
                 previousContent = trimmedContent;
 
                 continue;
@@ -50,18 +47,14 @@ class LineBreakBeforeReturnRule extends BaseRule {
                 continue;
             }
 
-            const rowStructure = this._findRowStructure(
-                dataStructure,
-                index,
-                trimmedContent
-            );
+            const rowStructure = this._findRowStructure(row, dataStructure);
 
             if (rowStructure) {
                 const { from, to } = rowStructure;
 
                 if (
                     from === to ||
-                    this._countBlockLength(data, rowStructure) === 1
+                    this._countRowStructureLength(data, rowStructure) === 1
                 ) {
                     previousContent = trimmedContent;
 
@@ -82,8 +75,10 @@ class LineBreakBeforeReturnRule extends BaseRule {
         return reviewComments;
     }
 
-    _findRowStructure(dataStructure, rowIndex, rowContent) {
-        const leftBraceIndex = rowContent.indexOf('{');
+    _findRowStructure(row, dataStructure) {
+        const { trimmedContent, index: rowIndex } = row;
+
+        const leftBraceIndex = trimmedContent.indexOf('{');
 
         for (let index = dataStructure.length - 1; index >= 0; index--) {
             const nesting = dataStructure[index];
@@ -100,9 +95,9 @@ class LineBreakBeforeReturnRule extends BaseRule {
         return null;
     }
 
-    _countBlockLength(data, block) {
+    _countRowStructureLength(data, rowStructure) {
         let length = 0;
-        const { from, to } = block;
+        const { from, to } = rowStructure;
 
         for (let index = from + 1; index < to; index++) {
             const { trimmedContent } = data[index];
@@ -120,13 +115,7 @@ class LineBreakBeforeReturnRule extends BaseRule {
     _startsWithStatement(content) {
         const statements = ['if', 'else', 'for', 'do', 'while'];
 
-        for (const statement of statements) {
-            if (content.startsWith(statement)) {
-                return true;
-            }
-        }
-
-        return false;
+        return statements.some((statement) => content.startsWith(statement));
     }
 
     /**
