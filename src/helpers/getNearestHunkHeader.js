@@ -25,7 +25,11 @@
 module.exports = (splitPatch, startIndex) => {
     let result = null;
 
-    if (!Array.isArray(splitPatch) || !Number.isInteger(startIndex)) {
+    if (
+        !Array.isArray(splitPatch) ||
+        !Number.isInteger(startIndex) ||
+        startIndex >= splitPatch.length
+    ) {
         return result;
     }
 
