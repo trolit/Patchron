@@ -195,7 +195,7 @@ class SingleLineBlockRule extends BaseRule {
 
             if (
                 (rowNesting && ['{', '}'].includes(trimmedContent)) ||
-                this.CUSTOM_LINES.includes(trimmedContent)
+                trimmedContent.includes(this.MERGE)
             ) {
                 continue;
             }
