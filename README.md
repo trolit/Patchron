@@ -2,7 +2,7 @@
 
 # Detective Pepega
 
-> A GitHub App built with [Probot](https://github.com/probot/probot) which is meant to help in maintaining development conventions by performing first PR code review and leaving suggestions before another member performs manual CR. It is based on pure patches received from opened pull requests. Therefore, some review comments might not be accurate, but still, those are edge cases (e.g. patch which is fragment of multi-line string or differentiating interpolated code from raw string).
+> A GitHub App built with [Probot](https://github.com/probot/probot) which is meant to help in maintaining development conventions by performing early pull request code review. CR is based on patches that contain limited number of information from modified files. Due to this, some review comments might not be accurate, but still, those are edge cases (e.g. patch which is fragment of multi-line string or differentiating interpolated code from raw string) which can be ignored when reviewed by PR owner.
 
 ## Setup
 
