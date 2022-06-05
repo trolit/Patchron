@@ -24,6 +24,18 @@ docker build -t pepega .
 docker run -e APP_ID=<app-id> -e PRIVATE_KEY=<pem-value> pepega
 ```
 
+## Settings
+
+| Property | Type | Description |
+| :--- | :--- | :--- |
+| isGetFilesRequestPaginated | boolean | test |
+| delayBetweenCommentRequestsInSeconds | Number | test |
+| isOwnerAssigningEnabled | boolean | test |
+| isReviewSummaryEnabled | boolean | test |
+| isStoringLogsEnabled | boolean | test |
+| maxCommentsPerReview | Number | test |
+| senders | Array<string> | test |
+
 ## Contributing
 
 If you have suggestions for how pepega could be improved, or want to report a bug, open an issue! We'd love all and any contributions.
