@@ -37,7 +37,7 @@ describe('invoke function', () => {
                 ...file,
                 splitPatch: [
                     `@@ -10,13 +10,5 @@`,
-                    `+ module.exports = (x) => {`,
+                    `+module.exports = (x) => {`,
                     `+    if (x === 5) {`,
                     `+        const result = doSomething();`,
                     `+        `,
@@ -53,7 +53,7 @@ describe('invoke function', () => {
                     `+    }`,
                     `+`,
                     `+    return x;`,
-                    `}`
+                    `+}`
                 ]
             }
         );
@@ -71,9 +71,9 @@ describe('invoke function', () => {
                 ...file,
                 splitPatch: [
                     `@@ -10,13 +10,5 @@`,
-                    `+ module.exports = (x) => {`,
+                    `+module.exports = (x) => {`,
                     `+    return x;`,
-                    `}`
+                    `+}`
                 ]
             }
         );
@@ -91,13 +91,13 @@ describe('invoke function', () => {
                 ...file,
                 splitPatch: [
                     `@@ -10,13 +10,5 @@`,
-                    `+ module.exports = (x) => {`,
+                    `+module.exports = (x) => {`,
                     `+    for (let i = 2; i < 5; i++)`,
                     `+        if (x + i >= 6)`,
                     `+            return x - i;`,
                     `+`,
                     `+    return x;`,
-                    `}`
+                    `+}`
                 ]
             }
         );
@@ -115,11 +115,11 @@ describe('invoke function', () => {
                 ...file,
                 splitPatch: [
                     `@@ -10,13 +10,5 @@`,
-                    `+ module.exports = (x) => {`,
+                    `+module.exports = (x) => {`,
                     `+    for (let x = 0; x < 5; x++) if (x == 3) return 5;`,
                     `+`,
                     `+    return x;`,
-                    `}`
+                    `+}`
                 ]
             }
         );
@@ -137,11 +137,11 @@ describe('invoke function', () => {
                 ...file,
                 splitPatch: [
                     `@@ -10,13 +10,5 @@`,
-                    `+ module.exports = (x) => {`,
+                    `+module.exports = (x) => {`,
                     `+    for (let x = 0; x < 5; x++) if (x == 3) { return 5; }`,
                     `+`,
                     `+    return x;`,
-                    `}`
+                    `+}`
                 ]
             }
         );
@@ -159,7 +159,7 @@ describe('invoke function', () => {
                 ...file,
                 splitPatch: [
                     `@@ -10,13 +10,5 @@`,
-                    `+ module.exports = (x) => {`,
+                    `+module.exports = (x) => {`,
                     `+    if (x === 5) {`,
                     `+        const y = doSomething();`,
                     `+        `,
@@ -167,7 +167,7 @@ describe('invoke function', () => {
                     `+    }`,
                     `+    `,
                     `+    return x;`,
-                    `}`
+                    `+}`
                 ]
             }
         );
@@ -190,7 +190,7 @@ describe('invoke function', () => {
                     `+const y = result + difference;`,
                     `+const z = y * getRandomValue();`,
                     `+`,
-                    `return z;`
+                    `+return z;`
                 ]
             }
         );
@@ -208,11 +208,11 @@ describe('invoke function', () => {
                 ...file,
                 splitPatch: [
                     `@@ -10,13 +10,5 @@`,
-                    `+ module.exports = () => {`,
+                    `+module.exports = () => {`,
                     `+    const x = 2;`,
                     `+`,
                     `+    return x;`,
-                    `}`
+                    `+}`
                 ]
             }
         );
@@ -230,7 +230,7 @@ describe('invoke function', () => {
                 ...file,
                 splitPatch: [
                     `@@ -10,13 +10,5 @@`,
-                    `+ module.exports = () => {`,
+                    `+module.exports = () => {`,
                     `+    const x = 2;`,
                     `+`,
                     `+    return x;`
@@ -273,7 +273,7 @@ describe('invoke function', () => {
                 ...file,
                 splitPatch: [
                     `@@ -10,13 +10,5 @@`,
-                    `+ module.exports = (x) => {`,
+                    `+module.exports = (x) => {`,
                     `+    if (x === 5) {`,
                     `+        const result = doSomething();`,
                     `+        return result;`,
@@ -285,7 +285,7 @@ describe('invoke function', () => {
                     `+        return a * x + b;`,
                     `+    }`,
                     `+    return x;`,
-                    `}`
+                    `+}`
                 ]
             }
         );

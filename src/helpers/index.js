@@ -2,9 +2,8 @@ const loopTimer = require('./loopTimer');
 const getPosition = require('./getPosition');
 const decodeContent = require('./decodeContent');
 const getLineNumber = require('./getLineNumber');
-const getContentNesting = require('./getContentNesting');
+const getDataStructure = require('./getDataStructure');
 const removeWhitespaces = require('./removeWhitespaces');
-const getPartOfTheContent = require('./getPartOfTheContent');
 const getNearestHunkHeader = require('./getNearestHunkHeader');
 
 module.exports = {
@@ -12,8 +11,7 @@ module.exports = {
     getPosition,
     decodeContent,
     getLineNumber,
-    getContentNesting,
+    getDataStructure,
     removeWhitespaces,
-    getPartOfTheContent,
     getNearestHunkHeader
 };

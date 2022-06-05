@@ -42,12 +42,9 @@ class SingleLineBlockRule extends BaseRule {
             return [];
         }
 
-        const contentNesting = this.helpers.getContentNesting(data);
+        const dataStructure = this.helpers.getDataStructure(data);
 
-        const singleLineBlocks = this._getSingleLineBlocks(
-            data,
-            contentNesting
-        );
+        const singleLineBlocks = this._getSingleLineBlocks(data, dataStructure);
 
         const reviewComments = this._reviewSingleLineBlocks(singleLineBlocks);
 
@@ -60,7 +57,7 @@ class SingleLineBlockRule extends BaseRule {
         );
     }
 
-    _getSingleLineBlocks(data, contentNesting) {
+    _getSingleLineBlocks(data, dataStructure) {
         const rowsToSkip = [];
         const singleLineBlocks = [];
         const dataLength = data.length;
@@ -84,8 +81,8 @@ class SingleLineBlockRule extends BaseRule {
 
             const nextRow = index + 1 < data.length ? data[index + 1] : null;
 
-            const rowNesting = this._findRowNesting(
-                contentNesting,
+            const rowStructure = this._findRowStructure(
+                dataStructure,
                 row,
                 nextRow
             );
@@ -97,17 +94,17 @@ class SingleLineBlockRule extends BaseRule {
                 to = this._getEndIndicatorIndex(data, block, row);
 
                 rowsToSkip.push(to);
-            } else if (rowNesting) {
-                to = rowNesting.to;
+            } else if (rowStructure) {
+                to = rowStructure.to;
             } else {
                 to = this._getEndIndex(block, row);
             }
 
-            if (this._isSingleLineBlock(data, from, to, rowNesting)) {
+            if (this._isSingleLineBlock(data, from, to, rowStructure)) {
                 singleLineBlocks.push({
                     from,
                     to,
-                    isWithBraces: !!rowNesting
+                    isWithBraces: !!rowStructure
                 });
             }
         }
@@ -121,21 +118,21 @@ class SingleLineBlockRule extends BaseRule {
         );
     }
 
-    _findRowNesting(contentNesting, row, nextRow) {
+    _findRowStructure(dataStructure, row, nextRow) {
         const { index } = row;
 
-        const currentRowNesting = contentNesting.find(
+        const currentRowStructure = dataStructure.find(
             ({ from }) => from === index
         );
 
-        if (!nextRow || currentRowNesting) {
-            return currentRowNesting;
+        if (!nextRow || currentRowStructure) {
+            return currentRowStructure;
         }
 
         const { trimmedContent } = nextRow;
 
         return trimmedContent.startsWith('{')
-            ? contentNesting.find(({ from }) => from === nextRow.index)
+            ? dataStructure.find(({ from }) => from === nextRow.index)
             : null;
     }
 
@@ -198,7 +195,7 @@ class SingleLineBlockRule extends BaseRule {
 
             if (
                 (rowNesting && ['{', '}'].includes(trimmedContent)) ||
-                this.CUSTOM_LINES.includes(trimmedContent)
+                trimmedContent === this.MERGE
             ) {
                 continue;
             }

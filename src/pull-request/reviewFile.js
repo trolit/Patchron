@@ -1,6 +1,5 @@
 const { rules } = require('src/config');
 const review = require('src/rules/review');
-const setupFileForReview = require('src/helpers/setupFileForReview');
 
 /**
  * triggers `Pepega.js` to review files against configured rules
@@ -27,7 +26,7 @@ module.exports = (pepegaContext, file) => {
         default:
             log.information(
                 __filename,
-                `Extension not supported (${file?.extension})`
+                `File with extension .${file?.extension} skipped`
             );
 
             break;
@@ -35,3 +34,29 @@ module.exports = (pepegaContext, file) => {
 
     return comments;
 };
+
+/**
+ * expands file object with following properties:
+ * ```js
+ * { commit_id, extension, splitPatch }
+ * ```
+ *
+ * @param {object} file
+ *
+ * {@link https://docs.github.com/en/rest/reference/pulls#list-pull-requests-files}
+ *
+ * @returns {void}
+ */
+function setupFileForReview(file) {
+    const { filename, contents_url, patch } = file;
+
+    const commitId = contents_url.split('ref=').pop();
+
+    const splitPatch = patch.split('\n');
+
+    const extension = filename.split('.').pop();
+
+    file.commitId = commitId;
+    file.extension = extension;
+    file.splitPatch = splitPatch;
+}

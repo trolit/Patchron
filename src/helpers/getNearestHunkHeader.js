@@ -1,8 +1,8 @@
 /**
  * returns nearest **hunk**
  *
- * @param {Array<string>} splitPatch - array including code
- * @param {number} startIndex - index of splitPatch row indicating where to start from
+ * @param {Array<string>} splitPatch file content split by \n
+ * @param {number} rowIndex index of row (in respect to local array)
  *
  * {@link https://www.edureka.co/community/7949/what-are-these-in-github}
  *
@@ -22,14 +22,18 @@
  *
  * @returns {object}
  */
-module.exports = (splitPatch, startIndex) => {
+module.exports = (splitPatch, rowIndex) => {
     let result = null;
 
-    if (!Array.isArray(splitPatch) || !Number.isInteger(startIndex)) {
+    if (
+        !Array.isArray(splitPatch) ||
+        !Number.isInteger(rowIndex) ||
+        rowIndex >= splitPatch.length
+    ) {
         return result;
     }
 
-    for (let i = startIndex; i >= 0; i--) {
+    for (let i = rowIndex; i >= 0; i--) {
         const rowContent = splitPatch[i];
 
         if (rowContent.startsWith('@@')) {

@@ -4,9 +4,9 @@ const getNearestHunkHeader = require('./getNearestHunkHeader');
 /**
  * translates row index into GitHub line number
  *
- * @param {Array<string>} content file content split by \n
+ * @param {Array<string>} splitPatch file content split by \n
  * @param {string} side left | right
- * @param {number} rowIndex index of row to get GitHub line number
+ * @param {number} rowIndex index of row (in respect to local array)
  *
  * @example
  *  getLineNumber(content, 'right', 5) => 29
@@ -25,22 +25,27 @@ const getNearestHunkHeader = require('./getNearestHunkHeader');
  *
  * @returns {number}
  */
-module.exports = (content, side = 'RIGHT', rowIndex) => {
+module.exports = (splitPatch, side = 'RIGHT', rowIndex) => {
+    const nearestHunkHeader = getNearestHunkHeader(splitPatch, rowIndex);
+
+    if (!nearestHunkHeader) {
+        return -1;
+    }
+
     const {
         index: nearestHunkHeaderIndex,
         modifiedFile,
         sourceFile
-    } = getNearestHunkHeader(content, rowIndex);
+    } = nearestHunkHeader;
 
     let counter = side === 'RIGHT' ? modifiedFile.line : sourceFile.line;
-
-    const prefixToIgnore = side === 'RIGHT' ? '-' : '+';
 
     if (nearestHunkHeaderIndex === rowIndex) {
         return counter;
     }
 
-    const contentLength = content.length;
+    const contentLength = splitPatch.length;
+    const prefixToIgnore = side === 'RIGHT' ? '-' : '+';
 
     for (
         let index = nearestHunkHeaderIndex + 1;
@@ -51,7 +56,7 @@ module.exports = (content, side = 'RIGHT', rowIndex) => {
             break;
         }
 
-        const minifiedRow = removeWhitespaces(content[index]);
+        const minifiedRow = removeWhitespaces(splitPatch[index]);
 
         if (!minifiedRow.startsWith(prefixToIgnore)) {
             counter++;

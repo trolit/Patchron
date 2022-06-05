@@ -20,22 +20,18 @@ class LineBreakBeforeReturnRule extends BaseRule {
         const data = this.setupData(this.file.splitPatch);
         const dataLength = data.length;
 
-        const contentNesting = this.helpers.getContentNesting(data);
-        const contentNestingLength = contentNesting.length;
-
         let previousContent = null;
         const reviewComments = [];
+        const dataStructure = this.helpers.getDataStructure(data);
 
         for (let index = 0; index < dataLength; index++) {
-            const { trimmedContent } = data[index];
+            const row = data[index];
+            const { trimmedContent } = row;
 
-            if (!trimmedContent.startsWith('return')) {
-                previousContent = trimmedContent;
-
-                continue;
-            }
-
-            if (previousContent === this.NEWLINE) {
+            if (
+                !trimmedContent.startsWith('return') ||
+                previousContent === this.NEWLINE
+            ) {
                 previousContent = trimmedContent;
 
                 continue;
@@ -51,21 +47,14 @@ class LineBreakBeforeReturnRule extends BaseRule {
                 continue;
             }
 
-            const returnNestBlock =
-                contentNestingLength === 1 || contentNestingLength % 2 === 0
-                    ? this._findNearestNesting(
-                          contentNesting,
-                          index,
-                          trimmedContent
-                      )
-                    : null;
+            const rowStructure = this._findRowStructure(row, dataStructure);
 
-            if (returnNestBlock) {
-                const { from, to } = returnNestBlock;
+            if (rowStructure) {
+                const { from, to } = rowStructure;
 
                 if (
                     from === to ||
-                    this._countNestedBlockLength(data, returnNestBlock) === 1
+                    this._countRowStructureLength(data, rowStructure) === 1
                 ) {
                     previousContent = trimmedContent;
 
@@ -86,11 +75,13 @@ class LineBreakBeforeReturnRule extends BaseRule {
         return reviewComments;
     }
 
-    _findNearestNesting(contentNesting, rowIndex, rowContent) {
-        const leftBraceIndex = rowContent.indexOf('{');
+    _findRowStructure(row, dataStructure) {
+        const { trimmedContent, index: rowIndex } = row;
 
-        for (let index = contentNesting.length - 1; index >= 0; index--) {
-            const nesting = contentNesting[index];
+        const leftBraceIndex = trimmedContent.indexOf('{');
+
+        for (let index = dataStructure.length - 1; index >= 0; index--) {
+            const nesting = dataStructure[index];
             const { from, to } = nesting;
 
             if (
@@ -104,14 +95,14 @@ class LineBreakBeforeReturnRule extends BaseRule {
         return null;
     }
 
-    _countNestedBlockLength(data, block) {
+    _countRowStructureLength(data, rowStructure) {
         let length = 0;
-        const { from, to } = block;
+        const { from, to } = rowStructure;
 
         for (let index = from + 1; index < to; index++) {
             const { trimmedContent } = data[index];
 
-            if ([this.DELETED, this.MERGED].includes(trimmedContent)) {
+            if (trimmedContent === this.MERGE) {
                 continue;
             }
 
@@ -121,16 +112,10 @@ class LineBreakBeforeReturnRule extends BaseRule {
         return length;
     }
 
-    _startsWithStatement(rowContent) {
+    _startsWithStatement(content) {
         const statements = ['if', 'else', 'for', 'do', 'while'];
 
-        for (const statement of statements) {
-            if (rowContent.startsWith(statement)) {
-                return true;
-            }
-        }
-
-        return false;
+        return statements.some((statement) => content.startsWith(statement));
     }
 
     /**
