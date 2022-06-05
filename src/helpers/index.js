@@ -4,7 +4,6 @@ const decodeContent = require('./decodeContent');
 const getLineNumber = require('./getLineNumber');
 const getDataStructure = require('./getDataStructure');
 const removeWhitespaces = require('./removeWhitespaces');
-const getPartOfTheContent = require('./getPartOfTheContent');
 const getNearestHunkHeader = require('./getNearestHunkHeader');
 
 module.exports = {
@@ -14,6 +13,5 @@ module.exports = {
     getLineNumber,
     getDataStructure,
     removeWhitespaces,
-    getPartOfTheContent,
     getNearestHunkHeader
 };
