@@ -17,7 +17,7 @@ module.exports = {
         isReviewSummaryEnabled: false,
         isStoringLogsEnabled: true,
         maxCommentsPerReview: 50, // limit number of comments that can be added per single review
-        senders: [] // limit people whose pull requests will be reviewed (pass GitHub usernames)
+        senders: [] // pass GitHub usernames to limit people whose pull requests will be reviewed
     },
     rules: {
         pull,
