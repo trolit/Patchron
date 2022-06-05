@@ -2,7 +2,7 @@
  * returns nearest **hunk**
  *
  * @param {Array<string>} splitPatch file content split by \n
- * @param {number} rowIndex index of splitPatch row indicating where to start from
+ * @param {number} rowIndex index of row (in respect to local array)
  *
  * {@link https://www.edureka.co/community/7949/what-are-these-in-github}
  *
