@@ -2,8 +2,8 @@ const { describe, expect, it } = require('@jest/globals');
 
 const { getNearestHunkHeader } = require('src/helpers');
 
-describe('invoke function', () => {
-    it('returns valid hunk header', () => {
+describe('', () => {
+    it('returns expected outcomes', () => {
         const splitPatch = [
             `@@ -10,5 +6,4 @@`,
             ` module.exports = (x) => {`,
@@ -19,25 +19,19 @@ describe('invoke function', () => {
             `+const z = 33;`
         ];
 
-        const hunkHeader1 = getNearestHunkHeader(splitPatch, 5);
-        expect(hunkHeader1).toHaveProperty('index', 0);
+        const outcome1 = getNearestHunkHeader(splitPatch, 5);
+        expect(outcome1).toHaveProperty('index', 0);
 
-        const hunkHeader2 = getNearestHunkHeader(splitPatch, 10);
-        expect(hunkHeader2).toHaveProperty('index', 8);
-    });
+        const outcome2 = getNearestHunkHeader(splitPatch, 10);
+        expect(outcome2).toHaveProperty('index', 8);
 
-    it('returns null on index out of range', () => {
-        const result = getNearestHunkHeader([], 15);
-        expect(result).toEqual(null);
-    });
+        const outcome3 = getNearestHunkHeader([], 15);
+        expect(outcome3).toEqual(null);
 
-    it('returns null on invalid index', () => {
-        const result = getNearestHunkHeader([], -15);
-        expect(result).toEqual(null);
-    });
+        const outcome4 = getNearestHunkHeader([], -15);
+        expect(outcome4).toEqual(null);
 
-    it('returns null on invalid first parameter type', () => {
-        const result = getNearestHunkHeader(15, -15);
-        expect(result).toEqual(null);
+        const outcome5 = getNearestHunkHeader(15, -15);
+        expect(outcome5).toEqual(null);
     });
 });

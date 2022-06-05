@@ -18,20 +18,20 @@ describe('', () => {
         `+const z = 33;`
     ];
 
-    it('returns expected positions', () => {
-        const position1 = getPosition(splitPatch, 6, 'RIGHT');
-        expect(position1).toEqual(3);
+    it('returns expected outcomes', () => {
+        const outcome1 = getPosition(splitPatch, 6, 'RIGHT');
+        expect(outcome1).toEqual(3);
 
-        const position2 = getPosition(splitPatch, 5, 'LEFT');
-        expect(position2).toEqual(4);
+        const outcome2 = getPosition(splitPatch, 5, 'LEFT');
+        expect(outcome2).toEqual(4);
 
-        const position3 = getPosition(splitPatch, 15, 'RIGHT');
-        expect(position3).toEqual(-1);
+        const outcome3 = getPosition(splitPatch, 15, 'RIGHT');
+        expect(outcome3).toEqual(-1);
 
-        const position4 = getPosition(splitPatch, -15, 'RIGHT');
-        expect(position4).toEqual(-1);
+        const outcome4 = getPosition(splitPatch, -15, 'RIGHT');
+        expect(outcome4).toEqual(-1);
 
-        const position5 = getPosition([], 5, 'RIGHT');
-        expect(position5).toEqual(-1);
+        const outcome5 = getPosition([], 5, 'RIGHT');
+        expect(outcome5).toEqual(-1);
     });
 });

@@ -6,7 +6,7 @@ function prepareData(patch) {
     return patch.map((line, index) => ({ index, trimmedContent: line }));
 }
 
-describe('invoke function', () => {
+describe('', () => {
     it('returns complete structure', () => {
         const data = prepareData([
             `@@ -10,13 +10,5 @@`,
