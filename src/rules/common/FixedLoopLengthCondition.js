@@ -49,7 +49,7 @@ class LoopLengthConditionInitialization extends BaseRule {
 
                     isLoopConditionValid =
                         this._matchLengthReference(conditionStatement) === null;
-                } else if (endIndex) {
+                } else if (endIndex > 0) {
                     isLoopConditionValid = this._isMultiLineLoopValid(
                         data,
                         index,
@@ -63,7 +63,7 @@ class LoopLengthConditionInitialization extends BaseRule {
                 if (isSingleLine) {
                     isLoopConditionValid =
                         this._matchLengthReference(fixedContent) === null;
-                } else if (endIndex) {
+                } else if (endIndex > 0) {
                     isLoopConditionValid = this._isMultiLineLoopValid(
                         data,
                         index,
@@ -82,7 +82,7 @@ class LoopLengthConditionInitialization extends BaseRule {
                 );
             }
 
-            if (!isSingleLine && endIndex) {
+            if (!isSingleLine && endIndex > 0) {
                 index = endIndex;
             }
         }
