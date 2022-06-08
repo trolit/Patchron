@@ -29,7 +29,7 @@ describe('invoke function', () => {
         nock.enableNetConnect();
     });
 
-    it('returns empty array on valid for loop condition statement', () => {
+    it('returns empty array on valid single-line for loop condition statement', () => {
         const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
             pepegaContext,
             {},
@@ -51,7 +51,7 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
-    it('returns review on invalid for loop condition statement', () => {
+    it('returns review on invalid single-line for loop condition statement', () => {
         const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
             pepegaContext,
             {},
@@ -74,7 +74,60 @@ describe('invoke function', () => {
         expect(result[0]).toHaveProperty('line', 6);
     });
 
-    it('returns empty array on valid while loop condition statement', () => {
+    it('returns empty array on valid multi-line for loop condition statement', () => {
+        const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
+            pepegaContext,
+            {},
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +6,15 @@`,
+                    `+const dataLength = data.length;`,
+                    `+for (`,
+                    `+    let index = 0, secondIndex = 1;`,
+                    `+    index == 5 ||`,
+                    `+    index < dataLength`,
+                    `+) {`,
+                    `+    const a = doSomething();`,
+                    `+    if (index === dataLength - 1) { break; }`,
+                    `+}`
+                ]
+            }
+        );
+
+        const result = fixedLoopLengthConditionRule.invoke();
+
+        expect(result).toEqual([]);
+    });
+
+    it('returns review on invalid multi-line for loop condition statement', () => {
+        const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
+            pepegaContext,
+            {},
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +6,15 @@`,
+                    `+for (`,
+                    `+    let index = 0, secondIndex = 1;`,
+                    `+    index == 5 ||`,
+                    `+    index < data.length`,
+                    `+) {`,
+                    `+    const a = doSomething();`,
+                    `+    if (index === dataLength - 1) { break; }`,
+                    `+}`
+                ]
+            }
+        );
+
+        const result = fixedLoopLengthConditionRule.invoke();
+
+        expect(result).toHaveLength(1);
+
+        expect(result[0]).toHaveProperty('line', 6);
+    });
+
+    it('returns empty array on valid single-line while loop condition statement', () => {
         const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
             pepegaContext,
             {},
@@ -96,7 +149,7 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
-    it('returns review on invalid while loop condition statement', () => {
+    it('returns review on invalid single-line while loop condition statement', () => {
         const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
             pepegaContext,
             {},
@@ -107,6 +160,57 @@ describe('invoke function', () => {
                     `+while (index < data.length) {`,
                     `+    const a = doSomething();`,
                     `+    if (index === data.length - 1) { break; }`,
+                    `+}`
+                ]
+            }
+        );
+
+        const result = fixedLoopLengthConditionRule.invoke();
+
+        expect(result).toHaveLength(1);
+
+        expect(result[0]).toHaveProperty('line', 6);
+    });
+
+    it('returns empty array on valid multi-line while loop condition statement', () => {
+        const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
+            pepegaContext,
+            {},
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +6,15 @@`,
+                    `+const dataLength = data.length;`,
+                    `+while (`,
+                    `+    index < dataLength ||`,
+                    `+    index === 0`,
+                    `+) {`,
+                    `+    const a = doSomething();`,
+                    `+    if (index === dataLength - 1) { break; }`,
+                    `+}`
+                ]
+            }
+        );
+
+        const result = fixedLoopLengthConditionRule.invoke();
+
+        expect(result).toEqual([]);
+    });
+
+    it('returns review on invalid multi-line while loop condition statement', () => {
+        const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
+            pepegaContext,
+            {},
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +6,15 @@`,
+                    `+while (`,
+                    `+    index === 0 ||`,
+                    `+    index < data.length`,
+                    `+) {`,
+                    `+    const a = doSomething();`,
+                    `+    if (index === dataLength - 1) { break; }`,
                     `+}`
                 ]
             }

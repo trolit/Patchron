@@ -107,10 +107,9 @@ class LoopLengthConditionInitialization extends BaseRule {
     }
 
     _isMultiLineLoopValid(data, index, endIndex, loopType) {
-        const endCondition = loopType === 'for' ? endIndex - 1 : endIndex;
         let localIndex = loopType === 'for' ? index + 2 : index + 1;
 
-        for (; localIndex < endCondition; localIndex++) {
+        for (; localIndex < endIndex; localIndex++) {
             const { trimmedContent } = data[localIndex];
 
             if (this._matchLengthReference(trimmedContent)) {
