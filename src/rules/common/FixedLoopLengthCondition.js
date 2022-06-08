@@ -2,6 +2,7 @@ const BaseRule = require('src/rules/Base');
 
 class LoopLengthConditionInitialization extends BaseRule {
     /**
+     * looks after `for`, `while`, `do while` loops and tests wheter condition statement includes reference to `length` property. If it does, line is commented out to not call `.length` in each iteration and declare variable before loop that will hold length.
      *
      * @param {PepegaContext} pepegaContext
      * @param {object} _
