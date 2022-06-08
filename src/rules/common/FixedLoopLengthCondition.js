@@ -110,7 +110,7 @@ class LoopLengthConditionInitialization extends BaseRule {
         const endCondition = loopType === 'for' ? endIndex - 1 : endIndex;
         let localIndex = loopType === 'for' ? index + 2 : index + 1;
 
-        for (; localIndex < endCondition; index++) {
+        for (; localIndex < endCondition; localIndex++) {
             const { trimmedContent } = data[localIndex];
 
             if (this._matchLengthReference(trimmedContent)) {
