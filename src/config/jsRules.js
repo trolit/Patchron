@@ -6,7 +6,8 @@ const {
         PositionedKeywordsRule,
         LineBreakBeforeReturnRule,
         ValueComparisionStyleRule,
-        KeywordsOrderedByLengthRule
+        KeywordsOrderedByLengthRule,
+        FixedLoopLengthConditionRule
     }
 } = require('src/rules');
 
@@ -22,6 +23,10 @@ module.exports = [
                 }
             ]
         }
+    },
+    {
+        enabled: false,
+        reference: FixedLoopLengthConditionRule
     },
     {
         enabled: false,
