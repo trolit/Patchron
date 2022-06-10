@@ -19,9 +19,7 @@ class LoopLengthConditionInitialization extends BaseRule {
 
         for (let index = 0; index < dataLength; index++) {
             const row = data[index];
-            let isSingleLine = false;
             const { trimmedContent } = row;
-            let isLoopConditionValid = true;
 
             const fixedContent = trimmedContent.startsWith('}')
                 ? trimmedContent.slice(1).trim()
@@ -31,50 +29,15 @@ class LoopLengthConditionInitialization extends BaseRule {
                 continue;
             }
 
-            const endIndex = this._findEndIndex(data, index);
+            let result = { isValid: true };
 
             if (fixedContent.startsWith('for')) {
-                isSingleLine = fixedContent.match(/for.*\(.*;.*;.*\)/);
-
-                if (isSingleLine) {
-                    const firstSemicolon = fixedContent.indexOf(';');
-                    const secondSemicolon = fixedContent.indexOf(
-                        ';',
-                        firstSemicolon + 1
-                    );
-
-                    const conditionStatement = fixedContent.slice(
-                        firstSemicolon,
-                        secondSemicolon + 1
-                    );
-
-                    isLoopConditionValid =
-                        this._matchLengthReference(conditionStatement) === null;
-                } else if (endIndex > 0) {
-                    isLoopConditionValid = this._isMultiLineLoopValid(
-                        data,
-                        index,
-                        endIndex,
-                        'for'
-                    );
-                }
+                result = this._validateForLoop(data, index, fixedContent);
             } else if (fixedContent.startsWith('while')) {
-                isSingleLine = fixedContent.match(/while.*\(.*\)/);
-
-                if (isSingleLine) {
-                    isLoopConditionValid =
-                        this._matchLengthReference(fixedContent) === null;
-                } else if (endIndex > 0) {
-                    isLoopConditionValid = this._isMultiLineLoopValid(
-                        data,
-                        index,
-                        endIndex,
-                        'while'
-                    );
-                }
+                result = this._validateWhileLoop(data, index, fixedContent);
             }
 
-            if (!isLoopConditionValid) {
+            if (result && !result.isValid) {
                 reviewComments.push(
                     this.getSingleLineComment({
                         body: this._getCommentBody(),
@@ -83,8 +46,8 @@ class LoopLengthConditionInitialization extends BaseRule {
                 );
             }
 
-            if (!isSingleLine && endIndex > 0) {
-                index = endIndex;
+            if (result?.lastIndex) {
+                index = result.lastIndex;
             }
         }
 
@@ -97,28 +60,88 @@ class LoopLengthConditionInitialization extends BaseRule {
         return statements.some((statement) => content.startsWith(statement));
     }
 
-    _findEndIndex(data, index) {
-        const slicedData = data.slice(index);
+    _validateForLoop(data, index, fixedContent) {
+        const isSingleLine = fixedContent.match(/for.*\(.*;.*;.*\)/);
 
-        const result = slicedData.find(({ trimmedContent }) =>
-            trimmedContent.startsWith(')')
-        );
+        if (isSingleLine) {
+            const firstSemicolon = fixedContent.indexOf(';');
+            const secondSemicolon = fixedContent.indexOf(
+                ';',
+                firstSemicolon + 1
+            );
 
-        return result?.index || -1;
+            const conditionStatement = fixedContent.slice(
+                firstSemicolon,
+                secondSemicolon + 1
+            );
+
+            return {
+                isValid: this._matchLengthReference(conditionStatement) === null
+            };
+        } else {
+            return this._isFragmentedLoopValid(data, index, 'for');
+        }
     }
 
-    _isMultiLineLoopValid(data, index, endIndex, loopType) {
-        let localIndex = loopType === 'for' ? index + 2 : index + 1;
+    _validateWhileLoop(data, index, fixedContent) {
+        const isSingleLine = fixedContent.match(/while.*\(.*\)/);
 
-        for (; localIndex < endIndex; localIndex++) {
-            const { trimmedContent } = data[localIndex];
+        if (isSingleLine) {
+            return {
+                isValid: this._matchLengthReference(fixedContent) === null
+            };
+        } else {
+            return this._isFragmentedLoopValid(data, index, 'while');
+        }
+    }
 
-            if (this._matchLengthReference(trimmedContent)) {
-                return false;
+    _isFragmentedLoopValid(data, index, loopType) {
+        let isValid = true;
+        let lastIndex = index;
+        const dataLength = data.length;
+
+        const nextRowIndex =
+            loopType === 'for'
+                ? this._findForLoopConditionStatement(data, index)
+                : index + 1;
+
+        if (nextRowIndex > dataLength || nextRowIndex < 0) {
+            return null;
+        }
+
+        const { indentation } = data[nextRowIndex];
+
+        for (
+            lastIndex = nextRowIndex + 1;
+            lastIndex < dataLength;
+            lastIndex++
+        ) {
+            const row = data[lastIndex];
+
+            if (row.indentation !== indentation) {
+                break;
+            }
+
+            if (this._matchLengthReference(row.trimmedContent)) {
+                isValid = false;
+
+                break;
             }
         }
 
-        return true;
+        return {
+            isValid,
+            lastIndex
+        };
+    }
+
+    _findForLoopConditionStatement(data, startIndex) {
+        const conditionStatementIndex = data.findIndex(
+            ({ trimmedContent, index: rowIndex }) =>
+                rowIndex > startIndex && trimmedContent.endsWith(';')
+        );
+
+        return conditionStatementIndex > 0 ? conditionStatementIndex + 1 : -1;
     }
 
     _matchLengthReference(content) {
@@ -129,7 +152,7 @@ class LoopLengthConditionInitialization extends BaseRule {
      * @returns {string}
      */
     _getCommentBody() {
-        return `TBA`;
+        return `It seems that \`.length\` property is initialized in condition statement. Please initialize it before loop.`;
     }
 }
 
