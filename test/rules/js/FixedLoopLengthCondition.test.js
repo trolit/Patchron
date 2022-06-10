@@ -128,7 +128,7 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
-    it('returns empty array on insufficient part of multi-line for loop', () => {
+    it('returns empty array on valid multi-line for loop fragment', () => {
         const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
             pepegaContext,
             {},
@@ -301,7 +301,7 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
-    it('returns empty array on insufficient part of multi-line while loop', () => {
+    it('returns empty array on valid multi-line while loop fragment', () => {
         const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
             pepegaContext,
             {},
