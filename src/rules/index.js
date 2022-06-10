@@ -6,6 +6,7 @@ const PositionedKeywordsRule = require('./common/PositionedKeywords');
 const LineBreakBeforeReturnRule = require('./common/LineBreakBeforeReturn');
 const ValueComparisionStyleRule = require('./common/ValueComparisionStyle');
 const KeywordsOrderedByLengthRule = require('./common/KeywordsOrderedByLength');
+const FixedLoopLengthConditionRule = require('./common/FixedLoopLengthCondition');
 
 const DirectImportRule = require('./js/DirectImport');
 
@@ -16,7 +17,8 @@ module.exports = {
         PositionedKeywordsRule,
         LineBreakBeforeReturnRule,
         ValueComparisionStyleRule,
-        KeywordsOrderedByLengthRule
+        KeywordsOrderedByLengthRule,
+        FixedLoopLengthConditionRule
     },
     pull: {
         StrictWorkflowRule

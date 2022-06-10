@@ -6,7 +6,8 @@ const {
         PositionedKeywordsRule,
         LineBreakBeforeReturnRule,
         ValueComparisionStyleRule,
-        KeywordsOrderedByLengthRule
+        KeywordsOrderedByLengthRule,
+        FixedLoopLengthConditionRule
     }
 } = require('src/rules');
 
@@ -21,6 +22,13 @@ module.exports = [
                     expression: /[(|'|"]lodash[)|'|"]/
                 }
             ]
+        }
+    },
+    {
+        enabled: false,
+        reference: FixedLoopLengthConditionRule,
+        config: {
+            expression: /(\w+).length/
         }
     },
     {
