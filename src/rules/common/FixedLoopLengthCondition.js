@@ -2,9 +2,9 @@
 
 const BaseRule = require('src/rules/Base');
 
-class LoopLengthConditionInitialization extends BaseRule {
+class FixedLoopLengthCondition extends BaseRule {
     /**
-     * looks after `for`, `while`, `do while` loops and tests wheter condition statement includes reference to `length` property. If it does, line is commented out to not call `.length` in each iteration and declare variable before loop that will hold length.
+     * looks after `for`, `while`, `do while` loops and tests wheter condition statement includes reference to `length` property. If it does, line is commented out to not call `.length` in each iteration and suggests to declare variable before loop that will hold length. Length regular expressions is specifed via rule's config.
      *
      * @param {PepegaContext} pepegaContext
      * @param {FixedLoopLengthConditionConfig} config
@@ -162,4 +162,4 @@ class LoopLengthConditionInitialization extends BaseRule {
     }
 }
 
-module.exports = LoopLengthConditionInitialization;
+module.exports = FixedLoopLengthCondition;
