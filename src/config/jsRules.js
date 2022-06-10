@@ -26,7 +26,10 @@ module.exports = [
     },
     {
         enabled: false,
-        reference: FixedLoopLengthConditionRule
+        reference: FixedLoopLengthConditionRule,
+        config: {
+            expression: /(\w+).length/
+        }
     },
     {
         enabled: false,

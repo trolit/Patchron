@@ -1,3 +1,5 @@
+/// <reference path="../../config/type-definitions/rules/common/FixedLoopLengthCondition.js" />
+
 const BaseRule = require('src/rules/Base');
 
 class LoopLengthConditionInitialization extends BaseRule {
@@ -5,11 +7,15 @@ class LoopLengthConditionInitialization extends BaseRule {
      * looks after `for`, `while`, `do while` loops and tests wheter condition statement includes reference to `length` property. If it does, line is commented out to not call `.length` in each iteration and declare variable before loop that will hold length.
      *
      * @param {PepegaContext} pepegaContext
-     * @param {object} _
+     * @param {FixedLoopLengthConditionConfig} config
      * @param {Patch} file
      */
-    constructor(pepegaContext, _, file) {
+    constructor(pepegaContext, config, file) {
         super(pepegaContext, file);
+
+        const { expression } = config;
+
+        this.expression = expression;
     }
 
     invoke() {
@@ -145,7 +151,7 @@ class LoopLengthConditionInitialization extends BaseRule {
     }
 
     _matchLengthReference(content) {
-        return content.match(/(\w+).length/);
+        return content.match(this.expression);
     }
 
     /**
