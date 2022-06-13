@@ -10,6 +10,8 @@ const FixedLoopLengthConditionRule = require('./common/FixedLoopLengthCondition'
 
 const DirectImportRule = require('./js/DirectImport');
 
+const ImportWithoutExtensionRule = require('./vue/ImportWithoutExtension');
+
 module.exports = {
     common: {
         MarkedCommentsRule,
@@ -20,10 +22,16 @@ module.exports = {
         KeywordsOrderedByLengthRule,
         FixedLoopLengthConditionRule
     },
+
     pull: {
         StrictWorkflowRule
     },
+
     js: {
         DirectImportRule
+    },
+
+    vue: {
+        ImportWithoutExtensionRule
     }
 };

@@ -1,5 +1,6 @@
 const {
-    common: { PositionedKeywordsRule }
+    common: { PositionedKeywordsRule },
+    vue: { ImportWithoutExtensionRule }
 } = require('src/rules');
 
 module.exports = [
@@ -40,5 +41,10 @@ module.exports = [
                 }
             ]
         }
+    },
+    {
+        enabled: false,
+        reference: ImportWithoutExtensionRule,
+        config: {}
     }
 ];
