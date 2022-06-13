@@ -9,8 +9,7 @@ const KeywordsOrderedByLengthRule = require('./common/KeywordsOrderedByLength');
 const FixedLoopLengthConditionRule = require('./common/FixedLoopLengthCondition');
 
 const DirectImportRule = require('./js/DirectImport');
-
-const ImportWithoutExtensionRule = require('./vue/ImportWithoutExtension');
+const ImportWithoutExtensionRule = require('./js/ImportWithoutExtension');
 
 module.exports = {
     common: {
@@ -28,10 +27,7 @@ module.exports = {
     },
 
     js: {
-        DirectImportRule
-    },
-
-    vue: {
+        DirectImportRule,
         ImportWithoutExtensionRule
     }
 };
