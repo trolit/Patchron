@@ -45,6 +45,8 @@ module.exports = [
     {
         enabled: false,
         reference: ImportWithoutExtensionRule,
-        config: {}
+        config: {
+            type: 'module'
+        }
     }
 ];
