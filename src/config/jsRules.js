@@ -8,7 +8,8 @@ const {
         ValueComparisionStyleRule,
         KeywordsOrderedByLengthRule,
         FixedLoopLengthConditionRule
-    }
+    },
+    js: { ImportWithoutExtensionRule }
 } = require('src/rules');
 
 module.exports = [
@@ -149,5 +150,12 @@ module.exports = [
     {
         enabled: false,
         reference: LineBreakBeforeReturnRule
+    },
+    {
+        enabled: false,
+        reference: ImportWithoutExtensionRule,
+        config: {
+            type: 'commonjs'
+        }
     }
 ];
