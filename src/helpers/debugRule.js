@@ -4,10 +4,11 @@
 
 /* eslint-disable no-console */
 
-const { pull, common, js } = require('src/rules');
+const { pull, common, js, vue } = require('src/rules');
 
 const rules = {
     ...js,
+    ...vue,
     ...pull,
     ...common
 };

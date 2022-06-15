@@ -11,6 +11,8 @@ const FixedLoopLengthConditionRule = require('./common/FixedLoopLengthCondition'
 const DirectImportRule = require('./js/DirectImport');
 const ImportWithoutExtensionRule = require('./js/ImportWithoutExtension');
 
+const PredefinedEventHandlerPrefixRule = require('./vue/PredefinedEventHandlerPrefix');
+
 module.exports = {
     common: {
         MarkedCommentsRule,
@@ -29,5 +31,9 @@ module.exports = {
     js: {
         DirectImportRule,
         ImportWithoutExtensionRule
+    },
+
+    vue: {
+        PredefinedEventHandlerPrefixRule
     }
 };
