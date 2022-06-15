@@ -1,6 +1,6 @@
 const {
     common: { PositionedKeywordsRule },
-    vue: { ImportWithoutExtensionRule }
+    js: { ImportWithoutExtensionRule }
 } = require('src/rules');
 
 module.exports = [
