@@ -1,3 +1,5 @@
+/// <reference path="../../config/type-definitions/rules/js/ImplicitIndexFileImport.js" />
+
 const BaseRule = require('src/rules/Base');
 
 class ImplicitIndexFileImportRule extends BaseRule {
@@ -46,13 +48,49 @@ class ImplicitIndexFileImportRule extends BaseRule {
         return reviewComments;
     }
 
-    _reviewData(data, expression) {}
+    _reviewData(data, expression) {
+        const reviewComments = [];
+        const dataLength = data.length;
+
+        for (let index = 0; index < dataLength; index++) {
+            const row = data[index];
+            const { trimmedContent } = row;
+
+            if (
+                trimmedContent.startsWith('@@') ||
+                this.CUSTOM_LINES.includes(trimmedContent)
+            ) {
+                continue;
+            }
+
+            const matchResult = trimmedContent.match(expression);
+
+            if (!matchResult) {
+                continue;
+            }
+
+            const matchedFragment = matchResult[0];
+
+            if (matchedFragment.includes('index')) {
+                reviewComments.push(
+                    this.getSingleLineComment({
+                        body: this._getCommentBody(),
+                        index
+                    })
+                );
+            }
+        }
+
+        return reviewComments;
+    }
 
     /**
      * @returns {string}
      */
     _getCommentBody() {
-        return `TBA`;
+        return `Please do not reference file named index explicitly in ${
+            this.type === this.MODULE ? 'import' : 'require'
+        }.`;
     }
 }
 
