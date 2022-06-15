@@ -44,7 +44,7 @@ describe('invoke function', () => {
                     `+    state,`,
                     `+    constants`,
                     `+} from 'src/utilities'`,
-                    `+import ReviewBuilder from 'src/review/Builder'`,
+                    `+import ReviewBuilder from './review/Builder'`,
                     `+import calculateReviewScore from 'src/helpers/calculateReviewScore'`
                 ]
             }
@@ -67,7 +67,7 @@ describe('invoke function', () => {
                     `+    state,`,
                     `+    constants`,
                     `+} from 'src/utilities'`,
-                    `+import ReviewBuilder from 'src/review/Builder'`,
+                    `+import ReviewBuilder from './review/Builder'`,
                     `+import calculateReviewScore from 'src/helpers/calculateReviewScore.js'`
                 ]
             }
@@ -92,7 +92,7 @@ describe('invoke function', () => {
                     `+    state,`,
                     `+    constants`,
                     `+} = require('src/utilities');`,
-                    `+const ReviewBuilder = require('src/review/Builder');`,
+                    `+const ReviewBuilder = require('./review/Builder');`,
                     `+const calculateReviewScore = require('src/helpers/calculateReviewScore');`
                 ]
             }
@@ -115,7 +115,7 @@ describe('invoke function', () => {
                     `+    state,`,
                     `+    constants`,
                     `+} = require('src/utilities');`,
-                    `+const ReviewBuilder = require('src/review/Builder');`,
+                    `+const ReviewBuilder = require('./review/Builder');`,
                     `+const calculateReviewScore = require('src/helpers/calculateReviewScore.js');`
                 ]
             }

@@ -70,9 +70,11 @@ class ImportWithoutExtensionRule extends BaseRule {
             }
 
             const matchedFragment = matchResult[0];
-            const splitMatchedFragment = matchedFragment.split('.');
+            const splitMatchedFragment = matchedFragment.split('/');
 
-            if (splitMatchedFragment.length > 1) {
+            const fileReference = splitMatchedFragment.pop();
+
+            if (fileReference.includes('.')) {
                 reviewComments.push(
                     this.getSingleLineComment({
                         body: this._getCommentBody(),
