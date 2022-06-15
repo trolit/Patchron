@@ -5,6 +5,10 @@ const BaseRule = require('src/rules/Base');
 
 class NormalizedEventHandlerRule extends BaseRule {
     /**
+     * Allows to define expected Vue event handler declaration
+     *
+     * {@link https://vuejs.org/guide/essentials/event-handling.html#key-modifiers}
+     *
      * @param {PepegaContext} pepegaContext
      * @param {NormalizedEventHandlerConfig} config
      * @param {Patch} file
