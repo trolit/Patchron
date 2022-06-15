@@ -88,7 +88,7 @@ class ImplicitIndexFileImportRule extends BaseRule {
      * @returns {string}
      */
     _getCommentBody() {
-        return `Please do not reference file named index explicitly in ${
+        return `Please do not reference file named \`index\` explicitly in ${
             this.type === this.MODULE ? 'import' : 'require'
         }.`;
     }
