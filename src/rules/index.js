@@ -10,6 +10,7 @@ const FixedLoopLengthConditionRule = require('./common/FixedLoopLengthCondition'
 
 const DirectImportRule = require('./js/DirectImport');
 const ImportWithoutExtensionRule = require('./js/ImportWithoutExtension');
+const ImplicitIndexFileImportRule = require('./js/ImplicitIndexFileImport');
 
 const PredefinedEventHandlerPrefixRule = require('./vue/PredefinedEventHandlerPrefix');
 
@@ -30,7 +31,8 @@ module.exports = {
 
     js: {
         DirectImportRule,
-        ImportWithoutExtensionRule
+        ImportWithoutExtensionRule,
+        ImplicitIndexFileImportRule
     },
 
     vue: {

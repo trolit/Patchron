@@ -1,3 +1,4 @@
+/// <reference path="../../config/type-definitions/common.js" />
 /// <reference path="../../config/type-definitions/rules/common/MarkedComments.js" />
 
 const BaseRule = require('src/rules/Base');
