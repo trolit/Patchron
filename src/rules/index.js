@@ -12,6 +12,8 @@ const DirectImportRule = require('./js/DirectImport');
 const ImportWithoutExtensionRule = require('./js/ImportWithoutExtension');
 const ImplicitIndexFileImportRule = require('./js/ImplicitIndexFileImport');
 
+const NormalizedEventHandlerRule = require('./vue/NormalizedEventHandler');
+
 module.exports = {
     common: {
         MarkedCommentsRule,
@@ -31,5 +33,9 @@ module.exports = {
         DirectImportRule,
         ImportWithoutExtensionRule,
         ImplicitIndexFileImportRule
+    },
+
+    vue: {
+        NormalizedEventHandlerRule
     }
 };
