@@ -9,6 +9,7 @@ const KeywordsOrderedByLengthRule = require('./common/KeywordsOrderedByLength');
 const FixedLoopLengthConditionRule = require('./common/FixedLoopLengthCondition');
 
 const DirectImportRule = require('./js/DirectImport');
+const ImportWithoutExtensionRule = require('./js/ImportWithoutExtension');
 
 module.exports = {
     common: {
@@ -20,10 +21,13 @@ module.exports = {
         KeywordsOrderedByLengthRule,
         FixedLoopLengthConditionRule
     },
+
     pull: {
         StrictWorkflowRule
     },
+
     js: {
-        DirectImportRule
+        DirectImportRule,
+        ImportWithoutExtensionRule
     }
 };

@@ -8,7 +8,8 @@ const {
         ValueComparisionStyleRule,
         KeywordsOrderedByLengthRule,
         FixedLoopLengthConditionRule
-    }
+    },
+    js: { ImportWithoutExtensionRule }
 } = require('src/rules');
 
 module.exports = [
@@ -19,7 +20,7 @@ module.exports = [
             packages: [
                 {
                     name: 'lodash',
-                    expression: /[(|'|"]lodash[)|'|"]/
+                    expression: /[(|'|"|`]lodash[)|'|"|`]/
                 }
             ]
         }
@@ -149,5 +150,12 @@ module.exports = [
     {
         enabled: false,
         reference: LineBreakBeforeReturnRule
+    },
+    {
+        enabled: false,
+        reference: ImportWithoutExtensionRule,
+        config: {
+            type: 'commonjs'
+        }
     }
 ];

@@ -1,5 +1,6 @@
 const {
-    common: { PositionedKeywordsRule }
+    common: { PositionedKeywordsRule },
+    js: { ImportWithoutExtensionRule }
 } = require('src/rules');
 
 module.exports = [
@@ -39,6 +40,13 @@ module.exports = [
                     ]
                 }
             ]
+        }
+    },
+    {
+        enabled: false,
+        reference: ImportWithoutExtensionRule,
+        config: {
+            type: 'module'
         }
     }
 ];
