@@ -1,12 +1,12 @@
 /// <reference path="../../config/type-definitions/common.js" />
-/// <reference path="../../config/type-definitions/rules/js/ImportWithoutExtension.js" />
+/// <reference path="../../config/type-definitions/rules/js/ImplicitIndexFileImport.js" />
 
 const BaseRule = require('src/rules/Base');
 
-class ImportWithoutExtensionRule extends BaseRule {
+class ImplicitIndexFileImportRule extends BaseRule {
     /**
      * @param {PepegaContext} pepegaContext
-     * @param {ImportWithoutExtensionConfig} config
+     * @param {ImplicitIndexFileImportConfig} config
      * @param {Patch} file
      */
     constructor(pepegaContext, config, file) {
@@ -71,11 +71,8 @@ class ImportWithoutExtensionRule extends BaseRule {
             }
 
             const matchedFragment = matchResult[0];
-            const splitMatchedFragment = matchedFragment.split('/');
 
-            const fileReference = splitMatchedFragment.pop();
-
-            if (fileReference.includes('.')) {
+            if (matchedFragment.includes('index')) {
                 reviewComments.push(
                     this.getSingleLineComment({
                         body: this._getCommentBody(),
@@ -92,10 +89,10 @@ class ImportWithoutExtensionRule extends BaseRule {
      * @returns {string}
      */
     _getCommentBody() {
-        return `Please, remove extension from marked ${
+        return `Please **do not** reference file named \`index\` explicitly in ${
             this.type === this.MODULE ? 'import' : 'require'
         }.`;
     }
 }
 
-module.exports = ImportWithoutExtensionRule;
+module.exports = ImplicitIndexFileImportRule;
