@@ -2,7 +2,7 @@
 
 const BaseRule = require('src/rules/Base');
 
-class PredefinedEventHandlerPrefixRule extends BaseRule {
+class NormalizedEventHandlerRule extends BaseRule {
     /**
      * @param {PepegaContext} pepegaContext
      * @param {ImportWithoutExtensionConfig} config
@@ -95,4 +95,4 @@ class PredefinedEventHandlerPrefixRule extends BaseRule {
     }
 }
 
-module.exports = PredefinedEventHandlerPrefixRule;
+module.exports = NormalizedEventHandlerRule;

@@ -12,7 +12,7 @@ const DirectImportRule = require('./js/DirectImport');
 const ImportWithoutExtensionRule = require('./js/ImportWithoutExtension');
 const ImplicitIndexFileImportRule = require('./js/ImplicitIndexFileImport');
 
-const PredefinedEventHandlerPrefixRule = require('./vue/PredefinedEventHandlerPrefix');
+const NormalizedEventHandlerRule = require('./vue/NormalizedEventHandler');
 
 module.exports = {
     common: {
@@ -36,6 +36,6 @@ module.exports = {
     },
 
     vue: {
-        PredefinedEventHandlerPrefixRule
+        NormalizedEventHandlerRule
     }
 };
