@@ -5,7 +5,7 @@ const BaseRule = require('src/rules/Base');
 class ImplicitIndexFileImportRule extends BaseRule {
     /**
      * @param {PepegaContext} pepegaContext
-     * @param {object} config
+     * @param {ImplicitIndexFileImportConfig} config
      * @param {Patch} file
      */
     constructor(pepegaContext, config, file) {
