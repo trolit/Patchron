@@ -44,7 +44,8 @@ describe('invoke function', () => {
                     `+    state,`,
                     `+    constants`,
                     `+} from 'src/utilities'`,
-                    `+import ReviewBuilder from './review/Builder'`,
+                    `+import ReviewBuilder from '../review/Builder'`,
+                    `+import ReviewValidator from '../review/Validator'`,
                     `+import calculateReviewScore from 'src/helpers/calculateReviewScore'`
                 ]
             }
@@ -68,6 +69,7 @@ describe('invoke function', () => {
                     `+    constants`,
                     `+} from 'src/utilities'`,
                     `+import ReviewBuilder from './review/Builder'`,
+                    `+import ReviewValidator from '../review/Validator.js'`,
                     `+import calculateReviewScore from 'src/helpers/calculateReviewScore.js'`
                 ]
             }
@@ -75,9 +77,11 @@ describe('invoke function', () => {
 
         const result = importWithoutExtensionRule.invoke();
 
-        expect(result).toHaveLength(1);
+        expect(result).toHaveLength(2);
 
         expect(result[0]).toHaveProperty('line', 15);
+
+        expect(result[1]).toHaveProperty('line', 16);
     });
 
     it('returns empty array on valid imports (commonJS module)', () => {
@@ -93,6 +97,7 @@ describe('invoke function', () => {
                     `+    constants`,
                     `+} = require('src/utilities');`,
                     `+const ReviewBuilder = require('./review/Builder');`,
+                    `+const ReviewValidator = require('../review/Validator');`,
                     `+const calculateReviewScore = require('src/helpers/calculateReviewScore');`
                 ]
             }
@@ -116,6 +121,7 @@ describe('invoke function', () => {
                     `+    constants`,
                     `+} = require('src/utilities');`,
                     `+const ReviewBuilder = require('./review/Builder');`,
+                    `+const ReviewValidator = require('../review/Validator.js');`,
                     `+const calculateReviewScore = require('src/helpers/calculateReviewScore.js');`
                 ]
             }
@@ -123,8 +129,10 @@ describe('invoke function', () => {
 
         const result = importWithoutExtensionRule.invoke();
 
-        expect(result).toHaveLength(1);
+        expect(result).toHaveLength(2);
 
         expect(result[0]).toHaveProperty('line', 15);
+
+        expect(result[1]).toHaveProperty('line', 16);
     });
 });
