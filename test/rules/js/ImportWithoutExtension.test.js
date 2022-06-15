@@ -68,7 +68,7 @@ describe('invoke function', () => {
                     `+    constants`,
                     `+} from 'src/utilities'`,
                     `+import ReviewBuilder from 'src/review/Builder'`,
-                    `+import calculateReviewScore from 'src/helpers/calculateReviewScore'`
+                    `+import calculateReviewScore from 'src/helpers/calculateReviewScore.js'`
                 ]
             }
         );

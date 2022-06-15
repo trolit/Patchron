@@ -16,7 +16,75 @@ class ImportWithoutExtensionRule extends BaseRule {
         this.type = type;
     }
 
-    invoke() {}
+    invoke() {
+        if (!['module', 'commonjs'].includes(this.type)) {
+            this.log.warning(
+                __filename,
+                'Unrecognized type in rule configuration',
+                this.file
+            );
+
+            return [];
+        }
+
+        const { splitPatch } = this.file;
+        const data = this.setupData(splitPatch);
+
+        const reviewComments = this._reviewData(
+            data,
+            this.type === 'module'
+                ? /from.*[(|'|"|`].*[)|'|"|`]/
+                : /require.*\(.*\)/
+        );
+
+        return reviewComments;
+    }
+
+    _reviewData(data, expression) {
+        const reviewComments = [];
+        const dataLength = data.length;
+
+        for (let index = 0; index < dataLength; index++) {
+            const row = data[index];
+            const { trimmedContent } = row;
+
+            if (
+                trimmedContent.startsWith('@@') ||
+                this.CUSTOM_LINES.includes(trimmedContent)
+            ) {
+                continue;
+            }
+
+            const matchResult = trimmedContent.match(expression);
+
+            if (!matchResult) {
+                continue;
+            }
+
+            const matchedFragment = matchResult[0];
+            const splitMatchedFragment = matchedFragment.split('.');
+
+            if (splitMatchedFragment.length > 1) {
+                reviewComments.push(
+                    this.getSingleLineComment({
+                        body: this._getCommentBody(),
+                        index
+                    })
+                );
+            }
+        }
+
+        return reviewComments;
+    }
+
+    /**
+     * @returns {string}
+     */
+    _getCommentBody() {
+        return `Please, remove extension from marked ${
+            this.type === 'module' ? 'import' : 'require'
+        }.`;
+    }
 }
 
 module.exports = ImportWithoutExtensionRule;
