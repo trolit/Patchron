@@ -10,6 +10,7 @@ const FixedLoopLengthConditionRule = require('./common/FixedLoopLengthCondition'
 
 const DirectImportRule = require('./js/DirectImport');
 const ImportWithoutExtensionRule = require('./js/ImportWithoutExtension');
+const ImplicitIndexFileImportRule = require('./js/ImplicitIndexFileImport');
 
 module.exports = {
     common: {
@@ -28,6 +29,7 @@ module.exports = {
 
     js: {
         DirectImportRule,
-        ImportWithoutExtensionRule
+        ImportWithoutExtensionRule,
+        ImplicitIndexFileImportRule
     }
 };
