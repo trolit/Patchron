@@ -14,7 +14,8 @@ const setupApp = require('test/rules/helpers/setupApp');
 const initializeFile = require('test/rules/helpers/initializeFile');
 
 const config = {
-    prefix: 'on'
+    prefix: 'on',
+    noUnnecessaryBraces: true
 };
 
 describe('invoke function', () => {
@@ -73,6 +74,67 @@ describe('invoke function', () => {
                     `+    <my-custom-component`,
                     `+        @click="clickHandler"`,
                     `+        v-on:click="clickHandler"`,
+                    `+        @keyup.s="$emit('test1')"`,
+                    `+        @keyup.enter="someBoolean = true"`,
+                    `+        @keyup.w="someString = 'someValue'"`,
+                    `+    />`,
+                    `+</div>`
+                ]
+            }
+        );
+
+        const result = normalizedEventHandlerRule.invoke();
+
+        expect(result).toHaveLength(2);
+
+        expect(result[0]).toHaveProperty('line', 8);
+
+        expect(result[1]).toHaveProperty('line', 9);
+    });
+
+    it('returns empty array when noUnnecessaryBraces = false', () => {
+        const normalizedEventHandlerRule = new NormalizedEventHandlerRule(
+            pepegaContext,
+            {
+                ...config,
+                noUnnecessaryBraces: false
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    `+<template>`,
+                    `+<div>`,
+                    `+    <my-custom-component`,
+                    `+        @click="onClick()"`,
+                    `+        v-on:click="onClick($event)"`,
+                    `+        @keyup.s="$emit('test1')"`,
+                    `+        @keyup.enter="someBoolean = true"`,
+                    `+        @keyup.w="someString = 'someValue'"`,
+                    `+    />`,
+                    `+</div>`
+                ]
+            }
+        );
+
+        const result = normalizedEventHandlerRule.invoke();
+
+        expect(result).toEqual([]);
+    });
+
+    it('returns review when noUnnecessaryBraces = true', () => {
+        const normalizedEventHandlerRule = new NormalizedEventHandlerRule(
+            pepegaContext,
+            config,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    `+<template>`,
+                    `+<div>`,
+                    `+    <my-custom-component`,
+                    `+        @click="onClick()"`,
+                    `+        v-on:click="onClick($event)"`,
                     `+        @keyup.s="$emit('test1')"`,
                     `+        @keyup.enter="someBoolean = true"`,
                     `+        @keyup.w="someString = 'someValue'"`,

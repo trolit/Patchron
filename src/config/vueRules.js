@@ -1,6 +1,7 @@
 const {
     common: { PositionedKeywordsRule },
-    js: { ImportWithoutExtensionRule }
+    js: { ImportWithoutExtensionRule },
+    vue: { NormalizedEventHandlerRule }
 } = require('src/rules');
 
 module.exports = [
@@ -47,6 +48,14 @@ module.exports = [
         reference: ImportWithoutExtensionRule,
         config: {
             type: 'module'
+        }
+    },
+    {
+        enabled: false,
+        reference: NormalizedEventHandlerRule,
+        config: {
+            prefix: 'on',
+            noUnnecessaryBraces: true
         }
     }
 ];
