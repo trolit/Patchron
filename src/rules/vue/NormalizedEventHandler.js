@@ -1,36 +1,29 @@
-/// <reference path="../../config/type-definitions/rules/js/ImportWithoutExtension.js" />
+/// <reference path="../../config/type-definitions/common.js" />
+/// <reference path="../../config/type-definitions/rules/vue/NormalizedEventHandler.js" />
 
 const BaseRule = require('src/rules/Base');
 
 class NormalizedEventHandlerRule extends BaseRule {
     /**
      * @param {PepegaContext} pepegaContext
-     * @param {ImportWithoutExtensionConfig} config
+     * @param {NormalizedEventHandlerConfig} config
      * @param {Patch} file
      */
     constructor(pepegaContext, config, file) {
         super(pepegaContext, file);
 
-        const { type } = config;
+        const { prefix, noUnnecessaryBraces } = config;
 
-        this.type = type;
+        this.prefix = prefix;
+        this.noUnnecessaryBraces = noUnnecessaryBraces;
 
-        const MODULE = 'module';
-        const COMMONJS = 'commonjs';
-
-        this.MODULE = MODULE;
-        this.COMMONJS = COMMONJS;
-
-        this.availableTypes = [MODULE, COMMONJS];
+        this.SHORTHAND_EVENT_EXPRESSION = /@click="(.*)"/;
+        this.LONGHAND_EVENT_EXPRESSION = /v-on:click="(.*)"/;
     }
 
     invoke() {
-        if (!this.availableTypes.includes(this.type)) {
-            this.log.warning(
-                __filename,
-                'Unrecognized type in rule configuration',
-                this.file
-            );
+        if (!this.prefix && !this.noUnnecessaryBraces) {
+            this.log.warning(__filename, 'Rule has no effect.', this.file);
 
             return [];
         }
@@ -38,17 +31,12 @@ class NormalizedEventHandlerRule extends BaseRule {
         const { splitPatch } = this.file;
         const data = this.setupData(splitPatch);
 
-        const reviewComments = this._reviewData(
-            data,
-            this.type === this.MODULE
-                ? /from.*[(|'|"|`].*[)|'|"|`]/
-                : /require.*\(.*\)/
-        );
+        const reviewComments = this._reviewData(data);
 
         return reviewComments;
     }
 
-    _reviewData(data, expression) {
+    _reviewData(data) {
         const reviewComments = [];
         const dataLength = data.length;
 
@@ -63,21 +51,35 @@ class NormalizedEventHandlerRule extends BaseRule {
                 continue;
             }
 
-            const matchResult = trimmedContent.match(expression);
+            const matchResult =
+                trimmedContent.match(this.SHORTHAND_EVENT_EXPRESSION) ||
+                trimmedContent.match(this.LONGHAND_EVENT_EXPRESSION);
 
             if (!matchResult) {
                 continue;
             }
 
-            const matchedFragment = matchResult[0];
-            const splitMatchedFragment = matchedFragment.split('/');
+            const eventHandler = matchResult[1];
 
-            const fileReference = splitMatchedFragment.pop();
+            if (eventHandler.includes('=') || eventHandler.startsWith('$')) {
+                continue;
+            }
 
-            if (fileReference.includes('.')) {
+            const result = {
+                isWithPrefix: this.prefix
+                    ? eventHandler.startsWith(this.prefix)
+                    : true,
+
+                hasNoUnnecessaryBraces: this.noUnnecessaryBraces
+                    ? trimmedContent.includes('()') ||
+                      trimmedContent.includes('($event)')
+                    : false
+            };
+
+            if (!result.isWithPrefix || result.hasNoUnnecessaryBraces) {
                 reviewComments.push(
                     this.getSingleLineComment({
-                        body: this._getCommentBody(),
+                        body: this._getCommentBody(result),
                         index
                     })
                 );
@@ -90,8 +92,18 @@ class NormalizedEventHandlerRule extends BaseRule {
     /**
      * @returns {string}
      */
-    _getCommentBody() {
-        return `TBA`;
+    _getCommentBody(result) {
+        return `Please 
+        ${
+            this.prefix && !result.isWithPrefix
+                ? `, start event handler name with \`${this.prefix}\` prefix `
+                : ''
+        } 
+        ${
+            this.hasNoUnnecessaryBraces && !result.hasNoUnnecessaryBraces
+                ? ', remove unnecessary braces.'
+                : ''
+        }`;
     }
 }
 
