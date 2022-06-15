@@ -8,7 +8,7 @@ const {
 } = require('@jest/globals');
 
 const {
-    vue: { PredefinedEventHandlerPrefixRule }
+    vue: { NormalizedEventHandlerRule }
 } = require('src/rules');
 const setupApp = require('test/rules/helpers/setupApp');
 const initializeFile = require('test/rules/helpers/initializeFile');
@@ -34,8 +34,10 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid event handlers /on/ prefixes', () => {
-        const predefinedEventHandlerPrefixRule =
-            new PredefinedEventHandlerPrefixRule(pepegaContext, config, {
+        const normalizedEventHandlerRule = new NormalizedEventHandlerRule(
+            pepegaContext,
+            config,
+            {
                 ...file,
                 splitPatch: [
                     `@@ -10,13 +5,7 @@`,
@@ -50,16 +52,19 @@ describe('invoke function', () => {
                     `+    />`,
                     `+</div>`
                 ]
-            });
+            }
+        );
 
-        const result = predefinedEventHandlerPrefixRule.invoke();
+        const result = normalizedEventHandlerRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on missing event handlers /on/ prefixes', () => {
-        const predefinedEventHandlerPrefixRule =
-            new PredefinedEventHandlerPrefixRule(pepegaContext, config, {
+        const normalizedEventHandlerRule = new NormalizedEventHandlerRule(
+            pepegaContext,
+            config,
+            {
                 ...file,
                 splitPatch: [
                     `@@ -10,13 +5,7 @@`,
@@ -74,9 +79,10 @@ describe('invoke function', () => {
                     `+    />`,
                     `+</div>`
                 ]
-            });
+            }
+        );
 
-        const result = predefinedEventHandlerPrefixRule.invoke();
+        const result = normalizedEventHandlerRule.invoke();
 
         expect(result).toHaveLength(2);
 
