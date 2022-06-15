@@ -14,10 +14,18 @@ class ImportWithoutExtensionRule extends BaseRule {
         const { type } = config;
 
         this.type = type;
+
+        const MODULE = 'module';
+        const COMMONJS = 'commonjs';
+
+        this.MODULE = MODULE;
+        this.COMMONJS = COMMONJS;
+
+        this.availableTypes = [MODULE, COMMONJS];
     }
 
     invoke() {
-        if (!['module', 'commonjs'].includes(this.type)) {
+        if (!this.availableTypes.includes(this.type)) {
             this.log.warning(
                 __filename,
                 'Unrecognized type in rule configuration',
@@ -32,7 +40,7 @@ class ImportWithoutExtensionRule extends BaseRule {
 
         const reviewComments = this._reviewData(
             data,
-            this.type === 'module'
+            this.type === this.MODULE
                 ? /from.*[(|'|"|`].*[)|'|"|`]/
                 : /require.*\(.*\)/
         );
@@ -82,7 +90,7 @@ class ImportWithoutExtensionRule extends BaseRule {
      */
     _getCommentBody() {
         return `Please, remove extension from marked ${
-            this.type === 'module' ? 'import' : 'require'
+            this.type === this.MODULE ? 'import' : 'require'
         }.`;
     }
 }
