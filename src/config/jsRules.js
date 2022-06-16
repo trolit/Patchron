@@ -9,7 +9,11 @@ const {
         KeywordsOrderedByLengthRule,
         FixedLoopLengthConditionRule
     },
-    js: { ImportWithoutExtensionRule, ImplicitIndexFileImportRule }
+    js: {
+        AsynchronousPatternRule,
+        ImportWithoutExtensionRule,
+        ImplicitIndexFileImportRule
+    }
 } = require('src/rules');
 
 module.exports = [
@@ -163,6 +167,13 @@ module.exports = [
         reference: ImplicitIndexFileImportRule,
         config: {
             type: 'commonjs'
+        }
+    },
+    {
+        enabled: false,
+        reference: AsynchronousPatternRule,
+        config: {
+            pattern: 'await'
         }
     }
 ];
