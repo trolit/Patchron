@@ -172,6 +172,8 @@ module.exports = [
     {
         enabled: false,
         reference: AsynchronousPatternRule,
-        config: {}
+        config: {
+            pattern: 'await'
+        }
     }
 ];
