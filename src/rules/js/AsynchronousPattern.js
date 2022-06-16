@@ -79,7 +79,7 @@ class AsynchronousPatternRule extends BaseRule {
      * @returns {string}
      */
     _getCommentBody() {
-        return `It seems that wrong asynchronous pattern was used (expected: ${this.pattern})`;
+        return `Please, stick to \`${this.pattern}\` asynchronous pattern in the project.`;
     }
 }
 
