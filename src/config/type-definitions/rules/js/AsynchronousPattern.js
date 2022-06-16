@@ -1,4 +1,4 @@
 /**
  * @typedef {object} AsynchronousPatternConfig
- * @property {'await|then'} pattern specify pattern of asynchronous calls
+ * @property {'await|then'} pattern specify expected pattern of asynchronous calls in the project
  */
