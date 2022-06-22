@@ -1,8 +1,8 @@
 <img src="https://github.com/trolit/Patchron/blob/master/picture.jpg" alt="Bot default avatar" height="100"/>
 
-# Detective Pepega
+# Patchron
 
-> A GitHub App built with [Probot](https://github.com/probot/probot) which is meant to help in maintaining development conventions by performing early pull request code review. CR is based on patches that contain limited number of information from modified files. Due to this, some review comments might not be accurate, but still, those are edge cases (e.g. patch which is fragment of multi-line string or differentiating interpolated code from raw string) which can be ignored when reviewed by PR owner.
+> A GitHub App built with [Probot](https://github.com/probot/probot) which is meant to help in maintaining development conventions by performing early pull request code review. Code review is based on patches that contain limited number of information from modified files. Due to this, some review comments might not be accurate, but still, those are edge cases (e.g. patch which is fragment of multi-line string or differentiating interpolated code from raw string) which can be ignored when reviewed by PR owner.
 
 ## Setup
 
@@ -18,27 +18,27 @@ npm start
 
 ```sh
 # 1. Build container
-docker build -t pepega .
+docker build -t patchron .
 
 # 2. Start container
-docker run -e APP_ID=<app-id> -e PRIVATE_KEY=<pem-value> pepega
+docker run -e APP_ID=<app-id> -e PRIVATE_KEY=<pem-value> patchron
 ```
 
 ## Settings
 
-| Property | Type | Description |
-| :--- | :--- | :--- |
-| isGetFilesRequestPaginated | boolean | test |
-| delayBetweenCommentRequestsInSeconds | Number | test |
-| isOwnerAssigningEnabled | boolean | test |
-| isReviewSummaryEnabled | boolean | test |
-| isStoringLogsEnabled | boolean | test |
-| maxCommentsPerReview | Number | test |
-| senders | Array<string> | test |
+| Property                             | Type          | Description |
+| :----------------------------------- | :------------ | :---------- |
+| isGetFilesRequestPaginated           | boolean       | test        |
+| delayBetweenCommentRequestsInSeconds | Number        | test        |
+| isOwnerAssigningEnabled              | boolean       | test        |
+| isReviewSummaryEnabled               | boolean       | test        |
+| isStoringLogsEnabled                 | boolean       | test        |
+| maxCommentsPerReview                 | Number        | test        |
+| senders                              | Array<string> | test        |
 
 ## Contributing
 
-If you have suggestions for how pepega could be improved, or want to report a bug, open an issue! We'd love all and any contributions.
+If you have suggestions for how Patchron could be improved, or want to report a bug, open an issue! We'd love all and any contributions.
 
 For more, check out the [Contributing Guide](CONTRIBUTING.md).
 
