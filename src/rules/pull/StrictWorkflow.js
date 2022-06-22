@@ -1,5 +1,3 @@
-/// <reference path="../../config/type-definitions/rules/pull/StrictWorkflow.js" />
-
 const BaseRule = require('src/rules/Base');
 
 class StrictWorkflowRule extends BaseRule {

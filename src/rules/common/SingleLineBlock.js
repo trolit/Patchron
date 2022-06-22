@@ -1,6 +1,3 @@
-/// <reference path="../../config/type-definitions/common.js" />
-/// <reference path="../../config/type-definitions/rules/common/SingleLineBlock.js" />
-
 const BaseRule = require('src/rules/Base');
 
 // TODO: need to handle case that for loop is split into 3 lines due to formatting

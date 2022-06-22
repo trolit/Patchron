@@ -1,6 +1,3 @@
-/// <reference path="../../config/type-definitions/common.js" />
-/// <reference path="../../config/type-definitions/rules/common/KeywordsOrderedByLength.js" />
-
 const BaseRule = require('src/rules/Base');
 
 class KeywordsOrderedByLengthRule extends BaseRule {

@@ -1,6 +1,3 @@
-/// <reference path="../../config/type-definitions/common.js" />
-/// <reference path="../../config/type-definitions/rules/common/ValueComparisionStyle.js" />
-
 const isEqual = require('lodash/isEqual');
 const BaseRule = require('src/rules/Base');
 

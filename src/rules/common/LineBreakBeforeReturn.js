@@ -1,5 +1,3 @@
-/// <reference path="../../config/type-definitions/common.js" />
-
 const BaseRule = require('src/rules/Base');
 
 class LineBreakBeforeReturnRule extends BaseRule {

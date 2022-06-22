@@ -1,5 +1,3 @@
-/// <reference path="../config/type-definitions/common.js" />
-
 const dedent = require('dedent-js');
 const helpers = require('src/helpers');
 const constants = require('src/config/constants');

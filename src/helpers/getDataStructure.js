@@ -1,5 +1,3 @@
-/// <reference path="../config/type-definitions/common.js" />
-
 /**
  * returns braces structure. **By default** does not return structures that are incomplete due to lack of information.
  *
