@@ -1,3 +1,7 @@
+/**
+ * Example file, generated within Probot app
+ */
+
 const nock = require('nock');
 const { StatusCodes: HTTP } = require('http-status-codes');
 
