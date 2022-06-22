@@ -14,11 +14,11 @@ const setupApp = require('test/rules/helpers/setupApp');
 const initializeFile = require('test/rules/helpers/initializeFile');
 
 describe('invoke function', () => {
-    let pepegaContext = null;
+    let patchronContext = null;
     let file = {};
 
     beforeEach(() => {
-        pepegaContext = setupApp();
+        patchronContext = setupApp();
 
         file = initializeFile();
     });
@@ -31,7 +31,7 @@ describe('invoke function', () => {
 
     it('returns empty array on empty allowed levels config', () => {
         const valueComparisionStyleRule = new ValueComparisionStyleRule(
-            pepegaContext,
+            patchronContext,
             {
                 allowedLevels: []
             },
@@ -45,7 +45,7 @@ describe('invoke function', () => {
 
     it('returns empty array on all allowed levels', () => {
         const valueComparisionStyleRule = new ValueComparisionStyleRule(
-            pepegaContext,
+            patchronContext,
             {
                 allowedLevels: [0, 1, 2]
             },
@@ -59,7 +59,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid comparision style (weak equality)', () => {
         const valueComparisionStyleRule = new ValueComparisionStyleRule(
-            pepegaContext,
+            patchronContext,
             {
                 allowedLevels: [0]
             },
@@ -86,7 +86,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid comparision style (strict equality)', () => {
         const valueComparisionStyleRule = new ValueComparisionStyleRule(
-            pepegaContext,
+            patchronContext,
             {
                 allowedLevels: [1]
             },
@@ -113,7 +113,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid comparision style (Object.is)', () => {
         const valueComparisionStyleRule = new ValueComparisionStyleRule(
-            pepegaContext,
+            patchronContext,
             {
                 allowedLevels: [2]
             },
@@ -140,7 +140,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid comparision style (weak equality)', () => {
         const valueComparisionStyleRule = new ValueComparisionStyleRule(
-            pepegaContext,
+            patchronContext,
             {
                 allowedLevels: [0]
             },
@@ -172,7 +172,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid comparision style (strict equality)', () => {
         const valueComparisionStyleRule = new ValueComparisionStyleRule(
-            pepegaContext,
+            patchronContext,
             {
                 allowedLevels: [1]
             },
@@ -204,7 +204,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid comparision style (Object.is)', () => {
         const valueComparisionStyleRule = new ValueComparisionStyleRule(
-            pepegaContext,
+            patchronContext,
             {
                 allowedLevels: [2]
             },

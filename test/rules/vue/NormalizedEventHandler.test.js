@@ -19,11 +19,11 @@ const config = {
 };
 
 describe('invoke function', () => {
-    let pepegaContext = null;
+    let patchronContext = null;
     let file = {};
 
     beforeEach(() => {
-        pepegaContext = setupApp();
+        patchronContext = setupApp();
 
         file = initializeFile();
     });
@@ -36,7 +36,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid event handlers /on/ prefixes', () => {
         const normalizedEventHandlerRule = new NormalizedEventHandlerRule(
-            pepegaContext,
+            patchronContext,
             config,
             {
                 ...file,
@@ -63,7 +63,7 @@ describe('invoke function', () => {
 
     it('returns review on missing event handlers /on/ prefixes', () => {
         const normalizedEventHandlerRule = new NormalizedEventHandlerRule(
-            pepegaContext,
+            patchronContext,
             config,
             {
                 ...file,
@@ -94,7 +94,7 @@ describe('invoke function', () => {
 
     it('returns empty array when noUnnecessaryBraces = false', () => {
         const normalizedEventHandlerRule = new NormalizedEventHandlerRule(
-            pepegaContext,
+            patchronContext,
             {
                 ...config,
                 noUnnecessaryBraces: false
@@ -124,7 +124,7 @@ describe('invoke function', () => {
 
     it('returns review when noUnnecessaryBraces = true', () => {
         const normalizedEventHandlerRule = new NormalizedEventHandlerRule(
-            pepegaContext,
+            patchronContext,
             config,
             {
                 ...file,

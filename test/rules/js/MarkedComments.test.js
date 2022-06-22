@@ -42,11 +42,11 @@ const validConfig = {
 };
 
 describe('invoke function', () => {
-    let pepegaContext = null;
+    let patchronContext = null;
     let file = {};
 
     beforeEach(() => {
-        pepegaContext = setupApp();
+        patchronContext = setupApp();
 
         file = initializeFile();
     });
@@ -59,7 +59,7 @@ describe('invoke function', () => {
 
     it('returns empty array on invalid flags config', () => {
         const markedCommentsRule = new MarkedCommentsRule(
-            pepegaContext,
+            patchronContext,
             {
                 ...validConfig,
                 isAppliedToSingleLineComments: false,
@@ -76,7 +76,7 @@ describe('invoke function', () => {
 
     it('returns empty array on empty prefixes', () => {
         const markedCommentsRule = new MarkedCommentsRule(
-            pepegaContext,
+            patchronContext,
             {
                 ...validConfig,
                 prefixes: []
@@ -91,7 +91,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid single line comments', () => {
         const markedCommentsRule = new MarkedCommentsRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             {
                 ...file,
@@ -117,7 +117,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid single line comments', () => {
         const markedCommentsRule = new MarkedCommentsRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             {
                 ...file,
@@ -139,7 +139,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid multi-line comments', () => {
         const markedCommentsRule = new MarkedCommentsRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             {
                 ...file,
@@ -174,7 +174,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid multi-line comments', () => {
         const markedCommentsRule = new MarkedCommentsRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             {
                 ...file,
@@ -204,7 +204,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid inline comments', () => {
         const markedCommentsRule = new MarkedCommentsRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             {
                 ...file,
@@ -235,7 +235,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid inline comments', () => {
         const markedCommentsRule = new MarkedCommentsRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             {
                 ...file,
@@ -259,7 +259,7 @@ describe('invoke function', () => {
 
     it('returns review with correct range on invalid multi-line comments', () => {
         const markedCommentsRule = new MarkedCommentsRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             {
                 ...file,

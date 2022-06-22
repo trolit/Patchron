@@ -6,12 +6,12 @@ class LineBreakBeforeReturnRule extends BaseRule {
     /**
      * Checks whether line before return is line-break. Note that edge case (part of string starting with return) isn't covered since amount of intel in received patch can be not enough to determine that and on the other hand it's still rare case.
      *
-     * @param {PepegaContext} pepegaContext
+     * @param {PatchronContext} patchronContext
      * @param {object} _
      * @param {Patch} file
      */
-    constructor(pepegaContext, _, file) {
-        super(pepegaContext, file);
+    constructor(patchronContext, _, file) {
+        super(patchronContext, file);
     }
 
     invoke() {

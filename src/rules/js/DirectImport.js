@@ -15,12 +15,12 @@ class DirectImportRule extends BaseRule {
      *
      * {@link https://www.blazemeter.com/blog/the-correct-way-to-import-lodash-libraries-a-benchmark}
      *
-     * @param {PepegaContext} pepegaContext
+     * @param {PatchronContext} patchronContext
      * @param {DirectImportConfig} config
      * @param {Patch} file
      */
-    constructor(pepegaContext, config, file) {
-        super(pepegaContext, file);
+    constructor(patchronContext, config, file) {
+        super(patchronContext, file);
 
         const { packages } = config;
 

@@ -1,13 +1,13 @@
 /**
  * adds assignees to pull request
  *
- * @param {PepegaContext} pepegaContext
+ * @param {PatchronContext} patchronContext
  * @param {Array<string>} assignees usernames of people to assign
  *
  * {@link https://octokit.github.io/rest.js/v18#issues-add-assignees}
  */
-module.exports = async (pepegaContext, assignees) => {
-    const { pullRequest, log, repo } = pepegaContext;
+module.exports = async (patchronContext, assignees) => {
+    const { pullRequest, log, repo } = patchronContext;
     const { context } = pullRequest;
 
     try {

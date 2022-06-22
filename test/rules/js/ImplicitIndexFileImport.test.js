@@ -17,11 +17,11 @@ const moduleConfig = { type: 'module' };
 const commonJsConfig = { type: 'commonjs' };
 
 describe('invoke function', () => {
-    let pepegaContext = null;
+    let patchronContext = null;
     let file = {};
 
     beforeEach(() => {
-        pepegaContext = setupApp();
+        patchronContext = setupApp();
 
         file = initializeFile();
     });
@@ -34,7 +34,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid imports (ES module)', () => {
         const implicitIndexFileImportRule = new ImplicitIndexFileImportRule(
-            pepegaContext,
+            patchronContext,
             moduleConfig,
             {
                 ...file,
@@ -57,7 +57,7 @@ describe('invoke function', () => {
 
     it('returns review on import with extension (ES module)', () => {
         const implicitIndexFileImportRule = new ImplicitIndexFileImportRule(
-            pepegaContext,
+            patchronContext,
             moduleConfig,
             {
                 ...file,
@@ -84,7 +84,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid imports (commonJS module)', () => {
         const implicitIndexFileImportRule = new ImplicitIndexFileImportRule(
-            pepegaContext,
+            patchronContext,
             commonJsConfig,
             {
                 ...file,
@@ -107,7 +107,7 @@ describe('invoke function', () => {
 
     it('returns review on import with extension (commonJS module)', () => {
         const implicitIndexFileImportRule = new ImplicitIndexFileImportRule(
-            pepegaContext,
+            patchronContext,
             commonJsConfig,
             {
                 ...file,

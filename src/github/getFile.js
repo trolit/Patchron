@@ -1,7 +1,7 @@
 /**
  * fetches specified file from pull request from particular commit, within it's content (encoded in base64).
  *
- * @param {PepegaContext} pepegaContext
+ * @param {PatchronContext} patchronContext
  * @param {string} contents_url path to file's content URL.
  * @param {object} options pass payload optional params (or params to overwrite used ones)
  *
@@ -12,8 +12,8 @@
  *
  * @returns {object} file details and it's content encoded in base64.
  */
-module.exports = async (pepegaContext, contents_url, options = {}) => {
-    const { pullRequest, log, repo } = pepegaContext;
+module.exports = async (patchronContext, contents_url, options = {}) => {
+    const { pullRequest, log, repo } = patchronContext;
     const { context } = pullRequest;
     let result = null;
 

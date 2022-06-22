@@ -5,12 +5,12 @@ const BaseRule = require('src/rules/Base');
 
 class KeywordsOrderedByLengthRule extends BaseRule {
     /**
-     * @param {PepegaContext} pepegaContext
+     * @param {PatchronContext} patchronContext
      * @param {KeywordsOrderedByLengthConfig} config
      * @param {Patch} file
      */
-    constructor(pepegaContext, config, file) {
-        super(pepegaContext, file);
+    constructor(patchronContext, config, file) {
+        super(patchronContext, file);
 
         const { keywords } = config;
 

@@ -9,12 +9,12 @@ class NormalizedEventHandlerRule extends BaseRule {
      *
      * {@link https://vuejs.org/guide/essentials/event-handling.html#key-modifiers}
      *
-     * @param {PepegaContext} pepegaContext
+     * @param {PatchronContext} patchronContext
      * @param {NormalizedEventHandlerConfig} config
      * @param {Patch} file
      */
-    constructor(pepegaContext, config, file) {
-        super(pepegaContext, file);
+    constructor(patchronContext, config, file) {
+        super(patchronContext, file);
 
         const { prefix, noUnnecessaryBraces } = config;
 

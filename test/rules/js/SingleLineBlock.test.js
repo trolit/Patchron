@@ -45,11 +45,11 @@ const validConfig = {
 };
 
 describe('invoke function', () => {
-    let pepegaContext = null;
+    let patchronContext = null;
     let file = {};
 
     beforeEach(() => {
-        pepegaContext = setupApp();
+        patchronContext = setupApp();
 
         file = initializeFile();
     });
@@ -62,7 +62,7 @@ describe('invoke function', () => {
 
     it('returns empty array on invalid blocks config', () => {
         const singleLineBlockRule = new SingleLineBlockRule(
-            pepegaContext,
+            patchronContext,
             {
                 blocks: [],
                 curlyBraces: false
@@ -83,7 +83,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid single-line if/else if/else blocks (with curly braces)', () => {
         const singleLineBlockRule = new SingleLineBlockRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             {
                 ...file,
@@ -127,7 +127,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid single-line if/else if/else blocks (with curly braces)', () => {
         const singleLineBlockRule = new SingleLineBlockRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             {
                 ...file,
@@ -185,7 +185,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid nested single-line if block (with curly braces)', () => {
         const singleLineBlockRule = new SingleLineBlockRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             {
                 ...file,
@@ -211,7 +211,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid nested single-line if block (with curly braces)', () => {
         const singleLineBlockRule = new SingleLineBlockRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             {
                 ...file,
@@ -239,7 +239,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid single-line if/else if/else blocks (without curly braces)', () => {
         const singleLineBlockRule = new SingleLineBlockRule(
-            pepegaContext,
+            patchronContext,
             {
                 ...validConfig,
                 curlyBraces: false
@@ -280,7 +280,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid single-line if/else if/else blocks (without curly braces)', () => {
         const singleLineBlockRule = new SingleLineBlockRule(
-            pepegaContext,
+            patchronContext,
             {
                 ...validConfig,
                 curlyBraces: false
@@ -347,7 +347,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid nested single-line if block (without curly braces)', () => {
         const singleLineBlockRule = new SingleLineBlockRule(
-            pepegaContext,
+            patchronContext,
             {
                 ...validConfig,
                 curlyBraces: false
@@ -375,7 +375,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid nested single-line if block (without curly braces)', () => {
         const singleLineBlockRule = new SingleLineBlockRule(
-            pepegaContext,
+            patchronContext,
             {
                 ...validConfig,
                 curlyBraces: false
@@ -413,7 +413,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid single-line do..while blocks (with curly braces)', () => {
         const singleLineBlockRule = new SingleLineBlockRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             {
                 ...file,
@@ -467,7 +467,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid single-line do..while blocks (with curly braces)', () => {
         const singleLineBlockRule = new SingleLineBlockRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             {
                 ...file,
@@ -535,7 +535,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid nested single-line do..while block (with curly braces)', () => {
         const singleLineBlockRule = new SingleLineBlockRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             {
                 ...file,
@@ -560,7 +560,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid nested single-line do..while block (with curly braces)', () => {
         const singleLineBlockRule = new SingleLineBlockRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             {
                 ...file,
@@ -588,7 +588,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid single-line do..while blocks (without curly braces)', () => {
         const singleLineBlockRule = new SingleLineBlockRule(
-            pepegaContext,
+            patchronContext,
             {
                 ...validConfig,
                 curlyBraces: false
@@ -641,7 +641,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid single-line do..while blocks (without curly braces)', () => {
         const singleLineBlockRule = new SingleLineBlockRule(
-            pepegaContext,
+            patchronContext,
             {
                 ...validConfig,
                 curlyBraces: false
@@ -718,7 +718,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid nested single-line do..while block (without curly braces)', () => {
         const singleLineBlockRule = new SingleLineBlockRule(
-            pepegaContext,
+            patchronContext,
             {
                 ...validConfig,
                 curlyBraces: false
@@ -746,7 +746,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid nested single-line do..while block (without curly braces)', () => {
         const singleLineBlockRule = new SingleLineBlockRule(
-            pepegaContext,
+            patchronContext,
             {
                 ...validConfig,
                 curlyBraces: false

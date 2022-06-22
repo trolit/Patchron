@@ -4,12 +4,12 @@ const review = require('src/rules/review');
 /**
  * triggers `Pepega.js` to review files against configured rules
  *
- * @param {PepegaContext} pepegaContext
+ * @param {PatchronContext} patchronContext
  *
  * @returns {Array<object>} review comments
  */
-module.exports = (pepegaContext) => {
-    const reviewComments = review(pepegaContext, rules.pull);
+module.exports = (patchronContext) => {
+    const reviewComments = review(patchronContext, rules.pull);
 
     return reviewComments;
 };

@@ -17,11 +17,11 @@ const awaitConfig = { pattern: 'await' };
 const thenConfig = { pattern: 'then' };
 
 describe('invoke function', () => {
-    let pepegaContext = null;
+    let patchronContext = null;
     let file = {};
 
     beforeEach(() => {
-        pepegaContext = setupApp();
+        patchronContext = setupApp();
 
         file = initializeFile();
     });
@@ -34,7 +34,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid asynchronous pattern (await)', () => {
         const asynchronousPatternRule = new AsynchronousPatternRule(
-            pepegaContext,
+            patchronContext,
             awaitConfig,
             {
                 ...file,
@@ -56,7 +56,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid asynchronous pattern (await)', () => {
         const asynchronousPatternRule = new AsynchronousPatternRule(
-            pepegaContext,
+            patchronContext,
             awaitConfig,
             {
                 ...file,
@@ -84,7 +84,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid asynchronous pattern (then)', () => {
         const asynchronousPatternRule = new AsynchronousPatternRule(
-            pepegaContext,
+            patchronContext,
             thenConfig,
             {
                 ...file,
@@ -110,7 +110,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid asynchronous pattern (then)', () => {
         const asynchronousPatternRule = new AsynchronousPatternRule(
-            pepegaContext,
+            patchronContext,
             thenConfig,
             {
                 ...file,

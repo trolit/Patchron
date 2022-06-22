@@ -13,7 +13,7 @@ class ValueComparisionStyleRule extends BaseRule {
      * - 1 - strict equality/inequality (===, !==)
      * - 2 - strict equality/inequality via `Object.is` (ES6)
      *
-     * @param {PepegaContext} pepegaContext
+     * @param {PatchronContext} patchronContext
      * @param {ValueComparisionStyleConfig} config
      * @param {Patch} file
      *
@@ -21,8 +21,8 @@ class ValueComparisionStyleRule extends BaseRule {
      * {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Equality_comparisons_and_sameness}
      * {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_inequality}
      */
-    constructor(pepegaContext, config, file) {
-        super(pepegaContext, file);
+    constructor(patchronContext, config, file) {
+        super(patchronContext, file);
 
         const { allowedLevels } = config;
         allowedLevels.sort();

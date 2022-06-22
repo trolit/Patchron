@@ -23,11 +23,11 @@ const validConfig = {
 };
 
 describe('invoke function', () => {
-    let pepegaContext = null;
+    let patchronContext = null;
     let file = {};
 
     beforeEach(() => {
-        pepegaContext = setupApp();
+        patchronContext = setupApp();
 
         file = initializeFile();
     });
@@ -40,7 +40,7 @@ describe('invoke function', () => {
 
     it('returns empty array on empty packages', () => {
         const directImportRule = new DirectImportRule(
-            pepegaContext,
+            patchronContext,
             {
                 packages: []
             },
@@ -54,7 +54,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid lodash cloneDeep require', () => {
         const directImportRule = new DirectImportRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             {
                 ...file,
@@ -84,7 +84,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid lodash cloneDeep require', () => {
         const directImportRule = new DirectImportRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             {
                 ...file,
@@ -104,7 +104,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid lodash cloneDeep import', () => {
         const directImportRule = new DirectImportRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             {
                 ...file,
@@ -134,7 +134,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid lodash cloneDeep import', () => {
         const directImportRule = new DirectImportRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             {
                 ...file,

@@ -26,11 +26,11 @@ const validConfig = {
 };
 
 describe('invoke function', () => {
-    let pepegaContext = null;
+    let patchronContext = null;
     let file = {};
 
     beforeEach(() => {
-        pepegaContext = setupApp();
+        patchronContext = setupApp();
 
         file = initializeFile();
     });
@@ -43,7 +43,7 @@ describe('invoke function', () => {
 
     it('returns empty array on empty keywords', () => {
         const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: []
             },
@@ -57,7 +57,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid `import` group order', () => {
         const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             {
                 ...file,
@@ -85,7 +85,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid ascending `import` group order', () => {
         const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             {
                 ...file,
@@ -110,7 +110,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid ascending `import` groups order', () => {
         const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             {
                 ...file,
@@ -137,7 +137,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid ascending `import` groups order', () => {
         const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             {
                 ...file,
@@ -161,7 +161,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid descending `import` group order', () => {
         const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [
                     {
@@ -196,7 +196,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid descending `import` group order', () => {
         const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [
                     {
@@ -231,7 +231,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid `import` order with ignoreNewline enabled', () => {
         const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [
                     {
@@ -275,7 +275,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid `import` order with ignoreNewline enabled', () => {
         const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [
                     {
@@ -309,7 +309,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid `import` order split into packages and components', () => {
         const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [
                     {
@@ -353,7 +353,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid `import` order split into packages and components', () => {
         const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [
                     {

@@ -8,18 +8,18 @@ const extendWithBackticks = require('src/extensions/setup-data/extendWithBacktic
 
 class BaseRule {
     /**
-     * @param {PepegaContext} pepegaContext
+     * @param {PatchronContext} patchronContext
      * @param {Patch} file
      */
-    constructor(pepegaContext, file = null) {
-        this.pepegaContext = pepegaContext;
-        this.log = this.pepegaContext.log;
+    constructor(patchronContext, file = null) {
+        this.patchronContext = patchronContext;
+        this.log = this.patchronContext.log;
 
         if (file) {
             this.file = file;
 
             this.reviewCommentBuilder = new ReviewCommentBuilder(
-                pepegaContext,
+                patchronContext,
                 file
             );
         }

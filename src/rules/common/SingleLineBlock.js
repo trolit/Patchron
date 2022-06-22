@@ -11,12 +11,12 @@ class SingleLineBlockRule extends BaseRule {
      * - if blocks have similiar parts, pay attention to their order e.g. if..else if..else and/or regular expression
      * - each block's expression should end with `.*`
      *
-     * @param {PepegaContext} pepegaContext
+     * @param {PatchronContext} patchronContext
      * @param {SingleLineBlockConfig} config
      * @param {Patch} file
      */
-    constructor(pepegaContext, config, file) {
-        super(pepegaContext, file);
+    constructor(patchronContext, config, file) {
+        super(patchronContext, file);
 
         const { blocks, curlyBraces } = config;
 

@@ -7,12 +7,12 @@ class FixedLoopLengthCondition extends BaseRule {
     /**
      * looks after `for`, `while`, `do while` loops and identifies whether condition statement includes reference to `length` property. If it does, line is commented out with description to not call `length` in each iteration suggesting to declare variable before loop instead.
      *
-     * @param {PepegaContext} pepegaContext
+     * @param {PatchronContext} patchronContext
      * @param {FixedLoopLengthConditionConfig} config
      * @param {Patch} file
      */
-    constructor(pepegaContext, config, file) {
-        super(pepegaContext, file);
+    constructor(patchronContext, config, file) {
+        super(patchronContext, file);
 
         const { expression } = config;
 

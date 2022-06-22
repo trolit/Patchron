@@ -5,12 +5,12 @@ const BaseRule = require('src/rules/Base');
 
 class PositionedKeywordsRule extends BaseRule {
     /**
-     * @param {PepegaContext} pepegaContext
+     * @param {PatchronContext} patchronContext
      * @param {PositionedKeywordsConfig} config
      * @param {Patch} file
      */
-    constructor(pepegaContext, config, file) {
-        super(pepegaContext, file);
+    constructor(patchronContext, config, file) {
+        super(patchronContext, file);
 
         const { keywords } = config;
 

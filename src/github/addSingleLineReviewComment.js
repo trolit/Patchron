@@ -1,15 +1,15 @@
 /**
  * sends request to add single line review comment.
  *
- * @param {PepegaContext} pepegaContext
+ * @param {PatchronContext} patchronContext
  * @param {SingleLineComment} singleLineComment
  *
  * {@link https://octokit.github.io/rest.js/v18#pulls-create-review-comment}
  *
  * @returns {object} request response
  */
-module.exports = async (pepegaContext, singleLineComment) => {
-    const { pullRequest, log } = pepegaContext;
+module.exports = async (patchronContext, singleLineComment) => {
+    const { pullRequest, log } = patchronContext;
     const { context } = pullRequest;
     let result = null;
 

@@ -6,7 +6,7 @@ const {
  * fetches files from pull request. Unpaginated response includes a maximum of 3000 files
  * so **it's not recommended** to overload GitHub API by multiple small requests in 99% cases.
  *
- * @param {PepegaContext} pepegaContext
+ * @param {PatchronContext} patchronContext
  * @param {object} options pass payload optional params (or params to overwrite used ones)
  * @param {string} [options.per_page = 30] results per page (max 100)
  * @param {string} [options.page] page number of the results to fetch.
@@ -15,8 +15,8 @@ const {
  *
  * @returns {Promise<Array<object>>}
  */
-module.exports = async (pepegaContext, options = {}) => {
-    const { pullRequest, log, repo } = pepegaContext;
+module.exports = async (patchronContext, options = {}) => {
+    const { pullRequest, log, repo } = patchronContext;
     const { context } = pullRequest;
     let files = [];
 
