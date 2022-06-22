@@ -1,4 +1,4 @@
-<img src="https://github.com/trolit/Pepega/blob/master/picture.png" alt="Bot default avatar" height="100"/>
+<img src="https://github.com/trolit/Patchron/blob/master/picture.jpg" alt="Bot default avatar" height="100"/>
 
 # Detective Pepega
 
@@ -49,7 +49,7 @@ For more, check out the [Contributing Guide](CONTRIBUTING.md).
 -   [GitHub API - best practices](https://docs.github.com/en/rest/guides/best-practices-for-integrators)
 -   [GitHub API - rate limits](https://docs.github.com/en/developers/apps/building-github-apps/rate-limits-for-github-apps)
 -   [GitHub API - pulls](https://docs.github.com/en/rest/reference/pulls)
--   [Profile picture](https://pixabay.com/vectors/frog-tongue-animal-green-cartoon-159003/)
+-   [Default picture](https://pixabay.com/vectors/dog-pet-hound-black-eye-animal-151123/)
 
 ## License
 
