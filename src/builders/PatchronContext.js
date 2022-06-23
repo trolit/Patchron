@@ -10,7 +10,7 @@ const updateLogPathJob = require('src/utilities/updateLogPathJob');
 /**
  * Class wrapping Probot's features and Pepega's logic.
  */
-class PepegaContextBuilder {
+class PatchronContextBuilder {
     /**
      * @param {ProbotApp} app
      */
@@ -60,4 +60,4 @@ class PepegaContextBuilder {
     }
 }
 
-module.exports = PepegaContextBuilder;
+module.exports = PatchronContextBuilder;

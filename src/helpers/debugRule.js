@@ -19,12 +19,12 @@ const rules = {
  * @param {string} ruleName - file name of rule
  * @param {object} config - rule config
  * @param {object} file - provide all elements that are required by passed rule
- * @param {PepegaContext} pepegaContext
+ * @param {PatchronContext} patchronContext
  */
-module.exports = (ruleName, config, file, pepegaContext) => {
+module.exports = (ruleName, config, file, patchronContext) => {
     const Rule = rules[ruleName];
 
-    const rule = new Rule(pepegaContext, config, file);
+    const rule = new Rule(patchronContext, config, file);
 
     const result = rule.invoke();
 

@@ -1,16 +1,13 @@
-/// <reference path="../../config/type-definitions/common.js" />
-/// <reference path="../../config/type-definitions/rules/js/ImplicitIndexFileImport.js" />
-
 const BaseRule = require('src/rules/Base');
 
 class ImplicitIndexFileImportRule extends BaseRule {
     /**
-     * @param {PepegaContext} pepegaContext
+     * @param {PatchronContext} patchronContext
      * @param {ImplicitIndexFileImportConfig} config
      * @param {Patch} file
      */
-    constructor(pepegaContext, config, file) {
-        super(pepegaContext, file);
+    constructor(patchronContext, config, file) {
+        super(patchronContext, file);
 
         const { type } = config;
 

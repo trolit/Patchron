@@ -3,7 +3,7 @@ const nock = require('nock');
 const { Probot, ProbotOctokit } = require('probot');
 
 const app = require('src');
-const PepegaContext = require('src/builders/PepegaContext');
+const PatchronContext = require('src/builders/PatchronContext');
 
 const privateKey = fs.readFileSync('test/fixtures/mock-cert.pem', 'utf-8');
 
@@ -23,7 +23,7 @@ module.exports = () => {
 
     probot.load(app);
 
-    const pepegaContext = new PepegaContext(probot);
+    const patchronContext = new PatchronContext(probot);
 
-    return pepegaContext;
+    return patchronContext;
 };

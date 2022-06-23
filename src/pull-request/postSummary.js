@@ -4,15 +4,15 @@ const addComment = require('src/github/addComment');
 /**
  * **POST** pull request review summary
  *
- * @param {PepegaContext} pepegaContext
+ * @param {PatchronContext} patchronContext
  * @param {number} successfullyPostedComments number of comments posted to the GitHub
  */
 module.exports = async (
-    pepegaContext,
+    patchronContext,
     successfullyPostedComments,
     reviewComments
 ) => {
-    const { pullRequest, log } = pepegaContext;
+    const { pullRequest, log } = patchronContext;
     const { pull_request } = pullRequest.context.payload;
     const { commits, additions, deletions, changed_files } = pull_request;
 
@@ -34,7 +34,7 @@ module.exports = async (
     `;
 
     try {
-        await addComment(pepegaContext, dedent(commentBody));
+        await addComment(patchronContext, dedent(commentBody));
     } catch (error) {
         log.fatal(error);
     }

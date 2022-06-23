@@ -2,11 +2,11 @@
 class ReviewCommentBuilder {
     /**
      *
-     * @param {PepegaContext} pepegaContext
+     * @param {PatchronContext} patchronContext
      * @param {Patch} file
      */
-    constructor(pepegaContext, file) {
-        const { pullRequest, repo } = pepegaContext;
+    constructor(patchronContext, file) {
+        const { pullRequest, repo } = patchronContext;
         const { commitId: commit_id } = file;
 
         this.basicInformation = {

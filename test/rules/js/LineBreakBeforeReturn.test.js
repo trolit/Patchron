@@ -14,11 +14,11 @@ const setupApp = require('test/rules/helpers/setupApp');
 const initializeFile = require('test/rules/helpers/initializeFile');
 
 describe('invoke function', () => {
-    let pepegaContext = null;
+    let patchronContext = null;
     let file = {};
 
     beforeEach(() => {
-        pepegaContext = setupApp();
+        patchronContext = setupApp();
 
         file = initializeFile();
     });
@@ -31,7 +31,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid return', () => {
         const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
-            pepegaContext,
+            patchronContext,
             null,
             {
                 ...file,
@@ -65,7 +65,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid return (example 1)', () => {
         const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
-            pepegaContext,
+            patchronContext,
             null,
             {
                 ...file,
@@ -85,7 +85,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid return (example 2)', () => {
         const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
-            pepegaContext,
+            patchronContext,
             null,
             {
                 ...file,
@@ -109,7 +109,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid return (example 3)', () => {
         const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
-            pepegaContext,
+            patchronContext,
             null,
             {
                 ...file,
@@ -131,7 +131,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid return (example 4)', () => {
         const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
-            pepegaContext,
+            patchronContext,
             null,
             {
                 ...file,
@@ -153,7 +153,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid return (example 5)', () => {
         const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
-            pepegaContext,
+            patchronContext,
             null,
             {
                 ...file,
@@ -179,7 +179,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid return (example 6)', () => {
         const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
-            pepegaContext,
+            patchronContext,
             null,
             {
                 ...file,
@@ -202,7 +202,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid return (example 7)', () => {
         const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
-            pepegaContext,
+            patchronContext,
             null,
             {
                 ...file,
@@ -224,7 +224,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid return (example 8)', () => {
         const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
-            pepegaContext,
+            patchronContext,
             null,
             {
                 ...file,
@@ -245,7 +245,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid return (example 9)', () => {
         const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
-            pepegaContext,
+            patchronContext,
             null,
             {
                 ...file,
@@ -267,7 +267,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid return', () => {
         const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
-            pepegaContext,
+            patchronContext,
             null,
             {
                 ...file,
@@ -305,7 +305,7 @@ describe('invoke function', () => {
 
     it('returns review on return that is part of multi-line string (edge case)', () => {
         const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
-            pepegaContext,
+            patchronContext,
             null,
             {
                 ...file,

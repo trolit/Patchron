@@ -1,7 +1,7 @@
 // ***********************************************************************
 // *
-// * Detective Pepega (made with Probot)
-// * https://github.com/trolit/Pepega/
+// * Patchron 2022 (made with Probot)
+// * https://github.com/trolit/Patchron/
 // *
 // ***********************************************************************
 
@@ -12,48 +12,48 @@ const {
     settings: { senders, isOwnerAssigningEnabled, isReviewSummaryEnabled }
 } = require('./config');
 const addAssignees = require('./github/addAssignees');
-const PepegaContext = require('./builders/PepegaContext');
 const postSummary = require('./pull-request/postSummary');
 const reviewFiles = require('./pull-request/reviewFiles');
 const postComments = require('./pull-request/postComments');
+const PatchronContext = require('./builders/PatchronContext');
 const reviewContext = require('./pull-request/reviewContext');
 
 /**
  * @param {ProbotApp} app
  */
 module.exports = (app) => {
-    const pepegaContext = new PepegaContext(app);
+    const patchronContext = new PatchronContext(app);
 
     app.on(
         ['pull_request.opened', 'pull_request.synchronize'],
         async (context) => {
-            pepegaContext.initializePullRequestData(context);
+            patchronContext.initializePullRequestData(context);
 
             const {
                 pullRequest: { owner }
-            } = pepegaContext;
+            } = patchronContext;
 
             if (isOwnerAssigningEnabled) {
-                await addAssignees(pepegaContext, [owner]);
+                await addAssignees(patchronContext, [owner]);
             }
 
             if (senders?.length && !senders.includes(owner)) {
                 return;
             }
 
-            const reviewComments = cloneDeep(reviewContext(pepegaContext));
+            const reviewComments = cloneDeep(reviewContext(patchronContext));
 
             if (!isReviewAborted(reviewComments)) {
-                reviewComments.push(...reviewFiles(pepegaContext));
+                reviewComments.push(...reviewFiles(patchronContext));
 
                 const numberOfPostedComments = postComments(
-                    pepegaContext,
+                    patchronContext,
                     reviewComments
                 );
 
                 if (isReviewSummaryEnabled) {
                     await postSummary(
-                        pepegaContext,
+                        patchronContext,
                         numberOfPostedComments,
                         reviewComments
                     );

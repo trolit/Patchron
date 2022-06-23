@@ -4,15 +4,15 @@ const getFiles = require('src/github/getFiles');
 /**
  * triggers `Pepega.js` to review files against configured rules
  *
- * @param {PepegaContext} pepegaContext
+ * @param {PatchronContext} patchronContext
  *
  * @returns {Array<object>} review comments
  */
-module.exports = async (pepegaContext) => {
+module.exports = async (patchronContext) => {
     const reviewComments = [];
 
     try {
-        const files = await getFiles(pepegaContext);
+        const files = await getFiles(patchronContext);
         const filesLength = files.length;
 
         for (let i = 0; i < filesLength; i++) {
@@ -21,12 +21,12 @@ module.exports = async (pepegaContext) => {
                 extension: files[i].filename.split('.').pop()
             };
 
-            const comments = reviewFile(pepegaContext, file);
+            const comments = reviewFile(patchronContext, file);
 
             reviewComments.push(...comments);
         }
     } catch (error) {
-        pepegaContext.log.error(error);
+        patchronContext.log.error(error);
     }
 
     return reviewComments;

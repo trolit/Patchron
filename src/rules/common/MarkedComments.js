@@ -1,16 +1,13 @@
-/// <reference path="../../config/type-definitions/common.js" />
-/// <reference path="../../config/type-definitions/rules/common/MarkedComments.js" />
-
 const BaseRule = require('src/rules/Base');
 
 class MarkedCommentsRule extends BaseRule {
     /**
-     * @param {PepegaContext} pepegaContext
+     * @param {PatchronContext} patchronContext
      * @param {MarkedCommentsConfig} config
      * @param {Patch} file
      */
-    constructor(pepegaContext, config, file) {
-        super(pepegaContext, file);
+    constructor(patchronContext, config, file) {
+        super(patchronContext, file);
 
         const {
             prefixes,

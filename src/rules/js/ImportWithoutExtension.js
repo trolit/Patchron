@@ -1,16 +1,13 @@
-/// <reference path="../../config/type-definitions/common.js" />
-/// <reference path="../../config/type-definitions/rules/js/ImportWithoutExtension.js" />
-
 const BaseRule = require('src/rules/Base');
 
 class ImportWithoutExtensionRule extends BaseRule {
     /**
-     * @param {PepegaContext} pepegaContext
+     * @param {PatchronContext} patchronContext
      * @param {ImportWithoutExtensionConfig} config
      * @param {Patch} file
      */
-    constructor(pepegaContext, config, file) {
-        super(pepegaContext, file);
+    constructor(patchronContext, config, file) {
+        super(patchronContext, file);
 
         const { type } = config;
 

@@ -1,7 +1,7 @@
 const { Context } = require('probot');
 
 module.exports = (
-    pepegaContext,
+    patchronContext,
     event = {
         id: 0,
         name: '',
@@ -14,5 +14,5 @@ module.exports = (
         ...event
     });
 
-    pepegaContext.pullRequest.context = context;
+    patchronContext.pullRequest.context = context;
 };

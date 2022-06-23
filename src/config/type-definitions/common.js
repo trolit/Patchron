@@ -54,7 +54,7 @@
  */
 
 /**
- * @typedef {object} PepegaContext
+ * @typedef {object} PatchronContext
  * @property  {import('../../utilities/EventLog')} log
  * @property {Repo} repo
  * @property {PullRequest} pullRequest

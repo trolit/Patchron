@@ -18,11 +18,11 @@ const config = {
 };
 
 describe('invoke function', () => {
-    let pepegaContext = null;
+    let patchronContext = null;
     let file = {};
 
     beforeEach(() => {
-        pepegaContext = setupApp();
+        patchronContext = setupApp();
 
         file = initializeFile();
     });
@@ -35,7 +35,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid single-line for loop condition statement', () => {
         const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
-            pepegaContext,
+            patchronContext,
             config,
             {
                 ...file,
@@ -57,7 +57,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid single-line for loop condition statement', () => {
         const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
-            pepegaContext,
+            patchronContext,
             config,
             {
                 ...file,
@@ -80,7 +80,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid multi-line for loop condition statement (example 1)', () => {
         const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
-            pepegaContext,
+            patchronContext,
             config,
             {
                 ...file,
@@ -106,7 +106,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid multi-line for loop condition statement (example 2)', () => {
         const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
-            pepegaContext,
+            patchronContext,
             config,
             {
                 ...file,
@@ -134,7 +134,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid multi-line for loop fragment', () => {
         const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
-            pepegaContext,
+            patchronContext,
             config,
             {
                 ...file,
@@ -154,7 +154,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid multi-line for loop condition statement (example 1)', () => {
         const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
-            pepegaContext,
+            patchronContext,
             config,
             {
                 ...file,
@@ -181,7 +181,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid multi-line for loop condition statement (example 2)', () => {
         const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
-            pepegaContext,
+            patchronContext,
             config,
             {
                 ...file,
@@ -211,7 +211,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid single-line while loop condition statement', () => {
         const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
-            pepegaContext,
+            patchronContext,
             config,
             {
                 ...file,
@@ -233,7 +233,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid single-line while loop condition statement', () => {
         const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
-            pepegaContext,
+            patchronContext,
             config,
             {
                 ...file,
@@ -256,7 +256,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid multi-line while loop condition statement (example 1)', () => {
         const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
-            pepegaContext,
+            patchronContext,
             config,
             {
                 ...file,
@@ -281,7 +281,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid multi-line while loop condition statement (example 2)', () => {
         const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
-            pepegaContext,
+            patchronContext,
             config,
             {
                 ...file,
@@ -307,7 +307,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid multi-line while loop fragment', () => {
         const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
-            pepegaContext,
+            patchronContext,
             config,
             {
                 ...file,
@@ -327,7 +327,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid multi-line while loop condition statement (example 1)', () => {
         const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
-            pepegaContext,
+            patchronContext,
             config,
             {
                 ...file,
@@ -353,7 +353,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid multi-line while loop condition statement (example 2)', () => {
         const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
-            pepegaContext,
+            patchronContext,
             config,
             {
                 ...file,
@@ -380,7 +380,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid do..while loop condition statement', () => {
         const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
-            pepegaContext,
+            patchronContext,
             config,
             {
                 ...file,
@@ -402,7 +402,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid do..while loop condition statement', () => {
         const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
-            pepegaContext,
+            patchronContext,
             config,
             {
                 ...file,

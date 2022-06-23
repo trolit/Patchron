@@ -13,13 +13,13 @@ const addSingleLineReviewComment = require('src/github/addSingleLineReviewCommen
  * - has `start_line`, it indicates that it's file's multi-line comment,
  * - has `line`, it indicates that it's file's single-line comment.
  *
- * @param {PepegaContext} pepegaContext
+ * @param {PatchronContext} patchronContext
  * @param {Array<object>} reviewComments
  *
  * @returns {number} number of comments successfully posted to the GitHub
  */
-module.exports = async (pepegaContext, reviewComments) => {
-    const { log } = pepegaContext;
+module.exports = async (patchronContext, reviewComments) => {
+    const { log } = patchronContext;
     let numberOfPostedComments = 0;
 
     if (maxCommentsPerReview <= 0) {
@@ -49,11 +49,14 @@ module.exports = async (pepegaContext, reviewComments) => {
             if (reviewComment?.body) {
                 const { body } = reviewComment;
 
-                await addComment(pepegaContext, body);
+                await addComment(patchronContext, body);
             } else if (reviewComment?.start_line) {
-                await addMultiLineReviewComment(pepegaContext, reviewComment);
+                await addMultiLineReviewComment(patchronContext, reviewComment);
             } else if (reviewComment?.line) {
-                await addSingleLineReviewComment(pepegaContext, reviewComment);
+                await addSingleLineReviewComment(
+                    patchronContext,
+                    reviewComment
+                );
             }
 
             numberOfPostedComments++;

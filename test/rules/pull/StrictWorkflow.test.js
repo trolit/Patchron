@@ -46,10 +46,10 @@ const validConfig = {
 };
 
 describe('invoke function', () => {
-    let pepegaContext = null;
+    let patchronContext = null;
 
     beforeEach(() => {
-        pepegaContext = setupApp();
+        patchronContext = setupApp();
     });
 
     afterEach(() => {
@@ -60,7 +60,7 @@ describe('invoke function', () => {
 
     it('returns null when rule workflow is empty', () => {
         const strictWorkflowRule = new StrictWorkflowRule(
-            pepegaContext,
+            patchronContext,
             {
                 ...validConfig,
                 workflow: []
@@ -74,7 +74,7 @@ describe('invoke function', () => {
     });
 
     it('returns null when workflow is valid', () => {
-        instantiateProbotContext(pepegaContext, {
+        instantiateProbotContext(patchronContext, {
             payload: {
                 pull_request: {
                     head: {
@@ -88,7 +88,7 @@ describe('invoke function', () => {
         });
 
         const strictWorkflowRule = new StrictWorkflowRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             null
         );
@@ -99,7 +99,7 @@ describe('invoke function', () => {
     });
 
     it('returns object when flow is invalid (wrong head prefix)', () => {
-        instantiateProbotContext(pepegaContext, {
+        instantiateProbotContext(patchronContext, {
             payload: {
                 pull_request: {
                     head: {
@@ -113,7 +113,7 @@ describe('invoke function', () => {
         });
 
         const strictWorkflowRule = new StrictWorkflowRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             null
         );
@@ -124,7 +124,7 @@ describe('invoke function', () => {
     });
 
     it('returns object when flow is invalid (valid head prefix)', () => {
-        instantiateProbotContext(pepegaContext, {
+        instantiateProbotContext(patchronContext, {
             payload: {
                 pull_request: {
                     head: {
@@ -138,7 +138,7 @@ describe('invoke function', () => {
         });
 
         const strictWorkflowRule = new StrictWorkflowRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             null
         );

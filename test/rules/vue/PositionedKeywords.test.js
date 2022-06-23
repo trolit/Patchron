@@ -64,11 +64,11 @@ const validConfig = {
 };
 
 describe('invoke function', () => {
-    let pepegaContext = null;
+    let patchronContext = null;
     let file = {};
 
     beforeEach(() => {
-        pepegaContext = setupApp();
+        patchronContext = setupApp();
 
         file = initializeFile();
     });
@@ -81,7 +81,7 @@ describe('invoke function', () => {
 
     it('returns empty array on empty keywords', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: []
             },
@@ -101,7 +101,7 @@ describe('invoke function', () => {
 
     it('returns empty array on missing custom position', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [
                     {
@@ -132,7 +132,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid custom positioning', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             {
                 ...file,
@@ -166,7 +166,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid custom positioning (enforced)', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             {
                 ...file,
@@ -200,7 +200,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid custom positioning (maxLineBreaks = 2, countDifferentCodeAsLineBreak = true)', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [
                     {
@@ -246,7 +246,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid `import`custom positioning (second layer order)', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [
                     {
@@ -288,7 +288,7 @@ describe('invoke function', () => {
 
     it('returns empty array on only one order type of custom positioning (second layer order)', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [
                     {
@@ -324,7 +324,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid custom positioning (maxLineBreaks = 0)', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             {
                 ...file,
@@ -366,7 +366,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid custom positioning (enforced, maxLineBreaks = 0)', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
-            pepegaContext,
+            patchronContext,
             validConfig,
             {
                 ...file,
@@ -408,7 +408,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid custom positioning (maxLineBreaks = 2, countDifferentCodeAsLineBreak = false)', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [
                     {
@@ -457,7 +457,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid `import` custom positioning (second layer order)', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [
                     {
@@ -501,7 +501,7 @@ describe('invoke function', () => {
 
     it('returns single comment on invalid custom positioning (breakOnFirstOccurence)', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [
                     {
@@ -553,7 +553,7 @@ describe('invoke function', () => {
 
     it('returns empty array on missing BOF position', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [
                     {
@@ -584,7 +584,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid BOF positioning', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [importKeywordBOFConfig]
             },
@@ -619,7 +619,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid BOF positioning (enforced)', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [importKeywordBOFConfig]
             },
@@ -655,7 +655,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid BOF positioning (maxLineBreaks = 2, countDifferentCodeAsLineBreak = true)', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [
                     {
@@ -698,7 +698,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid `import` BOF positioning (second layer order)', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [
                     {
@@ -740,7 +740,7 @@ describe('invoke function', () => {
 
     it('returns empty array on only one order type of BOF positioning (second layer order)', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [
                     {
@@ -775,7 +775,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid BOF position', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [
                     {
@@ -821,7 +821,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid BOF positioning (maxLineBreaks = 0)', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [importKeywordBOFConfig]
             },
@@ -864,7 +864,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid BOF positioning (enforced, maxLineBreaks = 0)', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [importKeywordBOFConfig]
             },
@@ -909,7 +909,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid BOF positioning (maxLineBreaks = 2, countDifferentCodeAsLineBreak = false)', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [
                     {
@@ -959,7 +959,7 @@ describe('invoke function', () => {
 
     it('returns empty array on valid BOF positioning (two BOF keywords)', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [
                     importKeywordBOFConfig,
@@ -999,7 +999,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid `import` BOF positioning (two BOF keywords)', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [
                     importKeywordBOFConfig,
@@ -1042,7 +1042,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid `import` BOF positioning (two BOF keywords)', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [
                     importKeywordBOFConfig,
@@ -1085,7 +1085,7 @@ describe('invoke function', () => {
 
     it('returns review on invalid `import` BOF positioning (second layer order)', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [
                     {
@@ -1129,7 +1129,7 @@ describe('invoke function', () => {
 
     it('returns single comment on invalid BOF positioning (breakOnFirstOccurence)', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [
                     {
@@ -1174,7 +1174,7 @@ describe('invoke function', () => {
 
     it('returns single comment on invalid `import` and `const` BOF positioning (two BOF keywords)', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
-            pepegaContext,
+            patchronContext,
             {
                 keywords: [
                     importKeywordBOFConfig,
