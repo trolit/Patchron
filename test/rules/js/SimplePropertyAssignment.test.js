@@ -8,7 +8,7 @@ const {
 } = require('@jest/globals');
 
 const {
-    js: { SimplePropertyAssignment }
+    js: { SimplePropertyAssignmentRule }
 } = require('src/rules');
 const setupApp = require('test/rules/helpers/setupApp');
 const initializeFile = require('test/rules/helpers/initializeFile');
@@ -32,7 +32,7 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid simple object property assignment', () => {
-        const simplePropertyAssignment = new SimplePropertyAssignment(
+        const simplePropertyAssignmentRule = new SimplePropertyAssignmentRule(
             patchronContext,
             config,
             {
@@ -60,13 +60,13 @@ describe('invoke function', () => {
             }
         );
 
-        const result = simplePropertyAssignment.invoke();
+        const result = simplePropertyAssignmentRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid simple object property assignment', () => {
-        const simplePropertyAssignment = new SimplePropertyAssignment(
+        const simplePropertyAssignmentRule = new SimplePropertyAssignmentRule(
             patchronContext,
             config,
             {
@@ -94,7 +94,7 @@ describe('invoke function', () => {
             }
         );
 
-        const result = simplePropertyAssignment.invoke();
+        const result = simplePropertyAssignmentRule.invoke();
 
         expect(result).toHaveLength(2);
 
