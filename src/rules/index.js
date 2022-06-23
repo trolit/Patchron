@@ -12,6 +12,7 @@ const DirectImportRule = require('./js/DirectImport');
 const AsynchronousPatternRule = require('./js/AsynchronousPattern');
 const ImportWithoutExtensionRule = require('./js/ImportWithoutExtension');
 const ImplicitIndexFileImportRule = require('./js/ImplicitIndexFileImport');
+const SimplePropertyAssignmentRule = require('./js/SimplePropertyAssignment');
 
 const NormalizedEventHandlerRule = require('./vue/NormalizedEventHandler');
 
@@ -34,7 +35,8 @@ module.exports = {
         DirectImportRule,
         AsynchronousPatternRule,
         ImportWithoutExtensionRule,
-        ImplicitIndexFileImportRule
+        ImplicitIndexFileImportRule,
+        SimplePropertyAssignmentRule
     },
 
     vue: {
