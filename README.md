@@ -1,4 +1,4 @@
-<img src="https://github.com/trolit/Patchron/blob/master/picture.jpg" alt="Bot default avatar" height="100"/>
+<img src="https://github.com/trolit/Patchron/blob/master/picture.jpg" alt="Bot default avatar" height="200"/>
 
 # Patchron
 
