@@ -2,7 +2,7 @@
 
 # Patchron
 
-> A GitHub App built with [Probot](https://github.com/probot/probot) which is meant to help in maintaining development conventions by performing early pull request code review. Code review is based on patches that contain limited number of information from modified files. Due to this, some review comments might not be accurate, but still, those are edge cases (e.g. patch which is fragment of multi-line string or differentiating interpolated code from raw string) which can be ignored when reviewed by PR owner.
+> A GitHub App built with [Probot](https://github.com/probot/probot) framework that is meant to improve maintaining development conventions by performing very first pull requests code review. Code review is based on patches that contain limited number of information from modified files. Due to this, some review comments might not be relevant, but still, those are edge problems (e.g. differentiating interpolated code from raw string) which can be ignored.
 
 ## Setup
 
