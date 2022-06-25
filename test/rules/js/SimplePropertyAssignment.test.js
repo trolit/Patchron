@@ -13,7 +13,7 @@ const {
 const setupApp = require('test/rules/helpers/setupApp');
 const initializeFile = require('test/rules/helpers/initializeFile');
 
-const config = { };
+const config = {};
 
 describe('invoke function', () => {
     let patchronContext = null;
@@ -39,23 +39,25 @@ describe('invoke function', () => {
                 ...file,
                 splitPatch: [
                     `@@ -10,13 +10,5 @@`,
-                    `+const object1 = {`,
+                    `+const objectA = { filter0, filter1 };`,
+                    `+const objectB = { filter0, filter1 };`,
+                    `+const objectC = {`,
                     `+    filter1,`,
                     `+    filter2,`,
                     `+    rules: result.filter(element => element.type === 'result')`,
-                    `+};`
+                    `+};`,
                     `+`,
-                    ` const object2 = {`,
+                    ` const objectD = {`,
                     `     property1: 123,`,
                     `     property2: 'hello',`,
                     `     property3,`,
                     ` };`,
                     `-`,
-                    `-const object3 = {`,
+                    `-const objectE = {`,
                     `-    property1: property1,`,
                     `-    property2: property2,`,
                     `-    property3: property3,`,
-                    `-};`,
+                    `-};`
                 ]
             }
         );
@@ -73,34 +75,39 @@ describe('invoke function', () => {
                 ...file,
                 splitPatch: [
                     `@@ -10,13 +10,5 @@`,
-                    `+const object1 = {`,
+                    `+const objectA = { filter0, filter1: filter1 };`,
+                    `+const objectB = { filter0: filter0, filter1 };`,
+                    `+const objectC = {`,
                     `+    filter1,`,
                     `+    filter2: filter2,`,
                     `+    rules: result.filter(element => element.type === 'result')`,
-                    `+};`
+                    `+};`,
                     `+`,
-                    ` const object2 = {`,
+                    ` const objectD = {`,
                     `     property1: property1,`,
                     `     property2: 'hello',`,
                     `     property3,`,
                     ` };`,
                     `-`,
-                    `-const object3 = {`,
+                    `-const objectE = {`,
                     `-    property1: property1,`,
                     `-    property2: property2,`,
                     `-    property3: property3,`,
-                    `-};`,
+                    `-};`
                 ]
             }
         );
 
         const result = simplePropertyAssignmentRule.invoke();
 
-        expect(result).toHaveLength(2);
+        expect(result).toHaveLength(4);
 
-        expect(result[0]).toHaveProperty('line', 12);
-        
-        expect(result[1]).toHaveProperty('line', 17);
+        expect(result[0]).toHaveProperty('line', 10);
+
+        expect(result[1]).toHaveProperty('line', 11);
+
+        expect(result[2]).toHaveProperty('line', 14);
+
+        expect(result[3]).toHaveProperty('line', 19);
     });
-
 });
