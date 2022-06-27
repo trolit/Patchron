@@ -17,12 +17,43 @@ const reviewFiles = require('./pull-request/reviewFiles');
 const postComments = require('./pull-request/postComments');
 const PatchronContext = require('./builders/PatchronContext');
 const reviewContext = require('./pull-request/reviewContext');
+const debugRule = require('./helpers/debugRule');
 
 /**
  * @param {ProbotApp} app
  */
 module.exports = (app) => {
     const patchronContext = new PatchronContext(app);
+
+    debugRule(
+        'SimplePropertyAssignmentRule',
+        {},
+        {
+            splitPatch: [
+                `@@ -10,13 +10,5 @@`,
+                `+const objectA = { filter0, filter1: filter1 };`,
+                `+const objectB = { filter0: filter0, filter1 };`,
+                `+const objectC = {`,
+                `+    filter1,`,
+                `+    filter2: filter2,`,
+                `+    rules: result.filter(element => element.type === 'result')`,
+                `+};`,
+                `+`,
+                ` const objectD = {`,
+                `     property1: property1,`,
+                `     property2: 'hello',`,
+                `     property3,`,
+                ` };`,
+                `-`,
+                `-const objectE = {`,
+                `-    property1: property1,`,
+                `-    property2: property2,`,
+                `-    property3: property3,`,
+                `-};`
+            ]
+        },
+        patchronContext
+    );
 
     app.on(
         ['pull_request.opened', 'pull_request.synchronize'],
