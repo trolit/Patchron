@@ -116,7 +116,7 @@ class SimplePropertyAssignmentRule extends BaseRule {
      * @returns {string}
      */
     _getCommentBody() {
-        return `TBA`;
+        return `It seems that there is redundant value assignment to property (assigned value has the same name as key)`;
     }
 }
 
