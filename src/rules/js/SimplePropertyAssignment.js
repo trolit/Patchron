@@ -2,6 +2,8 @@ const BaseRule = require('src/rules/Base');
 
 class SimplePropertyAssignmentRule extends BaseRule {
     /**
+     * checks lines that are property assignments. If in such assignment value name is the same as property name (e.g. `var1: var1`), line is commented out.
+     *
      * @param {PatchronContext} patchronContext
      * @param {object} config
      * @param {Patch} file
