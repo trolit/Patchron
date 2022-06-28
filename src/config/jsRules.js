@@ -4,6 +4,7 @@ const {
         MarkedCommentsRule,
         SingleLineBlockRule,
         PositionedKeywordsRule,
+        PredefinedFilenameRule,
         LineBreakBeforeReturnRule,
         ValueComparisionStyleRule,
         KeywordsOrderedByLengthRule,
@@ -180,6 +181,11 @@ module.exports = [
     {
         enabled: false,
         reference: SimplePropertyAssignmentRule,
+        config: {}
+    },
+    {
+        enabled: false,
+        reference: PredefinedFilenameRule,
         config: {}
     }
 ];
