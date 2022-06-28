@@ -12,7 +12,8 @@ const {
     js: {
         AsynchronousPatternRule,
         ImportWithoutExtensionRule,
-        ImplicitIndexFileImportRule
+        ImplicitIndexFileImportRule,
+        SimplePropertyAssignmentRule
     }
 } = require('src/rules');
 
@@ -175,5 +176,10 @@ module.exports = [
         config: {
             pattern: 'await'
         }
+    },
+    {
+        enabled: false,
+        reference: SimplePropertyAssignmentRule,
+        config: {}
     }
 ];
