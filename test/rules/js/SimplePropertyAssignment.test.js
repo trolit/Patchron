@@ -39,7 +39,7 @@ describe('invoke function', () => {
                 ...file,
                 splitPatch: [
                     `@@ -10,13 +10,5 @@`,
-                    `+const objectA = { filter0, filter1, };`,
+                    `+const objectA = { filter0, y: 5, filter1, };`,
                     `+const objectB = { filter0, filter1 };`,
                     `+const objectC = { test1: doSomething() };`,
                     `+const objectD = {`,
@@ -84,7 +84,7 @@ describe('invoke function', () => {
                 ...file,
                 splitPatch: [
                     `@@ -10,13 +10,5 @@`,
-                    `+const objectA = { filter0, filter1: filter1, };`,
+                    `+const objectA = { filter0, y: 5, filter1: filter1, };`,
                     `+const objectB = { filter0: filter0, filter1 };`,
                     `+const objectC = { test1: doSomething() };`,
                     `+const objectD = {`,
