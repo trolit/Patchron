@@ -1,9 +1,9 @@
 const BaseRule = require('src/rules/Base');
 
-class MarkedCommentsRule extends BaseRule {
+class MarkedCommentRule extends BaseRule {
     /**
      * @param {PatchronContext} patchronContext
-     * @param {MarkedCommentsConfig} config
+     * @param {MarkedCommentConfig} config
      * @param {Patch} file
      */
     constructor(patchronContext, config, file) {
@@ -241,4 +241,4 @@ class MarkedCommentsRule extends BaseRule {
     }
 }
 
-module.exports = MarkedCommentsRule;
+module.exports = MarkedCommentRule;

@@ -1,7 +1,7 @@
 const {
     common: {
         DirectImportRule,
-        MarkedCommentsRule,
+        MarkedCommentRule,
         SingleLineBlockRule,
         PositionedKeywordsRule,
         PredefinedFilenameRule,
@@ -40,7 +40,7 @@ module.exports = [
     },
     {
         enabled: false,
-        reference: MarkedCommentsRule,
+        reference: MarkedCommentRule,
         config: {
             prefixes: [
                 {

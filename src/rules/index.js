@@ -1,6 +1,6 @@
 const StrictWorkflowRule = require('./pull/StrictWorkflow');
 
-const MarkedCommentsRule = require('./common/MarkedComments');
+const MarkedCommentRule = require('./common/MarkedComment');
 const SingleLineBlockRule = require('./common/SingleLineBlock');
 const PositionedKeywordsRule = require('./common/PositionedKeywords');
 const PredefinedFilenameRule = require('./common/PredefinedFilename');
@@ -19,7 +19,7 @@ const NormalizedEventHandlerRule = require('./vue/NormalizedEventHandler');
 
 module.exports = {
     common: {
-        MarkedCommentsRule,
+        MarkedCommentRule,
         SingleLineBlockRule,
         PositionedKeywordsRule,
         PredefinedFilenameRule,
