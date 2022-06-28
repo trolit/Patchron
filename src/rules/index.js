@@ -3,6 +3,7 @@ const StrictWorkflowRule = require('./pull/StrictWorkflow');
 const MarkedCommentsRule = require('./common/MarkedComments');
 const SingleLineBlockRule = require('./common/SingleLineBlock');
 const PositionedKeywordsRule = require('./common/PositionedKeywords');
+const PredefinedFilenameRule = require('./common/PredefinedFilename');
 const LineBreakBeforeReturnRule = require('./common/LineBreakBeforeReturn');
 const ValueComparisionStyleRule = require('./common/ValueComparisionStyle');
 const KeywordsOrderedByLengthRule = require('./common/KeywordsOrderedByLength');
@@ -21,6 +22,7 @@ module.exports = {
         MarkedCommentsRule,
         SingleLineBlockRule,
         PositionedKeywordsRule,
+        PredefinedFilenameRule,
         LineBreakBeforeReturnRule,
         ValueComparisionStyleRule,
         KeywordsOrderedByLengthRule,
