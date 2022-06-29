@@ -14,10 +14,10 @@ const setupApp = require('test/rules/helpers/setupApp');
 const initializeFile = require('test/rules/helpers/initializeFile');
 
 const config = {
-    cases: [
+    restrictions: [
         {
             path: 'backend/controllers/*',
-            expectedFilename: /.*Controller.js/
+            expectedName: /.*Controller.js/
         }
     ]
 };
@@ -38,11 +38,11 @@ describe('invoke function', () => {
         nock.enableNetConnect();
     });
 
-    it('returns empty array on empty cases', () => {
+    it('returns empty array on empty restrictions', () => {
         const predefinedFilenameRule = new PredefinedFilenameRule(
             patchronContext,
             {
-                cases: []
+                restrictions: []
             },
             {
                 ...file,
@@ -104,8 +104,12 @@ describe('invoke function', () => {
         const predefinedFilenameRule = new PredefinedFilenameRule(
             patchronContext,
             {
-                ...config,
-                path: 'backend/controllers'
+                restrictions: [
+                    {
+                        ...config,
+                        path: 'backend/controllers'
+                    }
+                ]
             },
             {
                 ...file,
