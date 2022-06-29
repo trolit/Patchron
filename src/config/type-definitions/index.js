@@ -10,6 +10,7 @@
 /// <reference path="./rules/common/PositionedKeywords.js" />
 /// <reference path="./rules/common/SingleLineBlock.js" />
 /// <reference path="./rules/common/ValueComparisionStyle.js" />
+/// <reference path="./rules/common/PredefinedFilename.js" />
 
 /// <reference path="./rules/js/AsynchronousPattern.js" />
 /// <reference path="./rules/js/DirectImport.js" />

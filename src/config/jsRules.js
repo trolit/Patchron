@@ -186,6 +186,13 @@ module.exports = [
     {
         enabled: false,
         reference: PredefinedFilenameRule,
-        config: {}
+        config: {
+            restrictions: [
+                {
+                    path: 'backend/controllers/*',
+                    expectedFilename: /.*Controller.js/
+                }
+            ]
+        }
     }
 ];
