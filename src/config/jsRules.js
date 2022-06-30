@@ -190,7 +190,7 @@ module.exports = [
             restrictions: [
                 {
                     path: 'backend/controllers/*',
-                    expectedFilename: /.*Controller.js/
+                    expectedName: /.*Controller.js/
                 }
             ]
         }
