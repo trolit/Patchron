@@ -18,6 +18,14 @@ const config = {
         {
             path: 'backend/controllers/*',
             expectedName: /.*Controller.js/
+        },
+        {
+            path: 'backend/helpers/*',
+            expectedName: /^[a-z].*.js/
+        },
+        {
+            path: 'backend/plugins/*',
+            expectedName: /^[a-z].*.js/
         }
     ]
 };
@@ -70,7 +78,7 @@ describe('invoke function', () => {
         expect(result).toEqual(null);
     });
 
-    it('returns object on valid predefined filename (with asterisk)', () => {
+    it('returns null on valid predefined filename (with asterisk)', () => {
         const predefinedFilenameRule = new PredefinedFilenameRule(
             patchronContext,
             config,
@@ -82,7 +90,7 @@ describe('invoke function', () => {
 
         const result = predefinedFilenameRule.invoke();
 
-        expect(result).toHaveProperty('body');
+        expect(result).toEqual(null);
     });
 
     it('returns object on invalid predefined filename (with asterisk)', () => {
@@ -98,6 +106,28 @@ describe('invoke function', () => {
         const result = predefinedFilenameRule.invoke();
 
         expect(result).toHaveProperty('body');
+    });
+
+    it('returns null on valid predefined filename (without asterisk)', () => {
+        const predefinedFilenameRule = new PredefinedFilenameRule(
+            patchronContext,
+            {
+                restrictions: [
+                    {
+                        ...config,
+                        path: 'backend/controllers'
+                    }
+                ]
+            },
+            {
+                ...file,
+                filename: 'backend/controllers/IndexController.js'
+            }
+        );
+
+        const result = predefinedFilenameRule.invoke();
+
+        expect(result).toEqual(null);
     });
 
     it('returns null on unmatched path (without asterisk)', () => {
