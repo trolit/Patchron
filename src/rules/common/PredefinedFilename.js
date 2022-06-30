@@ -44,7 +44,8 @@ class PredefinedFilenameRule extends BaseRule {
                 isFilenameMatched = !modifiedPath.includes('/');
             }
 
-            const isFilenameValid = path.match(expectedName);
+            const rawFilename = filename.split('/').pop();
+            const isFilenameValid = rawFilename.match(expectedName);
 
             if (isFilenameMatched && !isFilenameValid) {
                 return {
