@@ -22,16 +22,46 @@ class PredefinedFilenameRule extends BaseRule {
     }
 
     invoke() {
-        const reviewComments = [];
+        if (!this.restrictions.length) {
+            this.log.warning(__filename, 'No restrictions defined', this.file);
 
-        return reviewComments;
+            return null;
+        }
+
+        const { filename } = this.file;
+
+        for (const { path, expectedName } of this.restrictions) {
+            let isFilenameMatched = false;
+            const isPathWithAsterisk = path.endsWith('*');
+
+            if (isPathWithAsterisk) {
+                const fixedPath = path.slice(0, -1);
+
+                isFilenameMatched = filename.startsWith(fixedPath);
+            } else {
+                const fixedPath = `${path}${path.endsWith('/') ? '' : '/'}`;
+                const modifiedPath = fixedPath.replace(fixedPath, '');
+
+                isFilenameMatched = !modifiedPath.includes('/');
+            }
+
+            const isFilenameValid = path.match(expectedName);
+
+            if (isFilenameMatched && !isFilenameValid) {
+                return {
+                    body: this._getCommentBody(filename, expectedName)
+                };
+            }
+        }
+
+        return null;
     }
 
     /**
      * @returns {string}
      */
-    _getCommentBody() {
-        return `TBA`;
+    _getCommentBody(filename, expectedName) {
+        return `Found filename: \`${filename}\`, expected: \`${expectedName}\``;
     }
 }
 
