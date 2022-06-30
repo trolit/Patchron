@@ -38,7 +38,7 @@ describe('invoke function', () => {
         nock.enableNetConnect();
     });
 
-    it('returns empty array on empty restrictions', () => {
+    it('returns null on empty restrictions', () => {
         const predefinedFilenameRule = new PredefinedFilenameRule(
             patchronContext,
             {
@@ -52,10 +52,10 @@ describe('invoke function', () => {
 
         const result = predefinedFilenameRule.invoke();
 
-        expect(result).toEqual([]);
+        expect(result).toEqual(null);
     });
 
-    it('returns empty array on unmatched path', () => {
+    it('returns null on unmatched path', () => {
         const predefinedFilenameRule = new PredefinedFilenameRule(
             patchronContext,
             config,
@@ -67,10 +67,10 @@ describe('invoke function', () => {
 
         const result = predefinedFilenameRule.invoke();
 
-        expect(result).toEqual([]);
+        expect(result).toEqual(null);
     });
 
-    it('returns empty array on valid predefined filename (with asterisk)', () => {
+    it('returns object on valid predefined filename (with asterisk)', () => {
         const predefinedFilenameRule = new PredefinedFilenameRule(
             patchronContext,
             config,
@@ -82,10 +82,10 @@ describe('invoke function', () => {
 
         const result = predefinedFilenameRule.invoke();
 
-        expect(result).toEqual([]);
+        expect(result).toHaveProperty('body');
     });
 
-    it('returns review on invalid predefined filename (with asterisk)', () => {
+    it('returns object on invalid predefined filename (with asterisk)', () => {
         const predefinedFilenameRule = new PredefinedFilenameRule(
             patchronContext,
             config,
@@ -97,10 +97,10 @@ describe('invoke function', () => {
 
         const result = predefinedFilenameRule.invoke();
 
-        expect(result).toHaveLength(1);
+        expect(result).toHaveProperty('body');
     });
 
-    it('returns empty array on unmatched path (without asterisk)', () => {
+    it('returns null on unmatched path (without asterisk)', () => {
         const predefinedFilenameRule = new PredefinedFilenameRule(
             patchronContext,
             {
@@ -119,6 +119,6 @@ describe('invoke function', () => {
 
         const result = predefinedFilenameRule.invoke();
 
-        expect(result).toEqual([]);
+        expect(result).toEqual(null);
     });
 });
