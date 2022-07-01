@@ -46,17 +46,17 @@ module.exports = async (patchronContext, reviewComments) => {
         const reviewComment = reviewComments[i];
 
         try {
-            if (reviewComment?.body) {
-                const { body } = reviewComment;
-
-                await addComment(patchronContext, body);
-            } else if (reviewComment?.start_line) {
+            if (reviewComment?.start_line) {
                 await addMultiLineReviewComment(patchronContext, reviewComment);
             } else if (reviewComment?.line) {
                 await addSingleLineReviewComment(
                     patchronContext,
                     reviewComment
                 );
+            } else if (reviewComment?.body) {
+                const { body } = reviewComment;
+
+                await addComment(patchronContext, body);
             }
 
             numberOfPostedComments++;

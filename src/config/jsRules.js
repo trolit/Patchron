@@ -1,9 +1,10 @@
 const {
     common: {
         DirectImportRule,
-        MarkedCommentsRule,
+        MarkedCommentRule,
         SingleLineBlockRule,
         PositionedKeywordsRule,
+        PredefinedFilenameRule,
         LineBreakBeforeReturnRule,
         ValueComparisionStyleRule,
         KeywordsOrderedByLengthRule,
@@ -39,7 +40,7 @@ module.exports = [
     },
     {
         enabled: false,
-        reference: MarkedCommentsRule,
+        reference: MarkedCommentRule,
         config: {
             prefixes: [
                 {
@@ -181,5 +182,17 @@ module.exports = [
         enabled: false,
         reference: SimplePropertyAssignmentRule,
         config: {}
+    },
+    {
+        enabled: false,
+        reference: PredefinedFilenameRule,
+        config: {
+            restrictions: [
+                {
+                    path: 'backend/controllers/*',
+                    expectedName: /.*Controller.js/
+                }
+            ]
+        }
     }
 ];

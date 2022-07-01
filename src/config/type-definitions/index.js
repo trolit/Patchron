@@ -6,10 +6,11 @@
 
 /// <reference path="./rules/common/FixedLoopLengthCondition.js" />
 /// <reference path="./rules/common/KeywordsOrderedByLength.js" />
-/// <reference path="./rules/common/MarkedComments.js" />
+/// <reference path="./rules/common/MarkedComment.js" />
 /// <reference path="./rules/common/PositionedKeywords.js" />
 /// <reference path="./rules/common/SingleLineBlock.js" />
 /// <reference path="./rules/common/ValueComparisionStyle.js" />
+/// <reference path="./rules/common/PredefinedFilename.js" />
 
 /// <reference path="./rules/js/AsynchronousPattern.js" />
 /// <reference path="./rules/js/DirectImport.js" />

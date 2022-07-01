@@ -1,8 +1,9 @@
 const StrictWorkflowRule = require('./pull/StrictWorkflow');
 
-const MarkedCommentsRule = require('./common/MarkedComments');
+const MarkedCommentRule = require('./common/MarkedComment');
 const SingleLineBlockRule = require('./common/SingleLineBlock');
 const PositionedKeywordsRule = require('./common/PositionedKeywords');
+const PredefinedFilenameRule = require('./common/PredefinedFilename');
 const LineBreakBeforeReturnRule = require('./common/LineBreakBeforeReturn');
 const ValueComparisionStyleRule = require('./common/ValueComparisionStyle');
 const KeywordsOrderedByLengthRule = require('./common/KeywordsOrderedByLength');
@@ -18,9 +19,10 @@ const NormalizedEventHandlerRule = require('./vue/NormalizedEventHandler');
 
 module.exports = {
     common: {
-        MarkedCommentsRule,
+        MarkedCommentRule,
         SingleLineBlockRule,
         PositionedKeywordsRule,
+        PredefinedFilenameRule,
         LineBreakBeforeReturnRule,
         ValueComparisionStyleRule,
         KeywordsOrderedByLengthRule,
