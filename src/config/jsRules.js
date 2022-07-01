@@ -199,6 +199,9 @@ module.exports = [
     {
         enabled: false,
         reference: OperatorStyleRule,
-        config: {}
+        config: {
+            mode: 'simplified',
+            patterns: []
+        }
     }
 ];
