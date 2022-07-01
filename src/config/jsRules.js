@@ -11,6 +11,7 @@ const {
         FixedLoopLengthConditionRule
     },
     js: {
+        OperatorStyleRule,
         AsynchronousPatternRule,
         ImportWithoutExtensionRule,
         ImplicitIndexFileImportRule,
@@ -194,5 +195,10 @@ module.exports = [
                 }
             ]
         }
+    },
+    {
+        enabled: false,
+        reference: OperatorStyleRule,
+        config: {}
     }
 ];
