@@ -17,12 +17,19 @@ const config = {
     mode: 'simplified',
     patterns: [
         {
-            name: 'OR',
-            expression: /a/,
-            expected: {
-                simplified: /a/,
-                expanded: /a/
-            }
+            name: 'eq (true)',
+            expandedRegex: /a/,
+            simplifiedRegex: /a/
+        },
+        {
+            name: 'eq (false)',
+            expandedRegex: /a/,
+            simplifiedRegex: /a/
+        },
+        {
+            name: 'ne',
+            expandedRegex: /a/,
+            simplifiedRegex: /a/
         }
     ]
 };
@@ -87,7 +94,7 @@ describe('invoke function', () => {
      * ---------------------------------------------------
      */
 
-    it('returns empty array on valid `OR null, true, false` pattern', () => {
+    it('returns empty array on valid `eq true` pattern', () => {
         const operatorStyleRule = new OperatorStyleRule(
             patchronContext,
             config,
@@ -115,69 +122,7 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
-    it('returns review on invalid `OR null, true, false` pattern', () => {
-        const operatorStyleRule = new OperatorStyleRule(
-            patchronContext,
-            config,
-            {
-                ...file,
-                splitPatch: [
-                    `@@ -10,13 +10,5 @@`,
-                    `+const actionType = this.getActionType() || null;`,
-                    `+`,
-                    `+if (!actionType) {`,
-                    `+    action = pickAction(context);`,
-                    `+}`,
-                    `+`,
-                    `+const isNull = this.findProperties();`,
-                    `+const isValid = this.validateActionType() || false;`,
-                    `+const isChecked = !isNull && isValid && this.testNode(button, action);`,
-                    `+`,
-                    `+return isChecked || false;`
-                ]
-            }
-        );
-
-        const result = operatorStyleRule.invoke();
-
-        expect(result).toHaveLength(3);
-
-        expect(result[0]).toHaveProperty('line', 10);
-
-        expect(result[1]).toHaveProperty('line', 17);
-
-        expect(result[2]).toHaveProperty('line', 20);
-    });
-
-    it('returns empty array on valid `EQ true` pattern', () => {
-        const operatorStyleRule = new OperatorStyleRule(
-            patchronContext,
-            config,
-            {
-                ...file,
-                splitPatch: [
-                    `@@ -10,13 +10,5 @@`,
-                    `+const actionType = !!this.getActionType();`,
-                    `+`,
-                    `+if (!actionType) {`,
-                    `+    action = pickAction(context);`,
-                    `+}`,
-                    `+`,
-                    `+const isNull = this.findProperties();`,
-                    `+const isValid = this.validateActionType();`,
-                    `+const isChecked = !isNull && isValid && this.testNode(button, action);`,
-                    `+`,
-                    `+return isChecked;`
-                ]
-            }
-        );
-
-        const result = operatorStyleRule.invoke();
-
-        expect(result).toEqual([]);
-    });
-
-    it('returns review on invalid `EQ true` pattern', () => {
+    it('returns review on invalid `eq true` pattern', () => {
         const operatorStyleRule = new OperatorStyleRule(
             patchronContext,
             config,
@@ -209,7 +154,7 @@ describe('invoke function', () => {
         expect(result[1]).toHaveProperty('line', 20);
     });
 
-    it('returns empty array on valid `EQ false` pattern', () => {
+    it('returns empty array on valid `eq false` pattern', () => {
         const operatorStyleRule = new OperatorStyleRule(
             patchronContext,
             config,
@@ -237,7 +182,7 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
-    it('returns review on invalid `EQ false` pattern', () => {
+    it('returns review on invalid `eq false` pattern', () => {
         const operatorStyleRule = new OperatorStyleRule(
             patchronContext,
             config,
@@ -269,7 +214,7 @@ describe('invoke function', () => {
         expect(result[1]).toHaveProperty('line', 20);
     });
 
-    it('returns empty array on valid `NE null, false` pattern', () => {
+    it('returns empty array on valid `ne null, false` pattern', () => {
         const operatorStyleRule = new OperatorStyleRule(
             patchronContext,
             config,
@@ -297,7 +242,7 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
-    it('returns review on invalid `NE null, false` pattern', () => {
+    it('returns review on invalid `ne null, false` pattern', () => {
         const operatorStyleRule = new OperatorStyleRule(
             patchronContext,
             config,
