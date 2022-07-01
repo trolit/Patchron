@@ -63,7 +63,7 @@ describe('invoke function', () => {
         expect(result).toEqual(null);
     });
 
-    it('returns null on unmatched path', () => {
+    it('returns null on unmatched path (example1)', () => {
         const predefinedFilenameRule = new PredefinedFilenameRule(
             patchronContext,
             config,
@@ -78,7 +78,22 @@ describe('invoke function', () => {
         expect(result).toEqual(null);
     });
 
-    it('returns null on valid predefined filename (with asterisk)', () => {
+    it('returns null on unmatched path (example2)', () => {
+        const predefinedFilenameRule = new PredefinedFilenameRule(
+            patchronContext,
+            config,
+            {
+                ...file,
+                filename: 'backend/helpers/IsItWorking.js'
+            }
+        );
+
+        const result = predefinedFilenameRule.invoke();
+
+        expect(result).toHaveProperty('body');
+    });
+
+    it('returns null on valid predefined filename', () => {
         const predefinedFilenameRule = new PredefinedFilenameRule(
             patchronContext,
             config,
@@ -93,13 +108,28 @@ describe('invoke function', () => {
         expect(result).toEqual(null);
     });
 
-    it('returns object on invalid predefined filename (with asterisk)', () => {
+    it('returns object on invalid predefined filename (example1)', () => {
         const predefinedFilenameRule = new PredefinedFilenameRule(
             patchronContext,
             config,
             {
                 ...file,
                 filename: 'backend/controllers/Employee/someFile.js'
+            }
+        );
+
+        const result = predefinedFilenameRule.invoke();
+
+        expect(result).toHaveProperty('body');
+    });
+
+    it('returns object on invalid predefined filename (example2)', () => {
+        const predefinedFilenameRule = new PredefinedFilenameRule(
+            patchronContext,
+            config,
+            {
+                ...file,
+                filename: 'backend/helpers/IsItWorking.js'
             }
         );
 
