@@ -10,8 +10,8 @@ const KeywordsOrderedByLengthRule = require('./common/KeywordsOrderedByLength');
 const FixedLoopLengthConditionRule = require('./common/FixedLoopLengthCondition');
 
 const DirectImportRule = require('./js/DirectImport');
-const OperatorStyleRule = require('./js/OperatorStyle');
 const AsynchronousPatternRule = require('./js/AsynchronousPattern');
+const SimpleComparisionRule = require('./js/SimpleComparisionRule');
 const ImportWithoutExtensionRule = require('./js/ImportWithoutExtension');
 const ImplicitIndexFileImportRule = require('./js/ImplicitIndexFileImport');
 const SimplePropertyAssignmentRule = require('./js/SimplePropertyAssignment');
@@ -36,7 +36,7 @@ module.exports = {
 
     js: {
         DirectImportRule,
-        OperatorStyleRule,
+        SimpleComparisionRule,
         AsynchronousPatternRule,
         ImportWithoutExtensionRule,
         ImplicitIndexFileImportRule,

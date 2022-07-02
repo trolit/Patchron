@@ -1,6 +1,6 @@
 const BaseRule = require('src/rules/Base');
 
-class OperatorStyleRule extends BaseRule {
+class SimpleComparisionRule extends BaseRule {
     /**
      *
      * @param {PatchronContext} patchronContext
@@ -21,4 +21,4 @@ class OperatorStyleRule extends BaseRule {
     }
 }
 
-module.exports = OperatorStyleRule;
+module.exports = SimpleComparisionRule;

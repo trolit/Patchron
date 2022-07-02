@@ -8,13 +8,12 @@ const {
 } = require('@jest/globals');
 
 const {
-    js: { OperatorStyleRule }
+    js: { SimpleComparisionRule }
 } = require('src/rules');
 const setupApp = require('test/rules/helpers/setupApp');
 const initializeFile = require('test/rules/helpers/initializeFile');
 
 const config = {
-    mode: 'simplified',
     patterns: [
         {
             name: 'eq (true)',
@@ -50,32 +49,10 @@ describe('invoke function', () => {
         nock.enableNetConnect();
     });
 
-    it('returns empty array on invalid mode', () => {
-        const operatorStyleRule = new OperatorStyleRule(
-            patchronContext,
-            {
-                mode: 'xyz',
-                patterns: [
-                    {
-                        name: 'pattern1'
-                    }
-                ]
-            },
-            {
-                ...file
-            }
-        );
-
-        const result = operatorStyleRule.invoke();
-
-        expect(result).toEqual([]);
-    });
-
     it('returns empty array on empty patterns', () => {
-        const operatorStyleRule = new OperatorStyleRule(
+        const simpleComparisionRule = new SimpleComparisionRule(
             patchronContext,
             {
-                mode: 'simplified',
                 patterns: []
             },
             {
@@ -83,19 +60,13 @@ describe('invoke function', () => {
             }
         );
 
-        const result = operatorStyleRule.invoke();
+        const result = simpleComparisionRule.invoke();
 
         expect(result).toEqual([]);
     });
 
-    /**
-     * ---------------------------------------------------
-     * SIMPLIFIED MODE TESTS
-     * ---------------------------------------------------
-     */
-
     it('returns empty array on valid `eq true` pattern', () => {
-        const operatorStyleRule = new OperatorStyleRule(
+        const simpleComparisionRule = new SimpleComparisionRule(
             patchronContext,
             config,
             {
@@ -117,13 +88,13 @@ describe('invoke function', () => {
             }
         );
 
-        const result = operatorStyleRule.invoke();
+        const result = simpleComparisionRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid `eq true` pattern', () => {
-        const operatorStyleRule = new OperatorStyleRule(
+        const simpleComparisionRule = new SimpleComparisionRule(
             patchronContext,
             config,
             {
@@ -145,7 +116,7 @@ describe('invoke function', () => {
             }
         );
 
-        const result = operatorStyleRule.invoke();
+        const result = simpleComparisionRule.invoke();
 
         expect(result).toHaveLength(2);
 
@@ -155,7 +126,7 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid `eq false` pattern', () => {
-        const operatorStyleRule = new OperatorStyleRule(
+        const simpleComparisionRule = new SimpleComparisionRule(
             patchronContext,
             config,
             {
@@ -177,13 +148,13 @@ describe('invoke function', () => {
             }
         );
 
-        const result = operatorStyleRule.invoke();
+        const result = simpleComparisionRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid `eq false` pattern', () => {
-        const operatorStyleRule = new OperatorStyleRule(
+        const simpleComparisionRule = new SimpleComparisionRule(
             patchronContext,
             config,
             {
@@ -205,7 +176,7 @@ describe('invoke function', () => {
             }
         );
 
-        const result = operatorStyleRule.invoke();
+        const result = simpleComparisionRule.invoke();
 
         expect(result).toHaveLength(2);
 
@@ -215,7 +186,7 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid `ne null, false` pattern', () => {
-        const operatorStyleRule = new OperatorStyleRule(
+        const simpleComparisionRule = new SimpleComparisionRule(
             patchronContext,
             config,
             {
@@ -237,13 +208,13 @@ describe('invoke function', () => {
             }
         );
 
-        const result = operatorStyleRule.invoke();
+        const result = simpleComparisionRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid `ne null, false` pattern', () => {
-        const operatorStyleRule = new OperatorStyleRule(
+        const simpleComparisionRule = new SimpleComparisionRule(
             patchronContext,
             config,
             {
@@ -265,7 +236,7 @@ describe('invoke function', () => {
             }
         );
 
-        const result = operatorStyleRule.invoke();
+        const result = simpleComparisionRule.invoke();
 
         expect(result).toHaveLength(2);
 

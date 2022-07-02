@@ -11,7 +11,7 @@ const {
         FixedLoopLengthConditionRule
     },
     js: {
-        OperatorStyleRule,
+        SimpleComparisionRule,
         AsynchronousPatternRule,
         ImportWithoutExtensionRule,
         ImplicitIndexFileImportRule,
@@ -198,9 +198,8 @@ module.exports = [
     },
     {
         enabled: false,
-        reference: OperatorStyleRule,
+        reference: SimpleComparisionRule,
         config: {
-            mode: 'simplified',
             patterns: []
         }
     }
