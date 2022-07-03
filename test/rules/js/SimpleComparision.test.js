@@ -16,20 +16,20 @@ const initializeFile = require('test/rules/helpers/initializeFile');
 const config = {
     patterns: [
         {
-            name: 'eq',
-            regex: /={2,3}(\s)*?(true|false|null|undefined)/,
-            suggestions: [
-                'value === true -> value',
-                'value === false/null/undefined -> !value'
-            ]
+            name: 'eq/ne (true, false)',
+            expression: /(!={1,2}|={2,3})(\s)*?(true|false)/,
+            examples: `
+            \`value === true\`, \`value !== false\` -> \`value\`
+            \`value === false\`, \`value !== true\` -> \`!value\`
+            `
         },
         {
-            name: 'ne',
-            regex: /!={1,2}(\s)*?(true|false|null|undefined)/,
-            suggestions: [
-                'value !== true -> !value',
-                'value !== false/null/undefined -> value'
-            ]
+            name: 'eq/ne (null, undefined)',
+            expression: /(!={1,2}|={2,3})(\s)*?(null|undefined)/,
+            examples: `
+            \`value === null/undefined\` -> \`!value\`
+            \`value !== null/undefined\` -> \`!!value\`
+            `
         }
     ]
 };
@@ -66,7 +66,7 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
-    it('returns empty array on valid `eq` pattern', () => {
+    it('returns empty array on valid `eq/ne (true, false)` pattern', () => {
         const simpleComparisionRule = new SimpleComparisionRule(
             patchronContext,
             config,
@@ -80,9 +80,9 @@ describe('invoke function', () => {
                     `+    action = pickAction(context);`,
                     `+}`,
                     `+`,
-                    `+const isNull = !result;`,
-                    `+const isUndefined = !this.validateActionType();`,
-                    `+const isChecked = !isNull && !isUndefined && this.testNode(button, action);`,
+                    `+const condition1 = !this.isValid1();`,
+                    `+const condition2 = this.isValid2();`,
+                    `+const isChecked = condition1 && condition2 && this.testNode(button, action);`,
                     `+`,
                     `+return isChecked;`
                 ]
@@ -94,7 +94,7 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
-    it('returns review on invalid `eq` pattern', () => {
+    it('returns review on invalid `eq/ne (true, false)` pattern', () => {
         const simpleComparisionRule = new SimpleComparisionRule(
             patchronContext,
             config,
@@ -104,13 +104,13 @@ describe('invoke function', () => {
                     `@@ -10,13 +10,5 @@`,
                     `+const withActionType = !!this.getActionType();`,
                     `+`,
-                    `+if (withActionType === false) {`,
+                    `+if (withActionType != true) {`,
                     `+    action = pickAction(context);`,
                     `+}`,
                     `+`,
-                    `+const isNull = result === null;`,
-                    `+const isUndefined = this.validateActionType() === undefined;`,
-                    `+const isChecked = !isNull && !isUndefined && this.testNode(button, action);`,
+                    `+const condition1 = this.isValid1() === false;`,
+                    `+const condition2 = this.isValid2() !== false;`,
+                    `+const isChecked = condition1 && condition2 && this.testNode(button, action);`,
                     `+`,
                     `+return isChecked == true;`
                 ]
@@ -130,7 +130,7 @@ describe('invoke function', () => {
         expect(result[3]).toHaveProperty('line', 20);
     });
 
-    it('returns empty array on valid `ne` pattern', () => {
+    it('returns empty array on valid `eq/ne (null, undefined)` pattern', () => {
         const simpleComparisionRule = new SimpleComparisionRule(
             patchronContext,
             config,
@@ -140,13 +140,14 @@ describe('invoke function', () => {
                     `@@ -10,13 +10,5 @@`,
                     `+const withActionType = !!this.getActionType();`,
                     `+`,
-                    `+if (!withActionType) {`,
+                    `+if (withActionType) {`,
                     `+    action = pickAction(context);`,
                     `+}`,
                     `+`,
-                    `+const isNull = !!result;`,
-                    `+const isUndefined = !!this.validateActionType();`,
-                    `+const isChecked = !isNull && !isUndefined && this.testNode(button, action);`,
+                    `+const condition1 = !this.isValid1();`,
+                    `+const condition2 = !this.isValid2();`,
+                    `+const isChecked = !condition1 && condition2`,
+                    `+                    && !!this.testNode(button, action);`,
                     `+`,
                     `+return isChecked;`
                 ]
@@ -158,7 +159,7 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
-    it('returns review on invalid `ne` pattern', () => {
+    it('returns review on invalid `eq/ne (null, undefined)` pattern', () => {
         const simpleComparisionRule = new SimpleComparisionRule(
             patchronContext,
             config,
@@ -166,17 +167,18 @@ describe('invoke function', () => {
                 ...file,
                 splitPatch: [
                     `@@ -10,13 +10,5 @@`,
-                    `+const withActionType = !!this.getActionType();`,
+                    `+const withActionType = this.getActionType() != null;`,
                     `+`,
-                    `+if (withActionType !== true) {`,
+                    `+if (withActionType) {`,
                     `+    action = pickAction(context);`,
                     `+}`,
                     `+`,
-                    `+const isNull = result !== null;`,
-                    `+const isUndefined = this.validateActionType() != undefined;`,
-                    `+const isChecked = !isNull && !isUndefined && this.testNode(button, action);`,
+                    `+const condition1 = this.isValid1() === undefined;`,
+                    `+const condition2 = this.isValid2() == undefined;`,
+                    `+const isChecked = !condition1 && condition2`,
+                    `+                    && this.testNode(button, action) !== null;`,
                     `+`,
-                    `+return isChecked != false;`
+                    `+return isChecked;`
                 ]
             }
         );
@@ -185,12 +187,12 @@ describe('invoke function', () => {
 
         expect(result).toHaveLength(4);
 
-        expect(result[0]).toHaveProperty('line', 12);
+        expect(result[0]).toHaveProperty('line', 10);
 
         expect(result[1]).toHaveProperty('line', 16);
 
         expect(result[2]).toHaveProperty('line', 17);
 
-        expect(result[3]).toHaveProperty('line', 20);
+        expect(result[3]).toHaveProperty('line', 19);
     });
 });
