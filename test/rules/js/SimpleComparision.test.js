@@ -34,7 +34,7 @@ const config = {
     ]
 };
 
-describe('invoke function', () => {
+describe.skip('invoke function', () => {
     let patchronContext = null;
     let file = {};
 

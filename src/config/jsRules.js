@@ -6,8 +6,8 @@ const {
         PositionedKeywordsRule,
         PredefinedFilenameRule,
         LineBreakBeforeReturnRule,
-        ValueComparisionStyleRule,
         KeywordsOrderedByLengthRule,
+        ComparisionOperatorLevelRule,
         FixedLoopLengthConditionRule
     },
     js: {
@@ -149,7 +149,7 @@ module.exports = [
     },
     {
         enabled: false,
-        reference: ValueComparisionStyleRule,
+        reference: ComparisionOperatorLevelRule,
         config: {
             allowedLevels: [2]
         }
