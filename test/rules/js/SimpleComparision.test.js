@@ -16,19 +16,20 @@ const initializeFile = require('test/rules/helpers/initializeFile');
 const config = {
     patterns: [
         {
-            name: 'eq (true)',
-            expandedRegex: /a/,
-            simplifiedRegex: /a/
-        },
-        {
-            name: 'eq (false)',
-            expandedRegex: /a/,
-            simplifiedRegex: /a/
+            name: 'eq',
+            regex: /={2,3}(\s)*?(true|false|null|undefined)/,
+            suggestions: [
+                'value === true -> value',
+                'value === false/null/undefined -> !value'
+            ]
         },
         {
             name: 'ne',
-            expandedRegex: /a/,
-            simplifiedRegex: /a/
+            regex: /!={1,2}(\s)*?(true|false|null|undefined)/,
+            suggestions: [
+                'value !== true -> !value',
+                'value !== false/null/undefined -> value'
+            ]
         }
     ]
 };
@@ -65,7 +66,7 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
-    it('returns empty array on valid `eq true` pattern', () => {
+    it('returns empty array on valid `eq` pattern', () => {
         const simpleComparisionRule = new SimpleComparisionRule(
             patchronContext,
             config,
@@ -73,15 +74,15 @@ describe('invoke function', () => {
                 ...file,
                 splitPatch: [
                     `@@ -10,13 +10,5 @@`,
-                    `+const actionType = !!this.getActionType();`,
+                    `+const withActionType = !!this.getActionType();`,
                     `+`,
-                    `+if (!actionType) {`,
+                    `+if (!withActionType) {`,
                     `+    action = pickAction(context);`,
                     `+}`,
                     `+`,
-                    `+const isNull = this.findProperties();`,
-                    `+const isValid = this.validateActionType();`,
-                    `+const isChecked = !isNull && isValid && this.testNode(button, action);`,
+                    `+const isNull = !result;`,
+                    `+const isUndefined = !this.validateActionType();`,
+                    `+const isChecked = !isNull && !isUndefined && this.testNode(button, action);`,
                     `+`,
                     `+return isChecked;`
                 ]
@@ -93,7 +94,7 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
-    it('returns review on invalid `eq true` pattern', () => {
+    it('returns review on invalid `eq` pattern', () => {
         const simpleComparisionRule = new SimpleComparisionRule(
             patchronContext,
             config,
@@ -101,15 +102,15 @@ describe('invoke function', () => {
                 ...file,
                 splitPatch: [
                     `@@ -10,13 +10,5 @@`,
-                    `+const actionType = !!this.getActionType();`,
+                    `+const withActionType = !!this.getActionType();`,
                     `+`,
-                    `+if (!actionType) {`,
+                    `+if (withActionType === false) {`,
                     `+    action = pickAction(context);`,
                     `+}`,
                     `+`,
-                    `+const isNull = this.findProperties();`,
-                    `+const isValid = this.validateActionType() === true;`,
-                    `+const isChecked = !isNull && isValid && this.testNode(button, action);`,
+                    `+const isNull = result === null;`,
+                    `+const isUndefined = this.validateActionType() === undefined;`,
+                    `+const isChecked = !isNull && !isUndefined && this.testNode(button, action);`,
                     `+`,
                     `+return isChecked == true;`
                 ]
@@ -118,130 +119,78 @@ describe('invoke function', () => {
 
         const result = simpleComparisionRule.invoke();
 
-        expect(result).toHaveLength(2);
-
-        expect(result[0]).toHaveProperty('line', 17);
-
-        expect(result[1]).toHaveProperty('line', 20);
-    });
-
-    it('returns empty array on valid `eq false` pattern', () => {
-        const simpleComparisionRule = new SimpleComparisionRule(
-            patchronContext,
-            config,
-            {
-                ...file,
-                splitPatch: [
-                    `@@ -10,13 +10,5 @@`,
-                    `+const actionType = !!this.getActionType();`,
-                    `+`,
-                    `+if (!actionType) {`,
-                    `+    action = pickAction(context);`,
-                    `+}`,
-                    `+`,
-                    `+const isNull = this.findProperties();`,
-                    `+const isValid = !this.validateActionType();`,
-                    `+const isChecked = !isNull && isValid && this.testNode(button, action);`,
-                    `+`,
-                    `+return !isChecked;`
-                ]
-            }
-        );
-
-        const result = simpleComparisionRule.invoke();
-
-        expect(result).toEqual([]);
-    });
-
-    it('returns review on invalid `eq false` pattern', () => {
-        const simpleComparisionRule = new SimpleComparisionRule(
-            patchronContext,
-            config,
-            {
-                ...file,
-                splitPatch: [
-                    `@@ -10,13 +10,5 @@`,
-                    `+const actionType = !!this.getActionType();`,
-                    `+`,
-                    `+if (!actionType) {`,
-                    `+    action = pickAction(context);`,
-                    `+}`,
-                    `+`,
-                    `+const isNull = this.findProperties();`,
-                    `+const isValid = this.validateActionType() === false;`,
-                    `+const isChecked = !isNull && isValid && this.testNode(button, action);`,
-                    `+`,
-                    `+return isChecked == false;`
-                ]
-            }
-        );
-
-        const result = simpleComparisionRule.invoke();
-
-        expect(result).toHaveLength(2);
-
-        expect(result[0]).toHaveProperty('line', 17);
-
-        expect(result[1]).toHaveProperty('line', 20);
-    });
-
-    it('returns empty array on valid `ne null, false` pattern', () => {
-        const simpleComparisionRule = new SimpleComparisionRule(
-            patchronContext,
-            config,
-            {
-                ...file,
-                splitPatch: [
-                    `@@ -10,13 +10,5 @@`,
-                    `+const actionType = !!this.getActionType();`,
-                    `+`,
-                    `+if (!actionType) {`,
-                    `+    action = pickAction(context);`,
-                    `+}`,
-                    `+`,
-                    `+const isNull = this.findProperties();`,
-                    `+const isValid = this.validateActionType();`,
-                    `+const isChecked = !isNull && isValid && this.testNode(button, action);`,
-                    `+`,
-                    `+return isChecked;`
-                ]
-            }
-        );
-
-        const result = simpleComparisionRule.invoke();
-
-        expect(result).toEqual([]);
-    });
-
-    it('returns review on invalid `ne null, false` pattern', () => {
-        const simpleComparisionRule = new SimpleComparisionRule(
-            patchronContext,
-            config,
-            {
-                ...file,
-                splitPatch: [
-                    `@@ -10,13 +10,5 @@`,
-                    `+const actionType = !!this.getActionType();`,
-                    `+`,
-                    `+if (actionType !== null) {`,
-                    `+    action = pickAction(context);`,
-                    `+}`,
-                    `+`,
-                    `+const isNull = this.findProperties();`,
-                    `+const isValid = this.validateActionType() != false;`,
-                    `+const isChecked = !isNull && isValid && this.testNode(button, action);`,
-                    `+`,
-                    `+return isChecked;`
-                ]
-            }
-        );
-
-        const result = simpleComparisionRule.invoke();
-
-        expect(result).toHaveLength(2);
+        expect(result).toHaveLength(4);
 
         expect(result[0]).toHaveProperty('line', 12);
 
-        expect(result[1]).toHaveProperty('line', 17);
+        expect(result[1]).toHaveProperty('line', 16);
+
+        expect(result[2]).toHaveProperty('line', 17);
+
+        expect(result[3]).toHaveProperty('line', 20);
+    });
+
+    it('returns empty array on valid `ne` pattern', () => {
+        const simpleComparisionRule = new SimpleComparisionRule(
+            patchronContext,
+            config,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +10,5 @@`,
+                    `+const withActionType = !!this.getActionType();`,
+                    `+`,
+                    `+if (!withActionType) {`,
+                    `+    action = pickAction(context);`,
+                    `+}`,
+                    `+`,
+                    `+const isNull = !!result;`,
+                    `+const isUndefined = !!this.validateActionType();`,
+                    `+const isChecked = !isNull && !isUndefined && this.testNode(button, action);`,
+                    `+`,
+                    `+return isChecked;`
+                ]
+            }
+        );
+
+        const result = simpleComparisionRule.invoke();
+
+        expect(result).toEqual([]);
+    });
+
+    it('returns review on invalid `ne` pattern', () => {
+        const simpleComparisionRule = new SimpleComparisionRule(
+            patchronContext,
+            config,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +10,5 @@`,
+                    `+const withActionType = !!this.getActionType();`,
+                    `+`,
+                    `+if (withActionType !== true) {`,
+                    `+    action = pickAction(context);`,
+                    `+}`,
+                    `+`,
+                    `+const isNull = result !== null;`,
+                    `+const isUndefined = this.validateActionType() != undefined;`,
+                    `+const isChecked = !isNull && !isUndefined && this.testNode(button, action);`,
+                    `+`,
+                    `+return isChecked != false;`
+                ]
+            }
+        );
+
+        const result = simpleComparisionRule.invoke();
+
+        expect(result).toHaveLength(4);
+
+        expect(result[0]).toHaveProperty('line', 12);
+
+        expect(result[1]).toHaveProperty('line', 16);
+
+        expect(result[2]).toHaveProperty('line', 17);
+
+        expect(result[3]).toHaveProperty('line', 20);
     });
 });
