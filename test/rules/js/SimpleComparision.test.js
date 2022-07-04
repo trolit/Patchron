@@ -18,7 +18,7 @@ const config = {
         {
             name: 'eq/ne (true, false)',
             expression: /(!={1,2}|={2,3})(\s)*?(true|false)/,
-            examples: `
+            comment: `
             \`value === true\`, \`value !== false\` -> \`value\`
             \`value === false\`, \`value !== true\` -> \`!value\`
             `
@@ -26,10 +26,13 @@ const config = {
         {
             name: 'eq/ne (null, undefined)',
             expression: /(!={1,2}|={2,3})(\s)*?(null|undefined)/,
-            examples: `
+            comment: `
             \`value === null/undefined\` -> \`!value\`
             \`value !== null/undefined\` -> \`!!value\`
-            `
+            `,
+            multiLineOptions: {
+                endsWith: ['=']
+            }
         }
     ]
 };

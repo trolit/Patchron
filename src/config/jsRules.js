@@ -200,7 +200,27 @@ module.exports = [
         enabled: false,
         reference: SimpleComparisionRule,
         config: {
-            patterns: []
+            patterns: [
+                {
+                    name: 'eq/ne (true, false)',
+                    expression: /(!={1,2}|={2,3})(\s)*?(true|false)/,
+                    comment: `
+                    \`value === true\`, \`value !== false\` -> \`value\`
+                    \`value === false\`, \`value !== true\` -> \`!value\`
+                    `
+                },
+                {
+                    name: 'eq/ne (null, undefined)',
+                    expression: /(!={1,2}|={2,3})(\s)*?(null|undefined)/,
+                    comment: `
+                    \`value === null/undefined\` -> \`!value\`
+                    \`value !== null/undefined\` -> \`!!value\`
+                    `,
+                    multiLineOptions: {
+                        endsWith: ['=']
+                    }
+                }
+            ]
         }
     }
 ];
