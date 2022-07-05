@@ -1,11 +1,13 @@
 const first = require('lodash/first');
+const isString = require('lodash/isString');
+const { CUSTOM_LINES } = require('src/config/constants');
 
 /**
- * tests if given line is beginning of multi-line according to multi-line options and when it is, to returns multi-line structure.
+ * returns whether given line is beginning of multi-line (`indicator`) and (when it is) attempts to find in `data` line that is end of multi-line (`limiter`). if `limiter` is not found, `endIndex` equals `-1`.
  *
- * @param {Array<SplitPatchRow>} data
- * @param {number} currentLineIndex when true blocks that aren't completed will be included in result
- * @param {object} multiLineOptions
+ * @param {Array<SplitPatchRow>} data received via `setupData`
+ * @param {number} currentLineIndex
+ * @param {MultiLineOptions} multiLineOptions
  *
  * @returns {object}
  */
@@ -37,24 +39,30 @@ module.exports = (data, currentLineIndex, multiLineOptions) => {
 };
 
 function _isMultiLine(indicator, content) {
-    const propertyName = first(Object.keys(indicator));
+    const propertyName = first(Object.getOwnPropertyNames(indicator));
     const propertyValue = indicator[propertyName];
 
     return _resolveProperty(propertyName, propertyValue, content);
 }
 
 function _findEndIndex(data, currentLineIndex, limiter) {
-    const propertyName = first(Object.keys(limiter));
+    const propertyName = isString(limiter)
+        ? limiter
+        : first(Object.getOwnPropertyNames(limiter));
+
     const propertyValue = limiter[propertyName];
 
     const slicedData = data.slice(currentLineIndex + 1);
-    const slicedDataLength = slicedData.length;
 
-    for (let index = 0; index < slicedDataLength; index++) {
-        const { trimmedContent, index: rowIndex } = data[index];
+    for (const row of slicedData) {
+        const { trimmedContent, index } = row;
+
+        if (CUSTOM_LINES.includes(trimmedContent)) {
+            continue;
+        }
 
         if (propertyName === 'nextLine') {
-            return rowIndex;
+            return index;
         }
 
         const isEndLine = _resolveProperty(
@@ -64,7 +72,7 @@ function _findEndIndex(data, currentLineIndex, limiter) {
         );
 
         if (isEndLine) {
-            return rowIndex;
+            return index;
         }
     }
 
