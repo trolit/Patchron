@@ -46,6 +46,13 @@ const config = {
                     limiter: 'nextLine'
                 }
             ]
+        },
+        {
+            name: 'ne (-1)',
+            expression: /!={1,2}(\s)*?-1/,
+            comment: `
+            \`value !== -1\` -> \`~value\`
+            `
         }
     ]
 };
@@ -266,5 +273,49 @@ describe('invoke function', () => {
 
         expect(result[5]).toHaveProperty('start_line', 27);
         expect(result[5]).toHaveProperty('position', 19);
+    });
+
+    it('returns empty array on valid `ne (-1)` pattern', () => {
+        const simpleComparisionRule = new SimpleComparisionRule(
+            patchronContext,
+            config,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +10,5 @@`,
+                    `+`,
+                    `+if (~actionIndex) {`,
+                    `+    action = pickAction(context);`,
+                    `+}`
+                ]
+            }
+        );
+
+        const result = simpleComparisionRule.invoke();
+
+        expect(result).toEqual([]);
+    });
+
+    it('returns review on invalid `ne (-1)` pattern', () => {
+        const simpleComparisionRule = new SimpleComparisionRule(
+            patchronContext,
+            config,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +10,5 @@`,
+                    `+`,
+                    `+if (actionIndex !== -1) {`,
+                    `+    action = pickAction(context);`,
+                    `+}`
+                ]
+            }
+        );
+
+        const result = simpleComparisionRule.invoke();
+
+        expect(result).toHaveLength(1);
+
+        expect(result[0]).toHaveProperty('line', 11);
     });
 });

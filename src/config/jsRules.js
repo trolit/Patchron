@@ -232,6 +232,13 @@ module.exports = [
                             limiter: 'nextLine'
                         }
                     ]
+                },
+                {
+                    name: 'ne (-1)',
+                    expression: /!={1,2}(\s)*?-1/,
+                    comment: `
+                    \`value !== -1\` -> \`~value\`
+                    `
                 }
             ]
         }
