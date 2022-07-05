@@ -2,6 +2,8 @@ const BaseRule = require('src/rules/Base');
 
 class SimpleComparisionRule extends BaseRule {
     /**
+     * allows to define set of `patterns` which when matched, will be commented out to the PR owner. `comment` property from `pattern` object allows to include for instance suggestion how matched code can be simplified.
+     *
      * @param {PatchronContext} patchronContext
      * @param {SimpleComparisionRuleConfig} config
      * @param {Patch} file
@@ -27,6 +29,7 @@ class SimpleComparisionRule extends BaseRule {
 
         const reviewComments = [];
         const { splitPatch } = this.file;
+
         const data = this.setupData(splitPatch);
         const dataLength = data.length;
 
