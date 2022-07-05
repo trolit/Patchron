@@ -41,8 +41,6 @@ class SimpleComparisionRule extends BaseRule {
             }
 
             for (const pattern of this.patterns) {
-                const { multiLineOptions } = pattern;
-
                 if (trimmedContent.match(pattern.expression)) {
                     reviewComments.push(
                         this.getSingleLineComment({
@@ -53,6 +51,12 @@ class SimpleComparisionRule extends BaseRule {
 
                     break;
                 }
+
+                if (!pattern?.multiLineOptions) {
+                    continue;
+                }
+
+                const { multiLineOptions } = pattern;
 
                 const multiLineStructure = this.helpers.getMultiLineStructure(
                     data,
