@@ -21,18 +21,31 @@ const config = {
             comment: `
             \`value === true\`, \`value !== false\` -> \`value\`
             \`value === false\`, \`value !== true\` -> \`!value\`
-            `
+            `,
+            multiLineOptions: [
+                {
+                    indicator: {
+                        endsWith: '='
+                    },
+                    limiter: 'nextLine'
+                }
+            ]
         },
         {
             name: 'eq/ne (null, undefined)',
             expression: /(!={1,2}|={2,3})(\s)*?(null|undefined)/,
             comment: `
             \`value === null/undefined\` -> \`!value\`
-            \`value !== null/undefined\` -> \`!!value\`
+            \`value !== null/undefined\` -> \`!!value\`, \`value\`
             `,
-            multiLineOptions: {
-                endsWith: ['=']
-            }
+            multiLineOptions: [
+                {
+                    indicator: {
+                        endsWith: '='
+                    },
+                    limiter: 'nextLine'
+                }
+            ]
         }
     ]
 };
@@ -87,7 +100,17 @@ describe('invoke function', () => {
                     `+const condition2 = this.isValid2();`,
                     `+const isChecked = condition1 && condition2 && this.testNode(button, action);`,
                     `+`,
-                    `+return isChecked;`
+                    `+const customHeight =`,
+                    `+                    isPredefinedHeight()`,
+                    `+                        ? 150`,
+                    `+                        : 300;`,
+                    `+const customWidth =`,
+                    `+                    !isPredefinedWidth()`,
+                    `+                        ? 256`,
+                    `+                        : 128;`,
+                    `+`,
+                    `+const customScale =`,
+                    `+                    isPredefinedScale()`
                 ]
             }
         );
@@ -113,16 +136,28 @@ describe('invoke function', () => {
                     `+`,
                     `+const condition1 = this.isValid1() === false;`,
                     `+const condition2 = this.isValid2() !== false;`,
-                    `+const isChecked = condition1 && condition2 && this.testNode(button, action);`,
+                    `+const isChecked = condition1 && condition2 && this.testNode(button, action) == true;`,
                     `+`,
-                    `+return isChecked == true;`
+                    `+const customHeight =`,
+                    `+                    isPredefinedHeight() ===`,
+                    `+                    true`,
+                    `+                        ? 150`,
+                    `+                        : 300;`,
+                    `+const customWidth =`,
+                    `+                    isPredefinedWidth() !==`,
+                    `+                    false`,
+                    `+                        ? 256`,
+                    `+                        : 128;`,
+                    `+`,
+                    `+const customScale =`,
+                    `+                    isPredefinedScale() ===`
                 ]
             }
         );
 
         const result = simpleComparisionRule.invoke();
 
-        expect(result).toHaveLength(4);
+        expect(result).toHaveLength(6);
 
         expect(result[0]).toHaveProperty('line', 12);
 
@@ -130,7 +165,13 @@ describe('invoke function', () => {
 
         expect(result[2]).toHaveProperty('line', 17);
 
-        expect(result[3]).toHaveProperty('line', 20);
+        expect(result[3]).toHaveProperty('line', 18);
+
+        expect(result[4]).toHaveProperty('start_line', 21);
+        expect(result[4]).toHaveProperty('position', 13);
+
+        expect(result[5]).toHaveProperty('start_line', 26);
+        expect(result[5]).toHaveProperty('position', 18);
     });
 
     it('returns empty array on valid `eq/ne (null, undefined)` pattern', () => {
@@ -152,7 +193,17 @@ describe('invoke function', () => {
                     `+const isChecked = !condition1 && condition2`,
                     `+                    && !!this.testNode(button, action);`,
                     `+`,
-                    `+return isChecked;`
+                    `+const customHeight =`,
+                    `+                    getPredefinedHeight()`,
+                    `+                        ? 150`,
+                    `+                        : 300;`,
+                    `+const customWidth =`,
+                    `+                    getPredefinedWidth()`,
+                    `+                        ? 256`,
+                    `+                        : 128;`,
+                    `+`,
+                    `+const customScale =`,
+                    `+                    getPredefinedScale() ===`
                 ]
             }
         );
@@ -181,14 +232,26 @@ describe('invoke function', () => {
                     `+const isChecked = !condition1 && condition2`,
                     `+                    && this.testNode(button, action) !== null;`,
                     `+`,
-                    `+return isChecked;`
+                    `+const customHeight =`,
+                    `+                    getPredefinedHeight() !==`,
+                    `+                    null`,
+                    `+                        ? 150`,
+                    `+                        : 300;`,
+                    `+const customWidth =`,
+                    `+                    getPredefinedWidth() ===`,
+                    `+                    undefined`,
+                    `+                        ? 256`,
+                    `+                        : 128;`,
+                    `+`,
+                    `+const customScale =`,
+                    `+                    getPredefinedScale() ===`
                 ]
             }
         );
 
         const result = simpleComparisionRule.invoke();
 
-        expect(result).toHaveLength(4);
+        expect(result).toHaveLength(6);
 
         expect(result[0]).toHaveProperty('line', 10);
 
@@ -197,5 +260,11 @@ describe('invoke function', () => {
         expect(result[2]).toHaveProperty('line', 17);
 
         expect(result[3]).toHaveProperty('line', 19);
+
+        expect(result[4]).toHaveProperty('start_line', 22);
+        expect(result[4]).toHaveProperty('position', 14);
+
+        expect(result[5]).toHaveProperty('start_line', 27);
+        expect(result[5]).toHaveProperty('position', 19);
     });
 });

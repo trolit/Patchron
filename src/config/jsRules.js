@@ -211,7 +211,7 @@ module.exports = [
                     multiLineOptions: [
                         {
                             indicator: {
-                                expression: '='
+                                endsWith: '='
                             },
                             limiter: 'nextLine'
                         }
