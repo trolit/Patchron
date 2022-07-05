@@ -93,3 +93,28 @@
  * @property {string} path
  * @property {string} commit_id
  */
+
+/**
+ * @typedef {Array<MultiLineOption>} MultiLineOptions
+ */
+
+/**
+ * @typedef {object} MultiLineOption
+ * @property {Indicator} indicator multi-line start condition. Use one of the provided options.
+ * @property {Limiter} limiter multi-line end condition. Use one of the provided options.
+ */
+
+/**
+ * @typedef {object} Indicator
+ * @property {string} endsWith
+ * @property {string} startsWith
+ * @property {object} expression
+ */
+
+/**
+ * @typedef {object} Limiter
+ * @property {string} endsWith
+ * @property {string} startsWith
+ * @property {object} expression
+ * @property {string} nextLine
+ */
