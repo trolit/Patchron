@@ -8,7 +8,7 @@ const {
 } = require('@jest/globals');
 
 const {
-    common: { ValueComparisionStyleRule }
+    common: { ComparisionOperatorLevelRule }
 } = require('src/rules');
 const setupApp = require('test/rules/helpers/setupApp');
 const initializeFile = require('test/rules/helpers/initializeFile');
@@ -30,7 +30,7 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on empty allowed levels config', () => {
-        const valueComparisionStyleRule = new ValueComparisionStyleRule(
+        const comparisionOperatorLevelRule = new ComparisionOperatorLevelRule(
             patchronContext,
             {
                 allowedLevels: []
@@ -38,13 +38,13 @@ describe('invoke function', () => {
             file
         );
 
-        const result = valueComparisionStyleRule.invoke();
+        const result = comparisionOperatorLevelRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns empty array on all allowed levels', () => {
-        const valueComparisionStyleRule = new ValueComparisionStyleRule(
+        const comparisionOperatorLevelRule = new ComparisionOperatorLevelRule(
             patchronContext,
             {
                 allowedLevels: [0, 1, 2]
@@ -52,13 +52,13 @@ describe('invoke function', () => {
             file
         );
 
-        const result = valueComparisionStyleRule.invoke();
+        const result = comparisionOperatorLevelRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns empty array on valid comparision style (weak equality)', () => {
-        const valueComparisionStyleRule = new ValueComparisionStyleRule(
+        const comparisionOperatorLevelRule = new ComparisionOperatorLevelRule(
             patchronContext,
             {
                 allowedLevels: [0]
@@ -79,13 +79,13 @@ describe('invoke function', () => {
             }
         );
 
-        const result = valueComparisionStyleRule.invoke();
+        const result = comparisionOperatorLevelRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns empty array on valid comparision style (strict equality)', () => {
-        const valueComparisionStyleRule = new ValueComparisionStyleRule(
+        const comparisionOperatorLevelRule = new ComparisionOperatorLevelRule(
             patchronContext,
             {
                 allowedLevels: [1]
@@ -106,13 +106,13 @@ describe('invoke function', () => {
             }
         );
 
-        const result = valueComparisionStyleRule.invoke();
+        const result = comparisionOperatorLevelRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns empty array on valid comparision style (Object.is)', () => {
-        const valueComparisionStyleRule = new ValueComparisionStyleRule(
+        const comparisionOperatorLevelRule = new ComparisionOperatorLevelRule(
             patchronContext,
             {
                 allowedLevels: [2]
@@ -133,13 +133,13 @@ describe('invoke function', () => {
             }
         );
 
-        const result = valueComparisionStyleRule.invoke();
+        const result = comparisionOperatorLevelRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid comparision style (weak equality)', () => {
-        const valueComparisionStyleRule = new ValueComparisionStyleRule(
+        const comparisionOperatorLevelRule = new ComparisionOperatorLevelRule(
             patchronContext,
             {
                 allowedLevels: [0]
@@ -160,7 +160,7 @@ describe('invoke function', () => {
             }
         );
 
-        const result = valueComparisionStyleRule.invoke();
+        const result = comparisionOperatorLevelRule.invoke();
 
         expect(result).toHaveLength(2);
 
@@ -171,7 +171,7 @@ describe('invoke function', () => {
     });
 
     it('returns review on invalid comparision style (strict equality)', () => {
-        const valueComparisionStyleRule = new ValueComparisionStyleRule(
+        const comparisionOperatorLevelRule = new ComparisionOperatorLevelRule(
             patchronContext,
             {
                 allowedLevels: [1]
@@ -192,7 +192,7 @@ describe('invoke function', () => {
             }
         );
 
-        const result = valueComparisionStyleRule.invoke();
+        const result = comparisionOperatorLevelRule.invoke();
 
         expect(result).toHaveLength(2);
 
@@ -203,7 +203,7 @@ describe('invoke function', () => {
     });
 
     it('returns review on invalid comparision style (Object.is)', () => {
-        const valueComparisionStyleRule = new ValueComparisionStyleRule(
+        const comparisionOperatorLevelRule = new ComparisionOperatorLevelRule(
             patchronContext,
             {
                 allowedLevels: [2]
@@ -224,7 +224,7 @@ describe('invoke function', () => {
             }
         );
 
-        const result = valueComparisionStyleRule.invoke();
+        const result = comparisionOperatorLevelRule.invoke();
 
         expect(result).toHaveLength(2);
 

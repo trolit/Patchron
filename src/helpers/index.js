@@ -5,6 +5,7 @@ const getLineNumber = require('./getLineNumber');
 const getDataStructure = require('./getDataStructure');
 const removeWhitespaces = require('./removeWhitespaces');
 const getNearestHunkHeader = require('./getNearestHunkHeader');
+const getMultiLineStructure = require('./getMultiLineStructure');
 
 module.exports = {
     loopTimer,
@@ -13,5 +14,6 @@ module.exports = {
     getLineNumber,
     getDataStructure,
     removeWhitespaces,
-    getNearestHunkHeader
+    getNearestHunkHeader,
+    getMultiLineStructure
 };

@@ -5,11 +5,12 @@ const SingleLineBlockRule = require('./common/SingleLineBlock');
 const PositionedKeywordsRule = require('./common/PositionedKeywords');
 const PredefinedFilenameRule = require('./common/PredefinedFilename');
 const LineBreakBeforeReturnRule = require('./common/LineBreakBeforeReturn');
-const ValueComparisionStyleRule = require('./common/ValueComparisionStyle');
 const KeywordsOrderedByLengthRule = require('./common/KeywordsOrderedByLength');
+const ComparisionOperatorLevelRule = require('./common/ComparisionOperatorLevel');
 const FixedLoopLengthConditionRule = require('./common/FixedLoopLengthCondition');
 
 const DirectImportRule = require('./js/DirectImport');
+const SimpleComparisionRule = require('./js/SimpleComparision');
 const AsynchronousPatternRule = require('./js/AsynchronousPattern');
 const ImportWithoutExtensionRule = require('./js/ImportWithoutExtension');
 const ImplicitIndexFileImportRule = require('./js/ImplicitIndexFileImport');
@@ -24,8 +25,8 @@ module.exports = {
         PositionedKeywordsRule,
         PredefinedFilenameRule,
         LineBreakBeforeReturnRule,
-        ValueComparisionStyleRule,
         KeywordsOrderedByLengthRule,
+        ComparisionOperatorLevelRule,
         FixedLoopLengthConditionRule
     },
 
@@ -35,6 +36,7 @@ module.exports = {
 
     js: {
         DirectImportRule,
+        SimpleComparisionRule,
         AsynchronousPatternRule,
         ImportWithoutExtensionRule,
         ImplicitIndexFileImportRule,

@@ -1,7 +1,7 @@
 const isEqual = require('lodash/isEqual');
 const BaseRule = require('src/rules/Base');
 
-class ValueComparisionStyleRule extends BaseRule {
+class ComparisionOperatorLevelRule extends BaseRule {
     /**
      * Allows to set expected equality/inequality comparement convention. Rule is based on patch and currently does not implement any way to deduce whether part of patch is pure text or part of code (e.g. in case of Vue). An workaround to that could be to escape `=` characters in strings and use `=` unicode representation in HTML.
      *
@@ -11,7 +11,7 @@ class ValueComparisionStyleRule extends BaseRule {
      * - 2 - strict equality/inequality via `Object.is` (ES6)
      *
      * @param {PatchronContext} patchronContext
-     * @param {ValueComparisionStyleConfig} config
+     * @param {ComparisionOperatorLevelConfig} config
      * @param {Patch} file
      *
      * {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals}
@@ -192,4 +192,4 @@ class ValueComparisionStyleRule extends BaseRule {
     }
 }
 
-module.exports = ValueComparisionStyleRule;
+module.exports = ComparisionOperatorLevelRule;
