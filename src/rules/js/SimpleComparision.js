@@ -31,23 +31,60 @@ class SimpleComparisionRule extends BaseRule {
         const dataLength = data.length;
 
         for (let index = 0; index < dataLength; index++) {
-            const { trimmedContent } = data[index];
+            const { trimmedContent, index: rowIndex } = data[index];
 
-            if (this.CUSTOM_LINES.includes(trimmedContent)) {
+            if (
+                this.CUSTOM_LINES.includes(trimmedContent) ||
+                trimmedContent.startsWith('@@')
+            ) {
                 continue;
             }
 
-            const matchedPattern = this.patterns.find((pattern) =>
-                trimmedContent.match(pattern.expression)
-            );
+            for (const pattern of this.patterns) {
+                const { multiLineOptions } = pattern;
 
-            if (matchedPattern) {
-                reviewComments.push(
-                    this.getSingleLineComment({
-                        body: this._getCommentBody(matchedPattern),
-                        index
-                    })
+                if (trimmedContent.match(pattern.expression)) {
+                    reviewComments.push(
+                        this.getSingleLineComment({
+                            body: this._getCommentBody(pattern),
+                            index: rowIndex
+                        })
+                    );
+
+                    break;
+                }
+
+                const multiLineStructure = this.helpers.getMultiLineStructure(
+                    data,
+                    index,
+                    multiLineOptions
                 );
+
+                if (!multiLineStructure.isMultiLine) {
+                    continue;
+                }
+
+                const { endIndex } = multiLineStructure;
+
+                if (~endIndex) {
+                    const content = this.convertMultiLineToSingleLine(
+                        data,
+                        index,
+                        endIndex
+                    );
+
+                    if (content.match(pattern.expression)) {
+                        reviewComments.push(
+                            this.getMultiLineComment({
+                                body: this._getCommentBody(pattern),
+                                from: rowIndex,
+                                to: endIndex
+                            })
+                        );
+
+                        break;
+                    }
+                }
             }
         }
 
@@ -58,7 +95,7 @@ class SimpleComparisionRule extends BaseRule {
      * @returns {string}
      */
     _getCommentBody(matchedPattern) {
-        const commentBody = `It seems that code can be simplified.
+        const commentBody = `Please, simplify marked code.
 
         ${matchedPattern.comment}
         `;
