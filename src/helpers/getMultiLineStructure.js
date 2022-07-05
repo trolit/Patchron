@@ -7,7 +7,7 @@ const { CUSTOM_LINES } = require('src/config/constants');
  *
  * @param {Array<SplitPatchRow>} data received via `setupData`
  * @param {number} currentLineIndex
- * @param {MultiLineOptions} multiLineOptions
+ * @param {Array<MultiLineOption>} multiLineOptions
  *
  * @returns {object}
  */

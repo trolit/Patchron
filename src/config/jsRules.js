@@ -207,18 +207,31 @@ module.exports = [
                     comment: `
                     \`value === true\`, \`value !== false\` -> \`value\`
                     \`value === false\`, \`value !== true\` -> \`!value\`
-                    `
+                    `,
+                    multiLineOptions: [
+                        {
+                            indicator: {
+                                expression: '='
+                            },
+                            limiter: 'nextLine'
+                        }
+                    ]
                 },
                 {
                     name: 'eq/ne (null, undefined)',
                     expression: /(!={1,2}|={2,3})(\s)*?(null|undefined)/,
                     comment: `
                     \`value === null/undefined\` -> \`!value\`
-                    \`value !== null/undefined\` -> \`!!value\`
+                    \`value !== null/undefined\` -> \`!!value\`, \`value\`
                     `,
-                    multiLineOptions: {
-                        endsWith: ['=']
-                    }
+                    multiLineOptions: [
+                        {
+                            indicator: {
+                                endsWith: '='
+                            },
+                            limiter: 'nextLine'
+                        }
+                    ]
                 }
             ]
         }

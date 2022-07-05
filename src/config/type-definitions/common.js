@@ -95,10 +95,6 @@
  */
 
 /**
- * @typedef {Array<MultiLineOption>} MultiLineOptions
- */
-
-/**
  * @typedef {object} MultiLineOption
  * @property {Indicator} indicator multi-line start condition. Use one of the provided options.
  * @property {Limiter} limiter multi-line end condition. Use one of the provided options.
