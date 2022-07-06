@@ -86,8 +86,7 @@ module.exports = [
                                 notIncludes: 'from'
                             },
                             limiter: {
-                                includes: 'from',
-                                until: '/'
+                                startsWith: '} = from'
                             }
                         }
                     ]
@@ -103,8 +102,7 @@ module.exports = [
                                 notIncludes: 'from'
                             },
                             limiter: {
-                                includes: 'from',
-                                until: '/'
+                                startsWith: '} = from'
                             }
                         }
                     ]
