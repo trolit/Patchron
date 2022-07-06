@@ -96,29 +96,31 @@
 
 /**
  * @typedef {object} MultiLineOption
- * @property {Indicator} indicator multi-line start condition. Use one of the provided options.
- * @property {Limiter} limiter multi-line end condition. Use one of the provided options.
+ * @property {Indicator} indicator multi-line start condition.
+ * @property {Limiter} limiter multi-line end condition.
  */
 
 /**
  * @typedef {object} Indicator
- * @property {string} endsWith
- * @property {string} notEndsWith
- * @property {string} startsWith
- * @property {string} notStartsWith
- * @property {string} includes
- * @property {string} notIncludes
- * @property {object} expression
+ * @property {string} [endsWith]
+ * @property {string} [notEndsWith]
+ * @property {string} [startsWith]
+ * @property {string} [notStartsWith]
+ * @property {string} [includes]
+ * @property {string} [notIncludes]
+ * @property {object} [expression]
+ * @property {string} [until] marks to take part of content if `until` appeared in the text. Can be used in combination with other property e.g. `includes -> until`
  */
 
 /**
  * @typedef {object} Limiter
- * @property {string} endsWith
- * @property {string} notEndsWith
- * @property {string} startsWith
- * @property {string} notStartsWith
- * @property {string} includes
- * @property {string} notIncludes
- * @property {object} expression
- * @property {string} nextLine
+ * @property {string} [endsWith]
+ * @property {string} [notEndsWith]
+ * @property {string} [startsWith]
+ * @property {string} [notStartsWith]
+ * @property {string} [includes]
+ * @property {string} [notIncludes]
+ * @property {object} [expression]
+ * @property {string} [nextLine]
+ * @property {string} [until] marks to take part of content if `until` appeared in the text. Can be used in combination with other property e.g. `includes -> until`
  */

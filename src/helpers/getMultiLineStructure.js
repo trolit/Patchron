@@ -1,5 +1,6 @@
 const first = require('lodash/first');
 const isString = require('lodash/isString');
+const cloneDeep = require('lodash/cloneDeep');
 const { CUSTOM_LINES } = require('src/config/constants');
 
 /**
@@ -42,7 +43,7 @@ function _isMultiLine(indicator, content) {
     const propertyName = first(Object.getOwnPropertyNames(indicator));
     const propertyValue = indicator[propertyName];
 
-    return _resolveProperty(propertyName, propertyValue, content);
+    return _resolveProperty(propertyName, propertyValue, content, indicator);
 }
 
 function _findEndIndex(data, currentLineIndex, limiter) {
@@ -68,7 +69,8 @@ function _findEndIndex(data, currentLineIndex, limiter) {
         const isEndLine = _resolveProperty(
             propertyName,
             propertyValue,
-            trimmedContent
+            trimmedContent,
+            limiter
         );
 
         if (isEndLine) {
@@ -79,28 +81,36 @@ function _findEndIndex(data, currentLineIndex, limiter) {
     return -1;
 }
 
-function _resolveProperty(propertyName, propertyValue, content) {
+function _resolveProperty(propertyName, propertyValue, content, source = null) {
+    let fixedContent = cloneDeep(content);
+
+    if (source && source['until']) {
+        const until = source['until'];
+
+        fixedContent = fixedContent.split(until)[0];
+    }
+
     switch (propertyName) {
         case 'startsWith':
-            return content.startsWith(propertyValue);
+            return fixedContent.startsWith(propertyValue);
 
         case 'endsWith':
-            return content.endsWith(propertyValue);
+            return fixedContent.endsWith(propertyValue);
 
         case 'expression':
-            return content.match(propertyValue);
+            return fixedContent.match(propertyValue);
 
         case 'includes':
-            return content.includes(propertyValue);
+            return fixedContent.includes(propertyValue);
 
         case 'notStartsWith':
-            return !content.startsWith(propertyValue);
+            return !fixedContent.startsWith(propertyValue);
 
         case 'notEndsWith':
-            return !content.endsWith(propertyValue);
+            return !fixedContent.endsWith(propertyValue);
 
         case 'notIncludes':
-            return !content.includes(propertyValue);
+            return !fixedContent.includes(propertyValue);
 
         default:
             return false;
