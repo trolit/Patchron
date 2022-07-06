@@ -103,14 +103,22 @@
 /**
  * @typedef {object} Indicator
  * @property {string} endsWith
+ * @property {string} notEndsWith
  * @property {string} startsWith
+ * @property {string} notStartsWith
+ * @property {string} includes
+ * @property {string} notIncludes
  * @property {object} expression
  */
 
 /**
  * @typedef {object} Limiter
  * @property {string} endsWith
+ * @property {string} notEndsWith
  * @property {string} startsWith
+ * @property {string} notStartsWith
+ * @property {string} includes
+ * @property {string} notIncludes
  * @property {object} expression
  * @property {string} nextLine
  */

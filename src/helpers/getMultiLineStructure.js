@@ -90,6 +90,18 @@ function _resolveProperty(propertyName, propertyValue, content) {
         case 'expression':
             return content.match(propertyValue);
 
+        case 'includes':
+            return content.includes(propertyValue);
+
+        case 'notStartsWith':
+            return !content.startsWith(propertyValue);
+
+        case 'notEndsWith':
+            return !content.endsWith(propertyValue);
+
+        case 'notIncludes':
+            return !content.includes(propertyValue);
+
         default:
             return false;
     }
