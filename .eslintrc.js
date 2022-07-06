@@ -16,6 +16,7 @@ module.exports = {
     rules: {
         'consistent-return': 'error',
         'no-console': 'warn',
+        'no-case-declarations': 'off',
         'no-self-compare': 'error',
         'no-template-curly-in-string': 'error',
         'no-unreachable-loop': 'error',
