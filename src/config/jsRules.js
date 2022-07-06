@@ -78,16 +78,36 @@ module.exports = [
                 {
                     name: 'import (packages)',
                     regex: /import(?!.*@).*/,
-                    multiLineOptions: ['from'],
                     order: 'ascending',
-                    ignoreNewline: false
+                    ignoreNewline: false,
+                    multiLineOptions: [
+                        {
+                            indicator: {
+                                notIncludes: 'from'
+                            },
+                            limiter: {
+                                includes: 'from',
+                                until: '/'
+                            }
+                        }
+                    ]
                 },
                 {
                     name: 'import (components)',
                     regex: /import.*@\/components.*/,
-                    multiLineOptions: ['from'],
                     order: 'ascending',
-                    ignoreNewline: false
+                    ignoreNewline: false,
+                    multiLineOptions: [
+                        {
+                            indicator: {
+                                notIncludes: 'from'
+                            },
+                            limiter: {
+                                includes: 'from',
+                                until: '/'
+                            }
+                        }
+                    ]
                 }
             ]
         }
