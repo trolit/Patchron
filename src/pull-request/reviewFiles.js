@@ -2,7 +2,7 @@ const reviewFile = require('./reviewFile');
 const getFiles = require('src/github/getFiles');
 
 /**
- * triggers `Pepega.js` to review files against configured rules
+ * triggers `Patchron` to review files against configured rules
  *
  * @param {PatchronContext} patchronContext
  *

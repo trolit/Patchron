@@ -19,7 +19,7 @@
  */
 
 /**
- * @typedef {object} Patch part of file received via `getFiles` and extended in Pepega. Full response can be found here:
+ * @typedef {object} Patch part of file received via `getFiles` and extended in Patchron. Full response can be found here:
  * https://docs.github.com/en/rest/reference/pulls#list-pull-requests-files
  * @property {string} sha unique ID (a.k.a. the "SHA" or "hash") that allows to keep record of the specific changes committed along with who made them and when.
  * @property {string} filename e.g. `test/index.test.js`

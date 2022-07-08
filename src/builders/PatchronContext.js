@@ -8,7 +8,7 @@ const EventLog = require('src/utilities/EventLog');
 const updateLogPathJob = require('src/utilities/updateLogPathJob');
 
 /**
- * Class wrapping Probot's features and Pepega's logic.
+ * Class wrapping Probot's features and Patchron's logic.
  */
 class PatchronContextBuilder {
     /**
