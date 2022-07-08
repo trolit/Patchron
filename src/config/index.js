@@ -13,10 +13,10 @@ module.exports = {
     settings: {
         isGetFilesRequestPaginated: false, // when `false`, getFiles can receive up to 3000 files
         delayBetweenCommentRequestsInSeconds: 3,
-        isOwnerAssigningEnabled: false,
+        isOwnerAssigningEnabled: true,
         isReviewSummaryEnabled: false,
         isStoringLogsEnabled: true,
-        maxCommentsPerReview: 50, // limit number of comments that can be added per single review
+        maxCommentsPerReview: 25, // limit number of comments that can be added per single review
         senders: [] // pass GitHub usernames to limit people whose pull requests will be reviewed
     },
     rules: {
