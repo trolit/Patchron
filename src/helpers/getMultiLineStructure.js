@@ -1,4 +1,5 @@
 const first = require('lodash/first');
+const isEqual = require('lodash/isEqual');
 const isString = require('lodash/isString');
 const cloneDeep = require('lodash/cloneDeep');
 const { CUSTOM_LINES } = require('src/config/constants');
@@ -94,23 +95,29 @@ function _resolveProperty(propertyName, propertyValue, content, source = null) {
         case 'startsWith':
             return fixedContent.startsWith(propertyValue);
 
-        case 'endsWith':
-            return fixedContent.endsWith(propertyValue);
-
-        case 'expression':
-            return fixedContent.match(propertyValue);
-
-        case 'includes':
-            return fixedContent.includes(propertyValue);
-
         case 'notStartsWith':
             return !fixedContent.startsWith(propertyValue);
+
+        case 'endsWith':
+            return fixedContent.endsWith(propertyValue);
 
         case 'notEndsWith':
             return !fixedContent.endsWith(propertyValue);
 
+        case 'includes':
+            return fixedContent.includes(propertyValue);
+
         case 'notIncludes':
             return !fixedContent.includes(propertyValue);
+
+        case 'equals':
+            return isEqual(fixedContent, propertyValue);
+
+        case 'notEquals':
+            return !isEqual(fixedContent, propertyValue);
+
+        case 'expression':
+            return fixedContent.match(propertyValue);
 
         default:
             return false;
