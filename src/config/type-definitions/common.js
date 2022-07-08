@@ -126,5 +126,20 @@
  * @property {any} [notEquals] uses `lodash` isEqual. Functions and DOM nodes are not supported.
  * @property {object} [expression]
  * @property {string} [nextLine]
- * @property {string} [until] marks to take part of content if `until` appeared in the text. Can be used in combination with other property e.g. `includes -> until`
+ * @property {string} [until] marks to take part of content if `until` appeared in the text. Can be used in combination with other property.
+ * @property {Array<object>|string} [indentation] includes `indentation` filter. Can be used in combination with other property.
+ *
+ * - To refer to `indicator` indentation, use following `string` syntax:
+ * ```js
+ * indentation: '{operator}-indicator'
+ * // eg. indentation: 'eq-indicator'
+ * ```
+ *
+ * - To pass custom value, use `array` syntax:
+ * ```js
+ * indentation: [operator, value]
+ * // eg. indentation: ['gt', 5]
+ * ```
+ *
+ * operator can be one of the following: gt, ge, lt, le, eq
  */
