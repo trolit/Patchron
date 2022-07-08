@@ -46,8 +46,8 @@ class NormalizedEventHandlerRule extends BaseRule {
             const { trimmedContent } = row;
 
             if (
-                trimmedContent.startsWith('@@') ||
-                this.CUSTOM_LINES.includes(trimmedContent)
+                this.CUSTOM_LINES.includes(trimmedContent) ||
+                trimmedContent.startsWith('@@')
             ) {
                 continue;
             }

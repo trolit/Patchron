@@ -25,6 +25,13 @@ class LineBreakBeforeReturnRule extends BaseRule {
             const { trimmedContent } = row;
 
             if (
+                this.CUSTOM_LINES.includes(trimmedContent) ||
+                trimmedContent.startsWith('@@')
+            ) {
+                continue;
+            }
+
+            if (
                 !trimmedContent.startsWith('return') ||
                 previousContent === this.NEWLINE
             ) {
