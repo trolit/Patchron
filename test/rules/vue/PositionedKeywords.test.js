@@ -63,10 +63,10 @@ const importKeywordBOFConfig = {
     ]
 };
 
-const constKeywordConfig = (position, override = null) => {
+const requireKeywordConfig = (position, override = null) => {
     return {
-        name: 'const',
-        regex: /const.*=(.*require)?/,
+        name: 'require',
+        regex: /(.*require\(|^(const|let|var)(\s+)?{$)/,
         maxLineBreaks: 0,
         enforced: true,
         breakOnFirstOccurence: false,
@@ -74,7 +74,7 @@ const constKeywordConfig = (position, override = null) => {
         multiLineOptions: [
             {
                 indicator: {
-                    notIncludes: 'require'
+                    expression: /^(const|let|var)(\s+)?{$/
                 },
                 limiter: {
                     startsWith: '} = require'
@@ -984,89 +984,88 @@ describe('invoke function', () => {
         expect(result[1]).toHaveProperty('position', 14);
     });
 
-    // TODO: find way to handle multi-line `const ... = require`
-    // it('returns empty array on valid BOF positioning (two BOF keywords)', () => {
-    //     const positionedKeywordsRule = new PositionedKeywordsRule(
-    //         patchronContext,
-    //         {
-    //             keywords: [
-    //                 importKeywordBOFConfig,
-    //                 constKeywordConfig({ custom: null, BOF: true })
-    //             ]
-    //         },
-    //         {
-    //             ...file,
-    //             splitPatch: [
-    //                 `@@ -10,13 +1,17 @@`,
-    //                 `+const gamma = require('...')`,
-    //                 `+const beta = require('...');`,
-    //                 `+const alpha = require('...');`,
-    //                 `+`,
-    //                 ` import {`,
-    //                 `     method4,`,
-    //                 `     method5,`,
-    //                 ` } from '@/helpers/methods'`,
-    //                 `+import method1 from '@/helpers/methods'`,
-    //                 `-`,
-    //                 ` import {`,
-    //                 `     method24,`,
-    //                 ` } from '@/helpers/methods'`,
-    //                 `+import method2 from '@/helpers/methods'`,
-    //                 `+import method3 from '@/helpers/methods'`,
-    //                 ` import {`,
-    //                 `     method34,`,
-    //                 ` } from '@/helpers/methods'`
-    //             ]
-    //         }
-    //     );
+    it('returns empty array on valid BOF positioning (two BOF keywords)', () => {
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            patchronContext,
+            {
+                keywords: [
+                    importKeywordBOFConfig,
+                    requireKeywordConfig({ custom: null, BOF: true })
+                ]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +1,17 @@`,
+                    `+const gamma = require('...')`,
+                    `+const beta = require('...');`,
+                    `+const alpha = require('...');`,
+                    `+`,
+                    ` import {`,
+                    `     method4,`,
+                    `     method5,`,
+                    ` } from '@/helpers/methods'`,
+                    `+import method1 from '@/helpers/methods'`,
+                    `-`,
+                    ` import {`,
+                    `     method24,`,
+                    ` } from '@/helpers/methods'`,
+                    `+import method2 from '@/helpers/methods'`,
+                    `+import method3 from '@/helpers/methods'`,
+                    ` import {`,
+                    `     method34,`,
+                    ` } from '@/helpers/methods'`
+                ]
+            }
+        );
 
-    //     const result = positionedKeywordsRule.invoke();
+        const result = positionedKeywordsRule.invoke();
 
-    //     expect(result).toEqual([]);
-    // });
+        expect(result).toEqual([]);
+    });
 
-    // it('returns review on invalid `import` BOF positioning (two BOF keywords)', () => {
-    //     const positionedKeywordsRule = new PositionedKeywordsRule(
-    //         patchronContext,
-    //         {
-    //             keywords: [
-    //                 importKeywordBOFConfig,
-    //                 constKeywordConfig({ custom: null, BOF: true })
-    //             ]
-    //         },
-    //         {
-    //             ...file,
-    //             splitPatch: [
-    //                 `@@ -10,13 +1,19 @@`,
-    //                 `+const gamma = require('...')`,
-    //                 `+const beta = require('...');`,
-    //                 `+const alpha = require('...');`,
-    //                 `+const b = () => { ... }`,
-    //                 `+const a = () => { ... }`,
-    //                 ` import {`,
-    //                 `     method4,`,
-    //                 `     method5,`,
-    //                 ` } from '@/helpers/methods'`,
-    //                 `+import method1 from '@/helpers/methods'`,
-    //                 `-`,
-    //                 ` import {`,
-    //                 `     method24,`,
-    //                 ` } from '@/helpers/methods'`,
-    //                 `+import method2 from '@/helpers/methods'`,
-    //                 `+import method3 from '@/helpers/methods'`,
-    //                 ` import {`,
-    //                 `     method34,`,
-    //                 ` } from '@/helpers/methods'`
-    //             ]
-    //         }
-    //     );
+    it('returns review on invalid `import` BOF positioning (two BOF keywords)', () => {
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            patchronContext,
+            {
+                keywords: [
+                    importKeywordBOFConfig,
+                    requireKeywordConfig({ custom: null, BOF: true })
+                ]
+            },
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +1,19 @@`,
+                    `+const gamma = require('...')`,
+                    `+const beta = require('...');`,
+                    `+const alpha = require('...');`,
+                    `+const b = () => { ... }`,
+                    `+const a = () => { ... }`,
+                    ` import {`,
+                    `     method4,`,
+                    `     method5,`,
+                    ` } from '@/helpers/methods'`,
+                    `+import method1 from '@/helpers/methods'`,
+                    `-`,
+                    ` import {`,
+                    `     method24,`,
+                    ` } from '@/helpers/methods'`,
+                    `+import method2 from '@/helpers/methods'`,
+                    `+import method3 from '@/helpers/methods'`,
+                    ` import {`,
+                    `     method34,`,
+                    ` } from '@/helpers/methods'`
+                ]
+            }
+        );
 
-    //     const result = positionedKeywordsRule.invoke();
+        const result = positionedKeywordsRule.invoke();
 
-    //     expect(result).toHaveLength(1);
+        expect(result).toHaveLength(1);
 
-    //     expect(result[0]).toHaveProperty('line', 4);
-    // });
+        expect(result[0]).toHaveProperty('line', 4);
+    });
 
     it('returns review on invalid `import` BOF positioning (second layer order)', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
@@ -1163,7 +1162,7 @@ describe('invoke function', () => {
             {
                 keywords: [
                     importKeywordBOFConfig,
-                    constKeywordConfig({ custom: null, BOF: true })
+                    requireKeywordConfig({ custom: null, BOF: true })
                 ]
             },
             {

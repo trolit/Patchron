@@ -116,9 +116,8 @@ module.exports = [
         config: {
             keywords: [
                 {
-                    name: 'const',
-                    regex: /const.*require.*/,
-                    multiLineOptions: ['require'],
+                    name: 'require',
+                    regex: /(.*require\(|^(const|let|var)(\s+)?{$)/,
                     position: {
                         custom: null,
                         BOF: true
@@ -126,7 +125,17 @@ module.exports = [
                     maxLineBreaks: 1,
                     enforced: true,
                     breakOnFirstOccurence: false,
-                    countDifferentCodeAsLineBreak: false
+                    countDifferentCodeAsLineBreak: false,
+                    multiLineOptions: [
+                        {
+                            indicator: {
+                                expression: /^(const|let|var)(\s+)?{$/
+                            },
+                            limiter: {
+                                startsWith: '} = require'
+                            }
+                        }
+                    ]
                 }
             ]
         }
