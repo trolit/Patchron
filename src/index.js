@@ -31,7 +31,7 @@ module.exports = (app) => {
 
             const {
                 pullRequest: { owner }
-            } = patchronContext;
+            } = context;
 
             if (isOwnerAssigningEnabled) {
                 await addAssignees(patchronContext, [owner]);
