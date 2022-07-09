@@ -97,7 +97,9 @@ function _resolveProperty(
     if (source && source['indentation'] && limiterRow) {
         const indentation = source['indentation'];
 
-        result = _isIndentationValid(indentation, indicatorRow, limiterRow);
+        if (!_isIndentationValid(indentation, indicatorRow, limiterRow)) {
+            return false;
+        }
     }
 
     if (source && source['until']) {
@@ -108,40 +110,31 @@ function _resolveProperty(
 
     switch (propertyName) {
         case 'startsWith':
-            result = fixedContent.startsWith(propertyValue);
-            break;
+            return fixedContent.startsWith(propertyValue);
 
         case 'notStartsWith':
-            result = !fixedContent.startsWith(propertyValue);
-            break;
+            return !fixedContent.startsWith(propertyValue);
 
         case 'endsWith':
-            result = fixedContent.endsWith(propertyValue);
-            break;
+            return fixedContent.endsWith(propertyValue);
 
         case 'notEndsWith':
-            result = !fixedContent.endsWith(propertyValue);
-            break;
+            return !fixedContent.endsWith(propertyValue);
 
         case 'includes':
-            result = fixedContent.includes(propertyValue);
-            break;
+            return fixedContent.includes(propertyValue);
 
         case 'notIncludes':
-            result = !fixedContent.includes(propertyValue);
-            break;
+            return !fixedContent.includes(propertyValue);
 
         case 'equals':
-            result = isEqual(fixedContent, propertyValue);
-            break;
+            return isEqual(fixedContent, propertyValue);
 
         case 'notEquals':
-            result = !isEqual(fixedContent, propertyValue);
-            break;
+            return !isEqual(fixedContent, propertyValue);
 
         case 'expression':
-            result = fixedContent.match(propertyValue);
-            break;
+            return fixedContent.match(propertyValue);
     }
 
     return result;
