@@ -141,10 +141,6 @@ class PositionedKeywordsRule extends BaseRule {
         const { position: keywordPosition } = keyword;
         let position = null;
 
-        if (keywordPosition.custom !== null) {
-            position = this._findCustomPosition(data, keyword);
-        }
-
         if (keywordPosition.BOF) {
             const keywordsWithBOF = keywords.filter(
                 (element) =>
@@ -167,6 +163,8 @@ class PositionedKeywordsRule extends BaseRule {
 
                 return reviewComments;
             }
+        } else if (keywordPosition?.custom) {
+            position = this._findCustomPosition(data, keyword);
         }
 
         if (!position) {
@@ -301,7 +299,7 @@ class PositionedKeywordsRule extends BaseRule {
             index = this._correctIndex(data, index, keywordsWithBOF);
         }
 
-        // skip merge lines
+        // skip merge/commented lines
         for (; ; index++) {
             const { trimmedContent } = data[index];
 
