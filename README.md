@@ -36,6 +36,49 @@ docker run -e APP_ID=<app-id> -e PRIVATE_KEY=<pem-value> patchron
 | `maxCommentsPerReview`                 | Number (`25`)        | Limit number of comments that can be posted in single review under single PR.                                                 |
 | `senders`                              | Array<string> (`[]`) | Allows to limit pull requests reviews to certain users. Pass GitHub usernames.                                                |
 
+## Patch overview (dev)
+
+Patch contains latest changes done to particular file. Here is example of how it looks like:
+
+```js
+"@@ -10,13 +10,7 @@ const payload = require('./fixtures/pull_request.opened');\n" +
+" const fs = require('fs');\n" +
+" const path = require('path');\n" +
+' \n' +
+'-const {\n' +
+'-    describe,\n' +
+'-    expect,\n' +
+'-    test,\n' +
+"-} = require('@jest/globals');\n" +
+"+const { expect, test } = require('@jest/globals');\n" +
+' \n' +
+'@@ -27,7 +21,6 @@ const deployment = {\n' +
+"         schema: 'rocks!',\n" +
+'     },\n' +
+"     environment: 'production',\n" +
+`-    description: "My Probot App's first deploy!",\n` +
+' };\n' +
+```
+
+<details>
+<summary>Things to note</summary>
+
+-   line that was added starts with `+`
+-   line that was removed starts with `-`
+-   line that was changed starts with `whitespace`
+-   line that begins with `@@` is <em>hunk header</em>. It allows to identify lines in respect to source file. It also informs about hunk length.
+
+Hunk header e.g. `@@ -10,13 +10,7 @@` contains following information:
+
+-   LEFT SIDE `-10,13`
+    -   10 is number of first line that starts below hunk header
+    -   13 is left side hunk length (sum of unchanged and removed lines)
+-   RIGHT SIDE `+10,7`
+    -   10 is number of first line that starts below hunk header
+    -   7 is right side hunk length (sum of unchanged and added lines)
+
+</details>
+
 ## Contributing
 
 If you have suggestions for how Patchron could be improved, or want to report a bug, open an issue!

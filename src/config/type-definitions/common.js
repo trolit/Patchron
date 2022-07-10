@@ -15,7 +15,7 @@
  * @property {number} indentation indentation amount searched with `/\S|$/`
  * @property {string} content row content without GIT indication
  * @property {string} trimmedContent row content  without GIT indication after trim
- * @property {Backticks} backticks information about row's backticks (available via extension). When line has no backticks, it's value is `null`
+ * @property {Backticks} [backticks] information about row's backticks (available via extension). When line has no backticks, it's value is `null`
  */
 
 /**
