@@ -10,7 +10,7 @@ const {
 const {
     js: { SimplePropertyAssignmentRule }
 } = require('src/rules');
-const setupApp = require('test/rules/helpers/setupApp');
+const setupPatchronContext = require('test/setupPatchronContext');
 const initializeFile = require('test/rules/helpers/initializeFile');
 
 const config = {};
@@ -20,7 +20,7 @@ describe('invoke function', () => {
     let file = {};
 
     beforeEach(() => {
-        patchronContext = setupApp();
+        patchronContext = setupPatchronContext();
 
         file = initializeFile();
     });

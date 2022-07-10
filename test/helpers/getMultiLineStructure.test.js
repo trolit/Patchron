@@ -1,14 +1,14 @@
 const { describe, expect, it, beforeEach } = require('@jest/globals');
 
 const BaseRule = require('src/rules/Base');
-const setupApp = require('test/rules/helpers/setupApp');
 const { getMultiLineStructure } = require('src/helpers');
+const setupPatchronContext = require('test/setupPatchronContext');
 
 describe('', () => {
     let baseRule = null;
 
     beforeEach(() => {
-        const patchronContext = setupApp();
+        const patchronContext = setupPatchronContext();
 
         baseRule = new BaseRule(patchronContext);
     });
