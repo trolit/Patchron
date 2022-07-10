@@ -2,7 +2,7 @@
 
 # Patchron
 
-> A GitHub App built with [Probot](https://github.com/probot/probot) that implements set of rules to perform early pull request review and comment out cases that do not meet configuration. Please note that review is based on patches which **contain limited number of information**. Due to that you may find some review comments to not be relevant to the situation but still `Patchron` can be used to simplify next code reviews done by humans and maintain conventions.
+> A GitHub App built with [Probot](https://github.com/probot/probot) that implements set of rules to perform early pull request review and comment out cases that do not meet configuration. Please note that review is based on patches which **contain limited number of information**. Due to that you may find some review comments to not be relevant to the situation but still `Patchron` can be used to maintain conventions and speed up further code reviews done by members by commenting out simple cases.
 
 ## Setup
 
