@@ -44,7 +44,10 @@ class DirectImportRule extends BaseRule {
         for (let index = 0; index < dataLength; index++) {
             const { trimmedContent } = data[index];
 
-            if (this.CUSTOM_LINES.includes(trimmedContent)) {
+            if (
+                this.CUSTOM_LINES.includes(trimmedContent) ||
+                trimmedContent.startsWith('@@')
+            ) {
                 continue;
             }
 

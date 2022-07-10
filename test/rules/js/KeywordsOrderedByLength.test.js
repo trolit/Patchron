@@ -10,15 +10,58 @@ const {
 const {
     common: { KeywordsOrderedByLengthRule }
 } = require('src/rules');
-const setupApp = require('test/rules/helpers/setupApp');
+const setupPatchronContext = require('test/setupPatchronContext');
 const initializeFile = require('test/rules/helpers/initializeFile');
 
 const importKeywordConfig = {
     name: 'import',
     regex: /import.*/,
-    multiLineOptions: ['from'],
     order: 'ascending',
-    ignoreNewline: false
+    ignoreNewline: false,
+    multiLineOptions: [
+        {
+            indicator: {
+                notIncludes: 'from'
+            },
+            limiter: {
+                startsWith: '} = from'
+            }
+        }
+    ]
+};
+
+const importPackageKeywordConfig = {
+    name: 'import (packages)',
+    regex: /import(?!.*@).*/,
+    order: 'ascending',
+    ignoreNewline: false,
+    multiLineOptions: [
+        {
+            indicator: {
+                notIncludes: 'from'
+            },
+            limiter: {
+                startsWith: '} = from'
+            }
+        }
+    ]
+};
+
+const importComponentKeywordConfig = {
+    name: 'import (components)',
+    regex: /import.*@\/components.*/,
+    order: 'ascending',
+    ignoreNewline: false,
+    multiLineOptions: [
+        {
+            indicator: {
+                notIncludes: 'from'
+            },
+            limiter: {
+                startsWith: '} = from'
+            }
+        }
+    ]
 };
 
 const validConfig = {
@@ -30,7 +73,7 @@ describe('invoke function', () => {
     let file = {};
 
     beforeEach(() => {
-        patchronContext = setupApp();
+        patchronContext = setupPatchronContext();
 
         file = initializeFile();
     });
@@ -312,20 +355,8 @@ describe('invoke function', () => {
             patchronContext,
             {
                 keywords: [
-                    {
-                        name: 'import (packages)',
-                        regex: /import(?!.*@).*/,
-                        multiLineOptions: ['from'],
-                        order: 'ascending',
-                        ignoreNewline: false
-                    },
-                    {
-                        name: 'import (components)',
-                        regex: /import.*@\/components.*/,
-                        multiLineOptions: ['from'],
-                        order: 'ascending',
-                        ignoreNewline: false
-                    }
+                    importPackageKeywordConfig,
+                    importComponentKeywordConfig
                 ]
             },
             {
@@ -356,20 +387,8 @@ describe('invoke function', () => {
             patchronContext,
             {
                 keywords: [
-                    {
-                        name: 'import (packages)',
-                        regex: /import(?!.*@).*/,
-                        multiLineOptions: ['from'],
-                        order: 'ascending',
-                        ignoreNewline: false
-                    },
-                    {
-                        name: 'import (components)',
-                        regex: /import.*@\/components.*/,
-                        multiLineOptions: ['from'],
-                        order: 'ascending',
-                        ignoreNewline: false
-                    }
+                    importPackageKeywordConfig,
+                    importComponentKeywordConfig
                 ]
             },
             {

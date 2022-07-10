@@ -87,40 +87,48 @@ class PositionedKeywordsRule extends BaseRule {
             const { trimmedContent } = data[index];
             const matchResult = trimmedContent.match(keyword.regex);
 
-            if (matchResult) {
-                const matchedContent = matchResult[0];
+            if (!matchResult) {
+                continue;
+            }
 
-                const isMultiLine =
-                    keyword?.multiLineOptions?.length &&
-                    this.isPartOfMultiLine(keyword, matchedContent);
+            const matchedContent = matchResult[0];
 
-                if (isMultiLine) {
-                    const multiLineEndIndex = this.getMultiLineEndIndex(
-                        data,
-                        keyword,
-                        index
-                    );
+            if (keyword?.multiLineOptions) {
+                const { multiLineOptions } = keyword;
+
+                const multiLineStructure = this.helpers.getMultiLineStructure(
+                    data,
+                    index,
+                    multiLineOptions
+                );
+
+                const { isMultiLine } = multiLineStructure;
+
+                if (isMultiLine && ~multiLineStructure.endIndex) {
+                    const { endIndex } = multiLineStructure;
 
                     const multiLineContent = this.convertMultiLineToSingleLine(
                         data,
                         index,
-                        multiLineEndIndex
+                        endIndex
                     );
 
                     matchedData.push({
                         index,
                         content: multiLineContent,
-                        length: multiLineEndIndex - index
+                        length: endIndex - index
                     });
 
-                    index = multiLineEndIndex;
-                } else {
-                    matchedData.push({
-                        index,
-                        content: matchedContent
-                    });
+                    index = endIndex;
+
+                    continue;
                 }
             }
+
+            matchedData.push({
+                index,
+                content: matchedContent
+            });
         }
 
         return matchedData;
@@ -132,10 +140,6 @@ class PositionedKeywordsRule extends BaseRule {
 
         const { position: keywordPosition } = keyword;
         let position = null;
-
-        if (keywordPosition.custom !== null) {
-            position = this._findCustomPosition(data, keyword);
-        }
 
         if (keywordPosition.BOF) {
             const keywordsWithBOF = keywords.filter(
@@ -159,6 +163,8 @@ class PositionedKeywordsRule extends BaseRule {
 
                 return reviewComments;
             }
+        } else if (keywordPosition?.custom) {
+            position = this._findCustomPosition(data, keyword);
         }
 
         if (!position) {
@@ -242,14 +248,22 @@ class PositionedKeywordsRule extends BaseRule {
 
         let length = null;
 
-        if (this.isPartOfMultiLine(keyword, data[index].trimmedContent)) {
-            const multiLineEndIndex = this.getMultiLineEndIndex(
+        if (keyword?.multiLineOptions) {
+            const { multiLineOptions } = keyword;
+
+            const multiLineStructure = this.helpers.getMultiLineStructure(
                 data,
-                keyword,
-                index
+                index,
+                multiLineOptions
             );
 
-            length = multiLineEndIndex - index;
+            const { isMultiLine } = multiLineStructure;
+
+            if (isMultiLine && ~multiLineStructure.endIndex) {
+                const { endIndex } = multiLineStructure;
+
+                length = endIndex - index;
+            }
         }
 
         return {
@@ -285,7 +299,7 @@ class PositionedKeywordsRule extends BaseRule {
             index = this._correctIndex(data, index, keywordsWithBOF);
         }
 
-        // skip merge lines
+        // skip merge/commented lines
         for (; ; index++) {
             const { trimmedContent } = data[index];
 
@@ -296,20 +310,21 @@ class PositionedKeywordsRule extends BaseRule {
 
         let length = null;
 
-        if (keyword.multiLineOptions?.length) {
-            const isMultiLine = this.isPartOfMultiLine(
-                keyword,
-                data[index].trimmedContent
+        if (keyword?.multiLineOptions) {
+            const { multiLineOptions } = keyword;
+
+            const multiLineStructure = this.helpers.getMultiLineStructure(
+                data,
+                index,
+                multiLineOptions
             );
 
-            if (isMultiLine) {
-                const multiLineEndIndex = this.getMultiLineEndIndex(
-                    data,
-                    keyword,
-                    index
-                );
+            const { isMultiLine } = multiLineStructure;
 
-                length = multiLineEndIndex - index;
+            if (isMultiLine && ~multiLineStructure.endIndex) {
+                const { endIndex } = multiLineStructure;
+
+                length = endIndex - index;
             }
         }
 
@@ -331,25 +346,25 @@ class PositionedKeywordsRule extends BaseRule {
         const { data, matchedData, keyword, position } = parameters;
 
         const {
-            breakOnFirstOccurence,
             maxLineBreaks,
+            breakOnFirstOccurence,
             countDifferentCodeAsLineBreak
         } = keyword;
 
         const matchedDataLength = matchedData.length;
 
         let recentRow = position;
-        let reviewComments = [];
+        const reviewComments = [];
 
         for (let index = 1; index < matchedDataLength; index++) {
             const row = matchedData[index];
 
-            let reason = 'tooManyLineBreaks';
-            let isValid = false;
             let distance = 0;
+            let isValid = false;
+            let reason = 'tooManyLineBreaks';
 
-            let previousIndex = recentRow.index;
             let currentIndex = row.index;
+            let previousIndex = recentRow.index;
 
             if (recentRow?.length) {
                 previousIndex += recentRow.length;

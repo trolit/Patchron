@@ -1,5 +1,5 @@
 class EventLog {
-    /** Constructs `Pepega.js` log service */
+    /** Constructs `Patchron` log service */
     constructor(log) {
         this.log = log;
     }

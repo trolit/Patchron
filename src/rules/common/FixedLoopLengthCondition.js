@@ -25,6 +25,13 @@ class FixedLoopLengthCondition extends BaseRule {
             const row = data[index];
             const { trimmedContent } = row;
 
+            if (
+                this.CUSTOM_LINES.includes(trimmedContent) ||
+                trimmedContent.startsWith('@@')
+            ) {
+                continue;
+            }
+
             const fixedContent = trimmedContent.startsWith('}')
                 ? trimmedContent.slice(1).trim()
                 : trimmedContent;

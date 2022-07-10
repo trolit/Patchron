@@ -5,7 +5,7 @@
   "description": "TBA",
   "author": "p4w31 !d21k0w5k1 <iddziku@gmail.com>",
   "license": "ISC",
-  "homepage": "https://github.com/trolit/Pepega",
+  "homepage": "https://github.com/trolit/Patchron",
   "keywords": [
     "probot",
     "github",
@@ -60,10 +60,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/trolit/Pepega.git"
+    "url": "git+https://github.com/trolit/Patchron.git"
   },
   "bugs": {
-    "url": "https://github.com/trolit/Pepega/issues"
+    "url": "https://github.com/trolit/Patchron/issues"
   },
   "_moduleAliases": {
     "@root": ".",

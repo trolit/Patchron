@@ -1,8 +1,8 @@
-<img src="https://github.com/trolit/Patchron/blob/master/picture.jpg" alt="Bot default avatar" height="200"/>
+<img src="https://github.com/trolit/Patchron/blob/master/picture.jpg" alt="Patchron image" height="200"/>
 
 # Patchron
 
-> A GitHub App built with [Probot](https://github.com/probot/probot) framework that is meant to improve maintaining development conventions by performing very first pull requests code review. Code review is based on patches that contain limited number of information from modified files. Due to this, some review comments might not be relevant, but still, those are edge problems (e.g. differentiating interpolated code from raw string) which can be ignored.
+> A GitHub App built with [Probot](https://github.com/probot/probot) that implements set of rules to perform early pull request review and comment out cases that do not meet configuration. Please note that review is based on patches which **contain limited number of information**. Due to that you may find some review comments to not be relevant to the situation but still `Patchron` can be used to simplify next code reviews done by humans and maintain conventions.
 
 ## Setup
 
@@ -26,19 +26,62 @@ docker run -e APP_ID=<app-id> -e PRIVATE_KEY=<pem-value> patchron
 
 ## Settings
 
-| Property                             | Type          | Description |
-| :----------------------------------- | :------------ | :---------- |
-| isGetFilesRequestPaginated           | boolean       | test        |
-| delayBetweenCommentRequestsInSeconds | Number        | test        |
-| isOwnerAssigningEnabled              | boolean       | test        |
-| isReviewSummaryEnabled               | boolean       | test        |
-| isStoringLogsEnabled                 | boolean       | test        |
-| maxCommentsPerReview                 | Number        | test        |
-| senders                              | Array<string> | test        |
+| Property                               | Type (default)       | Description                                                                                                                   |
+| :------------------------------------- | :------------------- | :---------------------------------------------------------------------------------------------------------------------------- |
+| `isGetFilesRequestPaginated`           | boolean (`false`)    | Controls how files are fetched. Unpaginated response includes a maximum of 3000 files which is sufficient in 99.99% of cases. |
+| `delayBetweenCommentRequestsInSeconds` | Number (`3`)         | After review is done, delays time between each comment request to not overload API.                                           |
+| `isOwnerAssigningEnabled`              | boolean (`true`)     | When true, PR owner will be automatically assigned once pull request will be issued.                                          |
+| `isReviewSummaryEnabled`               | boolean (`false`)    | When true, at the end of the PR review summary is posted that contains various information e.g. how many comments were posts. |
+| `isStoringLogsEnabled`                 | boolean (`true`)     | When true, stores logs physically in `/.logs` directory.                                                                      |
+| `maxCommentsPerReview`                 | Number (`25`)        | Limit number of comments that can be posted in single review under single PR.                                                 |
+| `senders`                              | Array<string> (`[]`) | Allows to limit pull requests reviews to certain users. Pass GitHub usernames.                                                |
+
+## Patch overview (dev)
+
+Patch contains latest changes done to particular file. Here is example of how it looks like:
+
+```js
+"@@ -10,13 +10,7 @@ const payload = require('./fixtures/pull_request.opened');\n" +
+" const fs = require('fs');\n" +
+" const path = require('path');\n" +
+' \n' +
+'-const {\n' +
+'-    describe,\n' +
+'-    expect,\n' +
+'-    test,\n' +
+"-} = require('@jest/globals');\n" +
+"+const { expect, test } = require('@jest/globals');\n" +
+' \n' +
+'@@ -27,7 +21,6 @@ const deployment = {\n' +
+"         schema: 'rocks!',\n" +
+'     },\n' +
+"     environment: 'production',\n" +
+`-    description: "My Probot App's first deploy!",\n` +
+' };\n' +
+```
+
+<details>
+<summary>Things to note</summary>
+
+-   line that was added starts with `+`
+-   line that was removed starts with `-`
+-   line that was changed starts with `whitespace`
+-   line that begins with `@@` is <em>hunk header</em>. It allows to identify lines in respect to source file. It also informs about hunk length.
+
+Hunk header e.g. `@@ -10,13 +10,7 @@` contains following information:
+
+-   LEFT SIDE `-10,13`
+    -   10 is number of first line that starts below hunk header
+    -   13 is left side hunk length (sum of unchanged and removed lines)
+-   RIGHT SIDE `+10,7`
+    -   10 is number of first line that starts below hunk header
+    -   7 is right side hunk length (sum of unchanged and added lines)
+
+</details>
 
 ## Contributing
 
-If you have suggestions for how Patchron could be improved, or want to report a bug, open an issue! We'd love all and any contributions.
+If you have suggestions for how Patchron could be improved, or want to report a bug, open an issue!
 
 For more, check out the [Contributing Guide](CONTRIBUTING.md).
 
@@ -53,4 +96,4 @@ For more, check out the [Contributing Guide](CONTRIBUTING.md).
 
 ## License
 
-[ISC](LICENSE) © 2022 p4w31 !d21k0w5k1
+[ISC](LICENSE) © 2022 trolit

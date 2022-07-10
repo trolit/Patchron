@@ -83,28 +83,30 @@ class KeywordsOrderedByLengthRule extends BaseRule {
 
             const matchResultTrimmedContent = matchResult[0].trim();
 
-            if (
-                keyword?.multiLineOptions &&
-                this.isPartOfMultiLine(keyword, matchResultTrimmedContent)
-            ) {
-                const multiLineEndIndex = this.getMultiLineEndIndex(
+            if (keyword?.multiLineOptions) {
+                const { multiLineOptions } = keyword;
+
+                const multiLineStructure = this.helpers.getMultiLineStructure(
                     data,
-                    keyword,
-                    index
+                    index,
+                    multiLineOptions
                 );
 
-                const { trimmedContent: endRowTrimmedContent } =
-                    data[multiLineEndIndex];
+                const { isMultiLine } = multiLineStructure;
 
-                matchedRows.push({
-                    index,
-                    trimmedContent: endRowTrimmedContent,
-                    length: multiLineEndIndex - index
-                });
+                if (isMultiLine && ~multiLineStructure.endIndex) {
+                    const { endIndex } = multiLineStructure;
 
-                index = multiLineEndIndex;
+                    matchedRows.push({
+                        index,
+                        trimmedContent: data[endIndex].trimmedContent,
+                        length: endIndex - index
+                    });
 
-                continue;
+                    index = endIndex;
+
+                    continue;
+                }
             }
 
             matchedRows.push({

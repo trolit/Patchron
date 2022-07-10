@@ -15,11 +15,11 @@
  * @property {number} indentation indentation amount searched with `/\S|$/`
  * @property {string} content row content without GIT indication
  * @property {string} trimmedContent row content  without GIT indication after trim
- * @property {Backticks} backticks information about row's backticks (available via extension). When line has no backticks, it's value is `null`
+ * @property {Backticks} [backticks] information about row's backticks (available via extension). When line has no backticks, it's value is `null`
  */
 
 /**
- * @typedef {object} Patch part of file received via `getFiles` and extended in Pepega. Full response can be found here:
+ * @typedef {object} Patch part of file received via `getFiles` and extended in Patchron. Full response can be found here:
  * https://docs.github.com/en/rest/reference/pulls#list-pull-requests-files
  * @property {string} sha unique ID (a.k.a. the "SHA" or "hash") that allows to keep record of the specific changes committed along with who made them and when.
  * @property {string} filename e.g. `test/index.test.js`
@@ -96,21 +96,50 @@
 
 /**
  * @typedef {object} MultiLineOption
- * @property {Indicator} indicator multi-line start condition. Use one of the provided options.
- * @property {Limiter} limiter multi-line end condition. Use one of the provided options.
+ * @property {Indicator} indicator multi-line start condition.
+ * @property {Limiter} limiter multi-line end condition.
  */
 
 /**
  * @typedef {object} Indicator
- * @property {string} endsWith
- * @property {string} startsWith
- * @property {object} expression
+ * @property {string} [startsWith]
+ * @property {string} [notStartsWith]
+ * @property {string} [endsWith]
+ * @property {string} [notEndsWith]
+ * @property {string} [includes]
+ * @property {string} [notIncludes]
+ * @property {any} [equals] uses `lodash` isEqual. Functions and DOM nodes are not supported.
+ * @property {any} [notEquals] uses `lodash` isEqual. Functions and DOM nodes are not supported.
+ * @property {object} [expression]
+ * @property {string} [until] marks to take part of content if `until` appeared in the text. Can be used in combination with other property e.g. `includes -> until`
  */
 
 /**
  * @typedef {object} Limiter
- * @property {string} endsWith
- * @property {string} startsWith
- * @property {object} expression
- * @property {string} nextLine
+ * @property {string} [startsWith]
+ * @property {string} [notStartsWith]
+ * @property {string} [endsWith]
+ * @property {string} [notEndsWith]
+ * @property {string} [includes]
+ * @property {string} [notIncludes]
+ * @property {any} [equals] uses `lodash` isEqual. Functions and DOM nodes are not supported.
+ * @property {any} [notEquals] uses `lodash` isEqual. Functions and DOM nodes are not supported.
+ * @property {object} [expression]
+ * @property {string} [nextLine]
+ * @property {string} [until] marks to take part of content if `until` appeared in the text. Can be used in combination with other property.
+ * @property {Array<object>|string} [indentation] includes `indentation` filter. Can be used in combination with other property.
+ *
+ * - To refer to `indicator` indentation, use following `string` syntax:
+ * ```js
+ * indentation: '{operator}-indicator'
+ * // eg. indentation: 'eq-indicator'
+ * ```
+ *
+ * - To pass custom value, use `array` syntax:
+ * ```js
+ * indentation: [operator, value]
+ * // eg. indentation: ['gt', 5]
+ * ```
+ *
+ * operator can be one of the following: gt, ge, lt, le, eq
  */

@@ -78,16 +78,34 @@ module.exports = [
                 {
                     name: 'import (packages)',
                     regex: /import(?!.*@).*/,
-                    multiLineOptions: ['from'],
                     order: 'ascending',
-                    ignoreNewline: false
+                    ignoreNewline: false,
+                    multiLineOptions: [
+                        {
+                            indicator: {
+                                notIncludes: 'from'
+                            },
+                            limiter: {
+                                startsWith: '} = from'
+                            }
+                        }
+                    ]
                 },
                 {
                     name: 'import (components)',
                     regex: /import.*@\/components.*/,
-                    multiLineOptions: ['from'],
                     order: 'ascending',
-                    ignoreNewline: false
+                    ignoreNewline: false,
+                    multiLineOptions: [
+                        {
+                            indicator: {
+                                notIncludes: 'from'
+                            },
+                            limiter: {
+                                startsWith: '} = from'
+                            }
+                        }
+                    ]
                 }
             ]
         }
@@ -98,9 +116,8 @@ module.exports = [
         config: {
             keywords: [
                 {
-                    name: 'const',
-                    regex: /const.*require.*/,
-                    multiLineOptions: ['require'],
+                    name: 'require',
+                    regex: /(.*require\(|^(const|let|var)(\s+)?{$)/,
                     position: {
                         custom: null,
                         BOF: true
@@ -108,7 +125,17 @@ module.exports = [
                     maxLineBreaks: 1,
                     enforced: true,
                     breakOnFirstOccurence: false,
-                    countDifferentCodeAsLineBreak: false
+                    countDifferentCodeAsLineBreak: false,
+                    multiLineOptions: [
+                        {
+                            indicator: {
+                                expression: /^(const|let|var)(\s+)?{$/
+                            },
+                            limiter: {
+                                startsWith: '} = require'
+                            }
+                        }
+                    ]
                 }
             ]
         }

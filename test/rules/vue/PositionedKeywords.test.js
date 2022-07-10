@@ -10,13 +10,12 @@ const {
 const {
     common: { PositionedKeywordsRule }
 } = require('src/rules');
-const setupApp = require('test/rules/helpers/setupApp');
+const setupPatchronContext = require('test/setupPatchronContext');
 const initializeFile = require('test/rules/helpers/initializeFile');
 
 const importKeywordCustomConfig = {
     name: 'import',
     regex: /import.*/,
-    multiLineOptions: ['from'],
     position: {
         custom: {
             name: '<script>',
@@ -27,13 +26,22 @@ const importKeywordCustomConfig = {
     maxLineBreaks: 0,
     enforced: true,
     breakOnFirstOccurence: false,
-    countDifferentCodeAsLineBreak: false
+    countDifferentCodeAsLineBreak: false,
+    multiLineOptions: [
+        {
+            indicator: {
+                notIncludes: 'from'
+            },
+            limiter: {
+                startsWith: '} from'
+            }
+        }
+    ]
 };
 
 const importKeywordBOFConfig = {
     name: 'import',
     regex: /import.*/,
-    multiLineOptions: ['from'],
     position: {
         custom: null,
         BOF: true,
@@ -42,18 +50,37 @@ const importKeywordBOFConfig = {
     maxLineBreaks: 0,
     enforced: true,
     breakOnFirstOccurence: false,
-    countDifferentCodeAsLineBreak: false
+    countDifferentCodeAsLineBreak: false,
+    multiLineOptions: [
+        {
+            indicator: {
+                notIncludes: 'from'
+            },
+            limiter: {
+                startsWith: '} from'
+            }
+        }
+    ]
 };
 
-const constKeywordConfig = (position, override = null) => {
+const requireKeywordConfig = (position, override = null) => {
     return {
-        name: 'const',
-        regex: /const.*require.*/,
-        multiLineOptions: [],
+        name: 'require',
+        regex: /(.*require\(|^(const|let|var)(\s+)?{$)/,
         maxLineBreaks: 0,
         enforced: true,
         breakOnFirstOccurence: false,
         countDifferentCodeAsLineBreak: false,
+        multiLineOptions: [
+            {
+                indicator: {
+                    expression: /^(const|let|var)(\s+)?{$/
+                },
+                limiter: {
+                    startsWith: '} = require'
+                }
+            }
+        ],
         position,
         override
     };
@@ -68,7 +95,7 @@ describe('invoke function', () => {
     let file = {};
 
     beforeEach(() => {
-        patchronContext = setupApp();
+        patchronContext = setupPatchronContext();
 
         file = initializeFile();
     });
@@ -115,7 +142,7 @@ describe('invoke function', () => {
                 splitPatch: [
                     `@@ -10,13 +5,7 @@`,
                     `+<scwddwdwript>`,
-                    `+import method1 from '@/helpers/methods`,
+                    `+import method1 from '@/helpers/methods'`,
                     `-`,
                     `+`,
                     `+import method2 from '@/helpers/methods'`,
@@ -142,17 +169,17 @@ describe('invoke function', () => {
                     ` import {`,
                     `     method4,`,
                     `     method5,`,
-                    ` from '@/helpers/methods'`,
-                    `+import method1 from '@/helpers/methods`,
+                    ` } from '@/helpers/methods'`,
+                    `+import method1 from '@/helpers/methods'`,
                     `-`,
                     ` import {`,
                     `     method24,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `+import method2 from '@/helpers/methods'`,
                     `+import method3 from '@/helpers/methods'`,
                     ` import {`,
                     `     method34,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `-`,
                     `-import method6 from '@/helpers/methods'`
                 ]
@@ -176,17 +203,17 @@ describe('invoke function', () => {
                     ` import {`,
                     `     method4,`,
                     `     method5,`,
-                    ` from '@/helpers/methods'`,
-                    `+import method1 from '@/helpers/methods`,
+                    ` } from '@/helpers/methods'`,
+                    `+import method1 from '@/helpers/methods'`,
                     `-`,
                     ` import {`,
                     `     method24,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `+import method2 from '@/helpers/methods'`,
                     `+import method3 from '@/helpers/methods'`,
                     ` import {`,
                     `     method34,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `-`,
                     `-import method6 from '@/helpers/methods'`
                 ]
@@ -218,19 +245,19 @@ describe('invoke function', () => {
                     ` import {`,
                     `     method4,`,
                     `     method5,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     ` const x = 2;`,
-                    `+import method1 from '@/helpers/methods`,
+                    `+import method1 from '@/helpers/methods'`,
                     `-`,
                     ` import {`,
                     `     method24,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `+import method2 from '@/helpers/methods'`,
                     `+const y = 3;`,
                     `+import method3 from '@/helpers/methods'`,
                     ` import {`,
                     `     method34,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `-`,
                     `-import method6 from '@/helpers/methods'`
                 ]
@@ -334,19 +361,19 @@ describe('invoke function', () => {
                     ` import {`,
                     `     method4,`,
                     `     method5,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     ` `,
-                    `+import method1 from '@/helpers/methods`,
+                    `+import method1 from '@/helpers/methods'`,
                     `-`,
                     ` import {`,
                     `     method24,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `+import method2 from '@/helpers/methods'`,
                     `+`,
                     `+import method3 from '@/helpers/methods'`,
                     ` import {`,
                     `     method34,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `-`,
                     `-import method6 from '@/helpers/methods'`
                 ]
@@ -376,19 +403,19 @@ describe('invoke function', () => {
                     ` import {`,
                     `     method4,`,
                     `     method5,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     ` const x = 2;`,
-                    `+import method1 from '@/helpers/methods`,
+                    `+import method1 from '@/helpers/methods'`,
                     `-`,
                     ` import {`,
                     `     method24,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `+import method2 from '@/helpers/methods'`,
                     `+const y = 3;`,
                     `+import method3 from '@/helpers/methods'`,
                     ` import {`,
                     `     method34,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `-`,
                     `-import method6 from '@/helpers/methods'`
                 ]
@@ -425,19 +452,19 @@ describe('invoke function', () => {
                     ` import {`,
                     `     method4,`,
                     `     method5,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     ` const x = 2;`,
-                    `+import method1 from '@/helpers/methods`,
+                    `+import method1 from '@/helpers/methods'`,
                     `-`,
                     ` import {`,
                     `     method24,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `+import method2 from '@/helpers/methods'`,
                     `+const y = 3;`,
                     `+import method3 from '@/helpers/methods'`,
                     ` import {`,
                     `     method34,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `-`,
                     `-import method6 from '@/helpers/methods'`
                 ]
@@ -518,19 +545,19 @@ describe('invoke function', () => {
                     ` import {`,
                     `     method4,`,
                     `     method5,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     ` const x = 2;`,
-                    `+import method1 from '@/helpers/methods`,
+                    `+import method1 from '@/helpers/methods'`,
                     `-`,
                     ` import {`,
                     `     method24,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `+import method2 from '@/helpers/methods'`,
                     `+const y = 3;`,
                     `+import method3 from '@/helpers/methods'`,
                     ` import {`,
                     `     method34,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `-`,
                     `-import method6 from '@/helpers/methods'`
                 ]
@@ -595,17 +622,17 @@ describe('invoke function', () => {
                     ` import {`,
                     `     method4,`,
                     `     method5,`,
-                    ` from '@/helpers/methods'`,
-                    `+import method1 from '@/helpers/methods`,
+                    ` } from '@/helpers/methods'`,
+                    `+import method1 from '@/helpers/methods'`,
                     `-`,
                     ` import {`,
                     `     method24,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `+import method2 from '@/helpers/methods'`,
                     `+import method3 from '@/helpers/methods'`,
                     ` import {`,
                     `     method34,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `-`,
                     `-import method6 from '@/helpers/methods'`
                 ]
@@ -631,17 +658,17 @@ describe('invoke function', () => {
                     ` import {`,
                     `     method4,`,
                     `     method5,`,
-                    ` from '@/helpers/methods'`,
-                    `+import method1 from '@/helpers/methods`,
+                    ` } from '@/helpers/methods'`,
+                    `+import method1 from '@/helpers/methods'`,
                     `-`,
                     ` import {`,
                     `     method24,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `+import method2 from '@/helpers/methods'`,
                     `+import method3 from '@/helpers/methods'`,
                     ` import {`,
                     `     method34,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `-`,
                     `-import method6 from '@/helpers/methods'`
                 ]
@@ -672,19 +699,19 @@ describe('invoke function', () => {
                     ` import {`,
                     `     method4,`,
                     `     method5,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     ` const x = 2;`,
-                    `+import method1 from '@/helpers/methods`,
+                    `+import method1 from '@/helpers/methods'`,
                     `-`,
                     ` import {`,
                     `     method24,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `+import method2 from '@/helpers/methods'`,
                     `+const y = 3;`,
                     `+import method3 from '@/helpers/methods'`,
                     ` import {`,
                     `     method34,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `-`,
                     `-import method6 from '@/helpers/methods'`
                 ]
@@ -793,19 +820,19 @@ describe('invoke function', () => {
                     ` import {`,
                     `     method4,`,
                     `     method5,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     ` const x = 2;`,
-                    `+import method1 from '@/helpers/methods`,
+                    `+import method1 from '@/helpers/methods'`,
                     `-`,
                     ` import {`,
                     `     method24,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `+import method2 from '@/helpers/methods'`,
                     `+const y = 3;`,
                     `+import method3 from '@/helpers/methods'`,
                     ` import {`,
                     `     method34,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `-`,
                     `-import method6 from '@/helpers/methods'`
                 ]
@@ -832,19 +859,19 @@ describe('invoke function', () => {
                     ` import {`,
                     `     method4,`,
                     `     method5,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     ` `,
-                    `+import method1 from '@/helpers/methods`,
+                    `+import method1 from '@/helpers/methods'`,
                     `-`,
                     ` import {`,
                     `     method24,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `+import method2 from '@/helpers/methods'`,
                     `+`,
                     `+import method3 from '@/helpers/methods'`,
                     ` import {`,
                     `     method34,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `-`,
                     `-import method6 from '@/helpers/methods'`
                 ]
@@ -877,19 +904,19 @@ describe('invoke function', () => {
                     ` import {`,
                     `     method4,`,
                     `     method5,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `const x = 2;`,
-                    `+import method1 from '@/helpers/methods`,
+                    `+import method1 from '@/helpers/methods'`,
                     `-`,
                     ` import {`,
                     `     method24,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `+import method2 from '@/helpers/methods'`,
                     `+const y = 3;`,
                     `+import method3 from '@/helpers/methods'`,
                     ` import {`,
                     `     method34,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `-`,
                     `-import method6 from '@/helpers/methods'`
                 ]
@@ -927,19 +954,19 @@ describe('invoke function', () => {
                     ` import {`,
                     `     method4,`,
                     `     method5,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     ` const x = 2;`,
-                    `+import method1 from '@/helpers/methods`,
+                    `+import method1 from '@/helpers/methods'`,
                     `-`,
                     ` import {`,
                     `     method24,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `+import method2 from '@/helpers/methods'`,
                     `+const y = 3;`,
                     `+import method3 from '@/helpers/methods'`,
                     ` import {`,
                     `     method34,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `-`,
                     `-import method6 from '@/helpers/methods'`
                 ]
@@ -963,7 +990,7 @@ describe('invoke function', () => {
             {
                 keywords: [
                     importKeywordBOFConfig,
-                    constKeywordConfig({ custom: null, BOF: true })
+                    requireKeywordConfig({ custom: null, BOF: true })
                 ]
             },
             {
@@ -977,17 +1004,17 @@ describe('invoke function', () => {
                     ` import {`,
                     `     method4,`,
                     `     method5,`,
-                    ` from '@/helpers/methods'`,
-                    `+import method1 from '@/helpers/methods`,
+                    ` } from '@/helpers/methods'`,
+                    `+import method1 from '@/helpers/methods'`,
                     `-`,
                     ` import {`,
                     `     method24,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `+import method2 from '@/helpers/methods'`,
                     `+import method3 from '@/helpers/methods'`,
                     ` import {`,
                     `     method34,`,
-                    ` from '@/helpers/methods'`
+                    ` } from '@/helpers/methods'`
                 ]
             }
         );
@@ -1003,7 +1030,7 @@ describe('invoke function', () => {
             {
                 keywords: [
                     importKeywordBOFConfig,
-                    constKeywordConfig({ custom: null, BOF: true })
+                    requireKeywordConfig({ custom: null, BOF: true })
                 ]
             },
             {
@@ -1018,60 +1045,17 @@ describe('invoke function', () => {
                     ` import {`,
                     `     method4,`,
                     `     method5,`,
-                    ` from '@/helpers/methods'`,
-                    `+import method1 from '@/helpers/methods`,
+                    ` } from '@/helpers/methods'`,
+                    `+import method1 from '@/helpers/methods'`,
                     `-`,
                     ` import {`,
                     `     method24,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `+import method2 from '@/helpers/methods'`,
                     `+import method3 from '@/helpers/methods'`,
                     ` import {`,
                     `     method34,`,
-                    ` from '@/helpers/methods'`
-                ]
-            }
-        );
-
-        const result = positionedKeywordsRule.invoke();
-
-        expect(result).toHaveLength(1);
-
-        expect(result[0]).toHaveProperty('line', 4);
-    });
-
-    it('returns review on invalid `import` BOF positioning (two BOF keywords)', () => {
-        const positionedKeywordsRule = new PositionedKeywordsRule(
-            patchronContext,
-            {
-                keywords: [
-                    importKeywordBOFConfig,
-                    constKeywordConfig({ custom: null, BOF: true })
-                ]
-            },
-            {
-                ...file,
-                splitPatch: [
-                    `@@ -10,13 +1,19 @@`,
-                    `+const gamma = require('...')`,
-                    `+const beta = require('...');`,
-                    `+const alpha = require('...');`,
-                    `+const b = () => { ... }`,
-                    `+const a = () => { ... }`,
-                    ` import {`,
-                    `     method4,`,
-                    `     method5,`,
-                    ` from '@/helpers/methods'`,
-                    `+import method1 from '@/helpers/methods`,
-                    `-`,
-                    ` import {`,
-                    `     method24,`,
-                    ` from '@/helpers/methods'`,
-                    `+import method2 from '@/helpers/methods'`,
-                    `+import method3 from '@/helpers/methods'`,
-                    ` import {`,
-                    `     method34,`,
-                    ` from '@/helpers/methods'`
+                    ` } from '@/helpers/methods'`
                 ]
             }
         );
@@ -1145,19 +1129,19 @@ describe('invoke function', () => {
                     ` import {`,
                     `     method4,`,
                     `     method5,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     ` const x = 2;`,
-                    `+import method1 from '@/helpers/methods`,
+                    `+import method1 from '@/helpers/methods'`,
                     `-`,
                     ` import {`,
                     `     method24,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `+import method2 from '@/helpers/methods'`,
                     `+const y = 3;`,
                     `+import method3 from '@/helpers/methods'`,
                     ` import {`,
                     `     method34,`,
-                    ` from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `-`,
                     `-import method6 from '@/helpers/methods'`
                 ]
@@ -1178,7 +1162,7 @@ describe('invoke function', () => {
             {
                 keywords: [
                     importKeywordBOFConfig,
-                    constKeywordConfig({ custom: null, BOF: true })
+                    requireKeywordConfig({ custom: null, BOF: true })
                 ]
             },
             {
@@ -1194,17 +1178,17 @@ describe('invoke function', () => {
                     ` import {`,
                     `     method4,`,
                     `     method5,`,
-                    ` from '@/helpers/methods'`,
-                    `+import method1 from '@/helpers/methods`,
+                    ` } from '@/helpers/methods'`,
+                    `+import method1 from '@/helpers/methods'`,
                     `-`,
                     ` import {`,
                     `     method24,`,
-                    `     from '@/helpers/methods'`,
+                    ` } from '@/helpers/methods'`,
                     `+import method2 from '@/helpers/methods'`,
                     `+import method3 from '@/helpers/methods'`,
                     ` import {`,
                     `     method34,`,
-                    ` from '@/helpers/methods'`
+                    ` } from '@/helpers/methods'`
                 ]
             }
         );

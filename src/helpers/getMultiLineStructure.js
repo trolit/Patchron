@@ -1,5 +1,7 @@
 const first = require('lodash/first');
+const isEqual = require('lodash/isEqual');
 const isString = require('lodash/isString');
+const cloneDeep = require('lodash/cloneDeep');
 const { CUSTOM_LINES } = require('src/config/constants');
 
 /**
@@ -12,7 +14,6 @@ const { CUSTOM_LINES } = require('src/config/constants');
  * @returns {object}
  */
 module.exports = (data, currentLineIndex, multiLineOptions) => {
-    const { trimmedContent } = data[currentLineIndex];
     const result = { isMultiLine: false };
 
     for (const options of multiLineOptions) {
@@ -22,7 +23,7 @@ module.exports = (data, currentLineIndex, multiLineOptions) => {
 
         const { indicator } = options;
 
-        if (!_isMultiLine(indicator, trimmedContent)) {
+        if (!_isMultiLine(indicator, data[currentLineIndex])) {
             continue;
         }
 
@@ -38,11 +39,11 @@ module.exports = (data, currentLineIndex, multiLineOptions) => {
     return result;
 };
 
-function _isMultiLine(indicator, content) {
+function _isMultiLine(indicator, row) {
     const propertyName = first(Object.getOwnPropertyNames(indicator));
     const propertyValue = indicator[propertyName];
 
-    return _resolveProperty(propertyName, propertyValue, content);
+    return _resolveProperty(propertyName, propertyValue, indicator, row, null);
 }
 
 function _findEndIndex(data, currentLineIndex, limiter) {
@@ -68,7 +69,9 @@ function _findEndIndex(data, currentLineIndex, limiter) {
         const isEndLine = _resolveProperty(
             propertyName,
             propertyValue,
-            trimmedContent
+            limiter,
+            data[currentLineIndex],
+            row
         );
 
         if (isEndLine) {
@@ -79,16 +82,106 @@ function _findEndIndex(data, currentLineIndex, limiter) {
     return -1;
 }
 
-function _resolveProperty(propertyName, propertyValue, content) {
+function _resolveProperty(
+    propertyName,
+    propertyValue,
+    source,
+    indicatorRow,
+    limiterRow
+) {
+    const { trimmedContent } = limiterRow || indicatorRow;
+
+    let fixedContent = cloneDeep(trimmedContent);
+    let result = false;
+
+    if (source && source['indentation'] && limiterRow) {
+        const indentation = source['indentation'];
+
+        if (!_isIndentationValid(indentation, indicatorRow, limiterRow)) {
+            return false;
+        }
+    }
+
+    if (source && source['until']) {
+        const until = source['until'];
+
+        fixedContent = fixedContent.split(until)[0];
+    }
+
     switch (propertyName) {
         case 'startsWith':
-            return content.startsWith(propertyValue);
+            return fixedContent.startsWith(propertyValue);
+
+        case 'notStartsWith':
+            return !fixedContent.startsWith(propertyValue);
 
         case 'endsWith':
-            return content.endsWith(propertyValue);
+            return fixedContent.endsWith(propertyValue);
+
+        case 'notEndsWith':
+            return !fixedContent.endsWith(propertyValue);
+
+        case 'includes':
+            return fixedContent.includes(propertyValue);
+
+        case 'notIncludes':
+            return !fixedContent.includes(propertyValue);
+
+        case 'equals':
+            return isEqual(fixedContent, propertyValue);
+
+        case 'notEquals':
+            return !isEqual(fixedContent, propertyValue);
 
         case 'expression':
-            return content.match(propertyValue);
+            return fixedContent.match(propertyValue);
+    }
+
+    return result;
+}
+
+function _isIndentationValid(indentation, indicatorRow, limiterRow) {
+    const { indentation: limiterRowIndentation } = limiterRow;
+
+    let leftOperand = null;
+    let operatorName = null;
+    let rightOperand = null;
+
+    if (isString(indentation)) {
+        const [operator, value] = indentation.split('-');
+
+        if (value !== 'indicator') {
+            return false;
+        }
+
+        const { indentation: indicatorRowIndentation } = indicatorRow;
+
+        operatorName = operator;
+        leftOperand = limiterRowIndentation;
+        rightOperand = indicatorRowIndentation;
+    } else if (Array.isArray(indentation)) {
+        const [operator, value] = indentation;
+
+        operatorName = operator;
+        leftOperand = limiterRowIndentation;
+        rightOperand = value;
+    }
+
+    switch (operatorName) {
+        case 'eq':
+            return leftOperand === rightOperand;
+
+        case 'gt':
+            return leftOperand > rightOperand;
+
+        case 'ge':
+            return leftOperand >= rightOperand;
+
+        case 'lt':
+            return leftOperand < rightOperand;
+
+        case 'le':
+            return leftOperand <= rightOperand;
 
         default:
             return false;

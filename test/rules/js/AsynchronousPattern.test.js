@@ -10,7 +10,7 @@ const {
 const {
     js: { AsynchronousPatternRule }
 } = require('src/rules');
-const setupApp = require('test/rules/helpers/setupApp');
+const setupPatchronContext = require('test/setupPatchronContext');
 const initializeFile = require('test/rules/helpers/initializeFile');
 
 const awaitConfig = { pattern: 'await' };
@@ -21,7 +21,7 @@ describe('invoke function', () => {
     let file = {};
 
     beforeEach(() => {
-        patchronContext = setupApp();
+        patchronContext = setupPatchronContext();
 
         file = initializeFile();
     });

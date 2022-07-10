@@ -67,7 +67,8 @@ class SingleLineBlockRule extends BaseRule {
 
             if (
                 this.CUSTOM_LINES.includes(content) ||
-                rowsToSkip.includes(index)
+                rowsToSkip.includes(index) ||
+                trimmedContent.startsWith('@@')
             ) {
                 continue;
             }

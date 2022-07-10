@@ -10,7 +10,7 @@ const {
 const {
     pull: { StrictWorkflowRule }
 } = require('src/rules');
-const setupApp = require('test/rules/helpers/setupApp');
+const setupPatchronContext = require('test/setupPatchronContext');
 const instantiateProbotContext = require('test/rules/helpers/instantiateProbotContext');
 
 const validConfig = {
@@ -49,7 +49,7 @@ describe('invoke function', () => {
     let patchronContext = null;
 
     beforeEach(() => {
-        patchronContext = setupApp();
+        patchronContext = setupPatchronContext();
     });
 
     afterEach(() => {

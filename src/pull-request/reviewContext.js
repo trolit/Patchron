@@ -2,7 +2,7 @@ const { rules } = require('src/config');
 const review = require('src/rules/review');
 
 /**
- * triggers `Pepega.js` to review files against configured rules
+ * triggers `Patchron` to review files against configured rules
  *
  * @param {PatchronContext} patchronContext
  *

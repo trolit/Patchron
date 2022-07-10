@@ -24,6 +24,10 @@ class LineBreakBeforeReturnRule extends BaseRule {
             const row = data[index];
             const { trimmedContent } = row;
 
+            if (trimmedContent.startsWith('@@')) {
+                continue;
+            }
+
             if (
                 !trimmedContent.startsWith('return') ||
                 previousContent === this.NEWLINE
