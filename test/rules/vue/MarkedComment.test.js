@@ -40,13 +40,13 @@ describe('invoke function', () => {
                 splitPatch: [
                     `@@ -10,13 +3,7 @@`,
                     `+<template>`,
-                    `+<--`,
+                    `+<!--`,
                     `+@NOTE might not work perfect due to problems with API`,
                     `-@WARNING`,
                     `+-->`,
-                    `+<div>`,
-                    `+    <-- @TODO`,
-                    `+        Update props once PR#859 will be merged`,
+                    `+<div> <!-- @NOTE another comment -->`,
+                    `+    <!-- @TODO`,
+                    `+         Update props once PR#859 will be merged`,
                     `+    -->`,
                     `+    <my-custom-component`,
                     `+        :data="data"`,
@@ -54,10 +54,10 @@ describe('invoke function', () => {
                     `+        :container="container"`,
                     `+        @click="onClick"`,
                     `+    />`,
-                    `+    <-- @TMP data preview -->`,
+                    `+    <!-- @TMP data preview -->`,
                     `+    {{ data }}`,
                     `+</div>`,
-                    `+<--`
+                    `+<!--`
                 ]
             }
         );
@@ -76,12 +76,12 @@ describe('invoke function', () => {
                 splitPatch: [
                     `@@ -10,13 +3,7 @@`,
                     `+<template>`,
-                    `+<--`,
+                    `+<!--`,
                     `+might not work perfect due to problems with API`,
                     `-@WARNING`,
                     `+-->`,
-                    `+<div>`,
-                    `+    <--`,
+                    `+<div> <!-- another comment -->`,
+                    `+    <!--`,
                     `+        Update props once PR#859 will be merged`,
                     `+    -->`,
                     `+    <my-custom-component`,
@@ -90,10 +90,10 @@ describe('invoke function', () => {
                     `+        :container="container"`,
                     `+        @click="onClick"`,
                     `+    />`,
-                    `+    <-- tmp data preview -->`,
+                    `+    <!-- tmp data preview -->`,
                     `+    {{ data }}`,
                     `+</div>`,
-                    `+<--`
+                    `+<!--`
                 ]
             }
         );
