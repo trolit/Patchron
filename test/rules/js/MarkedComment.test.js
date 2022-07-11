@@ -189,7 +189,7 @@ describe('invoke function', () => {
                     `+/**: multi-line comment as one-liner */`,
                     `+const fs = require('fs');`,
                     `+`,
-                    `+const { expect, test, beforeEach, afterEach } = require('@jest/globals');`,
+                    `+const { expect, test, beforeEach, afterEach } = require('@jest/globals'); /*`,
                     `+* !: in inline flavour`,
                     `+*/`,
                     `-/* removed comment */`
