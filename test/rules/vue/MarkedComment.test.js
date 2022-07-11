@@ -45,8 +45,8 @@ describe('invoke function', () => {
                     `-@WARNING`,
                     `+-->`,
                     `+<div> <!-- @NOTE another comment -->`,
-                    `+    <!-- @TODO`,
-                    `+         Update props once PR#859 will be merged`,
+                    `+    <-- @TODO`,
+                    `+        Update props once PR#859 will be merged`,
                     `+    -->`,
                     `+    <my-custom-component`,
                     `+        :data="data"`,
@@ -81,7 +81,7 @@ describe('invoke function', () => {
                     `-@WARNING`,
                     `+-->`,
                     `+<div> <!-- another comment -->`,
-                    `+    <!--`,
+                    `+    <--`,
                     `+        Update props once PR#859 will be merged`,
                     `+    -->`,
                     `+    <my-custom-component`,
@@ -100,14 +100,16 @@ describe('invoke function', () => {
 
         const result = markedCommentRule.invoke();
 
-        expect(result).toHaveLength(3);
+        expect(result).toHaveLength(4);
 
         expect(result[0]).toHaveProperty('start_line', 4);
         expect(result[0]).toHaveProperty('position', 4);
 
-        expect(result[1]).toHaveProperty('start_line', 8);
-        expect(result[1]).toHaveProperty('position', 8);
+        expect(result[1]).toHaveProperty('line', 7);
 
-        expect(result[2]).toHaveProperty('line', 17);
+        expect(result[2]).toHaveProperty('start_line', 8);
+        expect(result[2]).toHaveProperty('position', 8);
+
+        expect(result[3]).toHaveProperty('line', 17);
     });
 });
