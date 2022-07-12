@@ -2,8 +2,10 @@ const BaseRule = require('src/rules/Base');
 
 class MarkedCommentRule extends BaseRule {
     /**
+     * ensures that in common comment blocks at least one line has to begin with one of the predefined prefixes.
+     *
      * @param {PatchronContext} patchronContext
-     * @param {MarkedCommentConfig} config
+     * @param {MarkedCommonCommentConfig} config
      * @param {Patch} file
      */
     constructor(patchronContext, config, file) {

@@ -5,7 +5,7 @@ class MarkedCommentRule extends BaseRule {
      * ensures that in HTML comment block at least one line has to begin with one of the predefined prefixes.
      *
      * @param {PatchronContext} patchronContext
-     * @param {object} config
+     * @param {MarkedHTMLCommentConfig} config
      * @param {Patch} file
      */
     constructor(patchronContext, config, file) {
