@@ -98,9 +98,9 @@ describe('invoke function', () => {
                 splitPatch: [
                     `@@ -10,13 +10,7 @@ // this comment shouldn't be counted as it's only hunk header in patch`,
                     `+const payload = require('./fixtures/pull_request.opened');`,
-                    `+const fs = require('fs');`,
+                    ` const fs = require('fs');`,
                     `        // unchanged line comment `,
-                    `+`,
+                    ` `,
                     `+const { expect, test, beforeEach, afterEach } = require('@jest/globals');`,
                     `-// removed comment`,
                     `-// removed comment 2`
