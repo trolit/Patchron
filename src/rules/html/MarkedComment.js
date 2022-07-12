@@ -62,7 +62,7 @@ class MarkedCommentRule extends BaseRule {
             if (~endIndex) {
                 reviewComments.push(
                     this.getMultiLineComment({
-                        body: this._getCommentBody(),
+                        body: this._getCommentBody(true),
                         from: index,
                         to: endIndex
                     })
@@ -107,8 +107,27 @@ class MarkedCommentRule extends BaseRule {
     /**
      * @returns {string}
      */
-    _getCommentBody() {
-        return `TBA :thinking:`;
+    _getCommentBody(isMultiLine = false) {
+        let formattedPrefixes = '';
+
+        this.prefixes.forEach((prefix) => {
+            formattedPrefixes = `${formattedPrefixes}
+            - \` ${prefix.value} \` (${prefix.meaning})`;
+        });
+
+        const start = isMultiLine
+            ? 'At least one line of comment block'
+            : 'Comment';
+
+        const commentBody = `${start} should start with one of the predefined prefixes.
+         
+        <details>
+            <summary> List of allowed prefixes </summary> \n\n${this.dedent(
+                formattedPrefixes
+            )}
+        </details>`;
+
+        return this.dedent(commentBody);
     }
 }
 

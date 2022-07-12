@@ -227,7 +227,9 @@ class MarkedCommentRule extends BaseRule {
             - \` ${prefix.value} \` (${prefix.meaning})`;
         });
 
-        const start = isMultiLine ? 'At least one line' : 'Comment';
+        const start = isMultiLine
+            ? 'At least one line of comment block'
+            : 'Comment';
 
         const commentBody = `${start} should start with one of the predefined prefixes.
          
