@@ -13,7 +13,26 @@ const {
 const setupPatchronContext = require('test/setupPatchronContext');
 const initializeFile = require('test/rules/helpers/initializeFile');
 
-const config = {};
+const config = {
+    prefixes: [
+        {
+            value: '@NOTE',
+            meaning: 'important information'
+        },
+        {
+            value: '@WARNING',
+            meaning: 'caution'
+        },
+        {
+            value: '@TODO',
+            meaning: 'something needs to be done'
+        },
+        {
+            value: '@TMP',
+            meaning: 'temporare code'
+        }
+    ]
+};
 
 describe('invoke function', () => {
     let patchronContext = null;
@@ -45,7 +64,7 @@ describe('invoke function', () => {
                     `-@WARNING`,
                     `+-->`,
                     `+<div> <!-- @NOTE another comment -->`,
-                    `+    <-- @TODO`,
+                    `+    <!-- @TODO`,
                     `+        Update props once PR#859 will be merged`,
                     `+    -->`,
                     `+    <my-custom-component`,
@@ -56,7 +75,10 @@ describe('invoke function', () => {
                     `+    />`,
                     `+    <!-- @TMP data preview -->`,
                     `+    {{ data }}`,
-                    `+</div>`,
+                    `+</div> <!--`,
+                    `+@NOTE remove it`,
+                    `+-->`,
+                    `+`,
                     `+<!--`
                 ]
             }
@@ -81,7 +103,7 @@ describe('invoke function', () => {
                     `-@WARNING`,
                     `+-->`,
                     `+<div> <!-- another comment -->`,
-                    `+    <--`,
+                    `+    <!--`,
                     `+        Update props once PR#859 will be merged`,
                     `+    -->`,
                     `+    <my-custom-component`,
@@ -92,7 +114,10 @@ describe('invoke function', () => {
                     `+    />`,
                     `+    <!-- tmp data preview -->`,
                     `+    {{ data }}`,
-                    `+</div>`,
+                    `+</div> <!--`,
+                    `+remove it @NOTE`,
+                    `+-->`,
+                    `+`,
                     `+<!--`
                 ]
             }
@@ -100,7 +125,7 @@ describe('invoke function', () => {
 
         const result = markedCommentRule.invoke();
 
-        expect(result).toHaveLength(4);
+        expect(result).toHaveLength(5);
 
         expect(result[0]).toHaveProperty('start_line', 4);
         expect(result[0]).toHaveProperty('position', 4);
@@ -111,5 +136,8 @@ describe('invoke function', () => {
         expect(result[2]).toHaveProperty('position', 8);
 
         expect(result[3]).toHaveProperty('line', 17);
+
+        expect(result[4]).toHaveProperty('start_line', 19);
+        expect(result[4]).toHaveProperty('position', 19);
     });
 });
