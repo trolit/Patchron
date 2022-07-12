@@ -4,14 +4,7 @@
 
 /* eslint-disable no-console */
 
-const { pull, common, js, vue } = require('src/rules');
-
-const rules = {
-    ...js,
-    ...vue,
-    ...pull,
-    ...common
-};
+const rules = require('src/rules');
 
 /**
  * Import that method into core **index.js** file to easily debug particular rule with particular state.
