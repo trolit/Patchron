@@ -65,7 +65,7 @@ Patch contains latest changes done to particular file. Here is example of how it
 
 -   line that was added starts with `+`
 -   line that was removed starts with `-`
--   line that was changed starts with `whitespace`
+-   line that was unchanged starts with `whitespace`
 -   line that begins with `@@` is <em>hunk header</em>. It allows to identify lines in respect to source file. It also informs about hunk length.
 
 Hunk header e.g. `@@ -10,13 +10,7 @@` contains following information:
