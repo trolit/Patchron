@@ -79,12 +79,6 @@ Hunk header e.g. `@@ -10,13 +10,7 @@` contains following information:
 
 </details>
 
-## Contributing
-
-If you have suggestions for how Patchron could be improved, or want to report a bug, open an issue!
-
-For more, check out the [Contributing Guide](CONTRIBUTING.md).
-
 ## Links
 
 -   [Deployments API example](https://developer.github.com/v3/repos/deployments/)
