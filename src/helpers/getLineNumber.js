@@ -1,4 +1,3 @@
-const removeWhitespaces = require('./removeWhitespaces');
 const getNearestHunkHeader = require('./getNearestHunkHeader');
 
 /**
@@ -56,9 +55,7 @@ module.exports = (splitPatch, side = 'RIGHT', rowIndex) => {
             break;
         }
 
-        const minifiedRow = removeWhitespaces(splitPatch[index]);
-
-        if (!minifiedRow.startsWith(prefixToIgnore)) {
+        if (!splitPatch[index].startsWith(prefixToIgnore)) {
             counter++;
         }
     }
