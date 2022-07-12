@@ -2,7 +2,7 @@ const BaseRule = require('src/rules/Base');
 
 class MarkedCommentRule extends BaseRule {
     /**
-     * ensures that in HTML comment block at least one line has to begin with one of the predefined prefixes.
+     * ensures that in HTML comment block, at least one line has to begin with one of the predefined prefixes.
      *
      * @param {PatchronContext} patchronContext
      * @param {MarkedHTMLCommentConfig} config
@@ -42,6 +42,7 @@ class MarkedCommentRule extends BaseRule {
 
             if (rawRow.endsWith(this.COMMENT_END)) {
                 const splitRawRow = rawRow.split(this.COMMENT_START);
+
                 const comment =
                     splitRawRow.length === 2 ? splitRawRow[1].trim() : null;
 
