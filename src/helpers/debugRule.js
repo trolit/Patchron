@@ -4,25 +4,19 @@
 
 /* eslint-disable no-console */
 
-const { pull, common, js, vue } = require('src/rules');
-
-const rules = {
-    ...js,
-    ...vue,
-    ...pull,
-    ...common
-};
+const rules = require('src/rules');
 
 /**
  * Import that method into core **index.js** file to easily debug particular rule with particular state.
  *
+ * @param {string} category
  * @param {string} ruleName - file name of rule
  * @param {object} config - rule config
  * @param {object} file - provide all elements that are required by passed rule
  * @param {PatchronContext} patchronContext
  */
-module.exports = (ruleName, config, file, patchronContext) => {
-    const Rule = rules[ruleName];
+module.exports = (category, ruleName, config, file, patchronContext) => {
+    const Rule = rules[category][ruleName];
 
     const rule = new Rule(patchronContext, config, file);
 
