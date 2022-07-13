@@ -2,6 +2,8 @@ const BaseRule = require('src/rules/Base');
 
 class AsynchronousPatternRule extends BaseRule {
     /**
+     * ensures that proper pattern is used in asynchronous calls
+     *
      * @param {PatchronContext} patchronContext
      * @param {AsynchronousPatternConfig} config
      * @param {Patch} file
