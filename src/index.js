@@ -24,43 +24,40 @@ const reviewContext = require('./pull-request/reviewContext');
 module.exports = (app) => {
     const patchronContext = new PatchronContext(app);
 
-    app.on(
-        ['pull_request.opened', 'pull_request.synchronize'],
-        async (context) => {
-            patchronContext.initializePullRequestData(context);
+    app.on(['pull_request.opened'], async (context) => {
+        patchronContext.initializePullRequestData(context);
 
-            const {
-                pullRequest: { owner }
-            } = context;
+        const {
+            pullRequest: { owner }
+        } = context;
 
-            if (isOwnerAssigningEnabled) {
-                await addAssignees(patchronContext, [owner]);
-            }
+        if (senders?.length && !senders.includes(owner)) {
+            return;
+        }
 
-            if (senders?.length && !senders.includes(owner)) {
-                return;
-            }
+        if (isOwnerAssigningEnabled) {
+            await addAssignees(patchronContext, [owner]);
+        }
 
-            const reviewComments = cloneDeep(reviewContext(patchronContext));
+        const reviewComments = cloneDeep(reviewContext(patchronContext));
 
-            if (!isReviewAborted(reviewComments)) {
-                reviewComments.push(...reviewFiles(patchronContext));
+        if (!isReviewAborted(reviewComments)) {
+            reviewComments.push(...reviewFiles(patchronContext));
 
-                const numberOfPostedComments = postComments(
+            const numberOfPostedComments = postComments(
+                patchronContext,
+                reviewComments
+            );
+
+            if (isReviewSummaryEnabled) {
+                await postSummary(
                     patchronContext,
+                    numberOfPostedComments,
                     reviewComments
                 );
-
-                if (isReviewSummaryEnabled) {
-                    await postSummary(
-                        patchronContext,
-                        numberOfPostedComments,
-                        reviewComments
-                    );
-                }
             }
         }
-    );
+    });
 };
 
 function isReviewAborted(reviewComments) {
