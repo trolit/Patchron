@@ -20,6 +20,7 @@ const postSummary = require('./pull-request/postSummary');
 const reviewFiles = require('./pull-request/reviewFiles');
 const postComments = require('./pull-request/postComments');
 const PatchronContext = require('./builders/PatchronContext');
+
 /**
  * @param {ProbotApp} app
  */
