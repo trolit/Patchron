@@ -19,6 +19,7 @@ module.exports = (patchronContext, files) => {
 
     for (const file of files) {
         _setupFileForReview(file);
+
         const { extension } = file;
         const relatedRules = rules.files[extension];
 
@@ -31,7 +32,17 @@ module.exports = (patchronContext, files) => {
             continue;
         }
 
-        comments.push(...review(patchronContext, relatedRules, file));
+        const { patch } = file;
+        const chunks = _splitPatchByHunkHeader(patch);
+
+        for (const chunk of chunks) {
+            comments.push(
+                ...review(patchronContext, relatedRules, {
+                    ...file,
+                    splitPatch: chunk
+                })
+            );
+        }
     }
 
     return comments;
@@ -40,7 +51,7 @@ module.exports = (patchronContext, files) => {
 /**
  * expands file object with following properties:
  * ```js
- * { commit_id, extension, splitPatch }
+ * { commit_id, extension }
  * ```
  *
  * @param {object} file
@@ -50,15 +61,35 @@ module.exports = (patchronContext, files) => {
  * @returns {void}
  */
 function _setupFileForReview(file) {
-    const { filename, contents_url, patch } = file;
+    const { filename, contents_url } = file;
 
     const commitId = contents_url.split('ref=').pop();
-
-    const splitPatch = patch.split('\n');
 
     const extension = filename.split('.').pop();
 
     file.commitId = commitId;
     file.extension = extension;
-    file.splitPatch = splitPatch;
+}
+
+function _splitPatchByHunkHeader(patch) {
+    const splitPatch = patch.split('\n');
+
+    let lastHunkHeaderPosition = 0;
+
+    const chunks = splitPatch.reduce(
+        (accumulator, line, index) => {
+            if (line.startsWith('@@') && index !== 0) {
+                lastHunkHeaderPosition++;
+
+                accumulator.push([line]);
+            } else {
+                accumulator[lastHunkHeaderPosition].push(line);
+            }
+
+            return accumulator;
+        },
+        [[]]
+    );
+
+    return chunks;
 }
