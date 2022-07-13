@@ -6,8 +6,11 @@
 // ***********************************************************************
 
 require('module-alias/register');
-const cloneDeep = require('lodash/cloneDeep');
 
+const {
+    rules: { pull: pullRules }
+} = require('./config');
+const review = require('./rules/review');
 const {
     settings: { senders, isOwnerAssigningEnabled, isReviewSummaryEnabled }
 } = require('./config');
@@ -17,8 +20,6 @@ const postSummary = require('./pull-request/postSummary');
 const reviewFiles = require('./pull-request/reviewFiles');
 const postComments = require('./pull-request/postComments');
 const PatchronContext = require('./builders/PatchronContext');
-const reviewContext = require('./pull-request/reviewContext');
-
 /**
  * @param {ProbotApp} app
  */
@@ -40,7 +41,7 @@ module.exports = (app) => {
             await addAssignees(patchronContext, [owner]);
         }
 
-        const reviewComments = cloneDeep(reviewContext(patchronContext));
+        const reviewComments = review(patchronContext, pullRules);
 
         if (!isReviewAborted(reviewComments)) {
             const files = await getFiles(patchronContext);
