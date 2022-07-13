@@ -11,6 +11,7 @@ const cloneDeep = require('lodash/cloneDeep');
 const {
     settings: { senders, isOwnerAssigningEnabled, isReviewSummaryEnabled }
 } = require('./config');
+const getFiles = require('./github/getFiles');
 const addAssignees = require('./github/addAssignees');
 const postSummary = require('./pull-request/postSummary');
 const reviewFiles = require('./pull-request/reviewFiles');
@@ -42,7 +43,9 @@ module.exports = (app) => {
         const reviewComments = cloneDeep(reviewContext(patchronContext));
 
         if (!isReviewAborted(reviewComments)) {
-            reviewComments.push(...reviewFiles(patchronContext));
+            const files = await getFiles(patchronContext);
+
+            reviewComments.push(...reviewFiles(patchronContext, files));
 
             const numberOfPostedComments = postComments(
                 patchronContext,
