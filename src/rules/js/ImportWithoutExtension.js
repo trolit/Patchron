@@ -2,6 +2,8 @@ const BaseRule = require('src/rules/Base');
 
 class ImportWithoutExtensionRule extends BaseRule {
     /**
+     * comments out `import/require` instructions which paths end with extensions
+     *
      * @param {PatchronContext} patchronContext
      * @param {ImportWithoutExtensionConfig} config
      * @param {Patch} file

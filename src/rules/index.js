@@ -1,13 +1,14 @@
-const js = require('./js');
-const vue = require('./vue');
-const html = require('./html');
-const pull = require('./pull');
-const common = require('./common');
+const requireDirectory = require('require-directory');
 
-module.exports = {
-    js,
-    vue,
-    html,
-    pull,
-    common
-};
+const rules = requireDirectory(module, {
+    exclude: /.*(Base|review).js/,
+    rename: (name) => {
+        const firstCharacter = name.charAt(0);
+
+        return firstCharacter === firstCharacter.toLowerCase()
+            ? name
+            : `${name}Rule`;
+    }
+});
+
+module.exports = rules;

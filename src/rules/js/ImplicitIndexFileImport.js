@@ -2,6 +2,8 @@ const BaseRule = require('src/rules/Base');
 
 class ImplicitIndexFileImportRule extends BaseRule {
     /**
+     * checks whether `import/require` lines that lead to `index.js` are not called explicitly
+     *
      * @param {PatchronContext} patchronContext
      * @param {ImplicitIndexFileImportConfig} config
      * @param {Patch} file

@@ -6,17 +6,20 @@
 // ***********************************************************************
 
 require('module-alias/register');
-const cloneDeep = require('lodash/cloneDeep');
 
+const {
+    rules: { pull: pullRules }
+} = require('./config');
+const review = require('./rules/review');
 const {
     settings: { senders, isOwnerAssigningEnabled, isReviewSummaryEnabled }
 } = require('./config');
+const getFiles = require('./github/getFiles');
 const addAssignees = require('./github/addAssignees');
 const postSummary = require('./pull-request/postSummary');
 const reviewFiles = require('./pull-request/reviewFiles');
 const postComments = require('./pull-request/postComments');
 const PatchronContext = require('./builders/PatchronContext');
-const reviewContext = require('./pull-request/reviewContext');
 
 /**
  * @param {ProbotApp} app
@@ -24,43 +27,42 @@ const reviewContext = require('./pull-request/reviewContext');
 module.exports = (app) => {
     const patchronContext = new PatchronContext(app);
 
-    app.on(
-        ['pull_request.opened', 'pull_request.synchronize'],
-        async (context) => {
-            patchronContext.initializePullRequestData(context);
+    app.on(['pull_request.opened'], async (context) => {
+        patchronContext.initializePullRequestData(context);
 
-            const {
-                pullRequest: { owner }
-            } = context;
+        const {
+            pullRequest: { owner }
+        } = context;
 
-            if (isOwnerAssigningEnabled) {
-                await addAssignees(patchronContext, [owner]);
-            }
+        if (senders?.length && !senders.includes(owner)) {
+            return;
+        }
 
-            if (senders?.length && !senders.includes(owner)) {
-                return;
-            }
+        if (isOwnerAssigningEnabled) {
+            await addAssignees(patchronContext, [owner]);
+        }
 
-            const reviewComments = cloneDeep(reviewContext(patchronContext));
+        const reviewComments = review(patchronContext, pullRules);
 
-            if (!isReviewAborted(reviewComments)) {
-                reviewComments.push(...reviewFiles(patchronContext));
+        if (!isReviewAborted(reviewComments)) {
+            const files = await getFiles(patchronContext);
 
-                const numberOfPostedComments = postComments(
+            reviewComments.push(...reviewFiles(patchronContext, files));
+
+            const numberOfPostedComments = postComments(
+                patchronContext,
+                reviewComments
+            );
+
+            if (isReviewSummaryEnabled) {
+                await postSummary(
                     patchronContext,
+                    numberOfPostedComments,
                     reviewComments
                 );
-
-                if (isReviewSummaryEnabled) {
-                    await postSummary(
-                        patchronContext,
-                        numberOfPostedComments,
-                        reviewComments
-                    );
-                }
             }
         }
-    );
+    });
 };
 
 function isReviewAborted(reviewComments) {

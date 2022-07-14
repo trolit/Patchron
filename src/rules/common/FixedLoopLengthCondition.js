@@ -1,6 +1,6 @@
 const BaseRule = require('src/rules/Base');
 
-class FixedLoopLengthCondition extends BaseRule {
+class FixedLoopLengthConditionRule extends BaseRule {
     /**
      * looks after `for`, `while`, `do while` loops and identifies whether condition statement includes reference to `length` property. If it does, line is commented out with description to not call `length` in each iteration suggesting to declare variable before loop instead.
      *
@@ -167,4 +167,4 @@ class FixedLoopLengthCondition extends BaseRule {
     }
 }
 
-module.exports = FixedLoopLengthCondition;
+module.exports = FixedLoopLengthConditionRule;

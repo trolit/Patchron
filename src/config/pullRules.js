@@ -22,10 +22,6 @@ module.exports = [
                 },
                 {
                     base: 'master',
-                    head: 'develop'
-                },
-                {
-                    base: 'master',
                     head: 'hotfix'
                 },
                 {
