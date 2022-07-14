@@ -1,3 +1,5 @@
 const requireDirectory = require('require-directory');
 
-module.exports = requireDirectory(module);
+module.exports = requireDirectory(module, {
+    include: /^.*Rule.js/
+});
