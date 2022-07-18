@@ -28,7 +28,7 @@ docker run -e APP_ID=<app-id> -e PRIVATE_KEY=<pem-value> patchron
 
 | Property                               | Type (default)       | Description                                                                                                                   |
 | :------------------------------------- | :------------------- | :---------------------------------------------------------------------------------------------------------------------------- |
-| `isGetFilesRequestPaginated`           | boolean (`false`)    | Controls how files are fetched. Unpaginated response includes a maximum of 3000 files which is sufficient in 99.99% of cases. |
+| `isGetFilesRequestPaginated`           | boolean (`false`)    | Controls how files are fetched. Unpaginated response includes a maximum of 3000 files which is sufficient in 99.9999999999% of cases. |
 | `delayBetweenCommentRequestsInSeconds` | Number (`3`)         | After review is done, delays time between each comment request to not overload API.                                           |
 | `isOwnerAssigningEnabled`              | boolean (`true`)     | When true, PR owner will be automatically assigned once pull request will be issued.                                          |
 | `isReviewSummaryEnabled`               | boolean (`false`)    | When true, at the end of the PR review summary is posted that contains various information e.g. how many comments were posts. |
