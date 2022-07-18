@@ -60,30 +60,35 @@ class SingleLineBlockRule extends BaseRule {
                 continue;
             }
 
-            let to = -1;
-            const from = row.index;
-
             const rowStructure = this._findRowStructure(
                 data,
                 dataStructure,
                 index
             );
 
-            const isWithBraces = !!rowStructure;
+            const from = row.index;
+            let isWithBraces = false;
+            let isSingleLineBlock = false;
 
             if (rowStructure) {
-                to = rowStructure.to;
-            } else if (matchedBlock?.multiLineOptions) {
-                to = this._resolveMultiLineStructure(data, matchedBlock, index);
+                isWithBraces = true;
+
+                isSingleLineBlock = this._isSingleLineStructure(
+                    data,
+                    rowStructure
+                );
             } else {
-                continue;
+                const endIndex = this._resolveMultiLineStructure(
+                    data,
+                    matchedBlock,
+                    index
+                );
             }
 
-            if (this._isSingleLineBlock(data, from, to, isWithBraces)) {
+            if (isSingleLineBlock) {
                 singleLineBlocks.push({
                     from,
-                    to,
-                    isWithBraces
+                    to
                 });
             }
         }
@@ -117,6 +122,24 @@ class SingleLineBlockRule extends BaseRule {
         return trimmedContent.startsWith('{')
             ? dataStructure.find(({ from }) => from === nextRow.index)
             : null;
+    }
+
+    _isSingleLineStructure(data, structure) {
+        const { from, to } = structure;
+
+        if (from === to) {
+            return true;
+        }
+
+        let count = 0;
+
+        for (let index = from + 1; index < to; index++) {
+            const { trimmedContent } = data[index];
+
+            trimmedContent === this.MERGE ? 0 : count++;
+        }
+
+        return count === 1;
     }
 
     _isSingleLineBlock(data, from, to, isWithBraces) {
