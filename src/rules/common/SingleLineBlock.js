@@ -24,9 +24,11 @@ class SingleLineBlockRule extends BaseRule {
             return [];
         }
 
-        const dataStructure = this.helpers.getDataStructure(data);
+        const singleLineBlocks = this._getSingleLineBlocks(data);
 
-        const singleLineBlocks = this._getSingleLineBlocks(data, dataStructure);
+        const reviewComments = this._reviewSingleLineBlocks(singleLineBlocks);
+
+        return reviewComments;
     }
 
     _includesAnyBlock(data) {
@@ -35,19 +37,16 @@ class SingleLineBlockRule extends BaseRule {
         );
     }
 
-    _getSingleLineBlocks(data, dataStructure) {
+    _getSingleLineBlocks(data) {
         const rowsToSkip = [];
         const singleLineBlocks = [];
-        const dataLength = data.length;
+        const dataStructure = this.helpers.getDataStructure(data);
 
-        for (let index = 0; index < dataLength; index++) {
-            const row = data[index];
-            const { content, trimmedContent } = row;
-
+        for (const { index: from, trimmedContent } of data) {
             if (
-                rowsToSkip.includes(index) ||
+                rowsToSkip.includes(from) ||
                 trimmedContent.startsWith('@@') ||
-                this.CUSTOM_LINES.includes(content)
+                this.CUSTOM_LINES.includes(trimmedContent)
             ) {
                 continue;
             }
@@ -60,41 +59,62 @@ class SingleLineBlockRule extends BaseRule {
                 continue;
             }
 
-            const rowStructure = this._findRowStructure(
+            let rowStructure = this._findRowStructure(
+                from,
                 data,
-                dataStructure,
-                index
+                dataStructure
             );
 
-            const from = row.index;
+            let to = -1;
             let isWithBraces = false;
             let isSingleLineBlock = false;
 
             if (rowStructure) {
+                to = rowStructure.to;
+
                 isWithBraces = true;
 
-                isSingleLineBlock = this._isSingleLineStructure(
-                    data,
-                    rowStructure
-                );
-            } else {
-                const endIndex = this._resolveMultiLineStructure(
-                    data,
-                    matchedBlock,
-                    index
-                );
+                isSingleLineBlock = this._isSingleLineBlock(data, rowStructure);
+            } else if (matchedBlock?.multiLineOptions) {
+                const endIndex = this._findEndIndex(from, data, matchedBlock);
+
+                if (~endIndex) {
+                    rowsToSkip.push(endIndex);
+
+                    rowStructure = this._findRowStructure(
+                        endIndex,
+                        data,
+                        dataStructure
+                    );
+
+                    // TODO:!!!
+                    const start = data[from].indentation;
+                    const end = data[endIndex].indentation;
+                    const nextEnd = data[endIndex + 1].indentation;
+
+                    isSingleLineBlock = rowStructure
+                        ? this._isSingleLineBlock(data, rowStructure)
+                        : end >= start || nextEnd >= start;
+
+                    isWithBraces = !!rowStructure;
+
+                    to = endIndex;
+                }
             }
 
             if (isSingleLineBlock) {
                 singleLineBlocks.push({
+                    to,
                     from,
-                    to
+                    isWithBraces
                 });
             }
         }
+
+        return singleLineBlocks;
     }
 
-    _resolveMultiLineStructure(data, matchedBlock, index) {
+    _findEndIndex(index, data, matchedBlock) {
         const { multiLineOptions } = matchedBlock;
 
         const multiLineStructure = this.helpers.getMultiLineStructure(
@@ -106,11 +126,11 @@ class SingleLineBlockRule extends BaseRule {
         return multiLineStructure?.endIndex || -1;
     }
 
-    _findRowStructure(data, dataStructure, index) {
-        const nextRow = index + 1 < data.length ? data[index + 1] : null;
+    _findRowStructure(rowIndex, data, dataStructure) {
+        const nextRow = rowIndex + 1 < data.length ? data[rowIndex + 1] : null;
 
         const currentRowStructure = dataStructure.find(
-            ({ from }) => from === index
+            ({ from }) => from === rowIndex
         );
 
         if (!nextRow || currentRowStructure) {
@@ -124,7 +144,7 @@ class SingleLineBlockRule extends BaseRule {
             : null;
     }
 
-    _isSingleLineStructure(data, structure) {
+    _isSingleLineBlock(data, structure) {
         const { from, to } = structure;
 
         if (from === to) {
@@ -142,23 +162,40 @@ class SingleLineBlockRule extends BaseRule {
         return count === 1;
     }
 
-    _isSingleLineBlock(data, from, to, isWithBraces) {
-        if (from === to) {
-            return true;
+    _reviewSingleLineBlocks(singleLineBlocks) {
+        const reviewComments = [];
+
+        for (const singleLineBlock of singleLineBlocks) {
+            const { from, to, isWithBraces } = singleLineBlock;
+
+            if (this.curlyBraces !== isWithBraces) {
+                const body = this._getCommentBody();
+
+                reviewComments.push(
+                    from === to
+                        ? this.getSingleLineComment({
+                              index: from,
+                              body
+                          })
+                        : this.getMultiLineComment({
+                              from,
+                              to,
+                              body
+                          })
+                );
+            }
         }
 
-        const dataLength = data.length;
-
-        if (isWithBraces) {
-            for (let index = from + 1; index < dataLength; index++) {}
-        }
+        return reviewComments;
     }
 
     /**
      * @returns {string}
      */
     _getCommentBody() {
-        return `TBA`;
+        return `This single-line block should${
+            this.curlyBraces ? `` : `n't`
+        } be wrapped with curly braces.`;
     }
 }
 
