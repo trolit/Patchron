@@ -42,9 +42,9 @@ class SingleLineBlockRule extends BaseRule {
         const singleLineBlocks = [];
         const dataStructure = this.helpers.getDataStructure(data);
 
-        for (const { index: from, trimmedContent } of data) {
+        for (const { index, trimmedContent } of data) {
             if (
-                rowsToSkip.includes(from) ||
+                rowsToSkip.includes(index) ||
                 trimmedContent.startsWith('@@') ||
                 this.CUSTOM_LINES.includes(trimmedContent)
             ) {
@@ -60,7 +60,7 @@ class SingleLineBlockRule extends BaseRule {
             }
 
             let rowStructure = this._findRowStructure(
-                from,
+                index,
                 data,
                 dataStructure
             );
@@ -74,9 +74,12 @@ class SingleLineBlockRule extends BaseRule {
 
                 isWithBraces = true;
 
-                isSingleLineBlock = this._isSingleLineBlock(data, rowStructure);
+                isSingleLineBlock = this._isSingleLineBlockWithBraces(
+                    data,
+                    rowStructure
+                );
             } else if (matchedBlock?.multiLineOptions) {
-                const endIndex = this._findEndIndex(from, data, matchedBlock);
+                const endIndex = this._findEndIndex(index, data, matchedBlock);
 
                 if (~endIndex) {
                     rowsToSkip.push(endIndex);
@@ -87,14 +90,13 @@ class SingleLineBlockRule extends BaseRule {
                         dataStructure
                     );
 
-                    // TODO:!!!
-                    const start = data[from].indentation;
-                    const end = data[endIndex].indentation;
-                    const nextEnd = data[endIndex + 1].indentation;
-
                     isSingleLineBlock = rowStructure
-                        ? this._isSingleLineBlock(data, rowStructure)
-                        : end >= start || nextEnd >= start;
+                        ? this._isSingleLineBlockWithBraces(data, rowStructure)
+                        : this._isSingleLineBlockWithoutBraces(
+                              data,
+                              index,
+                              endIndex
+                          );
 
                     isWithBraces = !!rowStructure;
 
@@ -105,25 +107,13 @@ class SingleLineBlockRule extends BaseRule {
             if (isSingleLineBlock) {
                 singleLineBlocks.push({
                     to,
-                    from,
+                    from: index,
                     isWithBraces
                 });
             }
         }
 
         return singleLineBlocks;
-    }
-
-    _findEndIndex(index, data, matchedBlock) {
-        const { multiLineOptions } = matchedBlock;
-
-        const multiLineStructure = this.helpers.getMultiLineStructure(
-            data,
-            index,
-            multiLineOptions
-        );
-
-        return multiLineStructure?.endIndex || -1;
     }
 
     _findRowStructure(rowIndex, data, dataStructure) {
@@ -144,7 +134,19 @@ class SingleLineBlockRule extends BaseRule {
             : null;
     }
 
-    _isSingleLineBlock(data, structure) {
+    _findEndIndex(index, data, matchedBlock) {
+        const { multiLineOptions } = matchedBlock;
+
+        const multiLineStructure = this.helpers.getMultiLineStructure(
+            data,
+            index,
+            multiLineOptions
+        );
+
+        return multiLineStructure?.endIndex || -1;
+    }
+
+    _isSingleLineBlockWithBraces(data, structure) {
         const { from, to } = structure;
 
         if (from === to) {
@@ -160,6 +162,28 @@ class SingleLineBlockRule extends BaseRule {
         }
 
         return count === 1;
+    }
+
+    _isSingleLineBlockWithoutBraces(data, index, endIndex) {
+        const startRow = data[index];
+        const dataLength = data.length;
+
+        for (; endIndex < dataLength; endIndex++) {
+            const { trimmedContent, indentation } = data[endIndex];
+
+            if (
+                trimmedContent === this.MERGE ||
+                trimmedContent === this.COMMENTED_LINE
+            ) {
+                continue;
+            }
+
+            if (indentation >= startRow.indentation) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     _reviewSingleLineBlocks(singleLineBlocks) {
