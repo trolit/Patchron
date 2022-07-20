@@ -92,7 +92,6 @@ function _resolveProperty(
     const { trimmedContent } = limiterRow || indicatorRow;
 
     let fixedContent = cloneDeep(trimmedContent);
-    let result = false;
 
     if (source && source['indentation'] && limiterRow) {
         const indentation = source['indentation'];
@@ -137,7 +136,7 @@ function _resolveProperty(
             return fixedContent.match(propertyValue);
     }
 
-    return result;
+    return false;
 }
 
 function _isIndentationValid(indentation, indicatorRow, limiterRow) {
