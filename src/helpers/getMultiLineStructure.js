@@ -17,13 +17,13 @@ module.exports = (data, currentLineIndex, multiLineOptions) => {
     const result = { isMultiLine: false };
 
     for (const options of multiLineOptions) {
-        if (!options?.indicator || !options?.limiter) {
+        if (!options?.limiter) {
             continue;
         }
 
-        const { indicator } = options;
+        const indicator = options?.indicator;
 
-        if (!_isMultiLine(indicator, data[currentLineIndex])) {
+        if (indicator && !_isMultiLine(indicator, data[currentLineIndex])) {
             continue;
         }
 
