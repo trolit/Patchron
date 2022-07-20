@@ -97,7 +97,7 @@
 /**
  * @typedef {object} MultiLineOption
  * @property {Indicator} indicator multi-line start condition. To skip indicator check, don't pass `indicator` property.
- * @property {Limiter} limiter multi-line end condition.
+ * @property {Limiter|Array<Limiter>} limiter multi-line end condition. You can also pass multiple `limiter` cases.
  */
 
 /**

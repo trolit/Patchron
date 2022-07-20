@@ -31,7 +31,19 @@ module.exports = (data, currentLineIndex, multiLineOptions) => {
 
         const { limiter } = options;
 
-        result.endIndex = _findEndIndex(data, currentLineIndex, limiter);
+        if (Array.isArray(limiter)) {
+            for (const value of limiter) {
+                const endIndex = _findEndIndex(data, currentLineIndex, value);
+
+                if (~endIndex) {
+                    result.endIndex = endIndex;
+
+                    break;
+                }
+            }
+        } else {
+            result.endIndex = _findEndIndex(data, currentLineIndex, limiter);
+        }
 
         break;
     }
