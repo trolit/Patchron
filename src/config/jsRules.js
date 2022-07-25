@@ -2,7 +2,7 @@ const {
     common: {
         DirectImportRule,
         MarkedCommentRule,
-        SingleLineBlockRule,
+        SingleLineBlockPatternRule,
         PositionedKeywordsRule,
         PredefinedFilenameRule,
         LineBreakBeforeReturnRule,
@@ -142,7 +142,7 @@ module.exports = [
     },
     {
         enabled: false,
-        reference: SingleLineBlockRule,
+        reference: SingleLineBlockPatternRule,
         config: {
             blocks: [
                 {

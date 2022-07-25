@@ -1,11 +1,11 @@
 const BaseRule = require('src/rules/Base');
 
-class SingleLineBlockRule extends BaseRule {
+class SingleLineBlockPatternRule extends BaseRule {
     /**
      * finds out configured blocks and tests whether single liners meet `curlyBraces` boolean criterion.
      *
      * @param {PatchronContext} patchronContext
-     * @param {SingleLineBlockConfig} config
+     * @param {SingleLineBlockPatternConfig} config
      * @param {Patch} file
      */
     constructor(patchronContext, config, file) {
@@ -244,4 +244,4 @@ class SingleLineBlockRule extends BaseRule {
     }
 }
 
-module.exports = SingleLineBlockRule;
+module.exports = SingleLineBlockPatternRule;

@@ -8,7 +8,7 @@ const {
 } = require('@jest/globals');
 
 const {
-    common: { SingleLineBlockRule }
+    common: { SingleLineBlockPatternRule }
 } = require('src/rules');
 const setupPatchronContext = require('test/setupPatchronContext');
 const initializeFile = require('test/rules/helpers/initializeFile');
@@ -122,7 +122,7 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on invalid blocks config', () => {
-        const singleLineBlockRule = new SingleLineBlockRule(
+        const singleLineBlockPatternRule = new SingleLineBlockPatternRule(
             patchronContext,
             {
                 blocks: [],
@@ -131,7 +131,7 @@ describe('invoke function', () => {
             file
         );
 
-        const result = singleLineBlockRule.invoke();
+        const result = singleLineBlockPatternRule.invoke();
 
         expect(result).toEqual([]);
     });
@@ -143,7 +143,7 @@ describe('invoke function', () => {
      */
 
     it('returns empty array on valid single-line if/else if/else blocks (with curly braces)', () => {
-        const singleLineBlockRule = new SingleLineBlockRule(
+        const singleLineBlockPatternRule = new SingleLineBlockPatternRule(
             patchronContext,
             validConfig,
             {
@@ -181,13 +181,13 @@ describe('invoke function', () => {
             }
         );
 
-        const result = singleLineBlockRule.invoke();
+        const result = singleLineBlockPatternRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid single-line if/else if/else blocks (with curly braces)', () => {
-        const singleLineBlockRule = new SingleLineBlockRule(
+        const singleLineBlockPatternRule = new SingleLineBlockPatternRule(
             patchronContext,
             validConfig,
             {
@@ -219,7 +219,7 @@ describe('invoke function', () => {
             }
         );
 
-        const result = singleLineBlockRule.invoke();
+        const result = singleLineBlockPatternRule.invoke();
 
         expect(result).toHaveLength(8);
 
@@ -241,7 +241,7 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid nested single-line if block (with curly braces)', () => {
-        const singleLineBlockRule = new SingleLineBlockRule(
+        const singleLineBlockPatternRule = new SingleLineBlockPatternRule(
             patchronContext,
             validConfig,
             {
@@ -261,13 +261,13 @@ describe('invoke function', () => {
             }
         );
 
-        const result = singleLineBlockRule.invoke();
+        const result = singleLineBlockPatternRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid nested single-line if block (with curly braces)', () => {
-        const singleLineBlockRule = new SingleLineBlockRule(
+        const singleLineBlockPatternRule = new SingleLineBlockPatternRule(
             patchronContext,
             validConfig,
             {
@@ -286,7 +286,7 @@ describe('invoke function', () => {
             }
         );
 
-        const result = singleLineBlockRule.invoke();
+        const result = singleLineBlockPatternRule.invoke();
 
         expect(result).toHaveLength(1);
 
@@ -294,7 +294,7 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid single-line if/else if/else blocks (without curly braces)', () => {
-        const singleLineBlockRule = new SingleLineBlockRule(
+        const singleLineBlockPatternRule = new SingleLineBlockPatternRule(
             patchronContext,
             {
                 ...validConfig,
@@ -329,13 +329,13 @@ describe('invoke function', () => {
             }
         );
 
-        const result = singleLineBlockRule.invoke();
+        const result = singleLineBlockPatternRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid single-line if/else if/else blocks (without curly braces)', () => {
-        const singleLineBlockRule = new SingleLineBlockRule(
+        const singleLineBlockPatternRule = new SingleLineBlockPatternRule(
             patchronContext,
             {
                 ...validConfig,
@@ -376,7 +376,7 @@ describe('invoke function', () => {
             }
         );
 
-        const result = singleLineBlockRule.invoke();
+        const result = singleLineBlockPatternRule.invoke();
 
         expect(result).toHaveLength(8);
 
@@ -402,7 +402,7 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid nested single-line if block (without curly braces)', () => {
-        const singleLineBlockRule = new SingleLineBlockRule(
+        const singleLineBlockPatternRule = new SingleLineBlockPatternRule(
             patchronContext,
             {
                 ...validConfig,
@@ -424,13 +424,13 @@ describe('invoke function', () => {
             }
         );
 
-        const result = singleLineBlockRule.invoke();
+        const result = singleLineBlockPatternRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid nested single-line if block (without curly braces)', () => {
-        const singleLineBlockRule = new SingleLineBlockRule(
+        const singleLineBlockPatternRule = new SingleLineBlockPatternRule(
             patchronContext,
             {
                 ...validConfig,
@@ -453,7 +453,7 @@ describe('invoke function', () => {
             }
         );
 
-        const result = singleLineBlockRule.invoke();
+        const result = singleLineBlockPatternRule.invoke();
 
         expect(result).toHaveLength(1);
 
@@ -468,7 +468,7 @@ describe('invoke function', () => {
      */
 
     it('returns empty array on valid single-line do..while blocks (with curly braces)', () => {
-        const singleLineBlockRule = new SingleLineBlockRule(
+        const singleLineBlockPatternRule = new SingleLineBlockPatternRule(
             patchronContext,
             validConfig,
             {
@@ -516,13 +516,13 @@ describe('invoke function', () => {
             }
         );
 
-        const result = singleLineBlockRule.invoke();
+        const result = singleLineBlockPatternRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid single-line do..while blocks (with curly braces)', () => {
-        const singleLineBlockRule = new SingleLineBlockRule(
+        const singleLineBlockPatternRule = new SingleLineBlockPatternRule(
             patchronContext,
             validConfig,
             {
@@ -567,7 +567,7 @@ describe('invoke function', () => {
             }
         );
 
-        const result = singleLineBlockRule.invoke();
+        const result = singleLineBlockPatternRule.invoke();
 
         expect(result).toHaveLength(6);
 
@@ -590,7 +590,7 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid nested single-line do..while block (with curly braces)', () => {
-        const singleLineBlockRule = new SingleLineBlockRule(
+        const singleLineBlockPatternRule = new SingleLineBlockPatternRule(
             patchronContext,
             validConfig,
             {
@@ -609,13 +609,13 @@ describe('invoke function', () => {
             }
         );
 
-        const result = singleLineBlockRule.invoke();
+        const result = singleLineBlockPatternRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid nested single-line do..while block (with curly braces)', () => {
-        const singleLineBlockRule = new SingleLineBlockRule(
+        const singleLineBlockPatternRule = new SingleLineBlockPatternRule(
             patchronContext,
             validConfig,
             {
@@ -634,7 +634,7 @@ describe('invoke function', () => {
             }
         );
 
-        const result = singleLineBlockRule.invoke();
+        const result = singleLineBlockPatternRule.invoke();
 
         expect(result).toHaveLength(1);
 
@@ -643,7 +643,7 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid single-line do..while blocks (without curly braces)', () => {
-        const singleLineBlockRule = new SingleLineBlockRule(
+        const singleLineBlockPatternRule = new SingleLineBlockPatternRule(
             patchronContext,
             {
                 ...validConfig,
@@ -690,13 +690,13 @@ describe('invoke function', () => {
             }
         );
 
-        const result = singleLineBlockRule.invoke();
+        const result = singleLineBlockPatternRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid single-line do..while blocks (without curly braces)', () => {
-        const singleLineBlockRule = new SingleLineBlockRule(
+        const singleLineBlockPatternRule = new SingleLineBlockPatternRule(
             patchronContext,
             {
                 ...validConfig,
@@ -747,7 +747,7 @@ describe('invoke function', () => {
             }
         );
 
-        const result = singleLineBlockRule.invoke();
+        const result = singleLineBlockPatternRule.invoke();
 
         expect(result).toHaveLength(7);
 
@@ -773,7 +773,7 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid nested single-line do..while block (without curly braces)', () => {
-        const singleLineBlockRule = new SingleLineBlockRule(
+        const singleLineBlockPatternRule = new SingleLineBlockPatternRule(
             patchronContext,
             {
                 ...validConfig,
@@ -795,13 +795,13 @@ describe('invoke function', () => {
             }
         );
 
-        const result = singleLineBlockRule.invoke();
+        const result = singleLineBlockPatternRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid nested single-line do..while block (without curly braces)', () => {
-        const singleLineBlockRule = new SingleLineBlockRule(
+        const singleLineBlockPatternRule = new SingleLineBlockPatternRule(
             patchronContext,
             {
                 ...validConfig,
@@ -823,7 +823,7 @@ describe('invoke function', () => {
             }
         );
 
-        const result = singleLineBlockRule.invoke();
+        const result = singleLineBlockPatternRule.invoke();
 
         expect(result).toHaveLength(1);
 
