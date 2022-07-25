@@ -1,10 +1,15 @@
 const {
-    common: { PositionedKeywordsRule },
+    common: { SelfClosingTagRule, PositionedKeywordsRule },
     js: { ImportWithoutExtensionRule },
     vue: { NormalizedEventHandlerRule }
 } = require('src/rules');
 
 module.exports = [
+    {
+        enabled: true,
+        reference: SelfClosingTagRule,
+        config: {}
+    },
     {
         enabled: true,
         reference: PositionedKeywordsRule,
