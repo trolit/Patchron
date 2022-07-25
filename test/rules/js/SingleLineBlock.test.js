@@ -16,29 +16,90 @@ const initializeFile = require('test/rules/helpers/initializeFile');
 const validConfig = {
     blocks: [
         {
-            name: 'if',
-            expression: /^[\s]*(?:if).*[(].*[)].*/
-        },
-        {
-            name: 'else if',
-            expression: /^[{}]?[\s]*(?:else if).*[(].*[)].*/
-        },
-        {
-            name: 'else',
-            expression: /^(?:[{}].*(?:else)).*|^(?:else).*/
+            name: 'for',
+            expression: /for.*\(.*\)/,
+            countAsSingleLineBlockWhenNoBraces: true
         },
         {
             name: 'for',
-            expression: /^[\s]*(?:for).*[(].*[)].*/
+            expression: /^for(\s)+\($/,
+            multiLineOptions: [
+                {
+                    limiter: {
+                        startsWith: ')',
+                        indentation: 'le-indicator'
+                    }
+                }
+            ]
         },
         {
             name: 'do..while',
             expression: /^[\s]*(?:do).*/,
-            endIndicator: /while/
+            multiLineOptions: [
+                {
+                    limiter: {
+                        includes: 'while',
+                        indentation: 'le-indicator',
+                        testInIndicator: true
+                    }
+                }
+            ]
+        },
+        {
+            name: 'if',
+            expression: /if.*\(.*\)/,
+            countAsSingleLineBlockWhenNoBraces: true
+        },
+        {
+            name: 'if',
+            expression: /^if(\s)+\($/,
+            multiLineOptions: [
+                {
+                    limiter: {
+                        startsWith: ')',
+                        indentation: 'le-indicator'
+                    }
+                }
+            ]
+        },
+        {
+            name: 'else if',
+            expression: /(?:else if).*\(.*\)/,
+            countAsSingleLineBlockWhenNoBraces: true
+        },
+        {
+            name: 'else if',
+            expression: /^(?:else if)(\s)+\($/,
+            multiLineOptions: [
+                {
+                    limiter: {
+                        startsWith: ')',
+                        indentation: 'le-indicator'
+                    }
+                }
+            ]
+        },
+        {
+            name: 'else',
+            expression: /^else.*/,
+            countAsSingleLineBlockWhenNoBraces: true
         },
         {
             name: 'while',
-            expression: /^[\s]*(?:while).*[(].*[)].*/
+            expression: /while.*\(.*\)/,
+            countAsSingleLineBlockWhenNoBraces: true
+        },
+        {
+            name: 'while',
+            expression: /^while(\s)+\($/,
+            multiLineOptions: [
+                {
+                    limiter: {
+                        startsWith: ')',
+                        indentation: 'le-indicator'
+                    }
+                }
+            ]
         }
     ],
     curlyBraces: true
@@ -164,17 +225,13 @@ describe('invoke function', () => {
 
         expect(result[0]).toHaveProperty('line', 3);
 
-        expect(result[1]).toHaveProperty('start_line', 5);
-        expect(result[1]).toHaveProperty('position', 6);
+        expect(result[1]).toHaveProperty('line', 5);
 
-        expect(result[2]).toHaveProperty('start_line', 7);
-        expect(result[2]).toHaveProperty('position', 8);
+        expect(result[2]).toHaveProperty('line', 7);
 
-        expect(result[3]).toHaveProperty('start_line', 9);
-        expect(result[3]).toHaveProperty('position', 10);
+        expect(result[3]).toHaveProperty('line', 9);
 
-        expect(result[4]).toHaveProperty('start_line', 13);
-        expect(result[4]).toHaveProperty('position', 14);
+        expect(result[4]).toHaveProperty('line', 13);
 
         expect(result[5]).toHaveProperty('line', 16);
 
@@ -233,8 +290,7 @@ describe('invoke function', () => {
 
         expect(result).toHaveLength(1);
 
-        expect(result[0]).toHaveProperty('start_line', 4);
-        expect(result[0]).toHaveProperty('position', 5);
+        expect(result[0]).toHaveProperty('line', 4);
     });
 
     it('returns empty array on valid single-line if/else if/else blocks (without curly braces)', () => {
@@ -489,7 +545,7 @@ describe('invoke function', () => {
                     `+`,
                     `-do result--;`,
                     `+do result++;`,
-                    `+    while (result < 9999);`,
+                    `+while (result < 9999);`,
                     `+`,
                     `+if (result) {`,
                     `+    this.increaseResultByValue(10);`,
@@ -504,7 +560,7 @@ describe('invoke function', () => {
                     `+while (1);`,
                     `+while (123 === 123) { break; }`,
                     `+do console.log('1');`,
-                    `+    while (1);`,
+                    `+while (1);`,
                     `-`,
                     `-do { console.log('test') } while (1);`
                 ]
