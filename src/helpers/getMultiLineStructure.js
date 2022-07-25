@@ -65,7 +65,9 @@ function _findEndIndex(data, currentLineIndex, limiter) {
 
     const propertyValue = limiter[propertyName];
 
-    const slicedData = data.slice(currentLineIndex + 1);
+    const slicedData = data.slice(
+        limiter?.testInIndicator ? currentLineIndex : currentLineIndex + 1
+    );
 
     for (const row of slicedData) {
         const { trimmedContent, index } = row;

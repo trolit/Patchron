@@ -128,6 +128,7 @@
  * @property {string} [nextLine]
  * @property {string} [until] marks to take part of content if `until` appeared in the text. Can be used in combination with other property.
  * @property {Array<object>|string} [indentation] includes `indentation` filter. Can be used in combination with other property.
+ * @property {boolean} [testInIndicator] when true, limiter rule is also tested in indicator.
  *
  * - To refer to `indicator` indentation, use following `string` syntax:
  * ```js
