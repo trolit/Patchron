@@ -30,7 +30,9 @@ class BaseRule {
             RIGHT,
             DELETED,
             NEWLINE,
+            BLOCK_END,
             UNCHANGED,
+            BLOCK_START,
             CUSTOM_LINES,
             COMMENTED_LINE
         } = constants;
@@ -48,6 +50,8 @@ class BaseRule {
         this.RIGHT = RIGHT;
 
         this.EMPTY = EMPTY;
+        this.BLOCK_END = BLOCK_END;
+        this.BLOCK_START = BLOCK_START;
 
         this.dedent = dedent;
 

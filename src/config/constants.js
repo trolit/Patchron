@@ -16,5 +16,7 @@ module.exports = Object.freeze({
     CUSTOM_LINES,
     COMMENTED_LINE,
 
-    EMPTY: ''
+    EMPTY: '',
+    BLOCK_START: '{',
+    BLOCK_END: '}'
 });
