@@ -78,6 +78,8 @@ class SingleLineBlockRule extends BaseRule {
                     data,
                     rowStructure
                 );
+
+                rowsToSkip.push(to);
             } else if (matchedBlock?.countAsSingleLineBlockWhenNoBraces) {
                 to = index;
 
@@ -153,7 +155,7 @@ class SingleLineBlockRule extends BaseRule {
     _isSingleLineBlockWithBraces(data, structure) {
         const { from, to } = structure;
 
-        if (from === to) {
+        if (from === to || to - from === 1) {
             return true;
         }
 
