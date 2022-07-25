@@ -1,5 +1,5 @@
 /**
- * @typedef {object} SingleLineBlockConfig
+ * @typedef {object} SingleLineBlockPatternConfig
  * @property {Array<Block>} blocks
  * @property {boolean} curlyBraces true indicates that matched blocks should be wrapped with curly braces {}
  */
