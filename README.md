@@ -26,15 +26,15 @@ docker run -e APP_ID=<app-id> -e PRIVATE_KEY=<pem-value> patchron
 
 ## Settings
 
-| Property                               | Type (default)       | Description                                                                                                                   |
-| :------------------------------------- | :------------------- | :---------------------------------------------------------------------------------------------------------------------------- |
+| Property                               | Type (default)       | Description                                                                                                                           |
+| :------------------------------------- | :------------------- | :------------------------------------------------------------------------------------------------------------------------------------ |
 | `isGetFilesRequestPaginated`           | boolean (`false`)    | Controls how files are fetched. Unpaginated response includes a maximum of 3000 files which is sufficient in 99.9999999999% of cases. |
-| `delayBetweenCommentRequestsInSeconds` | Number (`3`)         | After review is done, delays time between each comment request to not overload API.                                           |
-| `isOwnerAssigningEnabled`              | boolean (`true`)     | When true, PR owner will be automatically assigned once pull request will be issued.                                          |
-| `isReviewSummaryEnabled`               | boolean (`false`)    | When true, at the end of the PR review summary is posted that contains various information e.g. how many comments were posts. |
-| `isStoringLogsEnabled`                 | boolean (`true`)     | When true, stores logs physically in `/.logs` directory.                                                                      |
-| `maxCommentsPerReview`                 | Number (`25`)        | Limit number of comments that can be posted in single review under single PR.                                                 |
-| `senders`                              | Array<string> (`[]`) | Allows to limit pull requests reviews to certain users. Pass GitHub usernames.                                                |
+| `delayBetweenCommentRequestsInSeconds` | Number (`3`)         | After review is done, delays time between each comment request to not overload API.                                                   |
+| `isOwnerAssigningEnabled`              | boolean (`true`)     | When true, PR owner will be automatically assigned once pull request will be issued.                                                  |
+| `isReviewSummaryEnabled`               | boolean (`false`)    | When true, at the end of the PR review summary is posted that contains various information e.g. how many comments were posts.         |
+| `isStoringLogsEnabled`                 | boolean (`true`)     | When true, stores logs physically in `/.logs` directory.                                                                              |
+| `maxCommentsPerReview`                 | Number (`25`)        | Limit number of comments that can be posted in single review under single PR.                                                         |
+| `senders`                              | Array<string> (`[]`) | Allows to limit pull requests reviews to certain users. Pass GitHub usernames.                                                        |
 
 ## Patch overview (dev)
 
@@ -78,6 +78,34 @@ Hunk header e.g. `@@ -10,13 +10,7 @@` contains following information:
     -   7 is right side hunk length (sum of unchanged and added lines)
 
 </details>
+
+In almost all rules, received data is organized via `setupData` to easier further code analysis. Content is split by newline and each row contains default information mentioned below:
+
+```ts
+{
+    index: number,
+    indentation: number,
+    content: string,
+    trimmedContent: string
+}
+```
+
+-   Indentation is great option to better identify relation between particular parts of code if needed.
+-   `trimmedContent` and `content` have line state signs removed. To addition content of lines that:
+    -   are spacers, are replaced with `<<< newline >>>`
+    -   were removed, are replaced with `<<< merge >>>`
+    -   were commented, are replaced with `<<< commented >>>`
+
+Rules that require more than single line of patch to perform their checking, are using `getMultiLineStructure` helper. It allows to pass `multiLineOptions` array. Each element is built in the following manner:
+
+```ts
+{
+    indicator: object|null,       // first line of multi-line
+    limiter: object|Array<object> // last line of multi-line
+}
+```
+
+For more details on how those objects can be arranged, refer to [common type definitions](https://github.com/trolit/Patchron/blob/82fb4bf73f3289d24a80a3775936e2a1432c8ead/src/config/type-definitions/common.js#L97).
 
 ## Links
 
