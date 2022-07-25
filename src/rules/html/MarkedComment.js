@@ -34,7 +34,7 @@ class MarkedCommentRule extends BaseRule {
             const rawRow = this.getRawContent(row).trim();
 
             if (
-                rawRow.startsWith('@@') ||
+                rawRow.startsWith(this.HUNK_HEADER_INDICATOR) ||
                 !rawRow.includes(this.COMMENT_START)
             ) {
                 continue;

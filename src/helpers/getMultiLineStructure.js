@@ -17,13 +17,13 @@ module.exports = (data, currentLineIndex, multiLineOptions) => {
     const result = { isMultiLine: false };
 
     for (const options of multiLineOptions) {
-        if (!options?.indicator || !options?.limiter) {
+        if (!options?.limiter) {
             continue;
         }
 
-        const { indicator } = options;
+        const indicator = options?.indicator;
 
-        if (!_isMultiLine(indicator, data[currentLineIndex])) {
+        if (indicator && !_isMultiLine(indicator, data[currentLineIndex])) {
             continue;
         }
 
@@ -31,7 +31,19 @@ module.exports = (data, currentLineIndex, multiLineOptions) => {
 
         const { limiter } = options;
 
-        result.endIndex = _findEndIndex(data, currentLineIndex, limiter);
+        if (Array.isArray(limiter)) {
+            for (const value of limiter) {
+                const endIndex = _findEndIndex(data, currentLineIndex, value);
+
+                if (~endIndex) {
+                    result.endIndex = endIndex;
+
+                    break;
+                }
+            }
+        } else {
+            result.endIndex = _findEndIndex(data, currentLineIndex, limiter);
+        }
 
         break;
     }
@@ -53,7 +65,9 @@ function _findEndIndex(data, currentLineIndex, limiter) {
 
     const propertyValue = limiter[propertyName];
 
-    const slicedData = data.slice(currentLineIndex + 1);
+    const slicedData = data.slice(
+        limiter?.testInIndicator ? currentLineIndex : currentLineIndex + 1
+    );
 
     for (const row of slicedData) {
         const { trimmedContent, index } = row;
@@ -92,7 +106,6 @@ function _resolveProperty(
     const { trimmedContent } = limiterRow || indicatorRow;
 
     let fixedContent = cloneDeep(trimmedContent);
-    let result = false;
 
     if (source && source['indentation'] && limiterRow) {
         const indentation = source['indentation'];
@@ -137,7 +150,7 @@ function _resolveProperty(
             return fixedContent.match(propertyValue);
     }
 
-    return result;
+    return false;
 }
 
 function _isIndentationValid(indentation, indicatorRow, limiterRow) {

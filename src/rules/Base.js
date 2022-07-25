@@ -30,9 +30,12 @@ class BaseRule {
             RIGHT,
             DELETED,
             NEWLINE,
+            BLOCK_END,
             UNCHANGED,
+            BLOCK_START,
             CUSTOM_LINES,
-            COMMENTED_LINE
+            COMMENTED_LINE,
+            HUNK_HEADER_INDICATOR
         } = constants;
 
         this.MERGE = MERGE;
@@ -48,6 +51,9 @@ class BaseRule {
         this.RIGHT = RIGHT;
 
         this.EMPTY = EMPTY;
+        this.BLOCK_END = BLOCK_END;
+        this.BLOCK_START = BLOCK_START;
+        this.HUNK_HEADER_INDICATOR = HUNK_HEADER_INDICATOR;
 
         this.dedent = dedent;
 

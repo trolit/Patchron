@@ -27,12 +27,12 @@ class FixedLoopLengthConditionRule extends BaseRule {
 
             if (
                 this.CUSTOM_LINES.includes(trimmedContent) ||
-                trimmedContent.startsWith('@@')
+                trimmedContent.startsWith(this.HUNK_HEADER_INDICATOR)
             ) {
                 continue;
             }
 
-            const fixedContent = trimmedContent.startsWith('}')
+            const fixedContent = trimmedContent.startsWith(this.BLOCK_END)
                 ? trimmedContent.slice(1).trim()
                 : trimmedContent;
 

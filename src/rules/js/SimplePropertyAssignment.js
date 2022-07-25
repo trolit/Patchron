@@ -31,12 +31,15 @@ class SimplePropertyAssignmentRule extends BaseRule {
 
             if (
                 this.CUSTOM_LINES.includes(trimmedContent) ||
-                trimmedContent.startsWith('@@')
+                trimmedContent.startsWith(this.HUNK_HEADER_INDICATOR)
             ) {
                 continue;
             }
 
-            if (trimmedContent.includes('{') && trimmedContent.includes('}')) {
+            if (
+                trimmedContent.includes(this.BLOCK_START) &&
+                trimmedContent.includes(this.BLOCK_END)
+            ) {
                 const matches = trimmedContent.matchAll(
                     this.singleLinePropertyExpression
                 );

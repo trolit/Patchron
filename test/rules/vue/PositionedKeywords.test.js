@@ -44,8 +44,7 @@ const importKeywordBOFConfig = {
     regex: /import.*/,
     position: {
         custom: null,
-        BOF: true,
-        EOF: false
+        BOF: true
     },
     maxLineBreaks: 0,
     enforced: true,
