@@ -1,8 +1,14 @@
 <img src="https://github.com/trolit/Patchron/blob/master/picture.jpg" alt="Patchron image" height="200"/>
 
-# Patchron
+# 🐶 Patchron
 
-> A GitHub App built with [Probot](https://github.com/probot/probot) that implements set of rules to perform early pull request review and comment out cases that do not meet configuration. **Please note that review is based on patches which contain limited number of information**. Due to that you may find some review comments to not be relevant to the situation but still `Patchron` can be used to maintain conventions and speed up further code reviews done by members by commenting out simple cases.
+<p align="justify">
+implements set of rules to perform early pull request review and comment out cases that do not meet configuration. `Patchron` can be used to maintain conventions and speed up further code review done by members by handling out simple cases. It's worth mentioning that it won't work on minified files unless they will be beautified first.
+</p>
+
+### Note
+
+Review is based on patches which contain limited number of information. Due to that you may find some comments unrelevant to the situation but still those should be "rare cases".
 
 ## Setup
 
@@ -12,6 +18,8 @@ npm install
 
 # Run the bot
 npm start
+
+# Complete bot configuration under given URL
 ```
 
 ## Docker
@@ -36,11 +44,12 @@ docker run -e APP_ID=<app-id> -e PRIVATE_KEY=<pem-value> patchron
 | `maxCommentsPerReview`                 | Number (`25`)        | Limit number of comments that can be posted in single review under single PR.                                                         |
 | `senders`                              | Array<string> (`[]`) | Allows to limit pull requests reviews to certain users. Pass GitHub usernames.                                                        |
 
-## Patch overview (dev)
+## Short dev overview
 
-Patch contains latest changes done to particular file. Here is example of how it looks like:
+Patch contains latest changes done to particular file. Here is example of how received data looks like:
 
 ```js
+// first part (hunk) of file
 "@@ -10,13 +10,7 @@ const payload = require('./fixtures/pull_request.opened');\n" +
 " const fs = require('fs');\n" +
 " const path = require('path');\n" +
@@ -52,6 +61,7 @@ Patch contains latest changes done to particular file. Here is example of how it
 "-} = require('@jest/globals');\n" +
 "+const { expect, test } = require('@jest/globals');\n" +
 ' \n' +
+// second part (hunk) of file
 '@@ -27,7 +21,6 @@ const deployment = {\n' +
 "         schema: 'rocks!',\n" +
 '     },\n' +
@@ -116,6 +126,6 @@ For more details on how those objects can be arranged, refer to [common type def
 -   [GitHub API - pulls](https://docs.github.com/en/rest/reference/pulls)
 -   [Default picture](https://pixabay.com/vectors/dog-pet-hound-black-eye-animal-151123/)
 
-## License
+## Name origin
 
-[ISC](LICENSE) © 2022 trolit
+Name simply comes from merging two words: Patch and [Patron](<https://en.wikipedia.org/wiki/Patron_(dog)>) 🐶
