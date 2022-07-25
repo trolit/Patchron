@@ -240,4 +240,78 @@ describe('', () => {
 
         expect(result).toHaveProperty('endIndex', -1);
     });
+
+    it('returns valid endIndex (example 6)', () => {
+        const data = baseRule.setupData([
+            `@@ -10,13 +10,5 @@`,
+            `+const {`,
+            `+    method1`,
+            `+    method2`,
+            `+} = require('src/helpers');`
+        ]);
+
+        const result = getMultiLineStructure(data, 1, [
+            {
+                limiter: {
+                    expression: /} = require\(.*/
+                }
+            }
+        ]);
+
+        expect(result).toHaveProperty('endIndex', 4);
+    });
+
+    it('returns invalid endIndex on missing limiter (example 6)', () => {
+        const data = baseRule.setupData([
+            `@@ -10,13 +10,5 @@`,
+            `+const {`,
+            `+    method1`,
+            `+    method2`
+        ]);
+
+        const result = getMultiLineStructure(data, 1, [
+            {
+                limiter: {
+                    expression: /} = require\(.*/
+                }
+            }
+        ]);
+
+        expect(result).toHaveProperty('endIndex', -1);
+    });
+
+    it('returns valid endIndex (example 7)', () => {
+        const data = baseRule.setupData([
+            `@@ -10,13 +10,5 @@`,
+            `+const { method1, method2 } = require('src/helpers');`
+        ]);
+
+        const result = getMultiLineStructure(data, 1, [
+            {
+                limiter: {
+                    expression: /} = require\(.*/,
+                    testInIndicator: true
+                }
+            }
+        ]);
+
+        expect(result).toHaveProperty('endIndex', 1);
+    });
+
+    it('returns invalid endIndex on missing limiter (example 7)', () => {
+        const data = baseRule.setupData([
+            `@@ -10,13 +10,5 @@`,
+            `+const { method1, method2 } = test;`
+        ]);
+
+        const result = getMultiLineStructure(data, 1, [
+            {
+                limiter: {
+                    expression: /} = require\(.*/
+                }
+            }
+        ]);
+
+        expect(result).toHaveProperty('endIndex', -1);
+    });
 });
