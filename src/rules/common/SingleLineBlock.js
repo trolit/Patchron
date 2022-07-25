@@ -1,6 +1,13 @@
 const BaseRule = require('src/rules/Base');
 
 class SingleLineBlockRule extends BaseRule {
+    /**
+     * finds out configured blocks and tests whether single liners meet `curlyBraces` boolean criterion.
+     *
+     * @param {PatchronContext} patchronContext
+     * @param {SingleLineBlockConfig} config
+     * @param {Patch} file
+     */
     constructor(patchronContext, config, file) {
         super(patchronContext, file);
 
@@ -45,8 +52,8 @@ class SingleLineBlockRule extends BaseRule {
         for (const { index, trimmedContent } of data) {
             if (
                 rowsToSkip.includes(index) ||
-                trimmedContent.startsWith(this.HUNK_HEADER_INDICATOR) ||
-                this.CUSTOM_LINES.includes(trimmedContent)
+                this.CUSTOM_LINES.includes(trimmedContent) ||
+                trimmedContent.startsWith(this.HUNK_HEADER_INDICATOR)
             ) {
                 continue;
             }
@@ -78,6 +85,13 @@ class SingleLineBlockRule extends BaseRule {
                     data,
                     rowStructure
                 );
+
+                if (
+                    trimmedContent.includes('do') &&
+                    !data[to].trimmedContent.includes('while')
+                ) {
+                    to++;
+                }
 
                 rowsToSkip.push(to);
             } else if (matchedBlock?.countAsSingleLineBlockWhenNoBraces) {
@@ -172,6 +186,10 @@ class SingleLineBlockRule extends BaseRule {
 
     _isSingleLineBlockWithoutBraces(data, index, endIndex) {
         let counter = 0;
+
+        if (index === endIndex || endIndex - index === 1) {
+            return true;
+        }
 
         for (index = index + 1; index < endIndex; index++) {
             const { trimmedContent } = data[index];
