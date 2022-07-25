@@ -17,6 +17,7 @@ module.exports = Object.freeze({
     COMMENTED_LINE,
 
     EMPTY: '',
+    BLOCK_END: '}',
     BLOCK_START: '{',
-    BLOCK_END: '}'
+    HUNK_HEADER_INDICATOR: '@@'
 });
