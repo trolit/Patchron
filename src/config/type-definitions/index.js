@@ -7,9 +7,9 @@
 /// <reference path="./rules/html/MarkedComment.js" />
 
 /// <reference path="./rules/common/MarkedComment.js" />
-/// <reference path="./rules/common/SingleLineBlock.js" />
 /// <reference path="./rules/common/PositionedKeywords.js" />
 /// <reference path="./rules/common/PredefinedFilename.js" />
+/// <reference path="./rules/common/SingleLineBlockPattern.js" />
 /// <reference path="./rules/common/KeywordsOrderedByLength.js" />
 /// <reference path="./rules/common/ComparisionOperatorLevel.js" />
 /// <reference path="./rules/common/FixedLoopLengthCondition.js" />

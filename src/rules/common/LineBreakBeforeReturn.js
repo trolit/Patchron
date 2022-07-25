@@ -2,7 +2,7 @@ const BaseRule = require('src/rules/Base');
 
 class LineBreakBeforeReturnRule extends BaseRule {
     /**
-     * Checks whether line before return is line-break. Note that edge case (part of string starting with return) isn't covered since amount of intel in received patch can be not enough to determine that and on the other hand it's still rare case.
+     * Checks whether line before return is line-break. Note that edge case (part of string starting with return) isn't covered since amount of intel in received patch can be not enough to determine that (and on the other hand it's still rare case).
      *
      * @param {PatchronContext} patchronContext
      * @param {object} _
@@ -24,7 +24,7 @@ class LineBreakBeforeReturnRule extends BaseRule {
             const row = data[index];
             const { trimmedContent } = row;
 
-            if (trimmedContent.startsWith('@@')) {
+            if (trimmedContent.startsWith(this.HUNK_HEADER_INDICATOR)) {
                 continue;
             }
 
@@ -40,7 +40,7 @@ class LineBreakBeforeReturnRule extends BaseRule {
             if (
                 this._startsWithStatement(trimmedContent) ||
                 this._startsWithStatement(previousContent) ||
-                previousContent.startsWith('{')
+                previousContent.startsWith(this.BLOCK_START)
             ) {
                 previousContent = trimmedContent;
 
@@ -78,7 +78,7 @@ class LineBreakBeforeReturnRule extends BaseRule {
     _findRowStructure(row, dataStructure) {
         const { trimmedContent, index: rowIndex } = row;
 
-        const leftBraceIndex = trimmedContent.indexOf('{');
+        const leftBraceIndex = trimmedContent.indexOf(this.BLOCK_START);
 
         for (let index = dataStructure.length - 1; index >= 0; index--) {
             const nesting = dataStructure[index];

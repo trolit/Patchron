@@ -2,7 +2,7 @@ const {
     common: {
         DirectImportRule,
         MarkedCommentRule,
-        SingleLineBlockRule,
+        SingleLineBlockPatternRule,
         PositionedKeywordsRule,
         PredefinedFilenameRule,
         LineBreakBeforeReturnRule,
@@ -142,33 +142,94 @@ module.exports = [
     },
     {
         enabled: false,
-        reference: SingleLineBlockRule,
+        reference: SingleLineBlockPatternRule,
         config: {
             blocks: [
                 {
-                    name: 'if',
-                    expression: /^[\s]*(?:if).*[(].*[)].*/
-                },
-                {
-                    name: 'else if',
-                    expression: /^[{}]?[\s]*(?:else if).*[(].*[)].*/
-                },
-                {
-                    name: 'else',
-                    expression: /^(?:[{}].*(?:else)).*|^(?:else).*/
+                    name: 'for',
+                    expression: /for.*\(.*\)/,
+                    countAsSingleLineBlockWhenNoBraces: true
                 },
                 {
                     name: 'for',
-                    expression: /^[\s]*(?:for).*[(].*[)].*/
+                    expression: /^for(\s)+\($/,
+                    multiLineOptions: [
+                        {
+                            limiter: {
+                                startsWith: ')',
+                                indentation: 'le-indicator'
+                            }
+                        }
+                    ]
                 },
                 {
                     name: 'do..while',
                     expression: /^[\s]*(?:do).*/,
-                    endIndicator: /while/
+                    multiLineOptions: [
+                        {
+                            limiter: {
+                                includes: 'while',
+                                indentation: 'le-indicator',
+                                testInIndicator: true
+                            }
+                        }
+                    ]
+                },
+                {
+                    name: 'if',
+                    expression: /if.*\(.*\)/,
+                    countAsSingleLineBlockWhenNoBraces: true
+                },
+                {
+                    name: 'if',
+                    expression: /^if(\s)+\($/,
+                    multiLineOptions: [
+                        {
+                            limiter: {
+                                startsWith: ')',
+                                indentation: 'le-indicator'
+                            }
+                        }
+                    ]
+                },
+                {
+                    name: 'else if',
+                    expression: /(?:else if).*\(.*\)/,
+                    countAsSingleLineBlockWhenNoBraces: true
+                },
+                {
+                    name: 'else if',
+                    expression: /^(?:else if)(\s)+\($/,
+                    multiLineOptions: [
+                        {
+                            limiter: {
+                                startsWith: ')',
+                                indentation: 'le-indicator'
+                            }
+                        }
+                    ]
+                },
+                {
+                    name: 'else',
+                    expression: /^else.*/,
+                    countAsSingleLineBlockWhenNoBraces: true
                 },
                 {
                     name: 'while',
-                    expression: /^[\s]*(?:while).*[(].*[)].*/
+                    expression: /while.*\(.*\)/,
+                    countAsSingleLineBlockWhenNoBraces: true
+                },
+                {
+                    name: 'while',
+                    expression: /^while(\s)+\($/,
+                    multiLineOptions: [
+                        {
+                            limiter: {
+                                startsWith: ')',
+                                indentation: 'le-indicator'
+                            }
+                        }
+                    ]
                 }
             ],
             curlyBraces: true

@@ -1,5 +1,6 @@
 const BaseRule = require('src/rules/Base');
 
+// TODO: could use rework :thinking:
 class PositionedKeywordsRule extends BaseRule {
     /**
      * @param {PatchronContext} patchronContext
