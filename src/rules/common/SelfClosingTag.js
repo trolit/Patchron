@@ -35,41 +35,16 @@ class SelfClosingTagRule extends BaseRule {
 
             if (
                 this.CUSTOM_LINES.includes(trimmedContent) ||
-                trimmedContent.startsWith('@@')
+                trimmedContent.startsWith(this.HUNK_HEADER_INDICATOR)
             ) {
                 continue;
             }
 
-            const matchResult =
-                trimmedContent.match(this.SHORTHAND_EVENT_EXPRESSION) ||
-                trimmedContent.match(this.LONGHAND_EVENT_EXPRESSION);
-
-            if (!matchResult) {
-                continue;
-            }
-
-            const eventHandler = matchResult[1];
-
-            if (eventHandler.includes('=') || eventHandler.startsWith('$')) {
-                continue;
-            }
-
-            const result = {
-                isWithPrefix: this.prefix
-                    ? eventHandler.startsWith(this.prefix)
-                    : true,
-
-                hasNoUnnecessaryBraces: this.noUnnecessaryBraces
-                    ? trimmedContent.includes('()') ||
-                      trimmedContent.includes('($event)')
-                    : false
-            };
-
-            if (!result.isWithPrefix || result.hasNoUnnecessaryBraces) {
+            if (trimmedContent.match(this.expression)) {
                 reviewComments.push(
                     this.getSingleLineComment({
-                        body: this._getCommentBody(result),
-                        index
+                        index,
+                        body: this._getCommentBody()
                     })
                 );
             }
@@ -82,7 +57,7 @@ class SelfClosingTagRule extends BaseRule {
      * @returns {string}
      */
     _getCommentBody() {
-        return `TBA`;
+        return `It seems that the tag can be self-enclosed :thinking:`;
     }
 }
 
