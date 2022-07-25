@@ -45,7 +45,7 @@ class SingleLineBlockRule extends BaseRule {
         for (const { index, trimmedContent } of data) {
             if (
                 rowsToSkip.includes(index) ||
-                trimmedContent.startsWith('@@') ||
+                trimmedContent.startsWith(this.HUNK_HEADER_INDICATOR) ||
                 this.CUSTOM_LINES.includes(trimmedContent)
             ) {
                 continue;
@@ -78,6 +78,10 @@ class SingleLineBlockRule extends BaseRule {
                     data,
                     rowStructure
                 );
+            } else if (matchedBlock?.countAsSingleLineBlockWhenNoBraces) {
+                to = index;
+
+                isSingleLineBlock = true;
             } else if (matchedBlock?.multiLineOptions) {
                 const endIndex = this._findEndIndex(index, data, matchedBlock);
 
@@ -129,7 +133,7 @@ class SingleLineBlockRule extends BaseRule {
 
         const { trimmedContent } = nextRow;
 
-        return trimmedContent.startsWith('{')
+        return trimmedContent.startsWith(this.BLOCK_START)
             ? dataStructure.find(({ from }) => from === nextRow.index)
             : null;
     }
@@ -178,9 +182,11 @@ class SingleLineBlockRule extends BaseRule {
                 continue;
             }
 
-            if (indentation >= startRow.indentation) {
+            if (indentation > startRow.indentation) {
                 return true;
             }
+
+            return false;
         }
 
         return false;
