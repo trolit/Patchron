@@ -32,7 +32,7 @@ class FixedLoopLengthConditionRule extends BaseRule {
                 continue;
             }
 
-            const fixedContent = trimmedContent.startsWith('}')
+            const fixedContent = trimmedContent.startsWith(this.BLOCK_END)
                 ? trimmedContent.slice(1).trim()
                 : trimmedContent;
 

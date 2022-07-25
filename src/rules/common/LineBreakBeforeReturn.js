@@ -40,7 +40,7 @@ class LineBreakBeforeReturnRule extends BaseRule {
             if (
                 this._startsWithStatement(trimmedContent) ||
                 this._startsWithStatement(previousContent) ||
-                previousContent.startsWith('{')
+                previousContent.startsWith(this.BLOCK_START)
             ) {
                 previousContent = trimmedContent;
 
@@ -78,7 +78,7 @@ class LineBreakBeforeReturnRule extends BaseRule {
     _findRowStructure(row, dataStructure) {
         const { trimmedContent, index: rowIndex } = row;
 
-        const leftBraceIndex = trimmedContent.indexOf('{');
+        const leftBraceIndex = trimmedContent.indexOf(this.BLOCK_START);
 
         for (let index = dataStructure.length - 1; index >= 0; index--) {
             const nesting = dataStructure[index];

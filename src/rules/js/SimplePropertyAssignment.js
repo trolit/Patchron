@@ -36,7 +36,10 @@ class SimplePropertyAssignmentRule extends BaseRule {
                 continue;
             }
 
-            if (trimmedContent.includes('{') && trimmedContent.includes('}')) {
+            if (
+                trimmedContent.includes(this.BLOCK_START) &&
+                trimmedContent.includes(this.BLOCK_END)
+            ) {
                 const matches = trimmedContent.matchAll(
                     this.singleLinePropertyExpression
                 );
