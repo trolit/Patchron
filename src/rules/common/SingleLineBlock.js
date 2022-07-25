@@ -171,11 +171,10 @@ class SingleLineBlockRule extends BaseRule {
     }
 
     _isSingleLineBlockWithoutBraces(data, index, endIndex) {
-        const startRow = data[index];
-        const dataLength = data.length;
+        let counter = 0;
 
-        for (; endIndex < dataLength; endIndex++) {
-            const { trimmedContent, indentation } = data[endIndex];
+        for (index = index + 1; index < endIndex; index++) {
+            const { trimmedContent } = data[index];
 
             if (
                 trimmedContent === this.MERGE ||
@@ -184,14 +183,10 @@ class SingleLineBlockRule extends BaseRule {
                 continue;
             }
 
-            if (indentation > startRow.indentation) {
-                return true;
-            }
-
-            return false;
+            counter++;
         }
 
-        return false;
+        return counter === 1;
     }
 
     _reviewSingleLineBlocks(singleLineBlocks) {
