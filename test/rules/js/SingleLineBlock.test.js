@@ -493,7 +493,7 @@ describe('invoke function', () => {
                     `+`,
                     `-do { result--; }`,
                     `+do { result++; }`,
-                    `+    while (result < 9999);`,
+                    `+while (result < 9999);`,
                     `+`,
                     `+if (result) {`,
                     `+    this.increaseResultByValue(10);`,
