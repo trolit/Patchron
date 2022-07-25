@@ -1,3 +1,5 @@
+const { HUNK_HEADER_INDICATOR } = require('src/config/constants');
+
 /**
  * returns nearest **hunk**
  *
@@ -36,7 +38,7 @@ module.exports = (splitPatch, rowIndex) => {
     for (let i = rowIndex; i >= 0; i--) {
         const rowContent = splitPatch[i];
 
-        if (rowContent.startsWith('@@')) {
+        if (rowContent.startsWith(HUNK_HEADER_INDICATOR)) {
             const splitRowContent = rowContent.split(' ');
 
             if (splitRowContent.length < 3) {

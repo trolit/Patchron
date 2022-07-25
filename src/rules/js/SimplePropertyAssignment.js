@@ -31,7 +31,7 @@ class SimplePropertyAssignmentRule extends BaseRule {
 
             if (
                 this.CUSTOM_LINES.includes(trimmedContent) ||
-                trimmedContent.startsWith('@@')
+                trimmedContent.startsWith(this.HUNK_HEADER_INDICATOR)
             ) {
                 continue;
             }

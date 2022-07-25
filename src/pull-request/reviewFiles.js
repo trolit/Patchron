@@ -1,5 +1,6 @@
 const { rules } = require('src/config');
 const review = require('src/rules/review');
+const { HUNK_HEADER_INDICATOR } = require('src/config/constants');
 
 /**
  * triggers `Patchron` to review files against configured rules
@@ -78,7 +79,7 @@ function _splitPatchByHunkHeader(patch) {
 
     const chunks = splitPatch.reduce(
         (accumulator, line, index) => {
-            if (line.startsWith('@@') && index !== 0) {
+            if (line.startsWith(HUNK_HEADER_INDICATOR) && index !== 0) {
                 lastHunkHeaderPosition++;
 
                 accumulator.push([line]);

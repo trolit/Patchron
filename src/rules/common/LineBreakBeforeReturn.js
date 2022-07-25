@@ -24,7 +24,7 @@ class LineBreakBeforeReturnRule extends BaseRule {
             const row = data[index];
             const { trimmedContent } = row;
 
-            if (trimmedContent.startsWith('@@')) {
+            if (trimmedContent.startsWith(this.HUNK_HEADER_INDICATOR)) {
                 continue;
             }
 
