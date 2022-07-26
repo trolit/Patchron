@@ -6,6 +6,7 @@ const {
         LineBreakBeforeReturnRule,
         IndividualMethodImportRule,
         SingleLineBlockPatternRule,
+        KeywordsOrderedByLengthRule,
         ComparisionOperatorLevelRule,
         FixedLoopLengthConditionRule
     },
@@ -218,6 +219,27 @@ module.exports = [
                 }
             ],
             curlyBraces: true
+        }
+    },
+
+    {
+        enabled: true,
+        reference: KeywordsOrderedByLengthRule,
+        config: {
+            keywords: [
+                {
+                    name: 'require (packages)',
+                    regex: /require(?!.*@).*/,
+                    order: 'ascending',
+                    ignoreNewline: false
+                },
+                {
+                    name: 'require (other)',
+                    regex: /require.*@.*/,
+                    order: 'ascending',
+                    ignoreNewline: false
+                }
+            ]
         }
     },
 

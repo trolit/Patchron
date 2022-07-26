@@ -36,18 +36,27 @@ module.exports = [
                 {
                     name: 'import',
                     regex: /import.*/,
-                    multiLineOptions: ['from'],
                     position: {
                         custom: {
                             name: '<script>',
-                            expression: /<script>/
-                        },
-                        BOF: false
+                            expression: /<script>/,
+                            BOF: false
+                        }
                     },
                     maxLineBreaks: 0,
                     enforced: true,
                     breakOnFirstOccurence: false,
                     countDifferentCodeAsLineBreak: false,
+                    multiLineOptions: [
+                        {
+                            indicator: {
+                                notIncludes: 'from'
+                            },
+                            limiter: {
+                                startsWith: '} from'
+                            }
+                        }
+                    ],
                     order: [
                         {
                             name: 'packages',
