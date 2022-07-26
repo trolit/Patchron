@@ -1,15 +1,15 @@
 const {
     common: {
-        IndividualMethodImportRule,
         MarkedCommentsRule,
-        SingleLineBlockPatternRule,
         PositionedKeywordsRule,
         PredefinedFilenamesRule,
         LineBreakBeforeReturnRule,
-        KeywordsOrderedByLengthRule,
+        IndividualMethodImportRule,
+        SingleLineBlockPatternRule,
         ComparisionOperatorLevelRule,
         FixedLoopLengthConditionRule
     },
+
     js: {
         SimpleComparisionRule,
         AsynchronousPatternRule,
@@ -21,7 +21,99 @@ const {
 
 module.exports = [
     {
-        enabled: false,
+        enabled: true,
+        reference: MarkedCommentsRule,
+        config: {
+            prefixes: [
+                {
+                    value: '@TODO:',
+                    meaning: 'not implemented feature'
+                },
+                {
+                    value: '@TMP:',
+                    meaning: 'temporary solution'
+                },
+                {
+                    value: '@NOTE:',
+                    meaning: 'information about package/code'
+                }
+            ],
+            isAppliedToSingleLineComments: true,
+            isAppliedToMultiLineComments: true,
+            isAppliedToInlineComments: true
+        }
+    },
+
+    {
+        enabled: true,
+        reference: PositionedKeywordsRule,
+        config: {
+            keywords: [
+                {
+                    name: 'require',
+                    regex: /(.*require\(|^(const|let|var)(\s+)?{$)/,
+                    position: {
+                        BOF: true,
+                        custom: null
+                    },
+                    enforced: true,
+                    maxLineBreaks: 0,
+                    breakOnFirstOccurence: false,
+                    countDifferentCodeAsLineBreak: false,
+                    multiLineOptions: [
+                        {
+                            limiter: {
+                                startsWith: '} = require'
+                            }
+                        }
+                    ]
+                },
+                {
+                    name: 'import',
+                    regex: /import.*/,
+                    position: {
+                        BOF: true,
+                        custom: null
+                    },
+                    enforced: true,
+                    maxLineBreaks: 0,
+                    breakOnFirstOccurence: false,
+                    countDifferentCodeAsLineBreak: false,
+                    multiLineOptions: [
+                        {
+                            indicator: {
+                                notIncludes: 'from'
+                            },
+                            limiter: {
+                                startsWith: '} from'
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+
+    {
+        enabled: true,
+        reference: PredefinedFilenamesRule,
+        config: {
+            restrictions: [
+                {
+                    path: 'backend/src/controllers/*',
+                    expectedName: /.*Controller.js/
+                }
+            ]
+        }
+    },
+
+    {
+        enabled: true,
+        reference: LineBreakBeforeReturnRule
+    },
+
+    {
+        enabled: true,
         reference: IndividualMethodImportRule,
         config: {
             packages: [
@@ -32,116 +124,9 @@ module.exports = [
             ]
         }
     },
+
     {
-        enabled: false,
-        reference: FixedLoopLengthConditionRule,
-        config: {
-            expression: /(\w+).length/
-        }
-    },
-    {
-        enabled: false,
-        reference: MarkedCommentsRule,
-        config: {
-            prefixes: [
-                {
-                    value: 'TODO:',
-                    meaning: 'needs to be implemented'
-                },
-                {
-                    value: '*:',
-                    meaning: 'important note'
-                },
-                {
-                    value: '!:',
-                    meaning: 'to be removed'
-                },
-                {
-                    value: '?:',
-                    meaning: 'suggestion'
-                },
-                {
-                    value: 'TMP:',
-                    meaning: 'temporary solution'
-                }
-            ],
-            isAppliedToSingleLineComments: true,
-            isAppliedToMultiLineComments: true,
-            isAppliedToInlineComments: true
-        }
-    },
-    {
-        enabled: false,
-        reference: KeywordsOrderedByLengthRule,
-        config: {
-            keywords: [
-                {
-                    name: 'import (packages)',
-                    regex: /import(?!.*@).*/,
-                    order: 'ascending',
-                    ignoreNewline: false,
-                    multiLineOptions: [
-                        {
-                            indicator: {
-                                notIncludes: 'from'
-                            },
-                            limiter: {
-                                startsWith: '} = from'
-                            }
-                        }
-                    ]
-                },
-                {
-                    name: 'import (components)',
-                    regex: /import.*@\/components.*/,
-                    order: 'ascending',
-                    ignoreNewline: false,
-                    multiLineOptions: [
-                        {
-                            indicator: {
-                                notIncludes: 'from'
-                            },
-                            limiter: {
-                                startsWith: '} = from'
-                            }
-                        }
-                    ]
-                }
-            ]
-        }
-    },
-    {
-        enabled: false,
-        reference: PositionedKeywordsRule,
-        config: {
-            keywords: [
-                {
-                    name: 'require',
-                    regex: /(.*require\(|^(const|let|var)(\s+)?{$)/,
-                    position: {
-                        custom: null,
-                        BOF: true
-                    },
-                    maxLineBreaks: 1,
-                    enforced: true,
-                    breakOnFirstOccurence: false,
-                    countDifferentCodeAsLineBreak: false,
-                    multiLineOptions: [
-                        {
-                            indicator: {
-                                expression: /^(const|let|var)(\s+)?{$/
-                            },
-                            limiter: {
-                                startsWith: '} = require'
-                            }
-                        }
-                    ]
-                }
-            ]
-        }
-    },
-    {
-        enabled: false,
+        enabled: true,
         reference: SingleLineBlockPatternRule,
         config: {
             blocks: [
@@ -235,57 +220,25 @@ module.exports = [
             curlyBraces: true
         }
     },
+
     {
-        enabled: false,
+        enabled: true,
         reference: ComparisionOperatorLevelRule,
         config: {
-            allowedLevels: [2]
+            allowedLevels: [1, 2]
         }
     },
+
     {
-        enabled: false,
-        reference: LineBreakBeforeReturnRule
-    },
-    {
-        enabled: false,
-        reference: ImportWithoutExtensionRule,
+        enabled: true,
+        reference: FixedLoopLengthConditionRule,
         config: {
-            type: 'commonjs'
+            expression: /(\w+).length/
         }
     },
+
     {
-        enabled: false,
-        reference: ImplicitIndexFileImportRule,
-        config: {
-            type: 'commonjs'
-        }
-    },
-    {
-        enabled: false,
-        reference: AsynchronousPatternRule,
-        config: {
-            pattern: 'await'
-        }
-    },
-    {
-        enabled: false,
-        reference: SimplePropertyAssignmentRule,
-        config: {}
-    },
-    {
-        enabled: false,
-        reference: PredefinedFilenamesRule,
-        config: {
-            restrictions: [
-                {
-                    path: 'backend/controllers/*',
-                    expectedName: /.*Controller.js/
-                }
-            ]
-        }
-    },
-    {
-        enabled: false,
+        enabled: true,
         reference: SimpleComparisionRule,
         config: {
             patterns: [
@@ -330,5 +283,34 @@ module.exports = [
                 }
             ]
         }
+    },
+
+    {
+        enabled: true,
+        reference: AsynchronousPatternRule,
+        config: {
+            pattern: 'await'
+        }
+    },
+
+    {
+        enabled: true,
+        reference: ImportWithoutExtensionRule,
+        config: {
+            type: 'commonjs'
+        }
+    },
+
+    {
+        enabled: true,
+        reference: ImplicitIndexFileImportRule,
+        config: {
+            type: 'commonjs'
+        }
+    },
+
+    {
+        enabled: true,
+        reference: SimplePropertyAssignmentRule
     }
 ];
