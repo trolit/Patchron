@@ -5,9 +5,9 @@ class DirectPackageReferenceRule extends BaseRule {
      * Simple rule that allows to define packages which (when imported or required) should be used directly. For instance, when we consider **lodash** library, first two ways of `import` should be avoided.
      *
      * ```js
-     * import _ from 'lodash';
-     * import { uniq } from 'lodash';
-     * import uniq from 'lodash/uniq';
+     * 1) import _ from 'lodash';
+     * 2) import { uniq } from 'lodash';
+     * 3) import uniq from 'lodash/uniq';
      * ```
      *
      * {@link https://www.blazemeter.com/blog/the-correct-way-to-import-lodash-libraries-a-benchmark}
