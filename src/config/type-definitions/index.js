@@ -14,7 +14,7 @@
 /// <reference path="./rules/common/ComparisionOperatorLevel.js" />
 /// <reference path="./rules/common/FixedLoopLengthCondition.js" />
 
-/// <reference path="./rules/js/DirectImport.js" />
+/// <reference path="./rules/js/IndividualMethodImport.js" />
 /// <reference path="./rules/js/SimpleComparision.js" />
 /// <reference path="./rules/js/AsynchronousPattern.js" />
 /// <reference path="./rules/js/ImportWithoutExtension.js" />

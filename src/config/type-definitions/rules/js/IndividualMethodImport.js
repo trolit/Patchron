@@ -5,6 +5,6 @@
  */
 
 /**
- * @typedef {object} DirectImportConfig
+ * @typedef {object} IndividualMethodImportConfig
  * @property {Array<Package>} packages
  */
