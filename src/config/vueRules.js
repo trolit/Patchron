@@ -3,7 +3,12 @@ const {
         SelfClosingTagRule,
         PositionedKeywordsRule,
         PredefinedFilenamesRule,
-        KeywordsOrderedByLengthRule
+        LineBreakBeforeReturnRule,
+        IndividualMethodImportRule,
+        SingleLineBlockPatternRule,
+        KeywordsOrderedByLengthRule,
+        ComparisionOperatorLevelRule,
+        FixedLoopLengthConditionRule
     },
 
     js: {
@@ -20,8 +25,7 @@ const {
 module.exports = [
     {
         enabled: true,
-        reference: SelfClosingTagRule,
-        config: {}
+        reference: SelfClosingTagRule
     },
 
     {
@@ -74,6 +78,120 @@ module.exports = [
 
     {
         enabled: true,
+        reference: LineBreakBeforeReturnRule
+    },
+
+    {
+        enabled: true,
+        reference: IndividualMethodImportRule,
+        config: {
+            packages: [
+                {
+                    name: 'lodash',
+                    expression: /[(|'|"|`]lodash[)|'|"|`]/
+                }
+            ]
+        }
+    },
+
+    {
+        enabled: true,
+        reference: SingleLineBlockPatternRule,
+        config: {
+            blocks: [
+                {
+                    name: 'for',
+                    expression: /for.*\(.*\)/,
+                    countAsSingleLineBlockWhenNoBraces: true
+                },
+                {
+                    name: 'for',
+                    expression: /^for(\s)+\($/,
+                    multiLineOptions: [
+                        {
+                            limiter: {
+                                startsWith: ')',
+                                indentation: 'le-indicator'
+                            }
+                        }
+                    ]
+                },
+                {
+                    name: 'do..while',
+                    expression: /^[\s]*(?:do).*/,
+                    multiLineOptions: [
+                        {
+                            limiter: {
+                                includes: 'while',
+                                indentation: 'le-indicator',
+                                testInIndicator: true
+                            }
+                        }
+                    ]
+                },
+                {
+                    name: 'if',
+                    expression: /if.*\(.*\)/,
+                    countAsSingleLineBlockWhenNoBraces: true
+                },
+                {
+                    name: 'if',
+                    expression: /^if(\s)+\($/,
+                    multiLineOptions: [
+                        {
+                            limiter: {
+                                startsWith: ')',
+                                indentation: 'le-indicator'
+                            }
+                        }
+                    ]
+                },
+                {
+                    name: 'else if',
+                    expression: /(?:else if).*\(.*\)/,
+                    countAsSingleLineBlockWhenNoBraces: true
+                },
+                {
+                    name: 'else if',
+                    expression: /^(?:else if)(\s)+\($/,
+                    multiLineOptions: [
+                        {
+                            limiter: {
+                                startsWith: ')',
+                                indentation: 'le-indicator'
+                            }
+                        }
+                    ]
+                },
+                {
+                    name: 'else',
+                    expression: /^else.*/,
+                    countAsSingleLineBlockWhenNoBraces: true
+                },
+                {
+                    name: 'while',
+                    expression: /while.*\(.*\)/,
+                    countAsSingleLineBlockWhenNoBraces: true
+                },
+                {
+                    name: 'while',
+                    expression: /^while(\s)+\($/,
+                    multiLineOptions: [
+                        {
+                            limiter: {
+                                startsWith: ')',
+                                indentation: 'le-indicator'
+                            }
+                        }
+                    ]
+                }
+            ],
+            curlyBraces: true
+        }
+    },
+
+    {
+        enabled: true,
         reference: KeywordsOrderedByLengthRule,
         config: {
             keywords: [
@@ -110,6 +228,22 @@ module.exports = [
                     ]
                 }
             ]
+        }
+    },
+
+    {
+        enabled: true,
+        reference: ComparisionOperatorLevelRule,
+        config: {
+            allowedLevels: [1, 2]
+        }
+    },
+
+    {
+        enabled: true,
+        reference: FixedLoopLengthConditionRule,
+        config: {
+            expression: /(\w+).length/
         }
     },
 
