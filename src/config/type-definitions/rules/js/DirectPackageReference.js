@@ -5,6 +5,6 @@
  */
 
 /**
- * @typedef {object} DirectImportConfig
+ * @typedef {object} DirectPackageReferenceConfig
  * @property {Array<Package>} packages
  */
