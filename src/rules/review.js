@@ -1,17 +1,17 @@
 /**
  * @param {PatchronContext} patchronContext
- * @param {Array<object>} rulesConfig
+ * @param {Array<object>} rules
  * @param {Patch} file
  * @returns {Array<object>}
  */
-module.exports = (patchronContext, rulesConfig, file = null) => {
+module.exports = (patchronContext, rules, file = null) => {
     let comments = [];
 
-    rulesConfig.forEach((ruleConfig) => {
-        if (ruleConfig.enabled) {
-            const { reference: Rule, config } = ruleConfig;
+    rules.forEach((rule) => {
+        if (rule.enabled) {
+            const { reference: Rule } = rule;
 
-            const instance = new Rule(patchronContext, config, file);
+            const instance = new Rule(patchronContext, rule?.config, file);
 
             const ruleComments = instance.invoke();
 
