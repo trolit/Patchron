@@ -5,7 +5,7 @@
  */
 
 /**
- * @typedef {object} MarkedCommonCommentConfig
+ * @typedef {object} MarkedCommonCommentsConfig
  * @property {Array<Prefix>} prefixes array of prefixes that should be used in comments
  * @property {boolean} isAppliedToSingleLineComments
  * @property {boolean} isAppliedToMultiLineComments

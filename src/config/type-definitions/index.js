@@ -4,9 +4,9 @@
 
 /// <reference path="./common.js" />
 
-/// <reference path="./rules/html/MarkedComment.js" />
+/// <reference path="./rules/html/MarkedComments.js" />
 
-/// <reference path="./rules/common/MarkedComment.js" />
+/// <reference path="./rules/common/MarkedComments.js" />
 /// <reference path="./rules/common/PositionedKeywords.js" />
 /// <reference path="./rules/common/PredefinedFilename.js" />
 /// <reference path="./rules/common/SingleLineBlockPattern.js" />

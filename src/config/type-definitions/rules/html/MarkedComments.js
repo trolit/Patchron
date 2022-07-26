@@ -5,6 +5,6 @@
  */
 
 /**
- * @typedef {object} MarkedHTMLCommentConfig
+ * @typedef {object} MarkedHTMLCommentsConfig
  * @property {Array<Prefix>} prefixes array of prefixes that should be used in comments
  */

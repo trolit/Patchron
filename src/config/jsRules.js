@@ -1,7 +1,7 @@
 const {
     common: {
         DirectPackageReferenceRule,
-        MarkedCommentRule,
+        MarkedCommentsRule,
         SingleLineBlockPatternRule,
         PositionedKeywordsRule,
         PredefinedFilenameRule,
@@ -41,7 +41,7 @@ module.exports = [
     },
     {
         enabled: false,
-        reference: MarkedCommentRule,
+        reference: MarkedCommentsRule,
         config: {
             prefixes: [
                 {
