@@ -1,8 +1,8 @@
 const BaseRule = require('src/rules/Base');
 
-class DirectPackageReferenceRule extends BaseRule {
+class DirectImportRule extends BaseRule {
     /**
-     * Simple rule that allows to define packages which (when imported or required) should be used directly. For instance, when we consider **lodash** library, first two ways of `import` should be avoided.
+     * Simple rule that allows to define packages which (when imported) should be used directly. For instance, when we consider **lodash** library, first two ways of `import` should be avoided.
      *
      * ```js
      * 1) import _ from 'lodash';
@@ -13,7 +13,7 @@ class DirectPackageReferenceRule extends BaseRule {
      * {@link https://www.blazemeter.com/blog/the-correct-way-to-import-lodash-libraries-a-benchmark}
      *
      * @param {PatchronContext} patchronContext
-     * @param {DirectPackageReferenceConfig} config
+     * @param {DirectImportConfig} config
      * @param {Patch} file
      */
     constructor(patchronContext, config, file) {
@@ -84,4 +84,4 @@ class DirectPackageReferenceRule extends BaseRule {
     }
 }
 
-module.exports = DirectPackageReferenceRule;
+module.exports = DirectImportRule;

@@ -1,6 +1,6 @@
 const {
     common: {
-        DirectPackageReferenceRule,
+        DirectImportRule,
         MarkedCommentsRule,
         SingleLineBlockPatternRule,
         PositionedKeywordsRule,
@@ -22,7 +22,7 @@ const {
 module.exports = [
     {
         enabled: false,
-        reference: DirectPackageReferenceRule,
+        reference: DirectImportRule,
         config: {
             packages: [
                 {

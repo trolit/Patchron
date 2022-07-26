@@ -8,7 +8,7 @@ const {
 } = require('@jest/globals');
 
 const {
-    js: { DirectPackageReferenceRule }
+    js: { DirectImportRule }
 } = require('src/rules');
 const setupPatchronContext = require('test/setupPatchronContext');
 const initializeFile = require('test/rules/helpers/initializeFile');
@@ -39,7 +39,7 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on empty packages', () => {
-        const directPackageReferenceRule = new DirectPackageReferenceRule(
+        const directImportRule = new DirectImportRule(
             patchronContext,
             {
                 packages: []
@@ -47,13 +47,13 @@ describe('invoke function', () => {
             file
         );
 
-        const result = directPackageReferenceRule.invoke();
+        const result = directImportRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid lodash cloneDeep require', () => {
-        const directPackageReferenceRule = new DirectPackageReferenceRule(
+        const directImportRule = new DirectImportRule(
             patchronContext,
             validConfig,
             {
@@ -73,7 +73,7 @@ describe('invoke function', () => {
             }
         );
 
-        const result = directPackageReferenceRule.invoke();
+        const result = directImportRule.invoke();
 
         expect(result).toHaveLength(2);
 
@@ -83,7 +83,7 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid lodash cloneDeep require', () => {
-        const directPackageReferenceRule = new DirectPackageReferenceRule(
+        const directImportRule = new DirectImportRule(
             patchronContext,
             validConfig,
             {
@@ -97,13 +97,13 @@ describe('invoke function', () => {
             }
         );
 
-        const result = directPackageReferenceRule.invoke();
+        const result = directImportRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid lodash cloneDeep import', () => {
-        const directPackageReferenceRule = new DirectPackageReferenceRule(
+        const directImportRule = new DirectImportRule(
             patchronContext,
             validConfig,
             {
@@ -123,7 +123,7 @@ describe('invoke function', () => {
             }
         );
 
-        const result = directPackageReferenceRule.invoke();
+        const result = directImportRule.invoke();
 
         expect(result).toHaveLength(2);
 
@@ -133,7 +133,7 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid lodash cloneDeep import', () => {
-        const directPackageReferenceRule = new DirectPackageReferenceRule(
+        const directImportRule = new DirectImportRule(
             patchronContext,
             validConfig,
             {
@@ -147,7 +147,7 @@ describe('invoke function', () => {
             }
         );
 
-        const result = directPackageReferenceRule.invoke();
+        const result = directImportRule.invoke();
 
         expect(result).toEqual([]);
     });
