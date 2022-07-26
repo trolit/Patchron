@@ -8,7 +8,7 @@
 
 /// <reference path="./rules/common/MarkedComments.js" />
 /// <reference path="./rules/common/PositionedKeywords.js" />
-/// <reference path="./rules/common/PredefinedFilename.js" />
+/// <reference path="./rules/common/PredefinedFilenames.js" />
 /// <reference path="./rules/common/SingleLineBlockPattern.js" />
 /// <reference path="./rules/common/KeywordsOrderedByLength.js" />
 /// <reference path="./rules/common/ComparisionOperatorLevel.js" />
