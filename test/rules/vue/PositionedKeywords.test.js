@@ -72,9 +72,6 @@ const requireKeywordConfig = (position, override = null) => {
         countDifferentCodeAsLineBreak: false,
         multiLineOptions: [
             {
-                indicator: {
-                    expression: /^(const|let|var)(\s+)?{$/
-                },
                 limiter: {
                     startsWith: '} = require'
                 }
