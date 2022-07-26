@@ -4,7 +4,7 @@ const {
         MarkedCommentsRule,
         SingleLineBlockPatternRule,
         PositionedKeywordsRule,
-        PredefinedFilenameRule,
+        PredefinedFilenamesRule,
         LineBreakBeforeReturnRule,
         KeywordsOrderedByLengthRule,
         ComparisionOperatorLevelRule,
@@ -274,7 +274,7 @@ module.exports = [
     },
     {
         enabled: false,
-        reference: PredefinedFilenameRule,
+        reference: PredefinedFilenamesRule,
         config: {
             restrictions: [
                 {

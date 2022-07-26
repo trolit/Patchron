@@ -1,11 +1,11 @@
 const BaseRule = require('src/rules/Base');
 
-class PredefinedFilenameRule extends BaseRule {
+class PredefinedFilenamesRule extends BaseRule {
     /**
      * imposes specific filename structure. Path containing asterisk or slash only is ignored. End path with asterisk if you want to allow rule to match any number of levels after declared path e.g. `dir1/dir2/*` would match `dir1/dir2/dir3/a.js`, `dir1/dir2/b.js` etc..
      *
      * @param {PatchronContext} patchronContext
-     * @param {PredefinedFilenameConfig} config
+     * @param {PredefinedFilenamesConfig} config
      * @param {Patch} file
      */
     constructor(patchronContext, config, file) {
@@ -67,4 +67,4 @@ class PredefinedFilenameRule extends BaseRule {
     }
 }
 
-module.exports = PredefinedFilenameRule;
+module.exports = PredefinedFilenamesRule;
