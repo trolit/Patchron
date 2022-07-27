@@ -92,8 +92,6 @@ class PositionedKeywordsRule extends BaseRule {
                 continue;
             }
 
-            const matchedContent = matchResult[0];
-
             if (keyword?.multiLineOptions) {
                 const { multiLineOptions } = keyword;
 
@@ -128,7 +126,7 @@ class PositionedKeywordsRule extends BaseRule {
 
             matchedData.push({
                 index,
-                content: matchedContent
+                content: trimmedContent
             });
         }
 
@@ -207,6 +205,7 @@ class PositionedKeywordsRule extends BaseRule {
             );
 
             if (
+                row.index >= 0 &&
                 rowWithGreaterOrderIndex &&
                 rowWithGreaterOrderIndex.index < row.index
             ) {
