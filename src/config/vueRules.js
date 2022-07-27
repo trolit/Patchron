@@ -80,6 +80,10 @@ module.exports = [
                 {
                     path: 'src/components/*',
                     expectedName: /[A-Z].*.vue/
+                },
+                {
+                    path: 'src/helpers/*',
+                    expectedName: /[a-z].*.js/
                 }
             ]
         }
