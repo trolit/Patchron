@@ -24,7 +24,7 @@
     }
   ],
   "schedule":[
-    "on Sunday"
+    "after 1am and before 9am on Sunday"
   ],
   "ignoreDeps": ["prettier", "jsdoc", "eslint", "eslint-config-prettier", "eslint-plugin-jsdoc", "node", "jest"]
 }
