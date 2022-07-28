@@ -24,7 +24,7 @@
     }
   ],
   "schedule":[
-    "on Sunday"
+    "on the first day of the month"
   ],
   "ignoreDeps": ["prettier", "jsdoc", "eslint", "eslint-config-prettier", "eslint-plugin-jsdoc", "node", "jest"]
 }
