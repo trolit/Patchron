@@ -11,20 +11,20 @@
     {
       "matchPackagePatterns": ["^pino", "probot"],
       "groupName": "Probot",
-      "labels": ["probot"],
+      "addLabels": ["probot"],
       "prPriority": 6
     },
     {
       "matchDepTypes": ["dependencies"],
       "excludePackagePatterns": ["^pino", "probot"],
       "groupName": "utilities",
-      "labels": ["utilities"],
+      "addLabels": ["utilities"],
       "prPriority": 4
     },
     {
       "matchDepTypes": ["devDependencies"],
       "groupName": "dev dependencies",
-      "labels": ["devtools"],
+      "addLabels": ["dev-tools"],
       "prPriority": 2
     }
   ],
