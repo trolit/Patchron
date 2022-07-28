@@ -3,17 +3,19 @@
   "extends": [
     "config:base"
   ],
-  "prConcurrentLimit": 1,
+  "prConcurrentLimit": 2,
   "packageRules": [
     {
       "matchPackagePatterns": ["^pino", "probot"],
       "groupName": "Probot",
-      "prPriority": 5
+      "labels": ["probot"],
+      "prPriority": 6
     },
     {
       "matchDepTypes": ["dependencies"],
       "excludePackagePatterns": ["^pino", "probot"],
       "groupName": "utilities",
+      "labels": ["utilities"],
       "prPriority": 4
     },
     {
@@ -26,6 +28,7 @@
   "schedule":[
     "on the first day of the month"
   ],
+  "timezone": "Europe/Warsaw",
   "ignoreDeps": ["prettier", "jsdoc", "eslint", "eslint-config-prettier", "eslint-plugin-jsdoc", "node", "jest"]
 }
 
