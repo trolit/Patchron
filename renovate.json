@@ -2,5 +2,29 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:base"
-  ]
+  ],
+  "prConcurrentLimit": 1,
+  "packageRules": [
+    {
+      "matchPackagePatterns": ["^pino", "probot"],
+      "groupName": "Probot",
+      "prPriority": 5
+    },
+    {
+      "matchDepTypes": ["dependencies"],
+      "excludePackagePatterns": ["^pino", "probot"],
+      "groupName": "utilities",
+      "prPriority": 4
+    },
+    {
+      "matchDepTypes": ["devDependencies"],
+      "groupName": "dev dependencies",
+      "labels": ["devtools"],
+      "prPriority": 2
+    }
+  ],
+  "schedule":[
+    "on Sunday"
+  ],
+  "ignoreDeps": ["prettier", "jsdoc", "eslint", "eslint-config-prettier", "eslint-plugin-jsdoc", "node", "jest"]
 }
