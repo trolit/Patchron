@@ -20,18 +20,18 @@
     "trace-warnings": "node --trace-warnings index.js"
   },
   "dependencies": {
-    "cron": "^1.8.3",
-    "dayjs": "^1.11.1",
-    "dedent-js": "^1.0.1",
-    "dotenv": "^16.0.0",
-    "http-status-codes": "^2.2.0",
-    "js-base64": "^3.7.2",
-    "lodash": "^4.17.21",
-    "module-alias": "^2.2.2",
+    "cron": "1.8.3",
+    "dayjs": "1.11.4",
+    "dedent-js": "1.0.1",
+    "dotenv": "16.0.1",
+    "http-status-codes": "2.2.0",
+    "js-base64": "3.7.2",
+    "lodash": "4.17.21",
+    "module-alias": "2.2.2",
     "pino-multi-stream": "6.0.0",
     "pino-tee": "0.3.0",
     "probot": "12.2.5",
-    "require-directory": "^2.1.1"
+    "require-directory": "2.1.1"
   },
   "devDependencies": {
     "eslint": "^8.7.0",
