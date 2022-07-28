@@ -20,7 +20,7 @@
     "trace-warnings": "node --trace-warnings index.js"
   },
   "dependencies": {
-    "cron": "1.8.3",
+    "cron": "2.1.0",
     "dayjs": "1.11.4",
     "dedent-js": "1.0.1",
     "dotenv": "16.0.1",
