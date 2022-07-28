@@ -28,3 +28,4 @@
   ],
   "ignoreDeps": ["prettier", "jsdoc", "eslint", "eslint-config-prettier", "eslint-plugin-jsdoc", "node", "jest"]
 }
+
