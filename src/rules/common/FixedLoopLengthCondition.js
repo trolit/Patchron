@@ -2,7 +2,7 @@ const BaseRule = require('src/rules/Base');
 
 class FixedLoopLengthConditionRule extends BaseRule {
     /**
-     * looks after `for`, `while`, `do while` loops and identifies whether condition statement includes reference to `length` property. If it does, line is commented out with description to not call `length` in each iteration suggesting to declare variable before loop instead.
+     * looks after `for`, `while`, `do while` loops and identifies whether condition statement includes reference to `length` property. If it does, line is commented out with description to not call `length` in each iteration suggesting to declare variable before loop.
      *
      * @param {PatchronContext} patchronContext
      * @param {FixedLoopLengthConditionConfig} config

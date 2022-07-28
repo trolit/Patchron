@@ -2,6 +2,8 @@ const BaseRule = require('src/rules/Base');
 
 class StrictWorkflowRule extends BaseRule {
     /**
+     * checks if pull requested branch has valid prefix and flow
+     *
      * @param {PatchronContext} patchronContext
      * @param {StrictWorkflowConfig} config
      * @param {Patch} file

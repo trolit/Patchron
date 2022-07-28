@@ -3,6 +3,8 @@ const BaseRule = require('src/rules/Base');
 // TODO: could use rework 🤔
 class PositionedKeywordsRule extends BaseRule {
     /**
+     * allows to setup keywords with expected positions (`beginning of file` or `custom`). If default position won't be available (`enforced = true`), rule can use first occurence as "base" for checking position.
+     *
      * @param {PatchronContext} patchronContext
      * @param {PositionedKeywordsConfig} config
      * @param {Patch} file

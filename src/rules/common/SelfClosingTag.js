@@ -2,9 +2,7 @@ const BaseRule = require('src/rules/Base');
 
 class SelfClosingTagRule extends BaseRule {
     /**
-     * simple rule that looks after tags that have no content and do not use self-closing tag.
-     *
-     * Note that HTML doesn't allow custom elements to be self-closing, only official "void" elements. Read more at: {@link https://vuejs.org/style-guide/rules-strongly-recommended.html#self-closing-components}
+     * looks after tags that have no content and do not use self-closing tag. Note that HTML doesn't allow custom elements to be self-closing, only official "void" elements. Read more at: {@link https://vuejs.org/style-guide/rules-strongly-recommended.html#self-closing-components}
      *
      * @param {PatchronContext} patchronContext
      * @param {object} _

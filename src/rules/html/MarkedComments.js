@@ -2,7 +2,7 @@ const BaseRule = require('src/rules/Base');
 
 class MarkedCommentsRule extends BaseRule {
     /**
-     * ensures that in HTML comment block, at least one line begins with one of the predefined prefixes.
+     * ensures that in HTML comment block (`<!-- comment -->`), at least one line begins with one of the predefined prefixes.
      *
      * @param {PatchronContext} patchronContext
      * @param {MarkedHTMLCommentsConfig} config

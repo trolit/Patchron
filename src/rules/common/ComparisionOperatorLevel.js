@@ -3,7 +3,7 @@ const BaseRule = require('src/rules/Base');
 
 class ComparisionOperatorLevelRule extends BaseRule {
     /**
-     * Allows to set expected equality/inequality comparement convention. Rule is based on patch and currently does not implement any way to deduce whether part of patch is pure text or part of code (e.g. in case of Vue). An workaround to that could be to escape `=` characters in strings and use `=` unicode representation in HTML.
+     * allows to set expected equality/inequality convention. Bear in mind that rule does not implement any way to deduce whether part of patch is pure text or part of code (e.g. in case of Vue). An workaround to that could be to escape `=` characters in strings and use `=` unicode representation in HTML.
      *
      * **allowedLevels** options:
      * - 0 - weak equality/inequality (==, !=)
