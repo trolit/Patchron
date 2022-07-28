@@ -1,9 +1,12 @@
 {
+  "enabled": true,
+  "prConcurrentLimit": 2,
+  "prHourlyLimit": 2,
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:base"
   ],
-  "prConcurrentLimit": 2,
+  "labels": ["renovate"],
   "packageRules": [
     {
       "matchPackagePatterns": ["^pino", "probot"],
