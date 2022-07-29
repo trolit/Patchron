@@ -4,7 +4,7 @@ const {
 
 module.exports = [
     {
-        enabled: false,
+        enabled: true,
         reference: StrictWorkflowRule,
         config: {
             workflow: [
@@ -29,8 +29,8 @@ module.exports = [
                     head: 'hotfix'
                 }
             ],
-            abortReviewOnInvalidBranchPrefix: false,
-            abortReviewOnInvalidFlow: true
+            abortReviewOnInvalidFlow: true,
+            abortReviewOnInvalidBranchPrefix: false
         }
     }
 ];

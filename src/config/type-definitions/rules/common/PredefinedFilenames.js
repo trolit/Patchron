@@ -1,5 +1,5 @@
 /**
- * @typedef {object} PredefinedFilenameConfig
+ * @typedef {object} PredefinedFilenamesConfig
  * @property {Array<Restriction>} restrictions
  */
 

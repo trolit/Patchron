@@ -1,19 +1,19 @@
 const BaseRule = require('src/rules/Base');
 
-class DirectImportRule extends BaseRule {
+class IndividualMethodImportRule extends BaseRule {
     /**
-     * Simple rule that allows to define packages which (when imported) should be used directly. For instance, when we consider **lodash** library, first two ways of `import` should be avoided.
+     * checks whether package methods are imported / required individually. For instance, when we consider **lodash** library, first two ways of `import` should be avoided.
      *
      * ```js
-     * import _ from 'lodash'; // then _.uniq
-     * import { uniq } from 'lodash';
-     * import uniq from 'lodash/uniq';
+     * 1) import _ from 'lodash';
+     * 2) import { uniq } from 'lodash';
+     * 3) import uniq from 'lodash/uniq';
      * ```
      *
      * {@link https://www.blazemeter.com/blog/the-correct-way-to-import-lodash-libraries-a-benchmark}
      *
      * @param {PatchronContext} patchronContext
-     * @param {DirectImportConfig} config
+     * @param {IndividualMethodImportConfig} config
      * @param {Patch} file
      */
     constructor(patchronContext, config, file) {
@@ -84,4 +84,4 @@ class DirectImportRule extends BaseRule {
     }
 }
 
-module.exports = DirectImportRule;
+module.exports = IndividualMethodImportRule;

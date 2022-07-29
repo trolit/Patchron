@@ -8,7 +8,7 @@ const {
 } = require('@jest/globals');
 
 const {
-    common: { PredefinedFilenameRule }
+    common: { PredefinedFilenamesRule }
 } = require('src/rules');
 const setupPatchronContext = require('test/setupPatchronContext');
 const initializeFile = require('test/rules/helpers/initializeFile');
@@ -47,7 +47,7 @@ describe('invoke function', () => {
     });
 
     it('returns null on empty restrictions', () => {
-        const predefinedFilenameRule = new PredefinedFilenameRule(
+        const predefinedFilenamesRule = new PredefinedFilenamesRule(
             patchronContext,
             {
                 restrictions: []
@@ -58,13 +58,13 @@ describe('invoke function', () => {
             }
         );
 
-        const result = predefinedFilenameRule.invoke();
+        const result = predefinedFilenamesRule.invoke();
 
         expect(result).toEqual(null);
     });
 
     it('returns null on unmatched path (example1)', () => {
-        const predefinedFilenameRule = new PredefinedFilenameRule(
+        const predefinedFilenamesRule = new PredefinedFilenamesRule(
             patchronContext,
             config,
             {
@@ -73,13 +73,13 @@ describe('invoke function', () => {
             }
         );
 
-        const result = predefinedFilenameRule.invoke();
+        const result = predefinedFilenamesRule.invoke();
 
         expect(result).toEqual(null);
     });
 
     it('returns null on unmatched path (example2)', () => {
-        const predefinedFilenameRule = new PredefinedFilenameRule(
+        const predefinedFilenamesRule = new PredefinedFilenamesRule(
             patchronContext,
             config,
             {
@@ -88,13 +88,13 @@ describe('invoke function', () => {
             }
         );
 
-        const result = predefinedFilenameRule.invoke();
+        const result = predefinedFilenamesRule.invoke();
 
         expect(result).toHaveProperty('body');
     });
 
     it('returns null on valid predefined filename', () => {
-        const predefinedFilenameRule = new PredefinedFilenameRule(
+        const predefinedFilenamesRule = new PredefinedFilenamesRule(
             patchronContext,
             config,
             {
@@ -103,13 +103,13 @@ describe('invoke function', () => {
             }
         );
 
-        const result = predefinedFilenameRule.invoke();
+        const result = predefinedFilenamesRule.invoke();
 
         expect(result).toEqual(null);
     });
 
     it('returns object on invalid predefined filename (example1)', () => {
-        const predefinedFilenameRule = new PredefinedFilenameRule(
+        const predefinedFilenamesRule = new PredefinedFilenamesRule(
             patchronContext,
             config,
             {
@@ -118,13 +118,13 @@ describe('invoke function', () => {
             }
         );
 
-        const result = predefinedFilenameRule.invoke();
+        const result = predefinedFilenamesRule.invoke();
 
         expect(result).toHaveProperty('body');
     });
 
     it('returns object on invalid predefined filename (example2)', () => {
-        const predefinedFilenameRule = new PredefinedFilenameRule(
+        const predefinedFilenamesRule = new PredefinedFilenamesRule(
             patchronContext,
             config,
             {
@@ -133,13 +133,13 @@ describe('invoke function', () => {
             }
         );
 
-        const result = predefinedFilenameRule.invoke();
+        const result = predefinedFilenamesRule.invoke();
 
         expect(result).toHaveProperty('body');
     });
 
     it('returns null on valid predefined filename (without asterisk)', () => {
-        const predefinedFilenameRule = new PredefinedFilenameRule(
+        const predefinedFilenamesRule = new PredefinedFilenamesRule(
             patchronContext,
             {
                 restrictions: [
@@ -155,13 +155,13 @@ describe('invoke function', () => {
             }
         );
 
-        const result = predefinedFilenameRule.invoke();
+        const result = predefinedFilenamesRule.invoke();
 
         expect(result).toEqual(null);
     });
 
     it('returns null on unmatched path (without asterisk)', () => {
-        const predefinedFilenameRule = new PredefinedFilenameRule(
+        const predefinedFilenamesRule = new PredefinedFilenamesRule(
             patchronContext,
             {
                 restrictions: [
@@ -177,7 +177,7 @@ describe('invoke function', () => {
             }
         );
 
-        const result = predefinedFilenameRule.invoke();
+        const result = predefinedFilenamesRule.invoke();
 
         expect(result).toEqual(null);
     });

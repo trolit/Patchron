@@ -2,7 +2,7 @@ const BaseRule = require('src/rules/Base');
 
 class LineBreakBeforeReturnRule extends BaseRule {
     /**
-     * Checks whether line before return is line-break. Note that edge case (part of string starting with return) isn't covered since amount of intel in received patch can be not enough to determine that (and on the other hand it's still rare case).
+     * checks whether line before return is line-break. Note that edge case (part of string starting with return) isn't covered since amount of intel in received patch can be not enough to determine that.
      *
      * @param {PatchronContext} patchronContext
      * @param {object} _

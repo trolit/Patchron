@@ -8,7 +8,7 @@ const {
 } = require('@jest/globals');
 
 const {
-    html: { MarkedCommentRule }
+    html: { MarkedCommentsRule }
 } = require('src/rules');
 const setupPatchronContext = require('test/setupPatchronContext');
 const initializeFile = require('test/rules/helpers/initializeFile');
@@ -51,7 +51,7 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on marked comments', () => {
-        const markedCommentRule = new MarkedCommentRule(
+        const markedCommentsRule = new MarkedCommentsRule(
             patchronContext,
             config,
             {
@@ -84,13 +84,13 @@ describe('invoke function', () => {
             }
         );
 
-        const result = markedCommentRule.invoke();
+        const result = markedCommentsRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on unmarked comments', () => {
-        const markedCommentRule = new MarkedCommentRule(
+        const markedCommentsRule = new MarkedCommentsRule(
             patchronContext,
             config,
             {
@@ -123,7 +123,7 @@ describe('invoke function', () => {
             }
         );
 
-        const result = markedCommentRule.invoke();
+        const result = markedCommentsRule.invoke();
 
         expect(result).toHaveLength(5);
 

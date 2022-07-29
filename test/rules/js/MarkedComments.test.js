@@ -8,7 +8,7 @@ const {
 } = require('@jest/globals');
 
 const {
-    common: { MarkedCommentRule }
+    common: { MarkedCommentsRule }
 } = require('src/rules');
 const setupPatchronContext = require('test/setupPatchronContext');
 const initializeFile = require('test/rules/helpers/initializeFile');
@@ -58,7 +58,7 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on invalid flags config', () => {
-        const markedCommentRule = new MarkedCommentRule(
+        const markedCommentsRule = new MarkedCommentsRule(
             patchronContext,
             {
                 ...validConfig,
@@ -69,13 +69,13 @@ describe('invoke function', () => {
             file
         );
 
-        const result = markedCommentRule.invoke();
+        const result = markedCommentsRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns empty array on empty prefixes', () => {
-        const markedCommentRule = new MarkedCommentRule(
+        const markedCommentsRule = new MarkedCommentsRule(
             patchronContext,
             {
                 ...validConfig,
@@ -84,13 +84,13 @@ describe('invoke function', () => {
             file
         );
 
-        const result = markedCommentRule.invoke();
+        const result = markedCommentsRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid single line comments', () => {
-        const markedCommentRule = new MarkedCommentRule(
+        const markedCommentsRule = new MarkedCommentsRule(
             patchronContext,
             validConfig,
             {
@@ -108,7 +108,7 @@ describe('invoke function', () => {
             }
         );
 
-        const result = markedCommentRule.invoke();
+        const result = markedCommentsRule.invoke();
 
         expect(result).toHaveLength(1);
 
@@ -116,7 +116,7 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid single line comments', () => {
-        const markedCommentRule = new MarkedCommentRule(
+        const markedCommentsRule = new MarkedCommentsRule(
             patchronContext,
             validConfig,
             {
@@ -132,13 +132,13 @@ describe('invoke function', () => {
             }
         );
 
-        const result = markedCommentRule.invoke();
+        const result = markedCommentsRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid multi-line comments', () => {
-        const markedCommentRule = new MarkedCommentRule(
+        const markedCommentsRule = new MarkedCommentsRule(
             patchronContext,
             validConfig,
             {
@@ -160,7 +160,7 @@ describe('invoke function', () => {
             }
         );
 
-        const result = markedCommentRule.invoke();
+        const result = markedCommentsRule.invoke();
 
         expect(result).toHaveLength(3);
 
@@ -173,7 +173,7 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid multi-line comments', () => {
-        const markedCommentRule = new MarkedCommentRule(
+        const markedCommentsRule = new MarkedCommentsRule(
             patchronContext,
             validConfig,
             {
@@ -197,13 +197,13 @@ describe('invoke function', () => {
             }
         );
 
-        const result = markedCommentRule.invoke();
+        const result = markedCommentsRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review on invalid inline comments', () => {
-        const markedCommentRule = new MarkedCommentRule(
+        const markedCommentsRule = new MarkedCommentsRule(
             patchronContext,
             validConfig,
             {
@@ -221,7 +221,7 @@ describe('invoke function', () => {
             }
         );
 
-        const result = markedCommentRule.invoke();
+        const result = markedCommentsRule.invoke();
 
         expect(result).toHaveLength(3);
 
@@ -234,7 +234,7 @@ describe('invoke function', () => {
     });
 
     it('returns empty array on valid inline comments', () => {
-        const markedCommentRule = new MarkedCommentRule(
+        const markedCommentsRule = new MarkedCommentsRule(
             patchronContext,
             validConfig,
             {
@@ -252,13 +252,13 @@ describe('invoke function', () => {
             }
         );
 
-        const result = markedCommentRule.invoke();
+        const result = markedCommentsRule.invoke();
 
         expect(result).toEqual([]);
     });
 
     it('returns review with correct range on invalid multi-line comments', () => {
-        const markedCommentRule = new MarkedCommentRule(
+        const markedCommentsRule = new MarkedCommentsRule(
             patchronContext,
             validConfig,
             {
@@ -280,7 +280,7 @@ describe('invoke function', () => {
             }
         );
 
-        const result = markedCommentRule.invoke();
+        const result = markedCommentsRule.invoke();
 
         expect(result).toHaveLength(2);
 

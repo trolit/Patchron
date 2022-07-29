@@ -2,6 +2,8 @@ const BaseRule = require('src/rules/Base');
 
 class KeywordsOrderedByLengthRule extends BaseRule {
     /**
+     * allows to declare list of keywords and test their order using line length as condition.
+     *
      * @param {PatchronContext} patchronContext
      * @param {KeywordsOrderedByLengthConfig} config
      * @param {Patch} file

@@ -10,10 +10,11 @@ const { CUSTOM_LINES } = require('src/config/constants');
  * @param {Array<SplitPatchRow>} data received via `setupData`
  * @param {number} currentLineIndex
  * @param {Array<MultiLineOption>} multiLineOptions
+ * @param {object} [matchRegex] expression that was used to match line for further processing. When provided, protects from case when multiLineStructure takes endIndex that belongs to next indicator.
  *
  * @returns {object}
  */
-module.exports = (data, currentLineIndex, multiLineOptions) => {
+module.exports = (data, currentLineIndex, multiLineOptions, matchRegex) => {
     const result = { isMultiLine: false };
 
     for (const options of multiLineOptions) {
@@ -32,8 +33,13 @@ module.exports = (data, currentLineIndex, multiLineOptions) => {
         const { limiter } = options;
 
         if (Array.isArray(limiter)) {
-            for (const value of limiter) {
-                const endIndex = _findEndIndex(data, currentLineIndex, value);
+            for (const element of limiter) {
+                const endIndex = _findEndIndex(
+                    data,
+                    currentLineIndex,
+                    element,
+                    matchRegex
+                );
 
                 if (~endIndex) {
                     result.endIndex = endIndex;
@@ -42,7 +48,12 @@ module.exports = (data, currentLineIndex, multiLineOptions) => {
                 }
             }
         } else {
-            result.endIndex = _findEndIndex(data, currentLineIndex, limiter);
+            result.endIndex = _findEndIndex(
+                data,
+                currentLineIndex,
+                limiter,
+                matchRegex
+            );
         }
 
         break;
@@ -52,22 +63,19 @@ module.exports = (data, currentLineIndex, multiLineOptions) => {
 };
 
 function _isMultiLine(indicator, row) {
-    const propertyName = first(Object.getOwnPropertyNames(indicator));
-    const propertyValue = indicator[propertyName];
+    const [propertyName, propertyValue] = _destructureIndicator(indicator);
 
-    return _resolveProperty(propertyName, propertyValue, indicator, row, null);
+    return _resolveProperty(indicator, propertyName, propertyValue, row, null);
 }
 
-function _findEndIndex(data, currentLineIndex, limiter) {
-    const propertyName = isString(limiter)
-        ? limiter
-        : first(Object.getOwnPropertyNames(limiter));
-
-    const propertyValue = limiter[propertyName];
+function _findEndIndex(data, currentLineIndex, limiter, matchRegex) {
+    const [propertyName, propertyValue] = _destructureLimiter(limiter);
 
     const slicedData = data.slice(
         limiter?.testInIndicator ? currentLineIndex : currentLineIndex + 1
     );
+
+    let wasFirstRowSkipped = false;
 
     for (const row of slicedData) {
         const { trimmedContent, index } = row;
@@ -81,9 +89,9 @@ function _findEndIndex(data, currentLineIndex, limiter) {
         }
 
         const isEndLine = _resolveProperty(
+            limiter,
             propertyName,
             propertyValue,
-            limiter,
             data[currentLineIndex],
             row
         );
@@ -91,15 +99,27 @@ function _findEndIndex(data, currentLineIndex, limiter) {
         if (isEndLine) {
             return index;
         }
+
+        if ((limiter?.testInIndicator && !wasFirstRowSkipped) || !matchRegex) {
+            wasFirstRowSkipped = true;
+
+            continue;
+        }
+
+        const isAnotherMultiLineCaseFound = trimmedContent.match(matchRegex);
+
+        if (isAnotherMultiLineCaseFound) {
+            return -1;
+        }
     }
 
     return -1;
 }
 
 function _resolveProperty(
+    source,
     propertyName,
     propertyValue,
-    source,
     indicatorRow,
     limiterRow
 ) {
@@ -199,4 +219,21 @@ function _isIndentationValid(indentation, indicatorRow, limiterRow) {
         default:
             return false;
     }
+}
+
+function _destructureIndicator(indicator) {
+    const propertyName = first(Object.getOwnPropertyNames(indicator));
+    const propertyValue = indicator[propertyName];
+
+    return [propertyName, propertyValue];
+}
+
+function _destructureLimiter(limiter) {
+    const propertyName = isString(limiter)
+        ? limiter
+        : first(Object.getOwnPropertyNames(limiter));
+
+    const propertyValue = limiter[propertyName];
+
+    return [propertyName, propertyValue];
 }
