@@ -381,10 +381,10 @@ describe('invoke function', () => {
         expect(result).toHaveLength(2);
 
         expect(result[0]).toHaveProperty('start_line', 6);
-        expect(result[0]).toHaveProperty('position', 7);
+        expect(result[0]).toHaveProperty('line', 11);
 
         expect(result[1]).toHaveProperty('start_line', 15);
-        expect(result[1]).toHaveProperty('position', 13);
+        expect(result[1]).toHaveProperty('line', 17);
     });
 
     it('returns review on invalid custom positioning (enforced, maxLineBreaks = 0)', () => {
@@ -423,10 +423,10 @@ describe('invoke function', () => {
         expect(result).toHaveLength(2);
 
         expect(result[0]).toHaveProperty('start_line', 6);
-        expect(result[0]).toHaveProperty('position', 7);
+        expect(result[0]).toHaveProperty('line', 11);
 
         expect(result[1]).toHaveProperty('start_line', 15);
-        expect(result[1]).toHaveProperty('position', 13);
+        expect(result[1]).toHaveProperty('line', 17);
     });
 
     it('returns review on invalid custom positioning (maxLineBreaks = 2, countDifferentCodeAsLineBreak = false)', () => {
@@ -472,10 +472,10 @@ describe('invoke function', () => {
         expect(result).toHaveLength(2);
 
         expect(result[0]).toHaveProperty('start_line', 6);
-        expect(result[0]).toHaveProperty('position', 7);
+        expect(result[0]).toHaveProperty('line', 11);
 
         expect(result[1]).toHaveProperty('start_line', 15);
-        expect(result[1]).toHaveProperty('position', 13);
+        expect(result[1]).toHaveProperty('line', 17);
     });
 
     it('returns review on invalid `import` custom positioning (second layer order)', () => {
@@ -565,7 +565,7 @@ describe('invoke function', () => {
         expect(result).toHaveLength(1);
 
         expect(result[0]).toHaveProperty('start_line', 6);
-        expect(result[0]).toHaveProperty('position', 7);
+        expect(result[0]).toHaveProperty('line', 11);
     });
 
     /**
@@ -879,10 +879,10 @@ describe('invoke function', () => {
         expect(result).toHaveLength(2);
 
         expect(result[0]).toHaveProperty('start_line', 1);
-        expect(result[0]).toHaveProperty('position', 6);
+        expect(result[0]).toHaveProperty('line', 6);
 
         expect(result[1]).toHaveProperty('start_line', 10);
-        expect(result[1]).toHaveProperty('position', 12);
+        expect(result[1]).toHaveProperty('line', 12);
     });
 
     it('returns review on invalid BOF positioning (enforced, maxLineBreaks = 0)', () => {
@@ -924,10 +924,10 @@ describe('invoke function', () => {
         expect(result).toHaveLength(2);
 
         expect(result[0]).toHaveProperty('start_line', 7);
-        expect(result[0]).toHaveProperty('position', 8);
+        expect(result[0]).toHaveProperty('line', 12);
 
         expect(result[1]).toHaveProperty('start_line', 16);
-        expect(result[1]).toHaveProperty('position', 14);
+        expect(result[1]).toHaveProperty('line', 18);
     });
 
     it('returns review on invalid BOF positioning (maxLineBreaks = 2, countDifferentCodeAsLineBreak = false)', () => {
@@ -974,10 +974,10 @@ describe('invoke function', () => {
         expect(result).toHaveLength(2);
 
         expect(result[0]).toHaveProperty('start_line', 7);
-        expect(result[0]).toHaveProperty('position', 8);
+        expect(result[0]).toHaveProperty('line', 12);
 
         expect(result[1]).toHaveProperty('start_line', 16);
-        expect(result[1]).toHaveProperty('position', 14);
+        expect(result[1]).toHaveProperty('line', 18);
     });
 
     it('returns empty array on valid BOF positioning (two BOF keywords)', () => {
@@ -1149,7 +1149,7 @@ describe('invoke function', () => {
         expect(result).toHaveLength(1);
 
         expect(result[0]).toHaveProperty('start_line', 1);
-        expect(result[0]).toHaveProperty('position', 6);
+        expect(result[0]).toHaveProperty('line', 6);
     });
 
     it('returns single comment on invalid `import` and `const` BOF positioning (two BOF keywords)', () => {

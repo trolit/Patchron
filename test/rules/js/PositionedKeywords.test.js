@@ -178,7 +178,7 @@ describe('invoke function', () => {
         expect(result).toHaveLength(2);
 
         expect(result[0]).toHaveProperty('start_line', 6);
-        expect(result[0]).toHaveProperty('position', 7);
+        expect(result[0]).toHaveProperty('line', 11);
 
         expect(result[1]).toHaveProperty('line', 11);
     });

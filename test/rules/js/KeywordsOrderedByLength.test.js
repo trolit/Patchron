@@ -123,7 +123,7 @@ describe('invoke function', () => {
         expect(result).toHaveLength(1);
 
         expect(result[0]).toHaveProperty('start_line', 5);
-        expect(result[0]).toHaveProperty('position', 4);
+        expect(result[0]).toHaveProperty('line', 8);
     });
 
     it('returns empty array on valid ascending `import` group order', () => {
@@ -175,7 +175,7 @@ describe('invoke function', () => {
         expect(result).toHaveLength(1);
 
         expect(result[0]).toHaveProperty('start_line', 9);
-        expect(result[0]).toHaveProperty('position', 6);
+        expect(result[0]).toHaveProperty('line', 10);
     });
 
     it('returns empty array on valid ascending `import` groups order', () => {
@@ -234,7 +234,7 @@ describe('invoke function', () => {
         expect(result).toHaveLength(1);
 
         expect(result[0]).toHaveProperty('start_line', 5);
-        expect(result[0]).toHaveProperty('position', 4);
+        expect(result[0]).toHaveProperty('line', 8);
     });
 
     it('returns empty array on valid descending `import` group order', () => {
@@ -414,9 +414,9 @@ describe('invoke function', () => {
         expect(result).toHaveLength(2);
 
         expect(result[0]).toHaveProperty('start_line', 5);
-        expect(result[0]).toHaveProperty('position', 6);
+        expect(result[0]).toHaveProperty('line', 10);
 
         expect(result[1]).toHaveProperty('start_line', 12);
-        expect(result[1]).toHaveProperty('position', 10);
+        expect(result[1]).toHaveProperty('line', 14);
     });
 });

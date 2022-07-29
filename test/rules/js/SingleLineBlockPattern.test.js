@@ -383,16 +383,16 @@ describe('invoke function', () => {
         expect(result[0]).toHaveProperty('line', 3);
 
         expect(result[1]).toHaveProperty('start_line', 5);
-        expect(result[1]).toHaveProperty('position', 8);
+        expect(result[1]).toHaveProperty('line', 8);
 
         expect(result[2]).toHaveProperty('start_line', 9);
-        expect(result[2]).toHaveProperty('position', 12);
+        expect(result[2]).toHaveProperty('line', 12);
 
         expect(result[3]).toHaveProperty('start_line', 13);
-        expect(result[3]).toHaveProperty('position', 16);
+        expect(result[3]).toHaveProperty('line', 16);
 
         expect(result[4]).toHaveProperty('start_line', 19);
-        expect(result[4]).toHaveProperty('position', 21);
+        expect(result[4]).toHaveProperty('line', 21);
 
         expect(result[5]).toHaveProperty('line', 22);
 
@@ -458,7 +458,7 @@ describe('invoke function', () => {
         expect(result).toHaveLength(1);
 
         expect(result[0]).toHaveProperty('start_line', 4);
-        expect(result[0]).toHaveProperty('position', 6);
+        expect(result[0]).toHaveProperty('line', 6);
     });
 
     /**
@@ -574,19 +574,19 @@ describe('invoke function', () => {
         expect(result[0]).toHaveProperty('line', 2);
 
         expect(result[1]).toHaveProperty('start_line', 4);
-        expect(result[1]).toHaveProperty('position', 6);
+        expect(result[1]).toHaveProperty('line', 6);
 
         expect(result[2]).toHaveProperty('start_line', 8);
-        expect(result[2]).toHaveProperty('position', 10);
+        expect(result[2]).toHaveProperty('line', 10);
 
         expect(result[3]).toHaveProperty('start_line', 12);
-        expect(result[3]).toHaveProperty('position', 13);
+        expect(result[3]).toHaveProperty('line', 13);
 
         expect(result[4]).toHaveProperty('start_line', 17);
-        expect(result[4]).toHaveProperty('position', 19);
+        expect(result[4]).toHaveProperty('line', 19);
 
         expect(result[5]).toHaveProperty('start_line', 26);
-        expect(result[5]).toHaveProperty('position', 27);
+        expect(result[5]).toHaveProperty('line', 27);
     });
 
     it('returns empty array on valid nested single-line do..while block (with curly braces)', () => {
@@ -639,7 +639,7 @@ describe('invoke function', () => {
         expect(result).toHaveLength(1);
 
         expect(result[0]).toHaveProperty('start_line', 4);
-        expect(result[0]).toHaveProperty('position', 6);
+        expect(result[0]).toHaveProperty('line', 6);
     });
 
     it('returns empty array on valid single-line do..while blocks (without curly braces)', () => {
@@ -754,22 +754,22 @@ describe('invoke function', () => {
         expect(result[0]).toHaveProperty('line', 2);
 
         expect(result[1]).toHaveProperty('start_line', 4);
-        expect(result[1]).toHaveProperty('position', 6);
+        expect(result[1]).toHaveProperty('line', 6);
 
         expect(result[2]).toHaveProperty('start_line', 8);
-        expect(result[2]).toHaveProperty('position', 12);
+        expect(result[2]).toHaveProperty('line', 12);
 
         expect(result[3]).toHaveProperty('start_line', 14);
-        expect(result[3]).toHaveProperty('position', 15);
+        expect(result[3]).toHaveProperty('line', 15);
 
         expect(result[4]).toHaveProperty('start_line', 19);
-        expect(result[4]).toHaveProperty('position', 22);
+        expect(result[4]).toHaveProperty('line', 22);
 
         expect(result[5]).toHaveProperty('start_line', 24);
-        expect(result[5]).toHaveProperty('position', 27);
+        expect(result[5]).toHaveProperty('line', 27);
 
         expect(result[6]).toHaveProperty('start_line', 29);
-        expect(result[6]).toHaveProperty('position', 30);
+        expect(result[6]).toHaveProperty('line', 30);
     });
 
     it('returns empty array on valid nested single-line do..while block (without curly braces)', () => {
@@ -828,6 +828,6 @@ describe('invoke function', () => {
         expect(result).toHaveLength(1);
 
         expect(result[0]).toHaveProperty('start_line', 4);
-        expect(result[0]).toHaveProperty('position', 6);
+        expect(result[0]).toHaveProperty('line', 6);
     });
 });

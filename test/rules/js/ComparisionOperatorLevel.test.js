@@ -167,7 +167,7 @@ describe('invoke function', () => {
         expect(result[0]).toHaveProperty('line', 3);
 
         expect(result[1]).toHaveProperty('start_line', 5);
-        expect(result[1]).toHaveProperty('position', 8);
+        expect(result[1]).toHaveProperty('line', 8);
     });
 
     it('returns review on invalid comparision style (strict equality)', () => {
@@ -199,7 +199,7 @@ describe('invoke function', () => {
         expect(result[0]).toHaveProperty('line', 3);
 
         expect(result[1]).toHaveProperty('start_line', 5);
-        expect(result[1]).toHaveProperty('position', 8);
+        expect(result[1]).toHaveProperty('line', 8);
     });
 
     it('returns review on invalid comparision style (Object.is)', () => {
@@ -231,6 +231,6 @@ describe('invoke function', () => {
         expect(result[0]).toHaveProperty('line', 3);
 
         expect(result[1]).toHaveProperty('start_line', 5);
-        expect(result[1]).toHaveProperty('position', 8);
+        expect(result[1]).toHaveProperty('line', 8);
     });
 });
