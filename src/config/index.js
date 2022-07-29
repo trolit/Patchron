@@ -14,7 +14,7 @@ module.exports = {
         isGetFilesRequestPaginated: false, // when `false`, getFiles can receive up to 3000 files
         delayBetweenCommentRequestsInSeconds: 3,
         isOwnerAssigningEnabled: true,
-        isReviewSummaryEnabled: false,
+        isReviewSummaryEnabled: true,
         isStoringLogsEnabled: true,
         maxCommentsPerReview: 25, // limit number of comments that can be added per single review
         senders: [] // pass GitHub usernames to limit people whose pull requests will be reviewed
