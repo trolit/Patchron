@@ -52,26 +52,7 @@ module.exports = [
             keywords: [
                 {
                     name: 'require',
-                    regex: /(.*require\(|^(const|let|var)(\s+)?{$)/,
-                    position: {
-                        BOF: true,
-                        custom: null
-                    },
-                    enforced: true,
-                    maxLineBreaks: 0,
-                    breakOnFirstOccurence: false,
-                    countDifferentCodeAsLineBreak: false,
-                    multiLineOptions: [
-                        {
-                            limiter: {
-                                startsWith: '} = require'
-                            }
-                        }
-                    ]
-                },
-                {
-                    name: 'import',
-                    regex: /import.*/,
+                    regex: /const.*(?:require|{)/,
                     position: {
                         BOF: true,
                         custom: null
@@ -83,11 +64,22 @@ module.exports = [
                     multiLineOptions: [
                         {
                             indicator: {
-                                notIncludes: 'from'
+                                notIncludes: 'require'
                             },
                             limiter: {
-                                startsWith: '} from'
+                                startsWith: '} = require',
+                                indentation: 'eq-indicator'
                             }
+                        }
+                    ],
+                    order: [
+                        {
+                            name: 'packages',
+                            expression: /require(?!.*@).*/
+                        },
+                        {
+                            name: 'other',
+                            expression: /require.*/
                         }
                     ]
                 }
