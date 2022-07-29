@@ -1,6 +1,6 @@
 const {
     common: {
-        MarkedCommentsRule,
+        MarkedCommentsRule: MarkedCommonCommentsRule,
         PositionedKeywordsRule,
         PredefinedFilenamesRule,
         LineBreakBeforeReturnRule,
@@ -21,7 +21,7 @@ const {
 
     vue: { SelfClosingTagRule, NormalizedEventHandlerRule },
 
-    html: { MarkedCommentsRule: MarkedCommentsHTMLRule }
+    html: { MarkedCommentsRule: MarkedHTMLCommentsRule }
 } = require('src/rules');
 
 const {
@@ -36,13 +36,13 @@ const {
 module.exports = [
     {
         enabled: true,
-        reference: MarkedCommentsRule,
+        reference: MarkedCommonCommentsRule,
         config: MarkedCommentsRuleConfig
     },
 
     {
         enabled: true,
-        reference: MarkedCommentsHTMLRule,
+        reference: MarkedHTMLCommentsRule,
         config: MarkedCommentsRuleConfig
     },
 
