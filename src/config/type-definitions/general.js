@@ -76,7 +76,7 @@
  * @property {string} body
  * @property {number} start_line line number (counted from hunk header '@@')
  * @property {'LEFT'|'RIGHT'} start_side which side line refers to (LEFT=deletion, RIGHT=addition)
- * @property {number} position  number of lines to take into review (counted from line after '@@')
+ * @property {number} line  line that marks end of multi-line comment
  * @property {string} path
  * @property {string} commit_id
  */
@@ -89,7 +89,6 @@
  * @property {string} body
  * @property {number} line line number (counted from hunk header '@@')
  * @property {'LEFT'|'RIGHT'} side which side line refers to (LEFT=deletion, RIGHT=addition)
- * @property {number} position  number of lines to take into review (counted from line after '@@')
  * @property {string} path
  * @property {string} commit_id
  */

@@ -165,7 +165,7 @@ describe('invoke function', () => {
         expect(result).toHaveLength(3);
 
         expect(result[0]).toHaveProperty('start_line', 5);
-        expect(result[0]).toHaveProperty('position', 4);
+        expect(result[0]).toHaveProperty('line', 8);
 
         expect(result[1]).toHaveProperty('line', 10);
 
@@ -230,7 +230,7 @@ describe('invoke function', () => {
         expect(result[1]).toHaveProperty('line', 3);
 
         expect(result[2]).toHaveProperty('start_line', 5);
-        expect(result[2]).toHaveProperty('position', 6);
+        expect(result[2]).toHaveProperty('line', 7);
     });
 
     it('returns empty array on valid inline comments', () => {
@@ -285,9 +285,9 @@ describe('invoke function', () => {
         expect(result).toHaveLength(2);
 
         expect(result[0]).toHaveProperty('start_line', 2);
-        expect(result[0]).toHaveProperty('position', 4);
+        expect(result[0]).toHaveProperty('line', 5);
 
         expect(result[1]).toHaveProperty('start_line', 6);
-        expect(result[1]).toHaveProperty('position', 7);
+        expect(result[1]).toHaveProperty('line', 8);
     });
 });

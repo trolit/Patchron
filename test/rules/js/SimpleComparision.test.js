@@ -175,10 +175,10 @@ describe('invoke function', () => {
         expect(result[3]).toHaveProperty('line', 18);
 
         expect(result[4]).toHaveProperty('start_line', 21);
-        expect(result[4]).toHaveProperty('position', 13);
+        expect(result[4]).toHaveProperty('line', 22);
 
         expect(result[5]).toHaveProperty('start_line', 26);
-        expect(result[5]).toHaveProperty('position', 18);
+        expect(result[5]).toHaveProperty('line', 27);
     });
 
     it('returns empty array on valid `eq/ne (null, undefined)` pattern', () => {
@@ -269,10 +269,10 @@ describe('invoke function', () => {
         expect(result[3]).toHaveProperty('line', 19);
 
         expect(result[4]).toHaveProperty('start_line', 22);
-        expect(result[4]).toHaveProperty('position', 14);
+        expect(result[4]).toHaveProperty('line', 23);
 
         expect(result[5]).toHaveProperty('start_line', 27);
-        expect(result[5]).toHaveProperty('position', 19);
+        expect(result[5]).toHaveProperty('line', 28);
     });
 
     it('returns empty array on valid `ne (-1)` pattern', () => {

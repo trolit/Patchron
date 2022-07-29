@@ -128,16 +128,16 @@ describe('invoke function', () => {
         expect(result).toHaveLength(5);
 
         expect(result[0]).toHaveProperty('start_line', 4);
-        expect(result[0]).toHaveProperty('position', 4);
+        expect(result[0]).toHaveProperty('line', 6);
 
         expect(result[1]).toHaveProperty('line', 7);
 
         expect(result[2]).toHaveProperty('start_line', 8);
-        expect(result[2]).toHaveProperty('position', 8);
+        expect(result[2]).toHaveProperty('line', 10);
 
         expect(result[3]).toHaveProperty('line', 17);
 
         expect(result[4]).toHaveProperty('start_line', 19);
-        expect(result[4]).toHaveProperty('position', 19);
+        expect(result[4]).toHaveProperty('line', 21);
     });
 });
