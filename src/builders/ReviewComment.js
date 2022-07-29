@@ -12,6 +12,7 @@ class ReviewCommentBuilder {
         this.basicInformation = {
             ...repo,
             commit_id,
+            path: file.filename,
             pull_number: pullRequest.id
         };
     }
