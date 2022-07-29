@@ -67,5 +67,5 @@ module.exports = async (patchronContext, reviewComments) => {
         await timer(delayBetweenCommentRequestsInSeconds * 1000);
     }
 
-    return numberOfPostedComments;
+    return Promise.resolve(numberOfPostedComments);
 };
