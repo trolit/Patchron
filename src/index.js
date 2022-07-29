@@ -8,12 +8,11 @@
 require('module-alias/register');
 
 const {
-    rules: { pull: pullRules }
-} = require('./config');
-const review = require('./rules/review');
-const {
+    rules: { pull: pullRules },
     settings: { senders, isOwnerAssigningEnabled, isReviewSummaryEnabled }
 } = require('./config');
+
+const review = require('./rules/review');
 const getFiles = require('./github/getFiles');
 const addAssignees = require('./github/addAssignees');
 const postSummary = require('./pull-request/postSummary');
@@ -30,9 +29,7 @@ module.exports = (app) => {
     app.on(['pull_request.opened'], async (context) => {
         patchronContext.initializePullRequestData(context);
 
-        const {
-            pullRequest: { owner }
-        } = context;
+        const { owner } = context.pullRequest();
 
         if (senders?.length && !senders.includes(owner)) {
             return;
@@ -48,19 +45,19 @@ module.exports = (app) => {
             const files = await getFiles(patchronContext);
 
             reviewComments.push(...reviewFiles(patchronContext, files));
+        }
 
-            const numberOfPostedComments = postComments(
+        const numberOfPostedComments = await postComments(
+            patchronContext,
+            reviewComments
+        );
+
+        if (isReviewSummaryEnabled) {
+            await postSummary(
                 patchronContext,
+                numberOfPostedComments,
                 reviewComments
             );
-
-            if (isReviewSummaryEnabled) {
-                await postSummary(
-                    patchronContext,
-                    numberOfPostedComments,
-                    reviewComments
-                );
-            }
         }
     });
 };
