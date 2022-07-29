@@ -8,7 +8,7 @@ const {
 } = require('@jest/globals');
 
 const {
-    common: { SelfClosingTagRule }
+    vue: { SelfClosingTagRule }
 } = require('src/rules');
 const setupPatchronContext = require('test/setupPatchronContext');
 const initializeFile = require('test/rules/helpers/initializeFile');

@@ -1,7 +1,6 @@
 const {
     common: {
         MarkedCommentsRule,
-        SelfClosingTagRule,
         PositionedKeywordsRule,
         PredefinedFilenamesRule,
         LineBreakBeforeReturnRule,
@@ -20,7 +19,7 @@ const {
         SimplePropertyAssignmentRule
     },
 
-    vue: { NormalizedEventHandlerRule },
+    vue: { SelfClosingTagRule, NormalizedEventHandlerRule },
 
     html: { MarkedCommentsRule: MarkedCommentsHTMLRule }
 } = require('src/rules');
