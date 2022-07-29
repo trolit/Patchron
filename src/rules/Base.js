@@ -85,13 +85,13 @@ class BaseRule {
 
         const start_line = this.helpers.getLineNumber(splitPatch, side, from);
 
-        const position = this.helpers.getPosition(splitPatch, to, side);
+        const line = this.helpers.getLineNumber(splitPatch, side, to);
 
         const comment = this.reviewCommentBuilder.buildMultiLineComment({
             body,
+            line,
             start_line,
-            start_side: side,
-            position
+            start_side: side
         });
 
         return comment;
