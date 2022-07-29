@@ -3,15 +3,15 @@ module.exports = {
         MarkedCommentsRuleConfig: {
             prefixes: [
                 {
-                    value: '@TODO:',
+                    value: '@TODO',
                     meaning: 'not implemented feature'
                 },
                 {
-                    value: '@TMP:',
+                    value: '@TMP',
                     meaning: 'temporary solution'
                 },
                 {
-                    value: '@NOTE:',
+                    value: '@NOTE',
                     meaning: 'information about package/code'
                 }
             ],

@@ -15,7 +15,7 @@ module.exports = (patchronContext, rules, file = null) => {
 
             const ruleComments = instance.invoke();
 
-            if (ruleComments.length) {
+            if (ruleComments?.length) {
                 comments.push(...ruleComments);
             }
         }
