@@ -119,6 +119,7 @@ For more details on how those objects can be arranged, refer to [general type de
 
 ## Links
 
+-   [Octokit Rest API](https://octokit.github.io/rest.js)
 -   [Deployments API example](https://developer.github.com/v3/repos/deployments/)
 -   [Probot docs](https://probot.github.io/docs/)
 -   [GitHub API - best practices](https://docs.github.com/en/rest/guides/best-practices-for-integrators)
