@@ -115,7 +115,7 @@ Rules that require more than single line of patch to perform their checking, are
 }
 ```
 
-For more details on how those objects can be arranged, refer to [common type definitions](https://github.com/trolit/Patchron/blob/82fb4bf73f3289d24a80a3775936e2a1432c8ead/src/config/type-definitions/common.js#L97).
+For more details on how those objects can be arranged, refer to [general type definitions](https://github.com/trolit/Patchron/blob/master/src/config/type-definitions/general.js).
 
 ## Links
 
