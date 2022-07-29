@@ -16,7 +16,7 @@ const addSingleLineReviewComment = require('src/github/addSingleLineReviewCommen
  * @param {PatchronContext} patchronContext
  * @param {Array<object>} reviewComments
  *
- * @returns {number} number of comments successfully posted to the GitHub
+ * @returns {Promise<number>} number of comments successfully posted to the GitHub
  */
 module.exports = async (patchronContext, reviewComments) => {
     const { log } = patchronContext;
