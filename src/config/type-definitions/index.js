@@ -2,7 +2,7 @@
  * Please, pin this file in IDE to have better documentation
  */
 
-/// <reference path="./common.js" />
+/// <reference path="./general.js" />
 
 /// <reference path="./rules/html/MarkedComments.js" />
 
