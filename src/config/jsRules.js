@@ -4,7 +4,6 @@ const {
         PositionedKeywordsRule,
         PredefinedFilenamesRule,
         LineBreakBeforeReturnRule,
-        IndividualMethodImportRule,
         SingleLineBlockPatternRule,
         KeywordsOrderedByLengthRule,
         ComparisionOperatorLevelRule,
@@ -15,6 +14,7 @@ const {
         SimpleComparisionRule,
         AsynchronousPatternRule,
         ImportWithoutExtensionRule,
+        IndividualMethodImportRule,
         ImplicitIndexFileImportRule,
         SimplePropertyAssignmentRule
     }
