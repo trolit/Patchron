@@ -1,4 +1,4 @@
-<img src="https://github.com/trolit/Patchron/blob/master/picture.jpg" alt="Patchron image" height="200"/>
+<img src="https://github.com/trolit/Patchron/blob/master/.github/picture.jpg" alt="Patchron image" height="200"/>
 
 # 🐶 Patchron
 
