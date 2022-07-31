@@ -4,6 +4,8 @@ class MarkedCommentsRule extends BaseRule {
     /**
      * ensures that in common comment blocks, at least one line begins with one of the predefined prefixes.
      *
+     * Best to combine it with Better Comments extension: {@link https://marketplace.visualstudio.com/items?itemName=aaron-bond.better-comments}
+     *
      * @param {PatchronContext} patchronContext
      * @param {MarkedCommonCommentsConfig} config
      * @param {Patch} file
