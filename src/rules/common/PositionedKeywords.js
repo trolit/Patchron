@@ -97,18 +97,15 @@ class PositionedKeywordsRule extends BaseRule {
             if (keyword?.multiLineOptions) {
                 const { multiLineOptions, regex } = keyword;
 
-                const multiLineStructure = this.helpers.getMultiLineStructure(
-                    data,
-                    index,
-                    multiLineOptions,
-                    regex
-                );
+                const { isMultiLine, endIndex } =
+                    this.helpers.getMultiLineStructure(
+                        data,
+                        index,
+                        multiLineOptions,
+                        regex
+                    );
 
-                const { isMultiLine } = multiLineStructure;
-
-                if (isMultiLine && ~multiLineStructure.endIndex) {
-                    const { endIndex } = multiLineStructure;
-
+                if (isMultiLine && ~endIndex) {
                     const multiLineContent = this.convertMultiLineToSingleLine(
                         data,
                         index,
@@ -123,6 +120,10 @@ class PositionedKeywordsRule extends BaseRule {
 
                     index = endIndex;
 
+                    continue;
+                }
+
+                if (isMultiLine) {
                     continue;
                 }
             }
