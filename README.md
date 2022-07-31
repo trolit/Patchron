@@ -3,12 +3,14 @@
 # 🐶 Patchron
 
 <p align="justify">
-implements set of rules to perform early pull request review and comment out cases that do not meet configuration. `Patchron` can be used to maintain conventions and speed up further code review done by members by handling out simple cases. It's worth mentioning that it won't work on minified files unless they will be beautified first.
+inteded to support in maintaining simple project conventions among project members and speeding up further code review done by humans by performing early pull request review once issued.
 </p>
 
-### Note
+### Disclaimers
 
-Review is based on patches which contain limited number of information. Due to that you may find some comments unrelevant to the situation but still those should be "rare cases".
+-   review is based on patches which contain limited number of information. Due to that you may find some comments unrelevant to the situation but still those should be "rare cases".
+
+-   review won't work on minified files unless they will be "beautified" first.
 
 ## Setup
 
@@ -19,7 +21,7 @@ npm install
 # Run the bot
 npm start
 
-# Complete bot configuration under given URL
+# Finish Probot configuration
 ```
 
 ## Docker
@@ -34,15 +36,15 @@ docker run -e APP_ID=<app-id> -e PRIVATE_KEY=<pem-value> patchron
 
 ## Settings
 
-| Property                               | Type (default)       | Description                                                                                                                           |
-| :------------------------------------- | :------------------- | :------------------------------------------------------------------------------------------------------------------------------------ |
-| `isGetFilesRequestPaginated`           | boolean (`false`)    | Controls how files are fetched. Unpaginated response includes a maximum of 3000 files which is sufficient in 99.9999999999% of cases. |
-| `delayBetweenCommentRequestsInSeconds` | Number (`3`)         | After review is done, delays time between each comment request to not overload API.                                                   |
-| `isOwnerAssigningEnabled`              | boolean (`true`)     | When true, PR owner will be automatically assigned once pull request will be issued.                                                  |
-| `isReviewSummaryEnabled`               | boolean (`false`)    | When true, at the end of the PR review summary is posted that contains various information e.g. how many comments were posts.         |
-| `isStoringLogsEnabled`                 | boolean (`true`)     | When true, stores logs physically in `/.logs` directory.                                                                              |
-| `maxCommentsPerReview`                 | Number (`25`)        | Limit number of comments that can be posted in single review under single PR.                                                         |
-| `senders`                              | Array<string> (`[]`) | Allows to limit pull requests reviews to certain users. Pass GitHub usernames.                                                        |
+| Property                               | Type (default)       | Description                                                                                                                             |
+| :------------------------------------- | :------------------- | :-------------------------------------------------------------------------------------------------------------------------------------- |
+| `isGetFilesRequestPaginated`           | boolean (`false`)    | Controls files fetching strategy. Unpaginated response includes a maximum of 3000 files which is sufficient in 99.9999999999% of cases. |
+| `delayBetweenCommentRequestsInSeconds` | Number (`3`)         | After review is done, delays time between each comment request to not overload API.                                                     |
+| `isOwnerAssigningEnabled`              | boolean (`true`)     | When true, PR owner will be automatically assigned on issueing pull request.                                                            |
+| `isReviewSummaryEnabled`               | boolean (`false`)    | When true, at the end of the PR review, Patchron posts summary that contains various information e.g. how many comments were posted.    |
+| `isStoringLogsEnabled`                 | boolean (`true`)     | When true, logs are also stored physically in `/.logs` directory.                                                                       |
+| `maxCommentsPerReview`                 | Number (`25`)        | Limits number of comments that can be posted in single review under single PR.                                                          |
+| `senders`                              | Array<string> (`[]`) | Allows to limit pull requests reviews to certain users. Pass GitHub usernames.                                                          |
 
 ## Short dev overview
 
