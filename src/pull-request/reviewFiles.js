@@ -42,12 +42,18 @@ module.exports = (patchronContext, files) => {
         const chunks = _splitPatchByHunkHeader(patch);
 
         for (const chunk of chunks) {
-            comments.push(
-                ...review(patchronContext, relatedRules, {
+            const fileChunkReviewComments = review(
+                patchronContext,
+                relatedRules,
+                {
                     ...file,
                     splitPatch: chunk
-                })
+                }
             );
+
+            if (fileChunkReviewComments?.length) {
+                comments.push(...fileChunkReviewComments);
+            }
         }
     }
 
