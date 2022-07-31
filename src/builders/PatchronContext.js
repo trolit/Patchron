@@ -46,8 +46,6 @@ class PatchronContextBuilder {
 
         const repo = context.repo();
 
-        this.log.setPullNumber(payload.number);
-
         const { login: owner } = payload.sender;
 
         this.pullRequest = {

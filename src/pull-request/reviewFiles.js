@@ -34,6 +34,11 @@ module.exports = (patchronContext, files) => {
         }
 
         const { patch } = file;
+
+        if (!patch) {
+            continue;
+        }
+
         const chunks = _splitPatchByHunkHeader(patch);
 
         for (const chunk of chunks) {

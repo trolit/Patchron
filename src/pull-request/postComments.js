@@ -9,7 +9,7 @@ const addSingleLineReviewComment = require('src/github/addSingleLineReviewCommen
 /**
  * **POST** review comments to GitHub.
  * When `reviewComment:`
- * - has `body`, it indicates that review comes from Pull Request Rule,
+ * - has `body`, it indicates that review comes from `Pull Request` Rule,
  * - has `start_line`, it indicates that it's file's multi-line comment,
  * - has `line`, it indicates that it's file's single-line comment.
  *
@@ -28,7 +28,7 @@ module.exports = async (patchronContext, reviewComments) => {
             'Invalid value set on maxCommentsPerReview setting. No comments posted.'
         );
 
-        return numberOfPostedComments;
+        return Promise.reject(numberOfPostedComments);
     }
 
     const reviewCommentsLength = reviewComments.length;

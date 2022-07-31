@@ -105,16 +105,32 @@ class SimplePropertyAssignmentRule extends BaseRule {
     }
 
     _isNotSimpleAssignment(testString) {
-        const splitTestString = testString.split(':');
+        let splitTestString = [testString];
 
-        if (splitTestString.length < 2) {
-            return false;
+        if (testString.includes(this.BLOCK_START)) {
+            splitTestString = testString.split(this.BLOCK_START);
         }
 
-        const propertyName = splitTestString[0].trim();
-        const propertyValue = splitTestString[1].trim();
+        for (const part of splitTestString) {
+            const splitPart = part.split(':');
 
-        return propertyName === propertyValue;
+            if (splitPart.length < 2) {
+                continue;
+            }
+
+            const propertyName = splitPart[0].trim();
+            const propertyValue = splitPart[1].trim();
+
+            if (!propertyValue) {
+                continue;
+            }
+
+            if (propertyName === propertyValue) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

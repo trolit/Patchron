@@ -1,30 +1,32 @@
-<img src="https://github.com/trolit/Patchron/blob/master/.github/picture.jpg" alt="Patchron image" height="200"/>
-
 # 🐶 Patchron
 
 <p align="justify">
-inteded to support in maintaining simple project conventions among project members and speeding up further code review done by humans by performing early pull request review once issued.
+app that supports team in maintaining simple project conventions and speeds up further code review excluding simple cases once PR is issued. 
 </p>
 
-### Disclaimers
+### Disclaimers ❗
 
--   review is based on patches which contain limited number of information. Due to that you may find some comments unrelevant to the situation but still those should be "rare cases".
+-   review is based upon patches which contain limited number of information. Due to that, some comments might be unrelevant to the situation. Despite of that, it's only matter of clicking resolve button while at the same time reviewers don't have to focus on simple things 😅
 
 -   review won't work on minified files unless they will be "beautified" first.
 
-## Setup
+## 1. Setup
 
 ```sh
-# Install dependencies
+# 0. Fork/Download
+
+# 1. Install dependencies
 npm install
 
-# Run the bot
+# 2. Configure rules
+
+# 3. Run the bot
 npm start
 
-# Finish Probot configuration
+# 4. Finish configuration
 ```
 
-## Docker
+## 2. Docker
 
 ```sh
 # 1. Build container
@@ -34,21 +36,23 @@ docker build -t patchron .
 docker run -e APP_ID=<app-id> -e PRIVATE_KEY=<pem-value> patchron
 ```
 
-## Settings
+## 3. Settings
 
-| Property                               | Type (default)       | Description                                                                                                                             |
-| :------------------------------------- | :------------------- | :-------------------------------------------------------------------------------------------------------------------------------------- |
-| `isGetFilesRequestPaginated`           | boolean (`false`)    | Controls files fetching strategy. Unpaginated response includes a maximum of 3000 files which is sufficient in 99.9999999999% of cases. |
-| `delayBetweenCommentRequestsInSeconds` | Number (`3`)         | After review is done, delays time between each comment request to not overload API.                                                     |
-| `isOwnerAssigningEnabled`              | boolean (`true`)     | When true, PR owner will be automatically assigned on issueing pull request.                                                            |
-| `isReviewSummaryEnabled`               | boolean (`false`)    | When true, at the end of the PR review, Patchron posts summary that contains various information e.g. how many comments were posted.    |
-| `isStoringLogsEnabled`                 | boolean (`true`)     | When true, logs are also stored physically in `/.logs` directory.                                                                       |
-| `maxCommentsPerReview`                 | Number (`25`)        | Limits number of comments that can be posted in single review under single PR.                                                          |
-| `senders`                              | Array<string> (`[]`) | Allows to limit pull requests reviews to certain users. Pass GitHub usernames.                                                          |
+| Property                               | Type (default)               | Description                                                                                                                             |
+| :------------------------------------- | :--------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------- |
+| `isGetFilesRequestPaginated`           | boolean (`false`)            | Controls files fetching strategy. Unpaginated response includes a maximum of 3000 files which is sufficient in 99.9999999999% of cases. |
+| `delayBetweenCommentRequestsInSeconds` | Number (`3`)                 | After review is done, delays time between each comment request to not overload API.                                                     |
+| `isOwnerAssigningEnabled`              | boolean (`true`)             | When true, PR owner will be automatically assigned on issueing pull request.                                                            |
+| `isReviewSummaryEnabled`               | boolean (`true`)             | When true, at the end of the PR review, Patchron posts summary that contains various information e.g. how many comments were posted.    |
+| `isStoringLogsEnabled`                 | boolean (`true`)             | When true, logs are also stored physically in `/.logs` directory.                                                                       |
+| `maxCommentsPerReview`                 | Number (`25`)                | Limits number of comments that can be posted in single review under single PR.                                                          |
+| `senders`                              | Array&lt;`string`&gt; (`[]`) | Allows to limit pull requests reviews to certain users. Pass GitHub usernames.                                                          |
 
-## Short dev overview
+## 4. Short dev overview
 
-Patch contains latest changes done to particular file. Here is example of how received data looks like:
+### 4.1. Basics
+
+As mentioned earlier, Patchron knowledge is based upon patches. Patch contains latest changes done to particular file. To understand it better, here is example of how received data looks like:
 
 ```js
 // first part (hunk) of file
@@ -72,8 +76,10 @@ Patch contains latest changes done to particular file. Here is example of how re
 ' };\n' +
 ```
 
+To understand how git identifies what was changed, removed or added (and in which line it happend), check explanation tab:
+
 <details>
-<summary>Things to note</summary>
+<summary>Explanation</summary>
 
 -   line that was added starts with `+`
 -   line that was removed starts with `-`
@@ -91,18 +97,22 @@ Hunk header e.g. `@@ -10,13 +10,7 @@` contains following information:
 
 </details>
 
-In almost all rules, received data is organized via `setupData` to easier further code analysis. Content is split by newline and each row contains default information mentioned below:
+### 4.2. Data processing
+
+In almost all rules in Patchron, received data is organized via [setupData](https://github.com/trolit/Patchron/blob/0cefee8ba7437f55d98c07f3cc67b310851f47d8/src/rules/Base.js#L105) to easier further code analysis. Content is split by newline and each row contains default information mentioned below:
 
 ```ts
 {
-    index: number,
+    index: number, // index in relation to full patch
     indentation: number,
     content: string,
     trimmedContent: string
 }
 ```
 
--   Indentation is great option to better identify relation between particular parts of code if needed.
+Few things to note:
+
+-   Indentation can be sometimes a must to identify relation between particular parts of source code.
 -   `trimmedContent` and `content` have line state signs removed. To addition content of lines that:
     -   are spacers, are replaced with `<<< newline >>>`
     -   were removed, are replaced with `<<< merge >>>`
@@ -117,18 +127,70 @@ Rules that require more than single line of patch to perform their checking, are
 }
 ```
 
-For more details on how those objects can be arranged, refer to [general type definitions](https://github.com/trolit/Patchron/blob/master/src/config/type-definitions/general.js).
+For more details on how those objects can be arranged, refer to [general type definitions](https://github.com/trolit/Patchron/blob/master/src/config/type-definitions/general.js) or check how it's used in config files.
 
-## Links
+### 4.3. Creating rule
+
+Creating new rule is relatively simple. Before making first step, pin to IDE [type definitions](https://github.com/trolit/Patchron/blob/master/src/config/type-definitions/index.js) to see what lies under e.g. `patchronContext`. Copy rule structure from another file or refer to template below and start coding.
+
+<details>
+<summary>Template</summary>
+
+```js
+const BaseRule = require('src/rules/Base');
+
+class PredefinedFilenamesRule extends BaseRule {
+    /**
+     * @param {PatchronContext} patchronContext
+     * @param {object} config
+     * @param {Patch} file
+     */
+    constructor(patchronContext, config, file) {
+        super(patchronContext, file);
+
+        // 0. load rule config (if needed)
+    }
+
+    invoke() {
+        // 1. setup data (if rule targets patch content)
+        const { splitPatch } = this.file;
+
+        const data = this.setupData(splitPatch);
+
+        const reviewComments = [];
+
+        // 2. apply logic to determine wrong cases
+
+        // 3. add comments to array
+
+        // 4. done
+        return reviewComments;
+    }
+
+    /**
+     * @returns {string}
+     */
+    _getCommentBody(filename, expectedName) {
+        return '';
+    }
+}
+
+module.exports = PredefinedFilenamesRule;
+```
+
+</details>
+
+## 5. Links
 
 -   [Octokit Rest API](https://octokit.github.io/rest.js)
 -   [Deployments API example](https://developer.github.com/v3/repos/deployments/)
 -   [Probot docs](https://probot.github.io/docs/)
+-   [Pino (logger)](https://getpino.io/#/)
 -   [GitHub API - best practices](https://docs.github.com/en/rest/guides/best-practices-for-integrators)
 -   [GitHub API - rate limits](https://docs.github.com/en/developers/apps/building-github-apps/rate-limits-for-github-apps)
 -   [GitHub API - pulls](https://docs.github.com/en/rest/reference/pulls)
 -   [Default picture](https://pixabay.com/vectors/dog-pet-hound-black-eye-animal-151123/)
 
-## Name origin
+## 6. Name origin
 
 Name simply comes from merging two words: Patch and [Patron](<https://en.wikipedia.org/wiki/Patron_(dog)>) 🐶

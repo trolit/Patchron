@@ -83,8 +83,6 @@ class KeywordsOrderedByLengthRule extends BaseRule {
                 continue;
             }
 
-            const matchResultTrimmedContent = matchResult[0].trim();
-
             if (keyword?.multiLineOptions) {
                 const { multiLineOptions } = keyword;
 
@@ -113,7 +111,7 @@ class KeywordsOrderedByLengthRule extends BaseRule {
 
             matchedRows.push({
                 index,
-                trimmedContent: matchResultTrimmedContent
+                trimmedContent
             });
         }
 
