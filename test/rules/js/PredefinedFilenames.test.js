@@ -90,7 +90,7 @@ describe('invoke function', () => {
 
         const result = predefinedFilenamesRule.invoke();
 
-        expect(result).toHaveLength(1);
+        expect(result).toHaveProperty('body');
     });
 
     it('returns null on valid predefined filename', () => {
@@ -120,7 +120,7 @@ describe('invoke function', () => {
 
         const result = predefinedFilenamesRule.invoke();
 
-        expect(result).toHaveLength(1);
+        expect(result).toHaveProperty('body');
     });
 
     it('returns object on invalid predefined filename (example2)', () => {
@@ -135,7 +135,7 @@ describe('invoke function', () => {
 
         const result = predefinedFilenamesRule.invoke();
 
-        expect(result).toHaveLength(1);
+        expect(result).toHaveProperty('body');
     });
 
     it('returns null on valid predefined filename (without asterisk)', () => {

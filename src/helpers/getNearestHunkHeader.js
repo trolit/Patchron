@@ -1,3 +1,5 @@
+const isArray = require('lodash/isArray');
+const isInteger = require('lodash/isInteger');
 const { HUNK_HEADER_INDICATOR } = require('src/config/constants');
 
 /**
@@ -28,8 +30,8 @@ module.exports = (splitPatch, rowIndex) => {
     let result = null;
 
     if (
-        !Array.isArray(splitPatch) ||
-        !Number.isInteger(rowIndex) ||
+        !isArray(splitPatch) ||
+        !isInteger(rowIndex) ||
         rowIndex >= splitPatch.length
     ) {
         return result;

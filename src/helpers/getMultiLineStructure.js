@@ -1,4 +1,5 @@
 const first = require('lodash/first');
+const isArray = require('lodash/isArray');
 const isEqual = require('lodash/isEqual');
 const isString = require('lodash/isString');
 const cloneDeep = require('lodash/cloneDeep');
@@ -32,7 +33,7 @@ module.exports = (data, currentLineIndex, multiLineOptions, matchRegex) => {
 
         const { limiter } = options;
 
-        if (Array.isArray(limiter)) {
+        if (isArray(limiter)) {
             for (const element of limiter) {
                 const endIndex = _findEndIndex(
                     data,
@@ -192,7 +193,7 @@ function _isIndentationValid(indentation, indicatorRow, limiterRow) {
         operatorName = operator;
         leftOperand = limiterRowIndentation;
         rightOperand = indicatorRowIndentation;
-    } else if (Array.isArray(indentation)) {
+    } else if (isArray(indentation)) {
         const [operator, value] = indentation;
 
         operatorName = operator;

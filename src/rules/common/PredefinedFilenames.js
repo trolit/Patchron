@@ -48,11 +48,9 @@ class PredefinedFilenamesRule extends BaseRule {
             const isFilenameValid = rawFilename.match(expectedName);
 
             if (isFilenameMatched && !isFilenameValid) {
-                return [
-                    {
-                        body: this._getCommentBody(filename, expectedName)
-                    }
-                ];
+                return {
+                    body: this._getCommentBody(filename, expectedName)
+                };
             }
         }
 

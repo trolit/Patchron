@@ -1,3 +1,6 @@
+const isArray = require('lodash/isArray');
+const isObject = require('lodash/isObject');
+
 /**
  * @param {PatchronContext} patchronContext
  * @param {Array<object>} rules
@@ -15,7 +18,9 @@ module.exports = (patchronContext, rules, file = null) => {
 
             const ruleComments = instance.invoke();
 
-            if (ruleComments?.length) {
+            if (isObject(ruleComments)) {
+                comments.push(ruleComments);
+            } else if (isArray(ruleComments) && ruleComments.length) {
                 comments.push(...ruleComments);
             }
         }
