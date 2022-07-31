@@ -29,7 +29,7 @@ module.exports = [
                     head: 'hotfix'
                 }
             ],
-            abortReviewOnInvalidFlow: true,
+            abortReviewOnInvalidFlow: false,
             abortReviewOnInvalidBranchPrefix: false
         }
     }

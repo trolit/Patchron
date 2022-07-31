@@ -8,12 +8,15 @@ const addComment = require('src/github/addComment');
  * **POST** pull request review summary
  *
  * @param {PatchronContext} patchronContext
+ * @param {Array<object>} reviewComments
  * @param {number} successfullyPostedComments number of comments posted to the GitHub
+ * @param {boolean} isReviewAborted
  */
 module.exports = async (
     patchronContext,
+    reviewComments,
     successfullyPostedComments,
-    reviewComments
+    isReviewAborted
 ) => {
     const { pullRequest, log } = patchronContext;
     const { pull_request } = pullRequest.context.payload;
@@ -22,7 +25,11 @@ module.exports = async (
     const unpostedComments = reviewComments.length - successfullyPostedComments;
     const unpostedCommentsStatus = `⚠️ ${unpostedComments} comments were not posted. (Comments limit per PR: ${maxCommentsPerReview})`;
 
-    const commentBody = `<em>pull request review completed ✅</em>
+    const title = `pull request review ${
+        isReviewAborted ? 'aborted 😥' : 'completed ✅'
+    }`;
+
+    const commentBody = `<em>${title}</em>
 
     ${unpostedComments > 0 ? unpostedCommentsStatus : ' '}
     :speech_balloon: ${

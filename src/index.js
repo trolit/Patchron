@@ -40,8 +40,9 @@ module.exports = (app) => {
         }
 
         const reviewComments = review(patchronContext, pullRules);
+        const isReviewAborted = _isReviewAborted(reviewComments);
 
-        if (!isReviewAborted(reviewComments)) {
+        if (!isReviewAborted) {
             const files = await getFiles(patchronContext);
 
             reviewComments.push(...reviewFiles(patchronContext, files));
@@ -55,14 +56,15 @@ module.exports = (app) => {
         if (isReviewSummaryEnabled) {
             await postSummary(
                 patchronContext,
+                reviewComments,
                 numberOfPostedComments,
-                reviewComments
+                isReviewAborted
             );
         }
     });
 };
 
-function isReviewAborted(reviewComments) {
+function _isReviewAborted(reviewComments) {
     return (
         reviewComments.length &&
         reviewComments.some((comment) => comment.isReviewAborted)
