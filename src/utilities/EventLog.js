@@ -4,10 +4,6 @@ class EventLog {
         this.log = log;
     }
 
-    setPullNumber(pullNumber) {
-        this.pullNumber = pullNumber || -1;
-    }
-
     /**
      * @param {string} filename
      * @param {string} message
@@ -28,7 +24,6 @@ class EventLog {
 
         this.log.error(
             {
-                pullNumber: this.pullNumber,
                 ...logData,
                 triggeredAt: filename,
                 ...additionalData
@@ -51,7 +46,6 @@ class EventLog {
 
         this.log.info(
             {
-                pullNumber: this.pullNumber,
                 triggeredAt: filename,
                 ...additionalData
             },
@@ -81,7 +75,6 @@ class EventLog {
 
         this.log.warn(
             {
-                pullNumber: this.pullNumber,
                 ...logData,
                 triggeredAt: filename,
                 ...additionalData
@@ -102,7 +95,6 @@ class EventLog {
         }
 
         this.log.fatal({
-            pullNumber: this.pullNumber,
             error,
             ...additionalData
         });
