@@ -1,3 +1,5 @@
+<img src="./.github/images/banner.png">
+
 # 🐶 Patchron
 
 <p align="justify">
