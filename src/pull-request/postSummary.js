@@ -1,4 +1,7 @@
 const dedent = require('dedent-js');
+const {
+    settings: { maxCommentsPerReview }
+} = require('src/config');
 const addComment = require('src/github/addComment');
 
 /**
@@ -17,20 +20,20 @@ module.exports = async (
     const { commits, additions, deletions, changed_files } = pull_request;
 
     const unpostedComments = reviewComments.length - successfullyPostedComments;
-    const postedCommentsStatus = `:warning: ${unpostedComments} comments were not posted. Check logs for details.`;
+    const unpostedCommentsStatus = `⚠️ ${unpostedComments} comments were not posted. (Comments limit per PR: ${maxCommentsPerReview})`;
 
-    const commentBody = `<em>pull request review completed</em>
+    const commentBody = `<em>pull request review completed ✅</em>
 
-    ${unpostedComments > 0 ? postedCommentsStatus : ' '}
+    ${unpostedComments > 0 ? unpostedCommentsStatus : ' '}
     :speech_balloon: ${
         reviewComments.length
             ? `${reviewComments.length} comment(s) require attention.`
             : `0 comments added :star: :star:`
     }
-    :hammer: ${commits} commit(s)
-    :heavy_plus_sign: ${additions} additions
-    :heavy_minus_sign: ${deletions} deletions
-    :heavy_division_sign: ${changed_files} changed files
+    🔨 ${commits} commit(s)
+    ➕ ${additions} additions
+    ➖ ${deletions} deletions
+    ➗ ${changed_files} changed files
     `;
 
     try {

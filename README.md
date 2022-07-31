@@ -38,15 +38,15 @@ docker run -e APP_ID=<app-id> -e PRIVATE_KEY=<pem-value> patchron
 
 ## 3. Settings
 
-| Property                               | Type (default)             | Description                                                                                                                             |
-| :------------------------------------- | :------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------- |
-| `isGetFilesRequestPaginated`           | boolean (`false`)          | Controls files fetching strategy. Unpaginated response includes a maximum of 3000 files which is sufficient in 99.9999999999% of cases. |
-| `delayBetweenCommentRequestsInSeconds` | Number (`3`)               | After review is done, delays time between each comment request to not overload API.                                                     |
-| `isOwnerAssigningEnabled`              | boolean (`true`)           | When true, PR owner will be automatically assigned on issueing pull request.                                                            |
-| `isReviewSummaryEnabled`               | boolean (`true`)           | When true, at the end of the PR review, Patchron posts summary that contains various information e.g. how many comments were posted.    |
-| `isStoringLogsEnabled`                 | boolean (`true`)           | When true, logs are also stored physically in `/.logs` directory.                                                                       |
-| `maxCommentsPerReview`                 | Number (`25`)              | Limits number of comments that can be posted in single review under single PR.                                                          |
-| `senders`                              | Array&lt;string&gt; (`[]`) | Allows to limit pull requests reviews to certain users. Pass GitHub usernames.                                                          |
+| Property                               | Type (default)               | Description                                                                                                                             |
+| :------------------------------------- | :--------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------- |
+| `isGetFilesRequestPaginated`           | boolean (`false`)            | Controls files fetching strategy. Unpaginated response includes a maximum of 3000 files which is sufficient in 99.9999999999% of cases. |
+| `delayBetweenCommentRequestsInSeconds` | Number (`3`)                 | After review is done, delays time between each comment request to not overload API.                                                     |
+| `isOwnerAssigningEnabled`              | boolean (`true`)             | When true, PR owner will be automatically assigned on issueing pull request.                                                            |
+| `isReviewSummaryEnabled`               | boolean (`true`)             | When true, at the end of the PR review, Patchron posts summary that contains various information e.g. how many comments were posted.    |
+| `isStoringLogsEnabled`                 | boolean (`true`)             | When true, logs are also stored physically in `/.logs` directory.                                                                       |
+| `maxCommentsPerReview`                 | Number (`25`)                | Limits number of comments that can be posted in single review under single PR.                                                          |
+| `senders`                              | Array&lt;`string`&gt; (`[]`) | Allows to limit pull requests reviews to certain users. Pass GitHub usernames.                                                          |
 
 ## 4. Short dev overview
 
