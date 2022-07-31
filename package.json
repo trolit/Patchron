@@ -48,7 +48,6 @@
     "node": ">= 16.15.0"
   },
   "jest": {
-    "testEnvironment": "node",
     "moduleNameMapper": {
       "^@root(.*)$": "<rootDir>",
       "^src(.*)$": "<rootDir>/src$1",
