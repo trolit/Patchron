@@ -89,6 +89,47 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
+    it('returns empty array on insufficient comment part', () => {
+        const markedCommentsRule = new MarkedCommentsRule(
+            patchronContext,
+            validConfig,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +2,15 @@`,
+                    `/* `,
+                    `* line -> 1 (unchanged)`
+                ]
+            }
+        );
+
+        const result = markedCommentsRule.invoke();
+
+        expect(result).toEqual([]);
+    });
+
+    it('returns empty array on valid single line comments', () => {
+        const markedCommentsRule = new MarkedCommentsRule(
+            patchronContext,
+            validConfig,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +10,7 @@        // TODO: my imports`,
+                    `+const payload = require('./fixtures/pull_request.opened');`,
+                    `+const fs = require('fs');`,
+                    `        // !: unchanged line comment `,
+                    `+`,
+                    `+const { expect, test, beforeEach, afterEach } = require('@jest/globals');`
+                ]
+            }
+        );
+
+        const result = markedCommentsRule.invoke();
+
+        expect(result).toEqual([]);
+    });
+
     it('returns review on invalid single line comments', () => {
         const markedCommentsRule = new MarkedCommentsRule(
             patchronContext,
@@ -115,19 +156,27 @@ describe('invoke function', () => {
         expect(result[0]).toHaveProperty('line', 12);
     });
 
-    it('returns empty array on valid single line comments', () => {
+    it('returns empty array on valid multi-line comments', () => {
         const markedCommentsRule = new MarkedCommentsRule(
             patchronContext,
             validConfig,
             {
                 ...file,
                 splitPatch: [
-                    `@@ -10,13 +10,7 @@        // TODO: my imports`,
+                    `@@ -10,13 +5,15 @@`,
+                    `+/**`,
+                    `+* -> 1`,
+                    `+* TMP: -> 2`,
+                    `+*/`,
                     `+const payload = require('./fixtures/pull_request.opened');`,
+                    `+/* *: multi-line comment as one-liner */`,
+                    `+/**: multi-line comment as one-liner */`,
                     `+const fs = require('fs');`,
-                    `        // !: unchanged line comment `,
                     `+`,
-                    `+const { expect, test, beforeEach, afterEach } = require('@jest/globals');`
+                    `+const { expect, test, beforeEach, afterEach } = require('@jest/globals'); /*`,
+                    `+* !: in inline flavour`,
+                    `+*/`,
+                    `-/* removed comment */`
                 ]
             }
         );
@@ -172,25 +221,19 @@ describe('invoke function', () => {
         expect(result[2]).toHaveProperty('line', 11);
     });
 
-    it('returns empty array on valid multi-line comments', () => {
+    it('returns empty array on valid inline comments', () => {
         const markedCommentsRule = new MarkedCommentsRule(
             patchronContext,
             validConfig,
             {
                 ...file,
                 splitPatch: [
-                    `@@ -10,13 +5,15 @@`,
-                    `+/**`,
-                    `+* -> 1`,
-                    `+* TMP: -> 2`,
-                    `+*/`,
-                    `+const payload = require('./fixtures/pull_request.opened');`,
-                    `+/* *: multi-line comment as one-liner */`,
-                    `+/**: multi-line comment as one-liner */`,
-                    `+const fs = require('fs');`,
+                    `@@ -10,13 +2,15 @@`,
+                    `+const payload = require('./fixtures/pull_request.opened'); // *: inline comment 1`,
+                    `+const fs = require('fs'); /* !: inline comment 2 */`,
                     `+`,
-                    `+const { expect, test, beforeEach, afterEach } = require('@jest/globals'); /*`,
-                    `+* !: in inline flavour`,
+                    `+const { expect, test, beforeEach, afterEach } = require('@jest/globals'); /* `,
+                    `+* !: inline comment 3`,
                     `+*/`,
                     `-/* removed comment */`
                 ]
@@ -231,30 +274,6 @@ describe('invoke function', () => {
 
         expect(result[2]).toHaveProperty('start_line', 5);
         expect(result[2]).toHaveProperty('line', 7);
-    });
-
-    it('returns empty array on valid inline comments', () => {
-        const markedCommentsRule = new MarkedCommentsRule(
-            patchronContext,
-            validConfig,
-            {
-                ...file,
-                splitPatch: [
-                    `@@ -10,13 +2,15 @@`,
-                    `+const payload = require('./fixtures/pull_request.opened'); // *: inline comment 1`,
-                    `+const fs = require('fs'); /* !: inline comment 2 */`,
-                    `+`,
-                    `+const { expect, test, beforeEach, afterEach } = require('@jest/globals'); /* `,
-                    `+* !: inline comment 3`,
-                    `+*/`,
-                    `-/* removed comment */`
-                ]
-            }
-        );
-
-        const result = markedCommentsRule.invoke();
-
-        expect(result).toEqual([]);
     });
 
     it('returns review with correct range on invalid multi-line comments', () => {

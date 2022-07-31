@@ -55,7 +55,7 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
-    it('returns review on import with extension (ES module)', () => {
+    it('returns review on explicit index import (ES module)', () => {
         const implicitIndexFileImportRule = new ImplicitIndexFileImportRule(
             patchronContext,
             moduleConfig,
@@ -105,7 +105,7 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
-    it('returns review on import with extension (commonJS module)', () => {
+    it('returns review on explicit index import (commonJS module)', () => {
         const implicitIndexFileImportRule = new ImplicitIndexFileImportRule(
             patchronContext,
             commonJsConfig,

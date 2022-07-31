@@ -33,6 +33,12 @@ describe('invoke function', () => {
         nock.enableNetConnect();
     });
 
+    /**
+     * ---------------------------------------------------
+     * FOR LOOP
+     * ---------------------------------------------------
+     */
+
     it('returns empty array on valid single-line for loop condition statement', () => {
         const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
             patchronContext,
@@ -76,6 +82,25 @@ describe('invoke function', () => {
         expect(result).toHaveLength(1);
 
         expect(result[0]).toHaveProperty('line', 6);
+    });
+
+    it('returns empty array on insufficient multi-line for loop fragment', () => {
+        const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
+            patchronContext,
+            config,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +6,15 @@`,
+                    `+for (`,
+                    `+    let index = 0,`
+                ]
+            }
+        );
+
+        const result = fixedLoopLengthConditionRule.invoke();
+
+        expect(result).toEqual([]);
     });
 
     it('returns empty array on valid multi-line for loop condition statement (example 1)', () => {
@@ -123,26 +148,6 @@ describe('invoke function', () => {
                     `+    const a = doSomething();`,
                     `+    if (index === dataLength - 1) { break; }`,
                     `+}`
-                ]
-            }
-        );
-
-        const result = fixedLoopLengthConditionRule.invoke();
-
-        expect(result).toEqual([]);
-    });
-
-    it('returns empty array on valid multi-line for loop fragment', () => {
-        const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
-            patchronContext,
-            config,
-            {
-                ...file,
-                splitPatch: [
-                    `@@ -10,13 +6,15 @@`,
-                    `+const dataLength = data.length;`,
-                    `+for (`,
-                    `+    let index = 0,`
                 ]
             }
         );
@@ -208,6 +213,12 @@ describe('invoke function', () => {
 
         expect(result[0]).toHaveProperty('line', 7);
     });
+
+    /**
+     * ---------------------------------------------------
+     * WHILE LOOP
+     * ---------------------------------------------------
+     */
 
     it('returns empty array on valid single-line while loop condition statement', () => {
         const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(
@@ -377,6 +388,12 @@ describe('invoke function', () => {
 
         expect(result[0]).toHaveProperty('line', 6);
     });
+
+    /**
+     * ---------------------------------------------------
+     * DO WHILE LOOP
+     * ---------------------------------------------------
+     */
 
     it('returns empty array on valid do..while loop condition statement', () => {
         const fixedLoopLengthConditionRule = new FixedLoopLengthConditionRule(

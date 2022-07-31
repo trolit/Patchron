@@ -98,6 +98,31 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
+    it('returns empty array on valid ascending `import` group order', () => {
+        const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
+            patchronContext,
+            validConfig,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    ` import dedent from 'dedent-js'`,
+                    `+import getLastNumber from '../helpers/getLastNumber'`,
+                    `+import usersController from '../controllers/UsersController'`,
+                    `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`,
+                    `+`,
+                    `+import baseHelper from 'helpers/base'`,
+                    `+`,
+                    `+import staticFiles from '../../assets'`
+                ]
+            }
+        );
+
+        const result = keywordsOrderedByLengthRule.invoke();
+
+        expect(result).toEqual([]);
+    });
+
     it('returns review on invalid `import` group order', () => {
         const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
             patchronContext,
@@ -126,7 +151,7 @@ describe('invoke function', () => {
         expect(result[0]).toHaveProperty('line', 8);
     });
 
-    it('returns empty array on valid ascending `import` group order', () => {
+    it('returns empty array on valid ascending `import` groups order', () => {
         const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
             patchronContext,
             validConfig,
@@ -140,7 +165,6 @@ describe('invoke function', () => {
                     `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`,
                     `+`,
                     `+import baseHelper from 'helpers/base'`,
-                    `+`,
                     `+import staticFiles from '../../assets'`
                 ]
             }
@@ -178,20 +202,31 @@ describe('invoke function', () => {
         expect(result[0]).toHaveProperty('line', 10);
     });
 
-    it('returns empty array on valid ascending `import` groups order', () => {
+    it('returns empty array on valid descending `import` group order', () => {
         const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
             patchronContext,
-            validConfig,
+            {
+                keywords: [
+                    {
+                        ...importKeywordConfig,
+                        order: 'descending'
+                    }
+                ]
+            },
             {
                 ...file,
                 splitPatch: [
                     `@@ -10,13 +5,7 @@`,
-                    ` import dedent from 'dedent-js'`,
-                    `+import getLastNumber from '../helpers/getLastNumber'`,
-                    `+import usersController from '../controllers/UsersController'`,
                     `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`,
+                    `+import usersController from '../controllers/UsersController'`,
+                    `+import getLastNumber from '../helpers/getLastNumber'`,
+                    `+import {`,
+                    `+    dedent,`,
+                    `+    dedent2`,
+                    `+} from 'dedent-js'`,
                     `+`,
                     `+import baseHelper from 'helpers/base'`,
+                    `+`,
                     `+import staticFiles from '../../assets'`
                 ]
             }
@@ -237,14 +272,15 @@ describe('invoke function', () => {
         expect(result[0]).toHaveProperty('line', 8);
     });
 
-    it('returns empty array on valid descending `import` group order', () => {
+    it('returns empty array on valid `import` order with ignoreNewline enabled', () => {
         const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
             patchronContext,
             {
                 keywords: [
                     {
                         ...importKeywordConfig,
-                        order: 'descending'
+                        order: 'ascending',
+                        ignoreNewline: true
                     }
                 ]
             },
@@ -252,17 +288,15 @@ describe('invoke function', () => {
                 ...file,
                 splitPatch: [
                     `@@ -10,13 +5,7 @@`,
-                    `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`,
-                    `+import usersController from '../controllers/UsersController'`,
-                    `+import getLastNumber from '../helpers/getLastNumber'`,
                     `+import {`,
                     `+    dedent,`,
                     `+    dedent2`,
                     `+} from 'dedent-js'`,
-                    `+`,
                     `+import baseHelper from 'helpers/base'`,
-                    `+`,
-                    `+import staticFiles from '../../assets'`
+                    `+import staticFiles from '../../assets'`,
+                    `+import getLastNumber from '../helpers/getLastNumber'`,
+                    `+import usersController from '../controllers/UsersController'`,
+                    `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`
                 ]
             }
         );
@@ -314,40 +348,6 @@ describe('invoke function', () => {
         expect(result[2]).toHaveProperty('line', 13);
 
         expect(result[3]).toHaveProperty('line', 15);
-    });
-
-    it('returns empty array on valid `import` order with ignoreNewline enabled', () => {
-        const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
-            patchronContext,
-            {
-                keywords: [
-                    {
-                        ...importKeywordConfig,
-                        order: 'ascending',
-                        ignoreNewline: true
-                    }
-                ]
-            },
-            {
-                ...file,
-                splitPatch: [
-                    `@@ -10,13 +5,7 @@`,
-                    `+import {`,
-                    `+    dedent,`,
-                    `+    dedent2`,
-                    `+} from 'dedent-js'`,
-                    `+import baseHelper from 'helpers/base'`,
-                    `+import staticFiles from '../../assets'`,
-                    `+import getLastNumber from '../helpers/getLastNumber'`,
-                    `+import usersController from '../controllers/UsersController'`,
-                    `+import socialMediaIconProvider from '../helpers/icons/socialMediaIconProvider'`
-                ]
-            }
-        );
-
-        const result = keywordsOrderedByLengthRule.invoke();
-
-        expect(result).toEqual([]);
     });
 
     it('returns empty array on valid `import` order split into packages and components', () => {

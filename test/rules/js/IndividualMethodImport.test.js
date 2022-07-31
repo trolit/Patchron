@@ -52,6 +52,26 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
+    it('returns empty array on valid lodash cloneDeep require', () => {
+        const individualMethodImportRule = new IndividualMethodImportRule(
+            patchronContext,
+            validConfig,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +10,5 @@`,
+                    `-const y = 2;`,
+                    `+const cloneDeep = require('lodash/cloneDeep');`,
+                    `+`
+                ]
+            }
+        );
+
+        const result = individualMethodImportRule.invoke();
+
+        expect(result).toEqual([]);
+    });
+
     it('returns review on invalid lodash cloneDeep require', () => {
         const individualMethodImportRule = new IndividualMethodImportRule(
             patchronContext,
@@ -82,7 +102,7 @@ describe('invoke function', () => {
         expect(result[1]).toHaveProperty('line', 16);
     });
 
-    it('returns empty array on valid lodash cloneDeep require', () => {
+    it('returns empty array on valid lodash cloneDeep import', () => {
         const individualMethodImportRule = new IndividualMethodImportRule(
             patchronContext,
             validConfig,
@@ -91,7 +111,7 @@ describe('invoke function', () => {
                 splitPatch: [
                     `@@ -10,13 +10,5 @@`,
                     `-const y = 2;`,
-                    `+const cloneDeep = require('lodash/cloneDeep');`,
+                    `+import cloneDeep from 'lodash/cloneDeep';`,
                     `+`
                 ]
             }
@@ -130,25 +150,5 @@ describe('invoke function', () => {
         expect(result[0]).toHaveProperty('line', 10);
 
         expect(result[1]).toHaveProperty('line', 16);
-    });
-
-    it('returns empty array on valid lodash cloneDeep import', () => {
-        const individualMethodImportRule = new IndividualMethodImportRule(
-            patchronContext,
-            validConfig,
-            {
-                ...file,
-                splitPatch: [
-                    `@@ -10,13 +10,5 @@`,
-                    `-const y = 2;`,
-                    `+import cloneDeep from 'lodash/cloneDeep';`,
-                    `+`
-                ]
-            }
-        );
-
-        const result = individualMethodImportRule.invoke();
-
-        expect(result).toEqual([]);
     });
 });
