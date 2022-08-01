@@ -8,16 +8,21 @@ require('dotenv').config({
     path: '@root/.env'
 });
 
+const senders = process.env.SENDERS;
+const maxCommentsPerReview = process.env.MAX_COMMENTS_PER_REVIEW;
+
 module.exports = {
     nodeEnvironment: process.env.NODE_ENV,
     settings: {
-        isGetFilesRequestPaginated: false, // when `false`, getFiles can receive up to 3000 files
+        isGetFilesRequestPaginated: false,
         delayBetweenCommentRequestsInSeconds: 3,
         isOwnerAssigningEnabled: true,
         isReviewSummaryEnabled: true,
         isStoringLogsEnabled: true,
-        maxCommentsPerReview: 25, // limit number of comments that can be added per single review
-        senders: [] // pass GitHub usernames to limit people whose pull requests will be reviewed
+        maxCommentsPerReview: maxCommentsPerReview
+            ? parseInt(maxCommentsPerReview)
+            : 25,
+        senders: senders ? senders.split(',') : []
     },
     rules: {
         pull,

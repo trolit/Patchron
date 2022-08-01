@@ -8,24 +8,28 @@ app that supports team in maintaining simple project conventions and speeds up f
 
 ### Disclaimers ❗
 
--   review is based upon patches which contain limited number of information. Due to that, some comments might be unrelevant to the situation. Despite of that, it's only matter of clicking resolve button while at the same time reviewers don't have to focus on simple things 😅
+-   review is based upon **patches** which contain limited number of information. Due to that, some comments might be unrelevant to the situation. Despite of that, it comes to clicking resolve button while at the same time reviewers don't have to focus on simple things.
 
--   review won't work on minified files unless they will be "beautified" first.
+-   review won't work on minified files. Beautifying patches is not an option due to possibility of receiving only part of code.
+
+-   app was tested on basic Prettier configuration ([tabWidth](https://prettier.io/docs/en/options.html#tab-width): 4, [printWidth](https://prettier.io/docs/en/options.html#print-width): 80)
 
 ## 1. Setup
 
 ```sh
-# 0. Fork/Download
+# 0. Fork or Download
 
 # 1. Install dependencies
 npm install
 
-# 2. Configure rules
+# 2. Configure app (config/index.js) & rules
 
 # 3. Run the bot
 npm start
 
-# 4. Finish configuration
+# 4. Configure APP_ID and PRIVATE_KEY in .env
+https://github.com/settings/apps
+
 ```
 
 ## 2. Docker
@@ -36,6 +40,10 @@ docker build -t patchron .
 
 # 2. Start container
 docker run -e APP_ID=<app-id> -e PRIVATE_KEY=<pem-value> patchron
+
+e.g. more options:
+-e SENDERS=<usernames-separated-by-comma>
+-e MAX_COMMENTS_PER_REVIEW=<number>
 ```
 
 ## 3. Settings

@@ -2,7 +2,7 @@
 // *
 // * Patchron
 // * 18.01.2022
-// * 1.0.0 - 31.07.2022
+// * v1.0.0 - 31.07.2022
 // * https://github.com/trolit/Patchron/
 // * -made with Probot
 // *
