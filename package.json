@@ -57,7 +57,8 @@
   },
   "main": "src/index.js",
   "directories": {
-    "test": "test"
+    "test": "test",
+    "src":"src"
   },
   "repository": {
     "type": "git",
