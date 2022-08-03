@@ -12,11 +12,17 @@ require('module-alias/register');
 
 const {
     rules: { pull: pullRules },
-    settings: { senders, isOwnerAssigningEnabled, isReviewSummaryEnabled }
+    settings: {
+        senders,
+        isReviewSummaryEnabled,
+        isOwnerAssigningEnabled,
+        approvePullOnEmptyReviewComments
+    }
 } = require('./config');
 
 const review = require('./rules/review');
 const getFiles = require('./github/getFiles');
+const approvePull = require('./github/createReview');
 const addAssignees = require('./github/addAssignees');
 const postSummary = require('./pull-request/postSummary');
 const reviewFiles = require('./pull-request/reviewFiles');
@@ -63,6 +69,10 @@ module.exports = (app) => {
                 numberOfPostedComments,
                 isReviewAborted
             );
+        }
+
+        if (approvePullOnEmptyReviewComments && !reviewComments.length) {
+            await approvePull(patchronContext, { event: 'APPROVE' });
         }
     });
 };
