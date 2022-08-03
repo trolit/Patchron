@@ -7,7 +7,17 @@ const pull = require('./pullRules');
 const dotenv = require('dotenv').config();
 const dotenvParseVariables = require('dotenv-parse-variables');
 
-let settings = {};
+let settings = {
+    senders: [],
+    maxCommentsPerReview: 25,
+    isStoringLogsEnabled: true,
+    isOwnerAssigningEnabled: true,
+    isReviewSummaryEnabled: false,
+    isGetFilesRequestPaginated: false,
+    approvePullOnEmptyReviewComments: true,
+    delayBetweenCommentRequestsInSeconds: 3
+};
+
 const NODE_ENV = process.env.NODE_ENV;
 
 if (process.env.NODE_ENV !== 'test') {
@@ -25,15 +35,15 @@ if (process.env.NODE_ENV !== 'test') {
     } = env;
 
     settings = {
-        isGetFilesRequestPaginated: IS_GET_FILES_REQUEST_PAGINATED,
+        senders: SENDERS,
+        isStoringLogsEnabled: IS_STORING_LOGS_ENABLED,
+        maxCommentsPerReview: MAX_COMMENTS_PER_REVIEW,
         delayBetweenCommentRequestsInSeconds:
             DELAY_BETWEEN_COMMENT_REQUESTS_IN_SECONDS,
-        isOwnerAssigningEnabled: IS_OWNER_ASSIGNING_ENABLED,
         isReviewSummaryEnabled: IS_REVIEW_SUMMARY_ENABLED,
-        isStoringLogsEnabled: IS_STORING_LOGS_ENABLED,
-        approvePullOnEmptyReviewComments: APPROVE_PULL_ON_EMPTY_REVIEW_COMMENTS,
-        maxCommentsPerReview: MAX_COMMENTS_PER_REVIEW,
-        senders: SENDERS
+        isOwnerAssigningEnabled: IS_OWNER_ASSIGNING_ENABLED,
+        isGetFilesRequestPaginated: IS_GET_FILES_REQUEST_PAGINATED,
+        approvePullOnEmptyReviewComments: APPROVE_PULL_ON_EMPTY_REVIEW_COMMENTS
     };
 }
 
