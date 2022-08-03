@@ -17,8 +17,9 @@ module.exports = {
         isGetFilesRequestPaginated: false,
         delayBetweenCommentRequestsInSeconds: 3,
         isOwnerAssigningEnabled: true,
-        isReviewSummaryEnabled: true,
+        isReviewSummaryEnabled: false,
         isStoringLogsEnabled: true,
+        approvePullOnEmptyReviewComments: true,
         maxCommentsPerReview: maxCommentsPerReview
             ? parseInt(maxCommentsPerReview)
             : 25,
