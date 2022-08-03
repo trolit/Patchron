@@ -1,40 +1,34 @@
 /* eslint-disable no-inline-comments */
 
+const fs = require('fs');
+const dotenvParseVariables = require('dotenv-parse-variables');
+
 const js = require('./jsRules');
 const vue = require('./vueRules');
 const pull = require('./pullRules');
 
-const dotenv = require('dotenv').config();
-const dotenvParseVariables = require('dotenv-parse-variables');
+const env = '.env';
+const defaultEnv = '.env.default';
 
-let settings = {
-    senders: [],
-    maxCommentsPerReview: 25,
-    isStoringLogsEnabled: true,
-    isOwnerAssigningEnabled: true,
-    isReviewSummaryEnabled: false,
-    isGetFilesRequestPaginated: false,
-    approvePullOnEmptyReviewComments: true,
-    delayBetweenCommentRequestsInSeconds: 3
-};
+const dotenv = require('dotenv').config({
+    path: fs.existsSync(env) ? env : defaultEnv
+});
 
-const NODE_ENV = process.env.NODE_ENV;
+const parsedEnv = dotenvParseVariables(dotenv.parsed);
 
-if (process.env.NODE_ENV !== 'test') {
-    const env = dotenvParseVariables(dotenv.parsed);
+const {
+    SENDERS,
+    IS_STORING_LOGS_ENABLED,
+    MAX_COMMENTS_PER_REVIEW,
+    IS_REVIEW_SUMMARY_ENABLED,
+    IS_OWNER_ASSIGNING_ENABLED,
+    IS_GET_FILES_REQUEST_PAGINATED,
+    APPROVE_PULL_ON_EMPTY_REVIEW_COMMENTS,
+    DELAY_BETWEEN_COMMENT_REQUESTS_IN_SECONDS
+} = parsedEnv;
 
-    const {
-        SENDERS,
-        IS_STORING_LOGS_ENABLED,
-        MAX_COMMENTS_PER_REVIEW,
-        IS_REVIEW_SUMMARY_ENABLED,
-        IS_OWNER_ASSIGNING_ENABLED,
-        IS_GET_FILES_REQUEST_PAGINATED,
-        APPROVE_PULL_ON_EMPTY_REVIEW_COMMENTS,
-        DELAY_BETWEEN_COMMENT_REQUESTS_IN_SECONDS
-    } = env;
-
-    settings = {
+module.exports = {
+    settings: {
         senders: SENDERS,
         isStoringLogsEnabled: IS_STORING_LOGS_ENABLED,
         maxCommentsPerReview: MAX_COMMENTS_PER_REVIEW,
@@ -44,12 +38,8 @@ if (process.env.NODE_ENV !== 'test') {
         isOwnerAssigningEnabled: IS_OWNER_ASSIGNING_ENABLED,
         isGetFilesRequestPaginated: IS_GET_FILES_REQUEST_PAGINATED,
         approvePullOnEmptyReviewComments: APPROVE_PULL_ON_EMPTY_REVIEW_COMMENTS
-    };
-}
-
-module.exports = {
-    settings,
-    nodeEnvironment: NODE_ENV,
+    },
+    nodeEnvironment: process.env.NODE_ENV,
     rules: {
         pull,
         files: {
