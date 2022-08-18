@@ -40,13 +40,11 @@ if (!rules) {
     );
 }
 
-for (const categoryKey in rulesConfig) {
-    const rules = rulesConfig[categoryKey];
+for (const categoryKey in rules) {
     const element = rules[categoryKey];
 
-    if (isPlainObject(rules)) {
-        for (const subCategoryKey in rules) {
-            _adjustRules(rules[subCategoryKey]);
+    if (isPlainObject(element)) {
+        for (const subCategoryKey in element) {
             _adjustRules(element[subCategoryKey]);
         }
     } else {
