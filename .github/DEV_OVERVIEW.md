@@ -77,11 +77,11 @@ Rules that require more than single line of patch to perform their checking, are
 }
 ```
 
-For more details on how those objects can be arranged, refer to [general type definitions](https://github.com/trolit/Patchron/blob/master/src/config/type-definitions/general.js) or check how it's used in config files.
+For more details on how those objects can be arranged, refer to [general type definitions](https://github.com/trolit/Patchron/blob/master/src/type-definitions/general.js) or check how it's used in config files.
 
 ## 3. Rule creation
 
-Creating new rule is relatively simple. Before making first step, pin to IDE [type definitions](https://github.com/trolit/Patchron/blob/master/src/config/type-definitions/index.js) to see what lies under e.g. `patchronContext`. Copy rule structure from another file or refer to template below and start coding.
+Creating new rule is relatively simple. Before making first step, pin to IDE [type definitions](https://github.com/trolit/Patchron/blob/master/src/type-definitions/index.js) to see what lies under e.g. `patchronContext`. Copy rule structure from another file or refer to template below and start coding.
 
 ```js
 const BaseRule = require('src/rules/Base');
