@@ -1,7 +1,7 @@
 /**
  * @typedef {object} Package
  * @property {string} name readable name
- * @property {object} expression
+ * @property {object} regex
  */
 
 /**

@@ -44,7 +44,7 @@ class SimpleComparisionRule extends BaseRule {
             }
 
             for (const pattern of this.patterns) {
-                if (trimmedContent.match(pattern.expression)) {
+                if (trimmedContent.match(pattern.regex)) {
                     reviewComments.push(
                         this.getSingleLineComment({
                             body: this._getCommentBody(pattern),
@@ -80,7 +80,7 @@ class SimpleComparisionRule extends BaseRule {
                         endIndex
                     );
 
-                    if (content.match(pattern.expression)) {
+                    if (content.match(pattern.regex)) {
                         reviewComments.push(
                             this.getMultiLineComment({
                                 body: this._getCommentBody(pattern),

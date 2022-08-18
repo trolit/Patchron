@@ -208,10 +208,10 @@ describe('', () => {
         const result = getMultiLineStructure(data, 1, [
             {
                 indicator: {
-                    expression: /const {/
+                    regex: /const {/
                 },
                 limiter: {
-                    expression: /} = require\(.*/
+                    regex: /} = require\(.*/
                 }
             }
         ]);
@@ -230,10 +230,10 @@ describe('', () => {
         const result = getMultiLineStructure(data, 1, [
             {
                 indicator: {
-                    expression: /const {/
+                    regex: /const {/
                 },
                 limiter: {
-                    expression: /} = require\(.*/
+                    regex: /} = require\(.*/
                 }
             }
         ]);
@@ -253,7 +253,7 @@ describe('', () => {
         const result = getMultiLineStructure(data, 1, [
             {
                 limiter: {
-                    expression: /} = require\(.*/
+                    regex: /} = require\(.*/
                 }
             }
         ]);
@@ -272,7 +272,7 @@ describe('', () => {
         const result = getMultiLineStructure(data, 1, [
             {
                 limiter: {
-                    expression: /} = require\(.*/
+                    regex: /} = require\(.*/
                 }
             }
         ]);
@@ -289,7 +289,7 @@ describe('', () => {
         const result = getMultiLineStructure(data, 1, [
             {
                 limiter: {
-                    expression: /} = require\(.*/,
+                    regex: /} = require\(.*/,
                     testInIndicator: true
                 }
             }
@@ -307,7 +307,7 @@ describe('', () => {
         const result = getMultiLineStructure(data, 1, [
             {
                 limiter: {
-                    expression: /} = require\(.*/
+                    regex: /} = require\(.*/
                 }
             }
         ]);

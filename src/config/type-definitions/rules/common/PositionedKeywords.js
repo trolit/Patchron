@@ -25,11 +25,11 @@
 /**
  * @typedef {object} Custom
  * @property {string} name
- * @property {string|object} expression
+ * @property {string|object} regex
  */
 
 /**
  * @typedef {object} Order
  * @property {string} name
- * @property {object} expression
+ * @property {object} regex
  */

@@ -28,7 +28,7 @@ class ComparisionOperatorLevelRule extends BaseRule {
             {
                 level: 0,
                 text: '==, !=',
-                expressions: [
+                regexes: [
                     /[\sa-zA-Z0-9]==[\sa-zA-Z0-9]/g,
                     /[\sa-zA-Z0-9]!=[\sa-zA-Z0-9]/g
                 ]
@@ -36,7 +36,7 @@ class ComparisionOperatorLevelRule extends BaseRule {
             {
                 level: 1,
                 text: '===, !==',
-                expressions: [
+                regexes: [
                     /[\sa-zA-Z0-9]===[\sa-zA-Z0-9]/g,
                     /[\sa-zA-Z0-9]!==[\sa-zA-Z0-9]/g
                 ]
@@ -44,7 +44,7 @@ class ComparisionOperatorLevelRule extends BaseRule {
             {
                 level: 2,
                 text: 'Object.is',
-                expressions: [/(?:Object.is\(.*\))|(?:Object.is\()/g]
+                regexes: [/(?:Object.is\(.*\))|(?:Object.is\()/g]
             }
         ];
 
@@ -153,14 +153,14 @@ class ComparisionOperatorLevelRule extends BaseRule {
         const defaultPatternsLength = this.defaultPatterns.length;
 
         for (let index = 0; index < defaultPatternsLength; index++) {
-            const { expressions, level } = this.defaultPatterns[index];
+            const { regexes, level } = this.defaultPatterns[index];
 
             if (this.allowedLevels.includes(level)) {
                 continue;
             }
 
-            for (const expression of expressions) {
-                const matches = [...line.matchAll(expression)];
+            for (const regex of regexes) {
+                const matches = [...line.matchAll(regex)];
 
                 if (matches.length) {
                     isRowValid = false;

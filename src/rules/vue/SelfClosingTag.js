@@ -11,7 +11,7 @@ class SelfClosingTagRule extends BaseRule {
     constructor(patchronContext, _, file) {
         super(patchronContext, file);
 
-        this.expression = /><\/.*>/;
+        this.regex = /><\/.*>/;
     }
 
     invoke() {
@@ -38,7 +38,7 @@ class SelfClosingTagRule extends BaseRule {
                 continue;
             }
 
-            if (trimmedContent.match(this.expression)) {
+            if (trimmedContent.match(this.regex)) {
                 reviewComments.push(
                     this.getSingleLineComment({
                         index,

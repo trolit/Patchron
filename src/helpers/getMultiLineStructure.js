@@ -11,7 +11,7 @@ const { CUSTOM_LINES } = require('src/config/constants');
  * @param {Array<SplitPatchRow>} data received via `setupData`
  * @param {number} currentLineIndex
  * @param {Array<MultiLineOption>} multiLineOptions
- * @param {object} [matchRegex] expression that was used to match line for further processing. When provided, protects from case when multiLineStructure takes endIndex that belongs to next indicator.
+ * @param {object} [matchRegex] regex that was used to match line for further processing. When provided, protects from case when multiLineStructure takes endIndex that belongs to next indicator.
  *
  * @returns {object}
  */
@@ -167,7 +167,7 @@ function _resolveProperty(
         case 'notEquals':
             return !isEqual(fixedContent, propertyValue);
 
-        case 'expression':
+        case 'regex':
             return fixedContent.match(propertyValue);
     }
 

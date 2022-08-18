@@ -14,7 +14,7 @@ const setupPatchronContext = require('test/setupPatchronContext');
 const initializeFile = require('test/rules/helpers/initializeFile');
 
 const config = {
-    expression: /(\w+).length/
+    regex: /(\w+).length/
 };
 
 describe('invoke function', () => {

@@ -63,7 +63,7 @@ class PredefinedFilenamesRule extends BaseRule {
     _getCommentBody(filename, expectedName) {
         return `Filename <em>${filename
             .split('/')
-            .pop()}</em> (\`${filename}\`) should match following expression: \`${expectedName}\``;
+            .pop()}</em> (\`${filename}\`) should match following regex: \`${expectedName}\``;
     }
 }
 

@@ -17,12 +17,12 @@ const validConfig = {
     blocks: [
         {
             name: 'for',
-            expression: /for.*\(.*\)/,
+            regex: /for.*\(.*\)/,
             countAsSingleLineBlockWhenNoBraces: true
         },
         {
             name: 'for',
-            expression: /^for(\s)+\($/,
+            regex: /^for(\s)+\($/,
             multiLineOptions: [
                 {
                     limiter: {
@@ -34,7 +34,7 @@ const validConfig = {
         },
         {
             name: 'do..while',
-            expression: /^[\s]*(?:do).*/,
+            regex: /^[\s]*(?:do).*/,
             multiLineOptions: [
                 {
                     limiter: {
@@ -47,12 +47,12 @@ const validConfig = {
         },
         {
             name: 'if',
-            expression: /if.*\(.*\)/,
+            regex: /if.*\(.*\)/,
             countAsSingleLineBlockWhenNoBraces: true
         },
         {
             name: 'if',
-            expression: /^if(\s)+\($/,
+            regex: /^if(\s)+\($/,
             multiLineOptions: [
                 {
                     limiter: {
@@ -64,12 +64,12 @@ const validConfig = {
         },
         {
             name: 'else if',
-            expression: /(?:else if).*\(.*\)/,
+            regex: /(?:else if).*\(.*\)/,
             countAsSingleLineBlockWhenNoBraces: true
         },
         {
             name: 'else if',
-            expression: /^(?:else if)(\s)+\($/,
+            regex: /^(?:else if)(\s)+\($/,
             multiLineOptions: [
                 {
                     limiter: {
@@ -81,17 +81,17 @@ const validConfig = {
         },
         {
             name: 'else',
-            expression: /^else.*/,
+            regex: /^else.*/,
             countAsSingleLineBlockWhenNoBraces: true
         },
         {
             name: 'while',
-            expression: /while.*\(.*\)/,
+            regex: /while.*\(.*\)/,
             countAsSingleLineBlockWhenNoBraces: true
         },
         {
             name: 'while',
-            expression: /^while(\s)+\($/,
+            regex: /^while(\s)+\($/,
             multiLineOptions: [
                 {
                     limiter: {

@@ -19,7 +19,7 @@ const importKeywordCustomConfig = {
     position: {
         custom: {
             name: '<script>',
-            expression: /<script>/,
+            regex: /<script>/,
             BOF: false
         }
     },
@@ -277,11 +277,11 @@ describe('invoke function', () => {
                         order: [
                             {
                                 name: 'packages',
-                                expression: /import(?!.*@).*/
+                                regex: /import(?!.*@).*/
                             },
                             {
                                 name: 'components',
-                                expression: /import.*@\/components.*/
+                                regex: /import.*@\/components.*/
                             }
                         ]
                     }
@@ -319,11 +319,11 @@ describe('invoke function', () => {
                         order: [
                             {
                                 name: 'packages',
-                                expression: /import(?!.*@).*/
+                                regex: /import(?!.*@).*/
                             },
                             {
                                 name: 'components',
-                                expression: /import.*@\/components.*/
+                                regex: /import.*@\/components.*/
                             }
                         ]
                     }
@@ -488,11 +488,11 @@ describe('invoke function', () => {
                         order: [
                             {
                                 name: 'packages',
-                                expression: /import(?!.*@).*/
+                                regex: /import(?!.*@).*/
                             },
                             {
                                 name: 'components',
-                                expression: /import.*@\/components.*/
+                                regex: /import.*@\/components.*/
                             }
                         ]
                     }
@@ -729,11 +729,11 @@ describe('invoke function', () => {
                         order: [
                             {
                                 name: 'packages',
-                                expression: /import(?!.*@).*/
+                                regex: /import(?!.*@).*/
                             },
                             {
                                 name: 'components',
-                                expression: /import.*@\/components.*/
+                                regex: /import.*@\/components.*/
                             }
                         ]
                     }
@@ -771,11 +771,11 @@ describe('invoke function', () => {
                         order: [
                             {
                                 name: 'packages',
-                                expression: /import(?!.*@).*/
+                                regex: /import(?!.*@).*/
                             },
                             {
                                 name: 'components',
-                                expression: /import.*@\/components.*/
+                                regex: /import.*@\/components.*/
                             }
                         ]
                     }
@@ -1073,11 +1073,11 @@ describe('invoke function', () => {
                         order: [
                             {
                                 name: 'packages',
-                                expression: /import(?!.*@).*/
+                                regex: /import(?!.*@).*/
                             },
                             {
                                 name: 'components',
-                                expression: /import.*@\/components.*/
+                                regex: /import.*@\/components.*/
                             }
                         ]
                     }

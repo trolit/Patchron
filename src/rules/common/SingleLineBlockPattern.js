@@ -40,7 +40,7 @@ class SingleLineBlockPatternRule extends BaseRule {
 
     _includesAnyBlock(data) {
         return data.some(({ trimmedContent }) =>
-            this.blocks.some((block) => trimmedContent.match(block.expression))
+            this.blocks.some((block) => trimmedContent.match(block.regex))
         );
     }
 
@@ -58,8 +58,8 @@ class SingleLineBlockPatternRule extends BaseRule {
                 continue;
             }
 
-            const matchedBlock = this.blocks.find(({ expression }) =>
-                trimmedContent.match(expression)
+            const matchedBlock = this.blocks.find(({ regex }) =>
+                trimmedContent.match(regex)
             );
 
             if (!matchedBlock) {

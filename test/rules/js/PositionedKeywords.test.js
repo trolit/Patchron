@@ -38,11 +38,11 @@ const requireKeywordBOFConfig = {
     order: [
         {
             name: 'packages',
-            expression: /require(?!.*@).*/
+            regex: /require(?!.*@).*/
         },
         {
             name: 'other',
-            expression: /require.*/
+            regex: /require.*/
         }
     ]
 };
