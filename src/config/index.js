@@ -26,31 +26,31 @@ const {
     DELAY_BETWEEN_COMMENT_REQUESTS_IN_SECONDS
 } = parsedEnv;
 
-let rulesConfig = null;
+let rules = null;
 
 if (RULES_CONFIGURATION_URL) {
     // attempt to fetch config from URL
 } else {
-    rulesConfig = require('src/config/rules');
+    rules = require('src/config/rules');
 }
 
-if (!rulesConfig) {
+if (!rules) {
     throw new Error(
-        `Attempted to ${
-            RULES_CONFIGURATION_URL ? 'fetch' : 'load'
-        } rules config but it was not found.`
+        'Attempted to read > rules < configuration but it does not exist.'
     );
 }
 
 for (const categoryKey in rulesConfig) {
     const rules = rulesConfig[categoryKey];
+    const element = rules[categoryKey];
 
     if (isPlainObject(rules)) {
         for (const subCategoryKey in rules) {
             _adjustRules(rules[subCategoryKey]);
+            _adjustRules(element[subCategoryKey]);
         }
     } else {
-        _adjustRules(rules);
+        _adjustRules(element);
     }
 }
 
@@ -67,7 +67,7 @@ module.exports = {
         approvePullOnEmptyReviewComments: APPROVE_PULL_ON_EMPTY_REVIEW_COMMENTS
     },
     nodeEnvironment: process.env.NODE_ENV,
-    rules: rulesConfig
+    rules
 };
 
 function _adjustRules(rules) {
