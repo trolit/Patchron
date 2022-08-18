@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const jsonpath = require('jsonpath');
+const isPlainObject = require('lodash/isPlainObject');
 const dotenvParseVariables = require('dotenv-parse-variables');
 
 const env = '.env';
@@ -12,24 +13,6 @@ const dotenv = require('dotenv').config({
 });
 
 const parsedEnv = dotenvParseVariables(dotenv.parsed);
-
-const rulesConfig = require('src/config/rules');
-
-for (const category in rulesConfig) {
-    const rules = rulesConfig[category];
-
-    for (const rule of rules) {
-        const { rulename, config } = rule;
-
-        rule.reference = require(`src/rules/${rulename}`);
-
-        delete rule.rulename;
-
-        jsonpath.apply(config, '$..regex', (value) => {
-            return new RegExp(value);
-        });
-    }
-}
 
 const {
     SENDERS,
@@ -43,10 +26,32 @@ const {
     DELAY_BETWEEN_COMMENT_REQUESTS_IN_SECONDS
 } = parsedEnv;
 
+let rulesConfig = null;
+
 if (RULES_CONFIGURATION_URL) {
     // attempt to fetch config from URL
 } else {
-    // attempt to fetch config from app
+    rulesConfig = require('src/config/rules');
+}
+
+if (!rulesConfig) {
+    throw new Error(
+        `Attempted to ${
+            RULES_CONFIGURATION_URL ? 'fetch' : 'load'
+        } rules config but it was not found.`
+    );
+}
+
+for (const categoryKey in rulesConfig) {
+    const rules = rulesConfig[categoryKey];
+
+    if (isPlainObject(rules)) {
+        for (const subCategoryKey in rules) {
+            _adjustRules(rules[subCategoryKey]);
+        }
+    } else {
+        _adjustRules(rules);
+    }
 }
 
 module.exports = {
@@ -64,3 +69,17 @@ module.exports = {
     nodeEnvironment: process.env.NODE_ENV,
     rules: rulesConfig
 };
+
+function _adjustRules(rules) {
+    for (const rule of rules) {
+        const { rulename, config } = rule;
+
+        rule.reference = require(`src/rules/${rulename}`);
+
+        delete rule.rulename;
+
+        jsonpath.apply(config, '$..regex', (value) => {
+            return new RegExp(value);
+        });
+    }
+}
