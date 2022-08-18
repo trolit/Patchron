@@ -1,74 +1,74 @@
 {
-  "name": "patchron",
-  "version": "1.0.0",
-  "private": true,
-  "description": "TBA",
-  "author": "p4w31 !d21k0w5k1 <iddziku@gmail.com>",
-  "license": "ISC",
-  "homepage": "https://github.com/trolit/Patchron",
-  "keywords": [
-    "probot",
-    "github",
-    "probot-app"
-  ],
-  "scripts": {
-    "start": "nodemon --exec probot run ./src/index.js",
-    "test": "jest --verbose --silent",
-    "test:logs": "jest --verbose",
-    "lint:check": "eslint .",
-    "lint:fix": "eslint --fix .",
-    "trace-warnings": "node --trace-warnings index.js"
-  },
-  "dependencies": {
-    "cron": "2.1.0",
-    "dayjs": "1.11.5",
-    "dedent-js": "1.0.1",
-    "dotenv": "16.0.1",
-    "dotenv-parse-variables": "2.0.0",
-    "http-status-codes": "2.2.0",
-    "js-base64": "3.7.2",
-    "lodash": "4.17.21",
-    "module-alias": "2.2.2",
-    "pino-multi-stream": "6.0.0",
-    "pino-tee": "0.3.0",
-    "probot": "12.2.5",
-    "require-directory": "2.1.1"
-  },
-  "devDependencies": {
-    "eslint": "8.18.0",
-    "eslint-config-prettier": "8.5.0",
-    "eslint-plugin-jsdoc": "39.3.3",
-    "jest": "26.6.3",
-    "jsdoc": "3.6.10",
-    "nock": "13.2.9",
-    "nodemon": "2.0.19",
-    "prettier": "2.7.1",
-    "smee-client": "1.2.3"
-  },
-  "engines": {
-    "node": ">= 16.15.0"
-  },
-  "jest": {
-    "moduleNameMapper": {
-      "^@root(.*)$": "<rootDir>",
-      "^src(.*)$": "<rootDir>/src$1",
-      "^test(.*)$": "<rootDir>/test$1"
+    "name": "patchron",
+    "version": "1.0.0",
+    "private": true,
+    "description": "TBA",
+    "author": "p4w31 !d21k0w5k1 <iddziku@gmail.com>",
+    "license": "ISC",
+    "homepage": "https://github.com/trolit/Patchron",
+    "keywords": [
+        "probot",
+        "github",
+        "probot-app"
+    ],
+    "scripts": {
+        "start": "nodemon --exec probot run ./src/index.js",
+        "test": "jest --verbose --silent",
+        "test:logs": "jest --verbose",
+        "lint:check": "eslint .",
+        "lint:fix": "eslint --fix .",
+        "trace-warnings": "node --trace-warnings index.js"
+    },
+    "dependencies": {
+        "cron": "2.1.0",
+        "dayjs": "1.11.5",
+        "dedent-js": "1.0.1",
+        "dotenv": "16.0.1",
+        "dotenv-parse-variables": "2.0.0",
+        "http-status-codes": "2.2.0",
+        "js-base64": "3.7.2",
+        "lodash": "4.17.21",
+        "module-alias": "2.2.2",
+        "pino-multi-stream": "6.0.0",
+        "pino-tee": "0.3.0",
+        "probot": "12.2.5",
+        "require-directory": "2.1.1"
+    },
+    "devDependencies": {
+        "eslint": "8.18.0",
+        "eslint-config-prettier": "8.5.0",
+        "eslint-plugin-jsdoc": "39.3.3",
+        "jest": "26.6.3",
+        "jsdoc": "3.6.10",
+        "nock": "13.2.9",
+        "nodemon": "2.0.19",
+        "prettier": "2.7.1",
+        "smee-client": "1.2.3"
+    },
+    "engines": {
+        "node": ">= 16.15.0"
+    },
+    "jest": {
+        "moduleNameMapper": {
+            "^@root(.*)$": "<rootDir>",
+            "^src(.*)$": "<rootDir>/src$1",
+            "^test(.*)$": "<rootDir>/test$1"
+        }
+    },
+    "main": "src/index.js",
+    "directories": {
+        "test": "test",
+        "src": "src"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/trolit/Patchron.git"
+    },
+    "bugs": {
+        "url": "https://github.com/trolit/Patchron/issues"
+    },
+    "_moduleAliases": {
+        "@root": ".",
+        "src": "./src"
     }
-  },
-  "main": "src/index.js",
-  "directories": {
-    "test": "test",
-    "src":"src"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/trolit/Patchron.git"
-  },
-  "bugs": {
-    "url": "https://github.com/trolit/Patchron/issues"
-  },
-  "_moduleAliases": {
-    "@root": ".",
-    "src": "./src"
-  }
 }
