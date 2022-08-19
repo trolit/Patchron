@@ -1,8 +1,8 @@
 {
     "name": "patchron",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "private": true,
-    "description": "TBA",
+    "description": "GitHub app project which offers automated code review on issued pull requests, based on hooked patches and configured rules. Easy to expand. Includes jsdoc documentation and tests.",
     "author": "p4w31 !d21k0w5k1 <iddziku@gmail.com>",
     "license": "ISC",
     "homepage": "https://github.com/trolit/Patchron",
