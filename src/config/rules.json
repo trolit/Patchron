@@ -1,0 +1,704 @@
+{
+    "pull": [
+        {
+            "enabled": true,
+            "rulename": "pull/StrictWorkflow",
+            "config": {
+                "workflow": [
+                    {
+                        "base": "master",
+                        "head": "release"
+                    },
+                    {
+                        "base": "develop",
+                        "head": "release"
+                    },
+                    {
+                        "base": "develop",
+                        "head": "feature"
+                    },
+                    {
+                        "base": "master",
+                        "head": "hotfix"
+                    },
+                    {
+                        "base": "develop",
+                        "head": "hotfix"
+                    }
+                ],
+                "abortReviewOnInvalidFlow": false,
+                "abortReviewOnInvalidBranchPrefix": false
+            }
+        }
+    ],
+
+    "files": {
+        "js": [
+            {
+                "enabled": true,
+                "rulename": "common/MarkedComments",
+                "config": {
+                    "prefixes": [
+                        {
+                            "value": "@TODO",
+                            "meaning": "not implemented feature"
+                        },
+                        {
+                            "value": "@TMP",
+                            "meaning": "temporary solution"
+                        },
+                        {
+                            "value": "@NOTE",
+                            "meaning": "information about package/code"
+                        }
+                    ],
+                    "isAppliedToSingleLineComments": true,
+                    "isAppliedToMultiLineComments": true,
+                    "isAppliedToInlineComments": true
+                }
+            },
+
+            {
+                "enabled": true,
+                "rulename": "js/IndividualMethodImport",
+                "config": {
+                    "packages": [
+                        {
+                            "name": "lodash",
+                            "regex": "[(|'|\"|`]lodash[)|'|\"|`]"
+                        }
+                    ]
+                }
+            },
+
+            {
+                "enabled": true,
+                "rulename": "common/SingleLineBlockPattern",
+                "config": {
+                    "blocks": [
+                        {
+                            "name": "for",
+                            "regex": "for.*\\(.*\\)",
+                            "countAsSingleLineBlockWhenNoBraces": true
+                        },
+                        {
+                            "name": "for",
+                            "regex": "^for(\\s)+\\($",
+                            "multiLineOptions": [
+                                {
+                                    "limiter": {
+                                        "startsWith": ")",
+                                        "indentation": "le-indicator"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "do..while",
+                            "regex": "^[\\s]*(?:do).*",
+                            "multiLineOptions": [
+                                {
+                                    "limiter": {
+                                        "includes": "while",
+                                        "indentation": "le-indicator",
+                                        "testInIndicator": true
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "if",
+                            "regex": "if.*\\(.*\\)",
+                            "countAsSingleLineBlockWhenNoBraces": true
+                        },
+                        {
+                            "name": "if",
+                            "regex": "^if(\\s)+\\($",
+                            "multiLineOptions": [
+                                {
+                                    "limiter": {
+                                        "startsWith": ")",
+                                        "indentation": "le-indicator"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "else if",
+                            "regex": "(?:else if).*\\(.*\\)",
+                            "countAsSingleLineBlockWhenNoBraces": true
+                        },
+                        {
+                            "name": "else if",
+                            "regex": "^(?:else if)(\\s)+\\($",
+                            "multiLineOptions": [
+                                {
+                                    "limiter": {
+                                        "startsWith": ")",
+                                        "indentation": "le-indicator"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "else",
+                            "regex": "^else.*",
+                            "countAsSingleLineBlockWhenNoBraces": true
+                        },
+                        {
+                            "name": "while",
+                            "regex": "while.*\\(.*\\)",
+                            "countAsSingleLineBlockWhenNoBraces": true
+                        },
+                        {
+                            "name": "while",
+                            "regex": "^while(\\s)+\\($",
+                            "multiLineOptions": [
+                                {
+                                    "limiter": {
+                                        "startsWith": ")",
+                                        "indentation": "le-indicator"
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "curlyBraces": true
+                }
+            },
+
+            {
+                "enabled": true,
+                "rulename": "common/ComparisionOperatorLevel",
+                "config": {
+                    "allowedLevels": [1, 2]
+                }
+            },
+
+            {
+                "enabled": true,
+                "rulename": "common/FixedLoopLengthCondition",
+                "config": {
+                    "regex": "(\\w+).length"
+                }
+            },
+
+            {
+                "enabled": true,
+                "rulename": "js/SimpleComparision",
+                "config": {
+                    "patterns": [
+                        {
+                            "name": "eq/ne (true, false)",
+                            "regex": "(!={1,2}|={2,3})(\\s)*?(true|false)",
+                            "comment": "`value === true`, `value !== false` -> `value`\n`value === false`, `value !== true` -> `!value`",
+                            "multiLineOptions": [
+                                {
+                                    "indicator": {
+                                        "endsWith": "="
+                                    },
+                                    "limiter": "nextLine"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "eq/ne (null, undefined)",
+                            "regex": "(!={1,2}|={2,3})(\\s)*?(null|undefined)",
+                            "comment": "`value === null/undefined` -> `!value`\n`value !== null/undefined` -> `!!value`, `value`",
+                            "multiLineOptions": [
+                                {
+                                    "indicator": {
+                                        "endsWith": "="
+                                    },
+                                    "limiter": "nextLine"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "ne (-1)",
+                            "regex": "!={1,2}(\\s)*?-1",
+                            "comment": "`value !== -1` -> `~value`"
+                        }
+                    ]
+                }
+            },
+
+            {
+                "enabled": true,
+                "rulename": "js/AsynchronousPattern",
+                "config": {
+                    "pattern": "await"
+                }
+            },
+
+            {
+                "enabled": true,
+                "rulename": "common/PositionedKeywords",
+                "config": {
+                    "keywords": [
+                        {
+                            "name": "require",
+                            "regex": "const.*(?:require|{)",
+                            "position": {
+                                "BOF": true,
+                                "custom": null
+                            },
+                            "enforced": true,
+                            "maxLineBreaks": 0,
+                            "breakOnFirstOccurence": false,
+                            "countDifferentCodeAsLineBreak": false,
+                            "multiLineOptions": [
+                                {
+                                    "indicator": {
+                                        "notIncludes": "require"
+                                    },
+                                    "limiter": {
+                                        "startsWith": "} = require",
+                                        "indentation": "eq-indicator"
+                                    }
+                                }
+                            ],
+                            "order": [
+                                {
+                                    "name": "packages",
+                                    "regex": "require(?!.*@).*"
+                                },
+                                {
+                                    "name": "other",
+                                    "regex": "require.*"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+
+            {
+                "enabled": true,
+                "rulename": "common/PredefinedFilenames",
+                "config": {
+                    "restrictions": [
+                        {
+                            "path": "backend/src/controllers/*",
+                            "expectedName": ".*Controller.js"
+                        }
+                    ]
+                }
+            },
+
+            {
+                "enabled": true,
+                "rulename": "common/LineBreakBeforeReturn",
+                "config": {}
+            },
+
+            {
+                "enabled": true,
+                "rulename": "common/KeywordsOrderedByLength",
+                "config": {
+                    "keywords": [
+                        {
+                            "name": "require (packages)",
+                            "regex": "require(?!.*@).*",
+                            "order": "ascending",
+                            "ignoreNewline": false
+                        },
+                        {
+                            "name": "require (other)",
+                            "regex": "require.*@.*",
+                            "order": "ascending",
+                            "ignoreNewline": false
+                        }
+                    ]
+                }
+            },
+
+            {
+                "enabled": true,
+                "rulename": "js/ImportWithoutExtension",
+                "config": {
+                    "type": "commonjs"
+                }
+            },
+
+            {
+                "enabled": true,
+                "rulename": "js/ImplicitIndexFileImport",
+                "config": {
+                    "type": "commonjs"
+                }
+            },
+
+            {
+                "enabled": true,
+                "rulename": "js/SimplePropertyAssignment",
+                "config": {}
+            }
+        ],
+
+        "vue": [
+            {
+                "enabled": true,
+                "rulename": "common/MarkedComments",
+                "config": {
+                    "prefixes": [
+                        {
+                            "value": "@TODO",
+                            "meaning": "not implemented feature"
+                        },
+                        {
+                            "value": "@TMP",
+                            "meaning": "temporary solution"
+                        },
+                        {
+                            "value": "@NOTE",
+                            "meaning": "information about package/code"
+                        }
+                    ],
+                    "isAppliedToSingleLineComments": true,
+                    "isAppliedToMultiLineComments": true,
+                    "isAppliedToInlineComments": true
+                }
+            },
+
+            {
+                "enabled": true,
+                "rulename": "js/IndividualMethodImport",
+                "config": {
+                    "packages": [
+                        {
+                            "name": "lodash",
+                            "regex": "[(|'|\"|`]lodash[)|'|\"|`]"
+                        }
+                    ]
+                }
+            },
+
+            {
+                "enabled": true,
+                "rulename": "common/SingleLineBlockPattern",
+                "config": {
+                    "blocks": [
+                        {
+                            "name": "for",
+                            "regex": "for.*\\(.*\\)",
+                            "countAsSingleLineBlockWhenNoBraces": true
+                        },
+                        {
+                            "name": "for",
+                            "regex": "^for(\\s)+\\($",
+                            "multiLineOptions": [
+                                {
+                                    "limiter": {
+                                        "startsWith": ")",
+                                        "indentation": "le-indicator"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "do..while",
+                            "regex": "^[\\s]*(?:do).*",
+                            "multiLineOptions": [
+                                {
+                                    "limiter": {
+                                        "includes": "while",
+                                        "indentation": "le-indicator",
+                                        "testInIndicator": true
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "if",
+                            "regex": "if.*\\(.*\\)",
+                            "countAsSingleLineBlockWhenNoBraces": true
+                        },
+                        {
+                            "name": "if",
+                            "regex": "^if(\\s)+\\($",
+                            "multiLineOptions": [
+                                {
+                                    "limiter": {
+                                        "startsWith": ")",
+                                        "indentation": "le-indicator"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "else if",
+                            "regex": "(?:else if).*\\(.*\\)",
+                            "countAsSingleLineBlockWhenNoBraces": true
+                        },
+                        {
+                            "name": "else if",
+                            "regex": "^(?:else if)(\\s)+\\($",
+                            "multiLineOptions": [
+                                {
+                                    "limiter": {
+                                        "startsWith": ")",
+                                        "indentation": "le-indicator"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "else",
+                            "regex": "^else.*",
+                            "countAsSingleLineBlockWhenNoBraces": true
+                        },
+                        {
+                            "name": "while",
+                            "regex": "while.*\\(.*\\)",
+                            "countAsSingleLineBlockWhenNoBraces": true
+                        },
+                        {
+                            "name": "while",
+                            "regex": "^while(\\s)+\\($",
+                            "multiLineOptions": [
+                                {
+                                    "limiter": {
+                                        "startsWith": ")",
+                                        "indentation": "le-indicator"
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "curlyBraces": true
+                }
+            },
+
+            {
+                "enabled": true,
+                "rulename": "common/ComparisionOperatorLevel",
+                "config": {
+                    "allowedLevels": [1, 2]
+                }
+            },
+
+            {
+                "enabled": true,
+                "rulename": "common/FixedLoopLengthCondition",
+                "config": {
+                    "regex": "(\\w+).length"
+                }
+            },
+
+            {
+                "enabled": true,
+                "rulename": "js/SimpleComparision",
+                "config": {
+                    "patterns": [
+                        {
+                            "name": "eq/ne (true, false)",
+                            "regex": "(!={1,2}|={2,3})(\\s)*?(true|false)",
+                            "comment": "`value === true`, `value !== false` -> `value`\n`value === false`, `value !== true` -> `!value`",
+                            "multiLineOptions": [
+                                {
+                                    "indicator": {
+                                        "endsWith": "="
+                                    },
+                                    "limiter": "nextLine"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "eq/ne (null, undefined)",
+                            "regex": "(!={1,2}|={2,3})(\\s)*?(null|undefined)",
+                            "comment": "`value === null/undefined` -> `!value`\n`value !== null/undefined` -> `!!value`, `value`",
+                            "multiLineOptions": [
+                                {
+                                    "indicator": {
+                                        "endsWith": "="
+                                    },
+                                    "limiter": "nextLine"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "ne (-1)",
+                            "regex": "!={1,2}(\\s)*?-1",
+                            "comment": "`value !== -1` -> `~value`"
+                        }
+                    ]
+                }
+            },
+
+            {
+                "enabled": true,
+                "rulename": "js/AsynchronousPattern",
+                "config": {
+                    "pattern": "await"
+                }
+            },
+
+            {
+                "enabled": true,
+                "rulename": "html/MarkedComments",
+                "config": {
+                    "prefixes": [
+                        {
+                            "value": "@TODO",
+                            "meaning": "not implemented feature"
+                        },
+                        {
+                            "value": "@TMP",
+                            "meaning": "temporary solution"
+                        },
+                        {
+                            "value": "@NOTE",
+                            "meaning": "information about package/code"
+                        }
+                    ]
+                }
+            },
+
+            {
+                "enabled": true,
+                "rulename": "vue/SelfClosingTag",
+                "config": {}
+            },
+
+            {
+                "enabled": true,
+                "rulename": "common/PositionedKeywords",
+                "config": {
+                    "keywords": [
+                        {
+                            "name": "import",
+                            "regex": "import.*",
+                            "position": {
+                                "custom": {
+                                    "name": "<script>",
+                                    "regex": "<script>",
+                                    "BOF": false
+                                }
+                            },
+                            "maxLineBreaks": 0,
+                            "enforced": true,
+                            "breakOnFirstOccurence": false,
+                            "countDifferentCodeAsLineBreak": false,
+                            "multiLineOptions": [
+                                {
+                                    "indicator": {
+                                        "notIncludes": "from"
+                                    },
+                                    "limiter": {
+                                        "startsWith": "} from"
+                                    }
+                                }
+                            ],
+                            "order": [
+                                {
+                                    "name": "packages",
+                                    "regex": "import(?!.*@).*"
+                                },
+                                {
+                                    "name": "other",
+                                    "regex": "import.*"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+
+            {
+                "enabled": true,
+                "rulename": "common/PredefinedFilenames",
+                "config": {
+                    "restrictions": [
+                        {
+                            "path": "src/components/*",
+                            "expectedName": "[A-Z].*.vue"
+                        },
+                        {
+                            "path": "src/helpers/*",
+                            "expectedName": "[a-z].*.js"
+                        }
+                    ]
+                }
+            },
+
+            {
+                "enabled": true,
+                "rulename": "common/LineBreakBeforeReturn",
+                "config": {}
+            },
+
+            {
+                "enabled": true,
+                "rulename": "common/KeywordsOrderedByLength",
+                "config": {
+                    "keywords": [
+                        {
+                            "name": "import (packages)",
+                            "regex": "import(?!.*@).*",
+                            "order": "ascending",
+                            "ignoreNewline": false,
+                            "multiLineOptions": [
+                                {
+                                    "indicator": {
+                                        "notIncludes": "from"
+                                    },
+                                    "limiter": {
+                                        "startsWith": "} = from"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "import (components)",
+                            "regex": "import.*@/components.*",
+                            "order": "ascending",
+                            "ignoreNewline": false,
+                            "multiLineOptions": [
+                                {
+                                    "indicator": {
+                                        "notIncludes": "from"
+                                    },
+                                    "limiter": {
+                                        "startsWith": "} = from"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+
+            {
+                "enabled": true,
+                "rulename": "js/ImportWithoutExtension",
+                "config": {
+                    "type": "module"
+                }
+            },
+
+            {
+                "enabled": true,
+                "rulename": "js/ImplicitIndexFileImport",
+                "config": {
+                    "type": "module"
+                }
+            },
+
+            {
+                "enabled": true,
+                "rulename": "js/SimplePropertyAssignment",
+                "config": {}
+            },
+
+            {
+                "enabled": true,
+                "rulename": "vue/NormalizedEventHandler",
+                "config": {
+                    "prefix": "on",
+                    "noUnnecessaryBraces": true
+                }
+            }
+        ]
+    }
+}
