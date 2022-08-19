@@ -19,5 +19,7 @@ module.exports = Object.freeze({
     EMPTY: '',
     BLOCK_END: '}',
     BLOCK_START: '{',
-    HUNK_HEADER_INDICATOR: '@@'
+    HUNK_HEADER_INDICATOR: '@@',
+
+    TEST_ENVIRONMENT: 'test'
 });

@@ -5,8 +5,8 @@ const {
     settings: { isStoringLogsEnabled }
 } = require('src/config');
 const EventLog = require('src/utilities/EventLog');
+const { TEST_ENVIRONMENT } = require('src/config/constants');
 const updateLogPathJob = require('src/utilities/updateLogPathJob');
-
 /**
  * Class wrapping Probot's features and Patchron's logic.
  */
@@ -23,7 +23,7 @@ class PatchronContextBuilder {
             context: null
         };
 
-        if (isStoringLogsEnabled && nodeEnvironment !== 'test') {
+        if (isStoringLogsEnabled && nodeEnvironment !== TEST_ENVIRONMENT) {
             const eventEmitter = new EventEmitter();
 
             eventEmitter.on('path-updated', (updatedLog) => {
