@@ -12,14 +12,19 @@
 </p>
 
 <p align="justify">
-Performs early PR code review once PR is issued. Easy to expand and configure.
+GitHub bot that performs early pull request code review once it is issued.
 </p>
 
-#### Disclaimers ❗
+-   built with Probot framework
+-   easy to configure and expand
+-   with tests and type definitions
+-   wrapped with own context to improve logging and accessing context
 
--   review is based upon **patches** which contain limited number of information. Due to that, some comments might be unrelevant to the situation. Despite of that, it comes to clicking resolve button while at the same time reviewers don't have to focus on simple things.
+Disclaimers
 
--   app was tested on common Prettier configuration ([tabWidth](https://prettier.io/docs/en/options.html#tab-width): 4, [printWidth](https://prettier.io/docs/en/options.html#print-width): 80)
+> review is based upon patches which contain limited number of information. Due to that, some comments might be unrelevant to the situation. Despite of that, it comes to clicking resolve button while at the same time reviewers don't have to focus on simple things.
+
+> app was tested on common Prettier configuration tabWidth: 4, printWidth: 80
 
 ## 1. Setup
 
