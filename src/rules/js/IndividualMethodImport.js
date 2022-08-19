@@ -51,8 +51,8 @@ class IndividualMethodImportRule extends BaseRule {
                 continue;
             }
 
-            const myPackage = this.packages.find(({ expression }) =>
-                trimmedContent.match(expression)
+            const myPackage = this.packages.find(({ regex }) =>
+                trimmedContent.match(regex)
             );
 
             if (myPackage) {
@@ -70,9 +70,7 @@ class IndividualMethodImportRule extends BaseRule {
 
     _includesAnyMatch(data) {
         return data.some(({ trimmedContent }) =>
-            this.packages.some(({ expression }) =>
-                trimmedContent.match(expression)
-            )
+            this.packages.some(({ regex }) => trimmedContent.match(regex))
         );
     }
 

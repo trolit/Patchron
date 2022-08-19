@@ -3,24 +3,28 @@
 # 🐶 Patchron
 
 <p>
+<img src="https://img.shields.io/badge/1.1.0-ffa06b" alt="version badge"/>
 <a href="./.github/AVAILABLE_RULES.md" target="_blank">
-    <img src="https://img.shields.io/badge/List of available rules-65f9a0" alt="shields.io - button badge"/>
+    <img src="https://img.shields.io/badge/--%3E%20List%20of%20available%20rules%20%3C---65f9a0" alt="badge with anchor to AVAILABLE_RULES.md"/>
 </a> <a href="./.github/DEV_OVERVIEW.md" target="_blank">
-    <img src="https://img.shields.io/badge/For Developer-a175e8" alt="shields.io - button badge"/>
+    <img src="https://img.shields.io/badge/--%3E%20For%20Developer%20%3C---a175e8" alt="badge with anchor to DEV_OVERVIEW.md "/>
 </a>
 </p>
 
 <p align="justify">
-app that supports team in maintaining simple project conventions and speeds up further code review excluding simple cases once PR is issued. 
+GitHub bot that performs early pull request code review once it is issued.
 </p>
 
-#### Disclaimers ❗
+-   built with Probot framework
+-   easy to configure and expand
+-   with tests and type definitions
+-   wrapped with own context to improve logging and accessing context
 
--   review is based upon **patches** which contain limited number of information. Due to that, some comments might be unrelevant to the situation. Despite of that, it comes to clicking resolve button while at the same time reviewers don't have to focus on simple things.
+Disclaimers
 
--   review won't work on minified files. Beautifying patches is not an option due to possibility of receiving only part of code.
+> review is based upon patches which contain limited number of information. Due to that, some comments might be unrelevant to the situation. Despite of that, it comes to clicking resolve button while at the same time reviewers don't have to focus on simple things.
 
--   app was tested on basic Prettier configuration ([tabWidth](https://prettier.io/docs/en/options.html#tab-width): 4, [printWidth](https://prettier.io/docs/en/options.html#print-width): 80)
+> app was tested on common Prettier configuration tabWidth: 4, printWidth: 80
 
 ## 1. Setup
 
@@ -30,12 +34,12 @@ app that supports team in maintaining simple project conventions and speeds up f
 # 1. Install dependencies
 npm install
 
-# 2. Configure app (config/index.js) & rules
+# 2. Configure app
 
 # 3. Run the bot
 npm start
 
-# 4. Finish configuration (APP_ID and PRIVATE_KEY in .env)
+# 4. Follow further instructions to finish configuration (APP_ID and PRIVATE_KEY in .env)
 https://github.com/settings/apps
 
 ```
@@ -54,7 +58,7 @@ e.g. more options:
 -e MAX_COMMENTS_PER_REVIEW=<number>
 ```
 
-## 3. Settings
+## 3. Configuration
 
 | Property                               | Type (default)               | Description                                                                                                                                                                 |
 | :------------------------------------- | :--------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -66,6 +70,12 @@ e.g. more options:
 | `maxCommentsPerReview`                 | Number (`25`)                | Limits number of comments that can be posted in single review under single PR.                                                                                              |
 | `senders`                              | Array&lt;`string`&gt; (`[]`) | Allows to limit pull requests reviews to certain users. Pass GitHub usernames.                                                                                              |
 | `approvePullOnEmptyReviewComments`     | boolean (`true`)             | When true, approves pull request on empty review comments.                                                                                                                  |
+
+| Property                   | Default                     | Description                                                                                                                                            |
+| :------------------------- | :-------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NODE_ENV`                 | String (`default`)          | specifies environment in which app is running. Default points to `.env.default`, test to `.env.test` and any other to `.env` (except for empty value). |
+| `RULES_CONFIGURATION_URL`  | String (` `)                | When provided, attempts to fetch rules configuration from given URL. URL should point to `.json` file ([example structure](./src/config/rules.json)).  |
+| `RULES_CONFIGURATION_PATH` | String (`src/config/rules`) | Path to rules configuration file stored in the project. Used in testing environment and when `RULES_CONFIGURATION_URL` is not specified.               |
 
 ## 4. Links
 

@@ -17,7 +17,7 @@ const config = {
     patterns: [
         {
             name: 'eq/ne (true, false)',
-            expression: /(!={1,2}|={2,3})(\s)*?(true|false)/,
+            regex: /(!={1,2}|={2,3})(\s)*?(true|false)/,
             comment: `
             \`value === true\`, \`value !== false\` -> \`value\`
             \`value === false\`, \`value !== true\` -> \`!value\`
@@ -33,7 +33,7 @@ const config = {
         },
         {
             name: 'eq/ne (null, undefined)',
-            expression: /(!={1,2}|={2,3})(\s)*?(null|undefined)/,
+            regex: /(!={1,2}|={2,3})(\s)*?(null|undefined)/,
             comment: `
             \`value === null/undefined\` -> \`!value\`
             \`value !== null/undefined\` -> \`!!value\`, \`value\`
@@ -49,7 +49,7 @@ const config = {
         },
         {
             name: 'ne (-1)',
-            expression: /!={1,2}(\s)*?-1/,
+            regex: /!={1,2}(\s)*?-1/,
             comment: `
             \`value !== -1\` -> \`~value\`
             `

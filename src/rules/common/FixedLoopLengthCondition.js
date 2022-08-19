@@ -11,9 +11,9 @@ class FixedLoopLengthConditionRule extends BaseRule {
     constructor(patchronContext, config, file) {
         super(patchronContext, file);
 
-        const { expression } = config;
+        const { regex } = config;
 
-        this.expression = expression;
+        this.regex = regex;
     }
 
     invoke() {
@@ -156,7 +156,7 @@ class FixedLoopLengthConditionRule extends BaseRule {
     }
 
     _matchLengthReference(content) {
-        return content.match(this.expression);
+        return content.match(this.regex);
     }
 
     /**

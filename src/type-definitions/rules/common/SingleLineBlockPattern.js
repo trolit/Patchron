@@ -7,7 +7,7 @@
 /**
  * @typedef {object} Block
  * @property {string} name
- * @property {object} expression
+ * @property {object} regex
  * @property {Array<MultiLineOption>} [multiLineOptions]
  * @property {boolean} countAsSingleLineBlockWhenNoBraces when true, matched block is instantly counted as single line block when no braces were found.
  */

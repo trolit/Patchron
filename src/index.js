@@ -10,16 +10,7 @@
 
 require('module-alias/register');
 
-const {
-    rules: { pull: pullRules },
-    settings: {
-        senders,
-        isReviewSummaryEnabled,
-        isOwnerAssigningEnabled,
-        approvePullOnEmptyReviewComments
-    }
-} = require('./config');
-
+const config = require('./config');
 const review = require('./rules/review');
 const getFiles = require('./github/getFiles');
 const approvePull = require('./github/createReview');
@@ -28,6 +19,15 @@ const postSummary = require('./pull-request/postSummary');
 const reviewFiles = require('./pull-request/reviewFiles');
 const postComments = require('./pull-request/postComments');
 const PatchronContext = require('./builders/PatchronContext');
+
+const {
+    settings: {
+        senders,
+        isReviewSummaryEnabled,
+        isOwnerAssigningEnabled,
+        approvePullOnEmptyReviewComments
+    }
+} = config;
 
 /**
  * @param {ProbotApp} app
@@ -48,7 +48,7 @@ module.exports = (app) => {
             await addAssignees(patchronContext, [owner]);
         }
 
-        const reviewComments = review(patchronContext, pullRules);
+        const reviewComments = review(patchronContext, config.rules?.pullRules);
         const isReviewAborted = _isReviewAborted(reviewComments);
 
         if (!isReviewAborted) {

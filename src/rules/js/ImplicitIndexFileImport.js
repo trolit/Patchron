@@ -48,7 +48,7 @@ class ImplicitIndexFileImportRule extends BaseRule {
         return reviewComments;
     }
 
-    _reviewData(data, expression) {
+    _reviewData(data, regex) {
         const reviewComments = [];
         const dataLength = data.length;
 
@@ -63,7 +63,7 @@ class ImplicitIndexFileImportRule extends BaseRule {
                 continue;
             }
 
-            const matchResult = trimmedContent.match(expression);
+            const matchResult = trimmedContent.match(regex);
 
             if (!matchResult) {
                 continue;

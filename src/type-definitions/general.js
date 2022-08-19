@@ -55,7 +55,7 @@
 
 /**
  * @typedef {object} PatchronContext
- * @property  {import('../../utilities/EventLog')} log
+ * @property  {import('../utilities/EventLog')} log
  * @property {Repo} repo
  * @property {PullRequest} pullRequest
  */
@@ -109,7 +109,7 @@
  * @property {string} [notIncludes]
  * @property {any} [equals] uses `lodash` isEqual. Functions and DOM nodes are not supported.
  * @property {any} [notEquals] uses `lodash` isEqual. Functions and DOM nodes are not supported.
- * @property {object} [expression]
+ * @property {object} [regex]
  * @property {string} [until] marks to take part of content if `until` appeared in the text. Can be used in combination with other property e.g. `includes -> until`
  */
 
@@ -123,7 +123,7 @@
  * @property {string} [notIncludes]
  * @property {any} [equals] uses `lodash` isEqual. Functions and DOM nodes are not supported.
  * @property {any} [notEquals] uses `lodash` isEqual. Functions and DOM nodes are not supported.
- * @property {object} [expression]
+ * @property {object} [regex]
  * @property {string} [nextLine]
  * @property {string} [until] marks to take part of content if `until` appeared in the text. Can be used in combination with other property.
  * @property {Array<object>|string} [indentation] includes `indentation` filter. Can be used in combination with other property.

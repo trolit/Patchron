@@ -17,7 +17,7 @@ const validConfig = {
     packages: [
         {
             name: 'lodash',
-            expression: /[(|'|"]lodash[)|'|"]/
+            regex: /[(|'|"]lodash[)|'|"]/
         }
     ]
 };

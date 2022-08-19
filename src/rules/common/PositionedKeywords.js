@@ -192,8 +192,8 @@ class PositionedKeywordsRule extends BaseRule {
         for (const row of matchedData) {
             const { content } = row;
 
-            const orderIndex = order.findIndex(({ expression }) =>
-                content.match(expression)
+            const orderIndex = order.findIndex(({ regex }) =>
+                content.match(regex)
             );
 
             row.orderIndex = orderIndex;
@@ -230,12 +230,12 @@ class PositionedKeywordsRule extends BaseRule {
         let wasEnforced = false;
         let index = -1;
 
-        const { expression } = keyword.position.custom;
+        const { regex } = keyword.position.custom;
 
         index = data.findIndex(({ trimmedContent }) =>
-            typeof expression === 'object'
-                ? trimmedContent.match(expression)
-                : trimmedContent.includes(expression)
+            typeof regex === 'object'
+                ? trimmedContent.match(regex)
+                : trimmedContent.includes(regex)
         );
 
         if (index === -1 && keyword.enforced) {
