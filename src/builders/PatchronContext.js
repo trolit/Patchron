@@ -7,6 +7,7 @@ const {
 const EventLog = require('src/utilities/EventLog');
 const { TEST_ENVIRONMENT } = require('src/config/constants');
 const updateLogPathJob = require('src/utilities/updateLogPathJob');
+
 /**
  * Class wrapping Probot's features and Patchron's logic.
  */
