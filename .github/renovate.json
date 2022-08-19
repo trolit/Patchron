@@ -3,7 +3,7 @@
     "prConcurrentLimit": 2,
     "prHourlyLimit": 2,
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "extends": ["config:base"],
+    "extends": ["config:base", ":preserveSemverRanges"],
     "labels": ["renovate"],
     "packageRules": [
         {
@@ -24,6 +24,10 @@
             "groupName": "dev dependencies",
             "addLabels": ["dev-tools"],
             "prPriority": 2
+        },
+        {
+            "matchPackageNames": ["node-fetch"],
+            "rangeStrategy": "replace"
         }
     ],
     "schedule": ["on Sunday"],
