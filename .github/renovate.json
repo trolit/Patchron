@@ -24,6 +24,10 @@
             "groupName": "dev dependencies",
             "addLabels": ["dev-tools"],
             "prPriority": 2
+        },
+        {
+            "matchPackageNames": ["node-fetch"],
+            "rangeStrategy": "replace"
         }
     ],
     "schedule": ["on Sunday"],
