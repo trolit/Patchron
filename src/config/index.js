@@ -10,7 +10,7 @@ const { TEST_ENVIRONMENT } = require('src/config/constants');
 
 const nodeEnvironment = process.env.NODE_ENV;
 
-const env = _getEnvironmentVariables();
+const env = _configureEnvironment();
 
 const {
     SENDERS,
@@ -41,7 +41,7 @@ module.exports = {
     rules: _getRulesConfig()
 };
 
-function _getEnvironmentVariables() {
+function _configureEnvironment() {
     const prefix = '.env';
     let path = `${prefix}.default`;
 
