@@ -2,7 +2,7 @@
     "name": "@trolit/patchron",
     "version": "1.1.1",
     "private": true,
-    "description": "GitHub app project which offers automated code review on issued pull requests, based on hooked patches and configured rules. Easy to expand. Includes jsdoc documentation and tests.",
+    "description": "GitHub bot intended to provide first pull request review and faster further reviews done by devs.",
     "author": "p4w31 !d21k0w5k1 <iddziku@gmail.com>",
     "license": "ISC",
     "homepage": "https://github.com/trolit/Patchron",
