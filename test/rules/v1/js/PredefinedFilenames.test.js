@@ -7,11 +7,9 @@ const {
     afterEach
 } = require('@jest/globals');
 
-const {
-    common: { PredefinedFilenamesRule }
-} = require('src/rules');
 const setupPatchronContext = require('test/setupPatchronContext');
 const initializeFile = require('test/rules/helpers/initializeFile');
+const PredefinedFilenamesRule = require('src/rules/v1/common/PredefinedFilenames');
 
 const config = {
     restrictions: [

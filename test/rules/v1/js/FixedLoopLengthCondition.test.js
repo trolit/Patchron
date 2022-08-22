@@ -7,11 +7,9 @@ const {
     afterEach
 } = require('@jest/globals');
 
-const {
-    common: { FixedLoopLengthConditionRule }
-} = require('src/rules');
 const setupPatchronContext = require('test/setupPatchronContext');
 const initializeFile = require('test/rules/helpers/initializeFile');
+const FixedLoopLengthConditionRule = require('src/rules/v1/common/FixedLoopLengthCondition');
 
 const config = {
     regex: /(\w+).length/

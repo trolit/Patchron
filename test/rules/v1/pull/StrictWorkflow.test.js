@@ -7,10 +7,8 @@ const {
     afterEach
 } = require('@jest/globals');
 
-const {
-    pull: { StrictWorkflowRule }
-} = require('src/rules');
 const setupPatchronContext = require('test/setupPatchronContext');
+const StrictWorkflowRule = require('src/rules/v1/pull/StrictWorkflow');
 const instantiateProbotContext = require('test/rules/helpers/instantiateProbotContext');
 
 const validConfig = {
