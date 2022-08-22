@@ -1,0 +1,35 @@
+name: Publish package to GitHub Packages
+
+on:
+    release:
+        types: [created]
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            packages: write
+        steps:
+            - uses: actions/checkout@v3
+
+            - run: npm install
+            - run: npm ci
+
+            - name: Login to ghcr
+              uses: docker/login-action@v2
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Build Image
+              run: |
+                  docker build . --tag ghcr.io/trolit/patchron:latest \
+                  --cache-from ghcr.io/trolit/patchron:latest \
+                  --build-arg VCS_REF=${{ github.sha }} \
+                  --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+
+            - name: Push Image to GHCR
+              run: |
+                  docker push ghcr.io/trolit/patchron:latest
