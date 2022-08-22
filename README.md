@@ -3,7 +3,7 @@
 # 🐶 Patchron
 
 <p>
-<img src="https://img.shields.io/badge/1.1.0-ffa06b" alt="version badge"/>
+<img src="https://img.shields.io/badge/1.1.1-ffa06b" alt="version badge"/>
 <a href="./.github/AVAILABLE_RULES.md" target="_blank">
     <img src="https://img.shields.io/badge/--%3E%20List%20of%20available%20rules%20%3C---65f9a0" alt="badge with anchor to AVAILABLE_RULES.md"/>
 </a> <a href="./.github/DEV_OVERVIEW.md" target="_blank">
@@ -12,13 +12,14 @@
 </p>
 
 <p align="justify">
-GitHub bot that performs early pull request code review once it is issued.
+GitHub bot 🤖 that performs "early" pull request code review. 
 </p>
 
--   built with Probot framework
--   easy to configure and expand
--   with tests and type definitions
--   wrapped with own context to improve logging and accessing context
+-   versioned rules
+-   built with [Probot](https://probot.github.io/docs/) framework
+-   easy to configure and [expand](./.github/DEV_OVERVIEW.md)
+-   with tests (Jest) and type definitions (jsdoc)
+-   wrapped with [own context](./src/builders/PatchronContext.js) to improve logging and accessing Probot context
 
 Disclaimers
 
@@ -27,6 +28,8 @@ Disclaimers
 > app was tested on common Prettier configuration tabWidth: 4, printWidth: 80
 
 ## 1. Setup
+
+### 1.1. Node
 
 ```sh
 # 0. Fork or Download
@@ -39,12 +42,12 @@ npm install
 # 3. Run the bot
 npm start
 
-# 4. Follow further instructions to finish configuration (APP_ID and PRIVATE_KEY in .env)
+# 4. Follow further instructions to finish configuration
 https://github.com/settings/apps
 
 ```
 
-## 2. Docker
+### 1.2. Docker
 
 ```sh
 # 1. Build container
@@ -60,16 +63,20 @@ e.g. more options:
 
 ## 3. Configuration
 
-| Property                               | Type (default)               | Description                                                                                                                                                                 |
-| :------------------------------------- | :--------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `isGetFilesRequestPaginated`           | boolean (`false`)            | Controls files fetching strategy. Unpaginated response includes a maximum of 3000 files which is sufficient in 99.9999999999% of cases.                                     |
-| `delayBetweenCommentRequestsInSeconds` | Number (`3`)                 | After review is done, delays time between each comment request to not overload API. Creating content too quickly using this endpoint may result in secondary rate limiting. |
-| `isOwnerAssigningEnabled`              | boolean (`true`)             | When true, PR owner will be automatically assigned on issueing pull request.                                                                                                |
-| `isReviewSummaryEnabled`               | boolean (`false`)            | When true, at the end of the PR review, Patchron posts summary that contains various information e.g. how many comments were posted.                                        |
-| `isStoringLogsEnabled`                 | boolean (`true`)             | When true, logs are also stored physically in `/.logs` directory.                                                                                                           |
-| `maxCommentsPerReview`                 | Number (`25`)                | Limits number of comments that can be posted in single review under single PR.                                                                                              |
-| `senders`                              | Array&lt;`string`&gt; (`[]`) | Allows to limit pull requests reviews to certain users. Pass GitHub usernames.                                                                                              |
-| `approvePullOnEmptyReviewComments`     | boolean (`true`)             | When true, approves pull request on empty review comments.                                                                                                                  |
+#### Review logic options
+
+| Property                                    | Type (default)               | Description                                                                                                                                                                 |
+| :------------------------------------------ | :--------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `IS_GET_FILES_REQUEST_PAGINATED`            | boolean (`false`)            | Controls files fetching strategy. Unpaginated response includes a maximum of 3000 files which is sufficient in 99.9999999999% of cases.                                     |
+| `DELAY_BETWEEN_COMMENT_REQUESTS_IN_SECONDS` | Number (`3`)                 | After review is done, delays time between each comment request to not overload API. Creating content too quickly using this endpoint may result in secondary rate limiting. |
+| `IS_OWNER_ASSIGNING_ENABLED`                | boolean (`true`)             | When true, PR owner will be automatically assigned on issueing pull request.                                                                                                |
+| `IS_REVIEW_SUMMARY_ENABLED`                 | boolean (`false`)            | When true, at the end of the PR review, Patchron posts summary that contains various information e.g. how many comments were posted.                                        |
+| `IS_STORING_LOGS_ENABLED`                   | boolean (`false`)            | When true, logs are also stored physically in `/.logs` directory.                                                                                                           |
+| `MAX_COMMENTS_PER_REVIEW`                   | Number (`25`)                | Limits number of comments that can be posted in single review under single PR.                                                                                              |
+| `SENDERS`                                   | Array&lt;`string`&gt; (`[]`) | Allows to limit pull requests reviews to certain users. Pass GitHub usernames.                                                                                              |
+| `APPROVE_PULL_ON_EMPTY_REVIEW_COMMENTS`     | boolean (`true`)             | When true, approves pull request on empty review comments.                                                                                                                  |
+
+#### Other options
 
 | Property                   | Default                     | Description                                                                                                                                            |
 | :------------------------- | :-------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -79,9 +86,9 @@ e.g. more options:
 
 ## 4. Links
 
+-   [Probot docs](https://probot.github.io/docs/)
 -   [Octokit Rest API](https://octokit.github.io/rest.js)
 -   [Deployments API example](https://developer.github.com/v3/repos/deployments/)
--   [Probot docs](https://probot.github.io/docs/)
 -   [Pino (logger)](https://getpino.io/#/)
 -   [GitHub API - best practices](https://docs.github.com/en/rest/guides/best-practices-for-integrators)
 -   [GitHub API - rate limits](https://docs.github.com/en/developers/apps/building-github-apps/rate-limits-for-github-apps)

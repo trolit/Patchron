@@ -7,11 +7,9 @@ const {
     afterEach
 } = require('@jest/globals');
 
-const {
-    common: { SingleLineBlockPatternRule }
-} = require('src/rules');
 const setupPatchronContext = require('test/setupPatchronContext');
 const initializeFile = require('test/rules/helpers/initializeFile');
+const SingleLineBlockPatternRule = require('src/rules/v1/common/SingleLineBlockPattern');
 
 const validConfig = {
     blocks: [

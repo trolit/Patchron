@@ -7,11 +7,9 @@ const {
     afterEach
 } = require('@jest/globals');
 
-const {
-    common: { KeywordsOrderedByLengthRule }
-} = require('src/rules');
 const setupPatchronContext = require('test/setupPatchronContext');
 const initializeFile = require('test/rules/helpers/initializeFile');
+const KeywordsOrderedByLengthRule = require('src/rules/v1/common/KeywordsOrderedByLength');
 
 const importKeywordConfig = {
     name: 'import',

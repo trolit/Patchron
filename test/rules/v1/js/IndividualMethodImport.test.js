@@ -7,11 +7,9 @@ const {
     afterEach
 } = require('@jest/globals');
 
-const {
-    js: { IndividualMethodImportRule }
-} = require('src/rules');
 const setupPatchronContext = require('test/setupPatchronContext');
 const initializeFile = require('test/rules/helpers/initializeFile');
+const IndividualMethodImportRule = require('src/rules/v1/js/IndividualMethodImport');
 
 const validConfig = {
     packages: [

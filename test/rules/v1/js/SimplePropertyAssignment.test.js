@@ -7,11 +7,9 @@ const {
     afterEach
 } = require('@jest/globals');
 
-const {
-    js: { SimplePropertyAssignmentRule }
-} = require('src/rules');
 const setupPatchronContext = require('test/setupPatchronContext');
 const initializeFile = require('test/rules/helpers/initializeFile');
+const SimplePropertyAssignmentRule = require('src/rules/v1/js/SimplePropertyAssignment');
 
 const config = {};
 

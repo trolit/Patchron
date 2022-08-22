@@ -7,11 +7,9 @@ const {
     afterEach
 } = require('@jest/globals');
 
-const {
-    vue: { SelfClosingTagRule }
-} = require('src/rules');
 const setupPatchronContext = require('test/setupPatchronContext');
 const initializeFile = require('test/rules/helpers/initializeFile');
+const SelfClosingTagRule = require('src/rules/v1/vue/SelfClosingTag');
 
 const config = {};
 

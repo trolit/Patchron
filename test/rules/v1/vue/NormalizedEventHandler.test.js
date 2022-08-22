@@ -7,11 +7,9 @@ const {
     afterEach
 } = require('@jest/globals');
 
-const {
-    vue: { NormalizedEventHandlerRule }
-} = require('src/rules');
 const setupPatchronContext = require('test/setupPatchronContext');
 const initializeFile = require('test/rules/helpers/initializeFile');
+const NormalizedEventHandlerRule = require('src/rules/v1/vue/NormalizedEventHandler');
 
 const config = {
     prefix: 'on',

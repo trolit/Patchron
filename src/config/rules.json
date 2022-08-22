@@ -2,7 +2,7 @@
     "pull": [
         {
             "enabled": true,
-            "rulename": "pull/StrictWorkflow",
+            "rulename": "v1/pull/StrictWorkflow",
             "config": {
                 "workflow": [
                     {
@@ -36,7 +36,7 @@
         "js": [
             {
                 "enabled": true,
-                "rulename": "common/MarkedComments",
+                "rulename": "v1/common/MarkedComments",
                 "config": {
                     "prefixes": [
                         {
@@ -60,7 +60,7 @@
 
             {
                 "enabled": true,
-                "rulename": "js/IndividualMethodImport",
+                "rulename": "v1/js/IndividualMethodImport",
                 "config": {
                     "packages": [
                         {
@@ -73,7 +73,7 @@
 
             {
                 "enabled": true,
-                "rulename": "common/SingleLineBlockPattern",
+                "rulename": "v1/common/SingleLineBlockPattern",
                 "config": {
                     "blocks": [
                         {
@@ -169,7 +169,7 @@
 
             {
                 "enabled": true,
-                "rulename": "common/ComparisionOperatorLevel",
+                "rulename": "v1/common/ComparisionOperatorLevel",
                 "config": {
                     "allowedLevels": [1, 2]
                 }
@@ -177,7 +177,7 @@
 
             {
                 "enabled": true,
-                "rulename": "common/FixedLoopLengthCondition",
+                "rulename": "v1/common/FixedLoopLengthCondition",
                 "config": {
                     "regex": "(\\w+).length"
                 }
@@ -185,7 +185,7 @@
 
             {
                 "enabled": true,
-                "rulename": "js/SimpleComparision",
+                "rulename": "v1/js/SimpleComparision",
                 "config": {
                     "patterns": [
                         {
@@ -225,7 +225,7 @@
 
             {
                 "enabled": true,
-                "rulename": "js/AsynchronousPattern",
+                "rulename": "v1/js/AsynchronousPattern",
                 "config": {
                     "pattern": "await"
                 }
@@ -233,7 +233,7 @@
 
             {
                 "enabled": true,
-                "rulename": "common/PositionedKeywords",
+                "rulename": "v1/common/PositionedKeywords",
                 "config": {
                     "keywords": [
                         {
@@ -275,7 +275,7 @@
 
             {
                 "enabled": true,
-                "rulename": "common/PredefinedFilenames",
+                "rulename": "v1/common/PredefinedFilenames",
                 "config": {
                     "restrictions": [
                         {
@@ -288,13 +288,13 @@
 
             {
                 "enabled": true,
-                "rulename": "common/LineBreakBeforeReturn",
+                "rulename": "v1/common/LineBreakBeforeReturn",
                 "config": {}
             },
 
             {
                 "enabled": true,
-                "rulename": "common/KeywordsOrderedByLength",
+                "rulename": "v1/common/KeywordsOrderedByLength",
                 "config": {
                     "keywords": [
                         {
@@ -315,7 +315,7 @@
 
             {
                 "enabled": true,
-                "rulename": "js/ImportWithoutExtension",
+                "rulename": "v1/js/ImportWithoutExtension",
                 "config": {
                     "type": "commonjs"
                 }
@@ -323,7 +323,7 @@
 
             {
                 "enabled": true,
-                "rulename": "js/ImplicitIndexFileImport",
+                "rulename": "v1/js/ImplicitIndexFileImport",
                 "config": {
                     "type": "commonjs"
                 }
@@ -331,7 +331,7 @@
 
             {
                 "enabled": true,
-                "rulename": "js/SimplePropertyAssignment",
+                "rulename": "v1/js/SimplePropertyAssignment",
                 "config": {}
             }
         ],
@@ -339,7 +339,7 @@
         "vue": [
             {
                 "enabled": true,
-                "rulename": "common/MarkedComments",
+                "rulename": "v1/common/MarkedComments",
                 "config": {
                     "prefixes": [
                         {
@@ -363,7 +363,7 @@
 
             {
                 "enabled": true,
-                "rulename": "js/IndividualMethodImport",
+                "rulename": "v1/js/IndividualMethodImport",
                 "config": {
                     "packages": [
                         {
@@ -376,7 +376,7 @@
 
             {
                 "enabled": true,
-                "rulename": "common/SingleLineBlockPattern",
+                "rulename": "v1/common/SingleLineBlockPattern",
                 "config": {
                     "blocks": [
                         {
@@ -472,7 +472,7 @@
 
             {
                 "enabled": true,
-                "rulename": "common/ComparisionOperatorLevel",
+                "rulename": "v1/common/ComparisionOperatorLevel",
                 "config": {
                     "allowedLevels": [1, 2]
                 }
@@ -480,7 +480,7 @@
 
             {
                 "enabled": true,
-                "rulename": "common/FixedLoopLengthCondition",
+                "rulename": "v1/common/FixedLoopLengthCondition",
                 "config": {
                     "regex": "(\\w+).length"
                 }
@@ -488,7 +488,7 @@
 
             {
                 "enabled": true,
-                "rulename": "js/SimpleComparision",
+                "rulename": "v1/js/SimpleComparision",
                 "config": {
                     "patterns": [
                         {
@@ -528,7 +528,7 @@
 
             {
                 "enabled": true,
-                "rulename": "js/AsynchronousPattern",
+                "rulename": "v1/js/AsynchronousPattern",
                 "config": {
                     "pattern": "await"
                 }
@@ -536,7 +536,7 @@
 
             {
                 "enabled": true,
-                "rulename": "html/MarkedComments",
+                "rulename": "v1/html/MarkedComments",
                 "config": {
                     "prefixes": [
                         {
@@ -557,13 +557,13 @@
 
             {
                 "enabled": true,
-                "rulename": "vue/SelfClosingTag",
+                "rulename": "v1/vue/SelfClosingTag",
                 "config": {}
             },
 
             {
                 "enabled": true,
-                "rulename": "common/PositionedKeywords",
+                "rulename": "v1/common/PositionedKeywords",
                 "config": {
                     "keywords": [
                         {
@@ -607,7 +607,7 @@
 
             {
                 "enabled": true,
-                "rulename": "common/PredefinedFilenames",
+                "rulename": "v1/common/PredefinedFilenames",
                 "config": {
                     "restrictions": [
                         {
@@ -624,13 +624,13 @@
 
             {
                 "enabled": true,
-                "rulename": "common/LineBreakBeforeReturn",
+                "rulename": "v1/common/LineBreakBeforeReturn",
                 "config": {}
             },
 
             {
                 "enabled": true,
-                "rulename": "common/KeywordsOrderedByLength",
+                "rulename": "v1/common/KeywordsOrderedByLength",
                 "config": {
                     "keywords": [
                         {
@@ -671,7 +671,7 @@
 
             {
                 "enabled": true,
-                "rulename": "js/ImportWithoutExtension",
+                "rulename": "v1/js/ImportWithoutExtension",
                 "config": {
                     "type": "module"
                 }
@@ -679,7 +679,7 @@
 
             {
                 "enabled": true,
-                "rulename": "js/ImplicitIndexFileImport",
+                "rulename": "v1/js/ImplicitIndexFileImport",
                 "config": {
                     "type": "module"
                 }
@@ -687,13 +687,13 @@
 
             {
                 "enabled": true,
-                "rulename": "js/SimplePropertyAssignment",
+                "rulename": "v1/js/SimplePropertyAssignment",
                 "config": {}
             },
 
             {
                 "enabled": true,
-                "rulename": "vue/NormalizedEventHandler",
+                "rulename": "v1/vue/NormalizedEventHandler",
                 "config": {
                     "prefix": "on",
                     "noUnnecessaryBraces": true
