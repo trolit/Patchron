@@ -7,11 +7,9 @@ const {
     afterEach
 } = require('@jest/globals');
 
-const {
-    js: { AsynchronousPatternRule }
-} = require('src/rules');
 const setupPatchronContext = require('test/setupPatchronContext');
 const initializeFile = require('test/rules/helpers/initializeFile');
+const AsynchronousPatternRule = require('src/rules/v1/js/AsynchronousPattern');
 
 const awaitConfig = { pattern: 'await' };
 const thenConfig = { pattern: 'then' };

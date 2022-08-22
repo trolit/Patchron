@@ -7,11 +7,9 @@ const {
     afterEach
 } = require('@jest/globals');
 
-const {
-    js: { ImplicitIndexFileImportRule }
-} = require('src/rules');
 const setupPatchronContext = require('test/setupPatchronContext');
 const initializeFile = require('test/rules/helpers/initializeFile');
+const ImplicitIndexFileImportRule = require('src/rules/v1/js/ImplicitIndexFileImport');
 
 const moduleConfig = { type: 'module' };
 const commonJsConfig = { type: 'commonjs' };

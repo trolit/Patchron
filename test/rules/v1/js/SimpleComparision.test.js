@@ -7,11 +7,9 @@ const {
     afterEach
 } = require('@jest/globals');
 
-const {
-    js: { SimpleComparisionRule }
-} = require('src/rules');
 const setupPatchronContext = require('test/setupPatchronContext');
 const initializeFile = require('test/rules/helpers/initializeFile');
+const SimpleComparisionRule = require('src/rules/v1/js/SimpleComparision');
 
 const config = {
     patterns: [

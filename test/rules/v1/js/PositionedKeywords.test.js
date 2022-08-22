@@ -7,11 +7,9 @@ const {
     afterEach
 } = require('@jest/globals');
 
-const {
-    common: { PositionedKeywordsRule }
-} = require('src/rules');
 const setupPatchronContext = require('test/setupPatchronContext');
 const initializeFile = require('test/rules/helpers/initializeFile');
+const PositionedKeywordsRule = require('src/rules/v1/common/PositionedKeywords');
 
 const requireKeywordBOFConfig = {
     name: 'require',

@@ -7,11 +7,9 @@ const {
     afterEach
 } = require('@jest/globals');
 
-const {
-    js: { ImportWithoutExtensionRule }
-} = require('src/rules');
 const setupPatchronContext = require('test/setupPatchronContext');
 const initializeFile = require('test/rules/helpers/initializeFile');
+const ImportWithoutExtensionRule = require('src/rules/v1/js/ImportWithoutExtension');
 
 const moduleConfig = { type: 'module' };
 const commonJsConfig = { type: 'commonjs' };

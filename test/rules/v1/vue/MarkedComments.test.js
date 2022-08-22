@@ -7,11 +7,9 @@ const {
     afterEach
 } = require('@jest/globals');
 
-const {
-    html: { MarkedCommentsRule }
-} = require('src/rules');
 const setupPatchronContext = require('test/setupPatchronContext');
 const initializeFile = require('test/rules/helpers/initializeFile');
+const MarkedCommentsRule = require('src/rules/v1/html/MarkedComments');
 
 const config = {
     prefixes: [
