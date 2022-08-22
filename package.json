@@ -12,12 +12,14 @@
         "probot-app"
     ],
     "scripts": {
-        "start": "nodemon --exec probot run ./src/index.js",
+        "start": "probot run ./src/index.js",
+        "dev": "nodemon --exec probot run ./src/index.js",
         "test": "jest --verbose --silent",
         "test:logs": "jest --verbose",
         "lint:check": "eslint .",
         "lint:fix": "eslint --fix .",
-        "trace-warnings": "node --trace-warnings index.js"
+        "trace:warnings": "node --trace-warnings index.js",
+        "docker:build": "docker build -t patchron ."
     },
     "dependencies": {
         "cron": "2.1.0",
