@@ -15,6 +15,7 @@
 GitHub bot that performs early pull request code review once it is issued.
 </p>
 
+-   versioned rules
 -   built with Probot framework
 -   easy to configure and expand
 -   with tests and type definitions
