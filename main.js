@@ -1,4 +1,12 @@
-const { run } = require('probot');
+const { run: runAsServer } = require('probot');
+const { run: runAsAction } = require('@probot/adapter-github-actions');
+
 const app = require('./src/index');
 
-run(app);
+const githubToken = process.env.GITHUB_TOKEN;
+
+if (githubToken) {
+    runAsAction(app);
+} else {
+    runAsServer(app);
+}
