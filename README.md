@@ -3,7 +3,7 @@
 # 🐶 Patchron
 
 <p>
-<img src="https://img.shields.io/badge/1.1.1-ffa06b" alt="version badge"/>
+<img src="https://img.shields.io/badge/1.2.1-ffa06b" alt="version badge"/>
 <a href="./.github/AVAILABLE_RULES.md" target="_blank">
     <img src="https://img.shields.io/badge/--%3E%20List%20of%20available%20rules%20%3C---65f9a0" alt="badge with anchor to AVAILABLE_RULES.md"/>
 </a> <a href="./.github/DEV_OVERVIEW.md" target="_blank">

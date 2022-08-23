@@ -1,6 +1,6 @@
 {
     "name": "@trolit/patchron",
-    "version": "1.1.1",
+    "version": "1.2.1",
     "private": true,
     "description": "GitHub bot intended to provide first pull request review and faster further reviews done by devs.",
     "author": "p4w31 !d21k0w5k1 <iddziku@gmail.com>",
@@ -9,7 +9,9 @@
     "keywords": [
         "probot",
         "github",
-        "probot-app"
+        "pr-review",
+        "probot-app",
+        "automated-code-review"
     ],
     "scripts": {
         "start": "node main.js",
