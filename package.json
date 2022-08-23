@@ -12,7 +12,7 @@
         "probot-app"
     ],
     "scripts": {
-        "start": "probot run ./src/index.js",
+        "start": "node main.js",
         "dev": "nodemon --exec probot run ./src/index.js",
         "test": "jest --verbose --silent",
         "test:logs": "jest --verbose",
