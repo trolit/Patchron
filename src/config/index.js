@@ -1,16 +1,14 @@
 /* eslint-disable no-inline-comments */
 
 const fs = require('fs');
-const fetch = require('node-fetch');
-const jsonpath = require('jsonpath');
-const isPlainObject = require('lodash/isPlainObject');
+const configureRules = require('src/utilities/configureRules');
 const dotenvParseVariables = require('dotenv-parse-variables');
 
 const { TEST_ENVIRONMENT } = require('src/config/constants');
 
 const nodeEnvironment = process.env.NODE_ENV;
 
-const env = _configureEnvironment();
+const env = _setupEnv();
 
 const {
     SENDERS,
@@ -25,8 +23,15 @@ const {
     DELAY_BETWEEN_COMMENT_REQUESTS_IN_SECONDS
 } = env;
 
+const rules = require(RULES_CONFIGURATION_PATH);
+
+const configuredRules = configureRules(rules);
+
 module.exports = {
     nodeEnvironment,
+    rules: configuredRules,
+    rulesConfigurationUrl: RULES_CONFIGURATION_URL,
+    rulesConfigurationPath: RULES_CONFIGURATION_PATH,
     settings: {
         senders: SENDERS,
         isStoringLogsEnabled: IS_STORING_LOGS_ENABLED,
@@ -37,13 +42,12 @@ module.exports = {
         isOwnerAssigningEnabled: IS_OWNER_ASSIGNING_ENABLED,
         isGetFilesRequestPaginated: IS_GET_FILES_REQUEST_PAGINATED,
         approvePullOnEmptyReviewComments: APPROVE_PULL_ON_EMPTY_REVIEW_COMMENTS
-    },
-    rules: _getRulesConfig()
+    }
 };
 
-function _configureEnvironment() {
+function _setupEnv() {
     const prefix = '.env';
-    let path = `${prefix}.default`;
+    let path = `${prefix}.example`;
 
     if (nodeEnvironment === TEST_ENVIRONMENT) {
         path = `${prefix}.test`;
@@ -60,52 +64,4 @@ function _configureEnvironment() {
     }
 
     return dotenvParseVariables(dotenv.parsed);
-}
-
-async function _getRulesConfig() {
-    let rulesConfig = {};
-
-    if (RULES_CONFIGURATION_URL && nodeEnvironment !== TEST_ENVIRONMENT) {
-        try {
-            const response = await fetch(RULES_CONFIGURATION_URL);
-
-            rulesConfig = await response.json();
-        } catch (error) {
-            throw new Error(error);
-        }
-    } else {
-        rulesConfig = require(RULES_CONFIGURATION_PATH);
-    }
-
-    return _adjustRulesConfig(rulesConfig);
-}
-
-function _adjustRulesConfig(config) {
-    for (const categoryKey in config) {
-        const category = config[categoryKey];
-
-        if (isPlainObject(category)) {
-            for (const subCategoryKey in category) {
-                _setupRules(category[subCategoryKey]);
-            }
-        } else {
-            _setupRules(category);
-        }
-    }
-
-    return config;
-}
-
-function _setupRules(arrayOfRules) {
-    for (const rule of arrayOfRules) {
-        const { rulename, config } = rule;
-
-        rule.reference = require(`src/rules/${rulename}`);
-
-        delete rule.rulename;
-
-        jsonpath.apply(config, '$..regex', (value) => {
-            return new RegExp(value);
-        });
-    }
 }

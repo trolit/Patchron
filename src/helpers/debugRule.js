@@ -9,14 +9,22 @@ const rules = require('src/rules');
 /**
  * Import that method into core **index.js** file to easily debug particular rule with particular state.
  *
+ * @param {string} version
  * @param {string} category
  * @param {string} ruleName - file name of rule
  * @param {object} config - rule config
  * @param {object} file - provide all elements that are required by passed rule
  * @param {PatchronContext} patchronContext
  */
-module.exports = (category, ruleName, config, file, patchronContext) => {
-    const Rule = rules[category][ruleName];
+module.exports = (
+    version,
+    category,
+    ruleName,
+    config,
+    file,
+    patchronContext
+) => {
+    const Rule = rules[version][category][ruleName];
 
     const rule = new Rule(patchronContext, config, file);
 
