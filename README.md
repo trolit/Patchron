@@ -78,11 +78,11 @@ e.g. more options:
 
 #### Other options
 
-| Property                   | Default                     | Description                                                                                                                                            |
-| :------------------------- | :-------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `NODE_ENV`                 | String (`default`)          | specifies environment in which app is running. Default points to `.env.default`, test to `.env.test` and any other to `.env` (except for empty value). |
-| `RULES_CONFIGURATION_URL`  | String (` `)                | When provided, attempts to fetch rules configuration from given URL. URL should point to `.json` file ([example structure](./src/config/rules.json)).  |
-| `RULES_CONFIGURATION_PATH` | String (`src/config/rules`) | Path to rules configuration file stored in the project. Used in testing environment and when `RULES_CONFIGURATION_URL` is not specified.               |
+| Property                   | Default                     | Description                                                                                                                                           |
+| :------------------------- | :-------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NODE_ENV`                 | String (`.example`)         | specifies environment in which app is running.                                                                                                        |
+| `RULES_CONFIGURATION_URL`  | String (` `)                | When provided, attempts to fetch rules configuration from given URL. URL should point to `.json` file ([example structure](./src/config/rules.json)). |
+| `RULES_CONFIGURATION_PATH` | String (`src/config/rules`) | Path to rules configuration file stored in the project. Used in testing environment and when `RULES_CONFIGURATION_URL` is not specified.              |
 
 ## 4. Links
 
