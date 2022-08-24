@@ -1,11 +1,13 @@
+# https://nodejs.org/de/docs/guides/nodejs-docker-webapp/
+
 FROM node:16
 
 WORKDIR /usr/src/app
 
-COPY package.json package-lock.json ./
+# A wildcard is used to ensure both package.json AND package-lock.json are copied (npm@5+)
+COPY package*.json ./
 
-RUN npm ci --production
-RUN npm cache clean --force
+RUN npm ci --only=production
 
 COPY . .
 
