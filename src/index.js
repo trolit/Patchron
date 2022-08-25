@@ -66,7 +66,7 @@ module.exports = (app) => {
             await addAssignees(patchronContext, [owner]);
         }
 
-        const reviewComments = review(patchronContext, config.rules?.pullRules);
+        const reviewComments = review(patchronContext, config.rules?.pull);
         const isReviewAborted = _isReviewAborted(reviewComments);
 
         if (!isReviewAborted) {
