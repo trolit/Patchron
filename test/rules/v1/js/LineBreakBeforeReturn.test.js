@@ -263,7 +263,29 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
-    it('returns review on invalid return', () => {
+    it('returns empty array on valid return (example 10)', () => {
+        const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
+            patchronContext,
+            null,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +10,5 @@`,
+                    `+module.exports = () => {`,
+                    `+    for (let i = 0; i < 5; i++) console.log(i);`,
+                    `+`,
+                    `+    return 1;`,
+                    `}`
+                ]
+            }
+        );
+
+        const result = lineBreakBeforeReturnRule.invoke();
+
+        expect(result).toEqual([]);
+    });
+
+    it('returns review on invalid return (example 1)', () => {
         const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
             patchronContext,
             null,
@@ -299,6 +321,78 @@ describe('invoke function', () => {
         expect(result[2]).toHaveProperty('line', 19);
 
         expect(result[3]).toHaveProperty('line', 21);
+    });
+
+    it('returns review on invalid return (example 2)', () => {
+        const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
+            patchronContext,
+            null,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +10,5 @@`,
+                    `+module.exports = () => {`,
+                    `+    for (let i = 0; i < 5; i++) console.log(i);`,
+                    `+    return 1;`,
+                    `}`
+                ]
+            }
+        );
+
+        const result = lineBreakBeforeReturnRule.invoke();
+
+        expect(result).toHaveLength(1);
+
+        expect(result[0]).toHaveProperty('line', 12);
+    });
+
+    it('returns review on invalid return (example 3)', () => {
+        const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
+            patchronContext,
+            null,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +10,5 @@`,
+                    `+module.exports = () => {`,
+                    `+    for (let i = 0; i < 5; i++)`,
+                    `+        console.log(i);`,
+                    `+    return 1;`,
+                    `}`
+                ]
+            }
+        );
+
+        const result = lineBreakBeforeReturnRule.invoke();
+
+        expect(result).toHaveLength(1);
+
+        expect(result[0]).toHaveProperty('line', 13);
+    });
+
+    it('returns review on invalid return (example 4)', () => {
+        const lineBreakBeforeReturnRule = new LineBreakBeforeReturnRule(
+            patchronContext,
+            null,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +10,5 @@`,
+                    `+module.exports = () => {`,
+                    `+    for (let i = 0; i < 5; i++) {`,
+                    `+        console.log(i);`,
+                    `+        return 1;`,
+                    `+    }`,
+                    `}`
+                ]
+            }
+        );
+
+        const result = lineBreakBeforeReturnRule.invoke();
+
+        expect(result).toHaveLength(1);
+
+        expect(result[0]).toHaveProperty('line', 13);
     });
 
     it('returns review on return that is part of multi-line string (edge case)', () => {
