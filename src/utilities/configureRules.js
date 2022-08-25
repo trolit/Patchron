@@ -13,6 +13,8 @@ module.exports = (rules) => {
             _setupRules(category);
         }
     }
+
+    return rules;
 };
 
 function _setupRules(arrayOfRules) {
