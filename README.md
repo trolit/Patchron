@@ -77,10 +77,10 @@ Depending on how do you want to handle authentication in workflow you can:
 -   use `PAT` instead of `GITHUB_TOKEN` (not recommended)
 -   use/create solution that generates app installation token (e.g. [@navikt/github-app-token-generator](https://github.com/navikt/github-app-token-generator))
 
-Snippets:
+#### Snippets
 
 <details>
-<summary>with GitHub token (or PAT)</summary>
+<summary>use with GitHub token (or PAT)</summary>
 
 Use following snippet to add `PR review` workflow in your repository.
 
@@ -107,13 +107,13 @@ jobs:
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # or secrets.PAT
                   NODE_ENV: 'production'
-                  # available options: https://github.com/trolit/Patchron#3-configuration
+                  # available options: https://github.com/trolit/Patchron#2-configuration
 ```
 
 </details>
 
 <details>
-<summary>with Patchron app token</summary>
+<summary>use with Patchron app token</summary>
 
 -   Install app via marketplace https://github.com/apps/patchron
 -   Configure repository access (repository that you want to be reviewed should be accessible by app).
@@ -150,12 +150,12 @@ jobs:
               env:
                   GITHUB_TOKEN: ${{ steps.get-token.outputs.token }}
                   NODE_ENV: 'production'
-                  # available options: https://github.com/trolit/Patchron#3-configuration
+                  # available options: https://github.com/trolit/Patchron#2-configuration
 ```
 
 </details>
 
-## 3. Configuration
+## 2. Configuration
 
 #### Review logic options
 
@@ -178,7 +178,7 @@ jobs:
 | `RULES_CONFIGURATION_URL`  | String (` `)                | When provided, attempts to fetch rules configuration from given URL. URL should point to `.json` file ([example structure](./src/config/rules.json)). |
 | `RULES_CONFIGURATION_PATH` | String (`src/config/rules`) | Path to rules configuration file stored in the project. Used in testing environment and when `RULES_CONFIGURATION_URL` is not specified.              |
 
-## 4. Links
+## 3. Links
 
 -   [Probot docs](https://probot.github.io/docs/)
 -   [Octokit Rest API](https://octokit.github.io/rest.js)
@@ -189,6 +189,6 @@ jobs:
 -   [GitHub API - pulls](https://docs.github.com/en/rest/reference/pulls)
 -   [Default picture](https://pixabay.com/vectors/dog-pet-hound-black-eye-animal-151123/)
 
-## 5. Name origin
+## 4. Name origin
 
 Name simply comes from merging two words: Patch and [Patron](<https://en.wikipedia.org/wiki/Patron_(dog)>) 🐶
