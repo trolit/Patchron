@@ -99,7 +99,7 @@ jobs:
             - uses: actions/checkout@v3
               with:
                   repository: 'trolit/Patchron'
-                  ref: 'v1.2.2'
+                  ref: 'master'
 
             - run: npm ci --only=production
 
@@ -142,7 +142,7 @@ jobs:
             - uses: actions/checkout@v3
               with:
                   repository: 'trolit/Patchron'
-                  ref: 'v1.2.2'
+                  ref: 'master'
 
             - run: npm ci --only=production
 
