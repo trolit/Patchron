@@ -38,8 +38,8 @@ class LineBreakBeforeReturnRule extends BaseRule {
             }
 
             if (
-                this._startsWithStatement(trimmedContent) ||
-                this._startsWithStatement(previousContent) ||
+                this._isPartOfStatement(data, index, trimmedContent) ||
+                this._isPartOfStatement(data, index, previousContent) ||
                 previousContent.startsWith(this.BLOCK_START)
             ) {
                 previousContent = trimmedContent;
@@ -112,10 +112,41 @@ class LineBreakBeforeReturnRule extends BaseRule {
         return length;
     }
 
-    _startsWithStatement(content) {
+    _isPartOfStatement(data, index, content) {
         const statements = ['if', 'else', 'for', 'do', 'while'];
 
-        return statements.some((statement) => content.startsWith(statement));
+        const statement = statements.find((statement) =>
+            content.startsWith(statement)
+        );
+
+        if (statement && content !== 'do') {
+            const { endIndex } = this.helpers.getMultiLineStructure(
+                data,
+                index - 1,
+                [
+                    {
+                        indicator: {
+                            startsWith: statement
+                        },
+                        limiter: [
+                            {
+                                startsWith: '}',
+                                indentation: 'eq-indicator'
+                            },
+                            {
+                                startsWith: 'return',
+                                indentation: 'gt-indicator'
+                            }
+                        ]
+                    }
+                ],
+                /\b(?:if|else|for|do|while)\b/
+            );
+
+            return ~endIndex;
+        }
+
+        return !!statement;
     }
 
     /**

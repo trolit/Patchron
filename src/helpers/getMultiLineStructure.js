@@ -16,7 +16,11 @@ const { CUSTOM_LINES } = require('src/config/constants');
  * @returns {object}
  */
 module.exports = (data, currentLineIndex, multiLineOptions, matchRegex) => {
-    const result = { isMultiLine: false };
+    const result = { isMultiLine: false, endIndex: -1 };
+
+    if (currentLineIndex < 0 || currentLineIndex >= data.length) {
+        return result;
+    }
 
     for (const options of multiLineOptions) {
         if (!options?.limiter) {
