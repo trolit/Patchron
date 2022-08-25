@@ -11,7 +11,7 @@ RUN npm ci --only=production
 
 COPY . .
 
-CMD [ "node", "main.js" ]
+CMD [ "npm", "start" ]
 
 ARG VCS_REF
 ARG BUILD_DATE

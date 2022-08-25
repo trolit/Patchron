@@ -30,20 +30,20 @@ Disclaimers
 
 ## 1. Setup
 
+You can host your own instance of bot (e.g. via Docker image) or trigger it via GitHub Actions.
+
 ### 1.1. Node
 
 ```sh
-# 0. Fork or Download
+# 0. Clone repository
 
 # 1. Install dependencies
 npm install
 
-# 2. Configure app
-
-# 3. Run the bot
+# 2. Run the bot
 npm start
 
-# 4. Follow further instructions to finish configuration
+# 3. Follow further instructions in terminal to finish configuration
 https://github.com/settings/apps
 
 ```
@@ -51,16 +51,109 @@ https://github.com/settings/apps
 ### 1.2. Docker
 
 ```sh
-# 1. Build container
-docker build -t patchron .
+# 0. Pull container from GHCR
+docker pull ghcr.io/trolit/patchron:latest
+```
 
-# 2. Start container
+```sh
+# 0. Build container
+docker build -t patchron .
+```
+
+```sh
+# 1. Start container (APP_ID and PRIVATE_KEY are mandatory)
 docker run -e APP_ID=<app-id> -e PRIVATE_KEY=<pem-value> patchron
 
-e.g. more options:
+more options:
 -e SENDERS=<usernames-separated-by-comma>
 -e MAX_COMMENTS_PER_REVIEW=<number>
 ```
+
+### 1.3. GitHub Actions
+
+Depending on how do you want to handle authentication in workflow you can:
+
+-   use `GITHUB_TOKEN` (but comments will be associated with `github-actions` bots)
+-   use `PAT` instead of `GITHUB_TOKEN` (not recommended)
+-   use/create solution that generates app installation token (e.g. [@navikt/github-app-token-generator](https://github.com/navikt/github-app-token-generator))
+
+Snippets:
+
+<details>
+<summary>with GitHub token (or PAT)</summary>
+
+Use following snippet to add `PR review` workflow in your repository.
+
+```yml
+name: Review PR
+
+on:
+    pull_request:
+        types:
+            - opened
+
+jobs:
+    reviewOpenedPull:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+              with:
+                  repository: 'trolit/Patchron'
+                  ref: 'v1.2.2'
+
+            - run: npm ci --only=production
+
+            - run: npm start
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # or secrets.PAT
+                  NODE_ENV: 'production'
+                  # available options: https://github.com/trolit/Patchron#3-configuration
+```
+
+</details>
+
+<details>
+<summary>with Patchron app token</summary>
+
+-   Install app via marketplace https://github.com/apps/patchron
+-   Configure repository access (repository that you want to be reviewed should be accessible by app).
+-   Generate `PRIVATE_KEY`
+-   Add `APP_ID` and `PRIVATE_KEY` secrets to repository
+-   Use following snippet to add `PR Review` workflow in your repository.
+
+```yml
+name: Review PR
+
+on:
+    pull_request:
+        types:
+            - opened
+
+jobs:
+    reviewOpenedPull:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: navikt/github-app-token-generator@v1
+              id: get-token
+              with:
+                  private-key: ${{ secrets.PRIVATE_KEY }}
+                  app-id: ${{ secrets.APP_ID }}
+
+            - uses: actions/checkout@v3
+              with:
+                  repository: 'trolit/Patchron'
+                  ref: 'v1.2.2'
+
+            - run: npm ci --only=production
+
+            - run: npm start
+              env:
+                  GITHUB_TOKEN: ${{ steps.get-token.outputs.token }}
+                  NODE_ENV: 'production'
+                  # available options: https://github.com/trolit/Patchron#3-configuration
+```
+
+</details>
 
 ## 3. Configuration
 
