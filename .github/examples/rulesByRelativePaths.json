@@ -58,7 +58,7 @@
             ]
         },
 
-        "client": {
+        "client/*": {
             "js": [
                 {
                     "enabled": true,
