@@ -33,7 +33,7 @@
     ],
 
     "files": {
-        "server": {
+        "server/*": {
             "js": [
                 {
                     "enabled": true,
