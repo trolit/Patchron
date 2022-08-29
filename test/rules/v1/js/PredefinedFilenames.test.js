@@ -24,6 +24,10 @@ const config = {
         {
             path: 'backend/plugins/*',
             expectedName: /^[a-z].*.js/
+        },
+        {
+            path: 'backend/utilities/',
+            expectedName: /^[a-z].*.js/
         }
     ]
 };
@@ -82,74 +86,7 @@ describe('invoke function', () => {
             config,
             {
                 ...file,
-                filename: 'backend/helpers/IsItWorking.js'
-            }
-        );
-
-        const result = predefinedFilenamesRule.invoke();
-
-        expect(result).toHaveProperty('body');
-    });
-
-    it('returns null on valid predefined filename', () => {
-        const predefinedFilenamesRule = new PredefinedFilenamesRule(
-            patchronContext,
-            config,
-            {
-                ...file,
-                filename: 'backend/controllers/Employee/IndexController.js'
-            }
-        );
-
-        const result = predefinedFilenamesRule.invoke();
-
-        expect(result).toEqual(null);
-    });
-
-    it('returns object on invalid predefined filename (example1)', () => {
-        const predefinedFilenamesRule = new PredefinedFilenamesRule(
-            patchronContext,
-            config,
-            {
-                ...file,
-                filename: 'backend/controllers/Employee/someFile.js'
-            }
-        );
-
-        const result = predefinedFilenamesRule.invoke();
-
-        expect(result).toHaveProperty('body');
-    });
-
-    it('returns object on invalid predefined filename (example2)', () => {
-        const predefinedFilenamesRule = new PredefinedFilenamesRule(
-            patchronContext,
-            config,
-            {
-                ...file,
-                filename: 'backend/helpers/IsItWorking.js'
-            }
-        );
-
-        const result = predefinedFilenamesRule.invoke();
-
-        expect(result).toHaveProperty('body');
-    });
-
-    it('returns null on valid predefined filename (without asterisk)', () => {
-        const predefinedFilenamesRule = new PredefinedFilenamesRule(
-            patchronContext,
-            {
-                restrictions: [
-                    {
-                        ...config,
-                        path: 'backend/controllers'
-                    }
-                ]
-            },
-            {
-                ...file,
-                filename: 'backend/controllers/IndexController.js'
+                filename: 'backend/utilities/test/doSomethingJob.js'
             }
         );
 
@@ -178,5 +115,132 @@ describe('invoke function', () => {
         const result = predefinedFilenamesRule.invoke();
 
         expect(result).toEqual(null);
+    });
+
+    it('returns null on valid filename (example1)', () => {
+        const predefinedFilenamesRule = new PredefinedFilenamesRule(
+            patchronContext,
+            config,
+            {
+                ...file,
+                filename: 'backend/helpers/isItWorking.js'
+            }
+        );
+
+        const result = predefinedFilenamesRule.invoke();
+
+        expect(result).toEqual(null);
+    });
+
+    it('returns null on valid filename (example2)', () => {
+        const predefinedFilenamesRule = new PredefinedFilenamesRule(
+            patchronContext,
+            config,
+            {
+                ...file,
+                filename: 'backend/controllers/Employee/IndexController.js'
+            }
+        );
+
+        const result = predefinedFilenamesRule.invoke();
+
+        expect(result).toEqual(null);
+    });
+
+    it('returns null on valid filename (example3)', () => {
+        const predefinedFilenamesRule = new PredefinedFilenamesRule(
+            patchronContext,
+            config,
+            {
+                ...file,
+                filename: 'backend/utilities/doSomethingJob.js'
+            }
+        );
+
+        const result = predefinedFilenamesRule.invoke();
+
+        expect(result).toEqual(null);
+    });
+
+    it('returns null on valid filename (without asterisk)', () => {
+        const predefinedFilenamesRule = new PredefinedFilenamesRule(
+            patchronContext,
+            {
+                restrictions: [
+                    {
+                        ...config,
+                        path: 'backend/controllers'
+                    }
+                ]
+            },
+            {
+                ...file,
+                filename: 'backend/controllers/IndexController.js'
+            }
+        );
+
+        const result = predefinedFilenamesRule.invoke();
+
+        expect(result).toEqual(null);
+    });
+
+    it('returns object on invalid filename (example1)', () => {
+        const predefinedFilenamesRule = new PredefinedFilenamesRule(
+            patchronContext,
+            config,
+            {
+                ...file,
+                filename: 'backend/helpers/IsItWorking.js'
+            }
+        );
+
+        const result = predefinedFilenamesRule.invoke();
+
+        expect(result).toHaveProperty('body');
+    });
+
+    it('returns object on invalid filename (example2)', () => {
+        const predefinedFilenamesRule = new PredefinedFilenamesRule(
+            patchronContext,
+            config,
+            {
+                ...file,
+                filename: 'backend/controllers/Employee/someFile.js'
+            }
+        );
+
+        const result = predefinedFilenamesRule.invoke();
+
+        expect(result).toHaveProperty('body');
+    });
+
+    it('returns object on invalid filename (example3)', () => {
+        const predefinedFilenamesRule = new PredefinedFilenamesRule(
+            patchronContext,
+            config,
+            {
+                ...file,
+                filename: 'backend/helpers/IsItWorking.js'
+            }
+        );
+
+        const result = predefinedFilenamesRule.invoke();
+
+        expect(result).toHaveProperty('body');
+    });
+
+    it('returns object on invalid filename (example4)', () => {
+        const predefinedFilenamesRule = new PredefinedFilenamesRule(
+            patchronContext,
+            config,
+            {
+                ...file,
+                filename: 'backend/utilities/IsItWorking.js'
+            }
+        );
+
+        const result = predefinedFilenamesRule.invoke();
+
+        expect(result).toHaveProperty('body');
     });
 });
