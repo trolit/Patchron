@@ -12,11 +12,11 @@ require('module-alias/register');
 
 const fetch = require('node-fetch');
 
-const config = require('./config');
 const {
     TEST_ENVIRONMENT,
     PRODUCTION_ENVIRONMENT
 } = require('./config/constants');
+const config = require('./config');
 const review = require('./rules/review');
 const getFiles = require('./github/getFiles');
 const approvePull = require('./github/createReview');
