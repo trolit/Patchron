@@ -35,6 +35,6 @@ module.exports = Object.freeze({
     DEFAULT_APPROVE_PULL_ON_EMPTY_REVIEW_COMMENTS: true,
     DEFAULT_DELAY_BETWEEN_COMMENT_REQUESTS_IN_SECONDS: 3,
 
-    // @NOTE update it
+    // @NOTE ⚠️ update it manually, in case of adding rules to not yet existing extensions (do not assign `common` here) ⚠️
     SUPPORTED_EXTENSIONS: ['html', 'vue', 'js']
 });
