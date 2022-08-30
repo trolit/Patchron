@@ -14,7 +14,8 @@ const fetch = require('node-fetch');
 
 const {
     TEST_ENVIRONMENT,
-    PRODUCTION_ENVIRONMENT
+    PRODUCTION_ENVIRONMENT,
+    GITHUB_ACTION_ENVIRONMENT
 } = require('./config/constants');
 const config = require('./config');
 const review = require('./rules/review');
@@ -79,7 +80,11 @@ module.exports = (app) => {
             reviewComments.push(...reviewFiles(patchronContext, files));
         }
 
-        if (nodeEnvironment !== PRODUCTION_ENVIRONMENT) {
+        if (
+            ![PRODUCTION_ENVIRONMENT, GITHUB_ACTION_ENVIRONMENT].includes(
+                nodeEnvironment
+            )
+        ) {
             return;
         }
 
