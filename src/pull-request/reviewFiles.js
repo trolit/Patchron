@@ -2,7 +2,7 @@ const {
     SUPPORTED_EXTENSIONS,
     HUNK_HEADER_INDICATOR
 } = require('src/config/constants');
-const { rules } = require('src/config');
+const config = require('src/config');
 const review = require('src/rules/review');
 
 /**
@@ -114,6 +114,7 @@ function _splitPatchByHunkHeader(patch) {
  * attempts to return rules from expected "bucket"
  */
 function _getRelatedRules(filename, extension) {
+    const { rules } = config;
     const filePath = filename.substring(0, filename.lastIndexOf('/'));
 
     for (const key in rules.files) {
