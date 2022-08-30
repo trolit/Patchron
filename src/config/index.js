@@ -1,6 +1,5 @@
 /* eslint-disable no-inline-comments */
 
-const fs = require('fs');
 const configureRules = require('src/utilities/configureRules');
 const dotenvParseVariables = require('dotenv-parse-variables');
 
@@ -70,17 +69,8 @@ module.exports = {
 };
 
 function _setupEnv() {
-    const prefix = '.env';
-    let path = `${prefix}.example`;
-
-    if (nodeEnvironment === TEST_ENVIRONMENT) {
-        path = `${prefix}.test`;
-    } else if (fs.existsSync(prefix)) {
-        path = prefix;
-    }
-
     const dotenv = require('dotenv').config({
-        path
+        path: nodeEnvironment === TEST_ENVIRONMENT ? '.env.test' : '.env'
     });
 
     if (!dotenv) {
