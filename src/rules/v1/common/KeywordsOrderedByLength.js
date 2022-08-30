@@ -97,6 +97,16 @@ class KeywordsOrderedByLengthRule extends BaseRule {
                 if (isMultiLine && ~multiLineStructure.endIndex) {
                     const { endIndex } = multiLineStructure;
 
+                    const convertedLine = this.convertMultiLineToSingleLine(
+                        data,
+                        index,
+                        endIndex
+                    );
+
+                    if (!convertedLine.match(keyword.regex)) {
+                        continue;
+                    }
+
                     matchedRows.push({
                         index,
                         trimmedContent: data[endIndex].trimmedContent,

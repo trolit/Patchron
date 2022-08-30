@@ -22,7 +22,7 @@ const importKeywordConfig = {
                 notIncludes: 'from'
             },
             limiter: {
-                startsWith: '} = from'
+                startsWith: '} from'
             }
         }
     ]
@@ -39,7 +39,7 @@ const importPackageKeywordConfig = {
                 notIncludes: 'from'
             },
             limiter: {
-                startsWith: '} = from'
+                startsWith: '} from'
             }
         }
     ]
@@ -56,7 +56,7 @@ const importComponentKeywordConfig = {
                 notIncludes: 'from'
             },
             limiter: {
-                startsWith: '} = from'
+                startsWith: '} from'
             }
         }
     ]
