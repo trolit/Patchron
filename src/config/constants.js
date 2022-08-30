@@ -22,6 +22,7 @@ module.exports = Object.freeze({
     HUNK_HEADER_INDICATOR: '@@',
 
     TEST_ENVIRONMENT: 'test',
+    GITHUB_ACTION_ENVIRONMENT: 'github',
     PRODUCTION_ENVIRONMENT: 'production',
 
     DEFAULT_SENDERS: [],

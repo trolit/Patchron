@@ -6,6 +6,7 @@ const dotenvParseVariables = require('dotenv-parse-variables');
 const {
     DEFAULT_SENDERS,
     TEST_ENVIRONMENT,
+    GITHUB_ACTION_ENVIRONMENT,
     DEFAULT_IS_STORING_LOGS_ENABLED,
     DEFAULT_MAX_COMMENTS_PER_REVIEW,
     DEFAULT_RULES_CONFIGURATION_URL,
@@ -69,13 +70,35 @@ module.exports = {
 };
 
 function _setupEnv() {
-    const dotenv = require('dotenv').config({
-        path: nodeEnvironment === TEST_ENVIRONMENT ? '.env.test' : '.env'
-    });
+    let parsed = null;
 
-    if (!dotenv) {
-        throw new Error('Failed to load env');
+    if (nodeEnvironment === GITHUB_ACTION_ENVIRONMENT) {
+        parsed = {
+            SENDERS: process.env.SENDERS,
+            IS_GET_FILES_REQUEST_PAGINATED:
+                process.env.IS_GET_FILES_REQUEST_PAGINATED,
+            APPROVE_PULL_ON_EMPTY_REVIEW_COMMENTS:
+                process.env.APPROVE_PULL_ON_EMPTY_REVIEW_COMMENTS,
+            IS_STORING_LOGS_ENABLED: DEFAULT_IS_STORING_LOGS_ENABLED,
+            DELAY_BETWEEN_COMMENT_REQUESTS_IN_SECONDS:
+                process.env.DELAY_BETWEEN_COMMENT_REQUESTS_IN_SECONDS,
+            RULES_CONFIGURATION_URL: process.env.RULES_CONFIGURATION_URL,
+            MAX_COMMENTS_PER_REVIEWS: process.env.MAX_COMMENTS_PER_REVIEW,
+            RULES_CONFIGURATION_PATH: process.env.RULES_CONFIGURATION_PATH,
+            IS_REVIEW_SUMMARY_ENABLED: process.env.IS_REVIEW_SUMMARY_ENABLED,
+            IS_OWNER_ASSIGNING_ENABLED: process.env.IS_OWNER_ASSIGNING_ENABLED
+        };
+    } else {
+        const dotenv = require('dotenv').config({
+            path: nodeEnvironment === TEST_ENVIRONMENT ? '.env.test' : '.env'
+        });
+
+        if (!dotenv) {
+            throw new Error('Failed to load env');
+        }
+
+        parsed = dotenv.parsed;
     }
 
-    return dotenvParseVariables(dotenv.parsed);
+    return dotenvParseVariables(parsed);
 }
