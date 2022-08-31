@@ -13,7 +13,7 @@
 </p>
 
 <p align="justify">
-GitHub bot 🤖 that performs "early" pull request code review.
+GitHub bot 🤖 that performs initial pull request code review. It is intended to faster further code reviews, not substitute human ones 😎
 </p>
 
 -   versioned rules
@@ -24,27 +24,27 @@ GitHub bot 🤖 that performs "early" pull request code review.
 
 Disclaimer
 
-> review is based upon patches which contain limited number of information. Due to that, some comments might be unrelevant. Despite of that, it comes to clicking resolve button while at the same time reviewers don't have to focus on simple things.
+> review is based upon patches (to not overload GitHub API) which contain limited number of information. Due to that, some comments might be unrelevant. Despite of that, it comes to clicking resolve button while at the same time reviewers don't have to focus on simple things.
 
 ## 1. Setup
 
 <details>
     <summary>
-        Node.js
+        with Node.js
     </summary>
 
 1. Clone repository.
 2. Install dependencies.
 
-```sh
-npm install
-```
+    ```sh
+    npm install
+    ```
 
 3. Run the bot.
 
-```sh
-npm start
-```
+    ```sh
+    npm start
+    ```
 
 4. Follow further instructions from terminal to finish setup.
 
@@ -52,45 +52,43 @@ npm start
 
 <details>
     <summary>
-        Docker
+        with Docker
     </summary>
 
 1. Pull image from GHCR or build your own.
 
-```sh
-docker pull ghcr.io/trolit/patchron:latest
-```
+    ```sh
+    docker pull ghcr.io/trolit/patchron:latest
+    ```
 
-```sh
-docker build -t patchron .
-```
+    ```sh
+    docker build -t patchron .
+    ```
 
 2. Obtain `APP_ID` and `PRIVATE_KEY`.
 
-Install app via marketplace https://github.com/apps/patchron and configure repository access. Afterwards visit app https://github.com/settings/installations, note down `APP_ID` and generate `PRIVATE_KEY`.
+    Install app via marketplace https://github.com/apps/patchron and configure repository access. Afterwards visit app https://github.com/settings/installations, note down `APP_ID` and generate `PRIVATE_KEY`.
 
 3. Create running container from image (APP_ID and PRIVATE_KEY are mandatory)
 
-```sh
-docker run -e APP_ID=<app-id> -e PRIVATE_KEY=<pem-value> patchron
+    ```sh
+    docker run -e APP_ID=<app-id> -e PRIVATE_KEY=<pem-value> patchron
 
-more options:
--e SENDERS=<usernames-separated-by-comma>
--e MAX_COMMENTS_PER_REVIEW=<number>
-```
+    more options:
+    -e SENDERS=<usernames-separated-by-comma>
+    -e MAX_COMMENTS_PER_REVIEW=<number>
+    ```
 
 </details>
 
 <details>
     <summary>
-        GitHub Actions
+        with GitHub Actions
     </summary>
-
-Depending on how do you want to handle authentication in workflow (and at the same time decide upon review comments author) you can:
 
 ### Use GitHub Token or PAT
 
-You can use `GitHub token` that is generated automatically on event (comments will be associated with `github-actions` bot) or `personal access token` to associate review with e.g. your own bot account. Use following snippet to add workflow to your repository and adjust it to your needs.
+You can use `GitHub token` that is generated automatically on event (comments will be associated with `github-actions` bot) or `personal access token` to associate review with e.g. your own bot account. In that case you only need to add following snippet to repository workflow and adjust it to your needs.
 
 ```yml
 name: Perform first PR review (GITHUB TOKEN)
@@ -105,18 +103,18 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
-              with:
-                  repository: 'trolit/Patchron'
-                  ref: 'master'
+            with:
+                repository: 'trolit/Patchron'
+                ref: 'master'
 
             - run: npm ci --only=production
 
             - run: npm start
-              # options: https://github.com/trolit/Patchron#2-configuration
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # or secrets.PAT
-                  # when 'github' is assigned, attempts to read variables directly from workflow
-                  NODE_ENV: 'github'
+            # options: https://github.com/trolit/Patchron#2-configuration
+            env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # or secrets.PAT
+                # when 'github' is assigned, attempts to read variables directly from workflow
+                NODE_ENV: 'github'
 ```
 
 ### Use app installation token
@@ -129,64 +127,68 @@ jobs:
 4.  Add `APP_ID` and `PRIVATE_KEY` secrets to repository
 5.  Use following snippet to add workflow in your repository.
 
-```yml
-name: Perform first PR review (APP INSTALLATION TOKEN)
+    ```yml
+    name: Perform first PR review (APP INSTALLATION TOKEN)
 
-on:
-    pull_request:
-        types:
-            - opened
+    on:
+        pull_request:
+            types:
+                - opened
 
-jobs:
-    reviewOpenedPull:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: navikt/github-app-token-generator@v1
-              id: get-token
-              with:
-                  private-key: ${{ secrets.PRIVATE_KEY }}
-                  app-id: ${{ secrets.APP_ID }}
+    jobs:
+        reviewOpenedPull:
+            runs-on: ubuntu-latest
+            steps:
+                - uses: navikt/github-app-token-generator@v1
+                id: get-token
+                with:
+                    private-key: ${{ secrets.PRIVATE_KEY }}
+                    app-id: ${{ secrets.APP_ID }}
 
-            - uses: actions/checkout@v3
-              with:
-                  repository: 'trolit/Patchron'
-                  ref: 'master'
+                - uses: actions/checkout@v3
+                with:
+                    repository: 'trolit/Patchron'
+                    ref: 'master'
 
-            - run: npm ci --only=production
+                - run: npm ci --only=production
 
-            - run: npm start
-              # options: https://github.com/trolit/Patchron#2-configuration
-              env:
-                  GITHUB_TOKEN: ${{ steps.get-token.outputs.token }}
-                  # when 'github' is assigned, attempts to read variables directly from workflow
-                  NODE_ENV: 'github'
-```
+                - run: npm start
+                # options: https://github.com/trolit/Patchron#2-configuration
+                env:
+                    GITHUB_TOKEN: ${{ steps.get-token.outputs.token }}
+                    # when 'github' is assigned, attempts to read variables directly from workflow
+                    NODE_ENV: 'github'
+    ```
 
 </details>
 
+<br/>
+
 <details>
 <summary>
-How to configure own rules 🤔❔
+How to arrange own rules 🤔❔
 </summary>
 
-Rules config file is expected to be expressed as `.json` in specific structure to unify app behaviour between all available ways of serving it. Repository default configuration can be found [here](./src/config/rules.json). It uses following format:
+Rules config file is expected to be expressed as `.json` with specific structure to unify app behaviour between all available ways of serving it. It should have `pull` array and `files` object. Pull rules are intended to verify pull request data (not changes in files) and that's why it has separated section. You can manage configuration in two ways:
+
+### via extension
 
 ```json
 {
     "pull": [],
     "files": {
-        "js": [
-            { "rulename": "v1/common/MarkedComments", ... }
-        ],
+        "js": [],
         "vue": [],
         "cs": []
     }
 }
 ```
 
-When app catches files from pull request event, it takes each filename (e.g. `src/helpers/doSomething.js`) and attempts to get related rules from `files` object (`rules.files['js']`). Pull rules are separated from that behaviour as they do not test files but pull request itself.
+It's used in repository as default configuration [here](./src/config/rules.json). When app fetches files from pull request event, it takes each filename and attempts to get related rules from `files` object by file extension. If e.g. bot receives `src/helpers/doSomething.js` it will attempt to get rules from `rules.files['js']`.
 
-There might be a case where repository is used to hold e.g. both `client` and server `instances` and you would like to separate `client` rules from `server` because for instance server is in `commonjs` type and `client` in `module`. Then you could do the following:
+### via relative paths
+
+There might be a case where single repository is used to store more app parts (e.g. `client` and `server`) and you would like to separate `client` rules from `server` (because for example `server` is in `commonjs` type and `client` in `module`). To solve it, you can prepare [structure](./.github/examples/rulesByRelativePaths.json) that groups rules by relative paths:
 
 ```json
 {
@@ -194,23 +196,35 @@ There might be a case where repository is used to hold e.g. both `client` and se
     "files": [
         "server/*": {
             "js": [
-                { rule1 }
+                { }
             ]
         },
         "client/*": {
             "js": [
-                { rule1 }
+                { }
             ],
             "vue": [
-                { rule1 }
+                { }
             ]
         }
     ]
 }
 ```
 
--   It is required to provide full relative path.
--   End relative paths with asterisks (e.g. `server/*`) to match all files which location starts with `server/`.
+⚠️ It is required to provide full relative path. Assuming that repository has structure presented below:
+
+```
+.
+├── .github
+├── solution/
+│   ├── client
+│   └── server
+└── README.md
+```
+
+and you would like to review files under `client` directory, you would have to provide full relative path (`solution/client/*`).
+
+⚠️ End relative paths with asterisks (e.g. `server/*`) if you want to match files that are stored under `server/` regardless of the nesting level.
 
 -   `server/*`
 
@@ -225,19 +239,19 @@ There might be a case where repository is used to hold e.g. both `client` and se
 
 ## 2. Configuration
 
-| Property                                    | Type (default)               | Description                                                                                                                                                                                                                                  |
-| :------------------------------------------ | :--------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `NODE_ENV`                                  | String (` `)                 | specifies environment in which app is running. For GitHub actions use `github`, for testing purposes `test` and for self hosted `production`. Post comments, summary, approve actions are limited to `github` and `production` environments. |
-| `RULES_CONFIGURATION_PATH`                  | String (`src/config/rules`)  | Path to rules configuration file stored in project. Used when `RULES_CONFIGURATION_URL` is not provided.                                                                                                                                     |
-| `RULES_CONFIGURATION_URL`                   | String (` `)                 | When provided, attempts to fetch rules configuration from given URL. URL should point to `.json` file ([example structure](./src/config/rules.json)).                                                                                        |
-| `IS_GET_FILES_REQUEST_PAGINATED`            | boolean (`false`)            | Controls files fetching strategy. Unpaginated response includes a maximum of 3000 files which is sufficient in 99.9999999999% of cases.                                                                                                      |
-| `DELAY_BETWEEN_COMMENT_REQUESTS_IN_SECONDS` | Number (`3`)                 | After pull request review is done, delays time between each comment POST request to not overload GitHub API. Creating content too quickly may result in secondary rate limiting.                                                             |
-| `IS_OWNER_ASSIGNING_ENABLED`                | boolean (`true`)             | When true, PR owner will be automatically assigned on issueing pull request.                                                                                                                                                                 |
-| `IS_REVIEW_SUMMARY_ENABLED`                 | boolean (`false`)            | When true, at the end of the PR review, app will post summary that contains various information e.g. total comments that were successfully posted.                                                                                           |
-| `IS_STORING_LOGS_ENABLED`                   | boolean (`false`)            | When true, logs are also stored physically in `.logs` directory. Log files are named in following way: `YYYY-MM-DD`.                                                                                                                         |
-| `MAX_COMMENTS_PER_REVIEW`                   | Number (`25`)                | Limits number of comments that can be posted in single review under single pull request.                                                                                                                                                     |
-| `SENDERS`                                   | Array&lt;`string`&gt; (`[]`) | Allows to limit pull requests reviews to certain users. Pass GitHub usernames.                                                                                                                                                               |
-| `APPROVE_PULL_ON_EMPTY_REVIEW_COMMENTS`     | boolean (`true`)             | When true, approves pull request on empty review comments.                                                                                                                                                                                   |
+| Property                                    | Type (default)               | Description                                                                                                                                                                                                                                             |
+| :------------------------------------------ | :--------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `NODE_ENV`                                  | String (` `)                 | specifies environment in which app is running. For GitHub actions use `github`, for testing purposes `test` and for self hosted app `production`. GitHub POST comments, summary, approve actions are limited to `github` and `production` environments. |
+| `RULES_CONFIGURATION_PATH`                  | String (`src/config/rules`)  | Path to rules configuration file stored in project. Used when `RULES_CONFIGURATION_URL` is not provided.                                                                                                                                                |
+| `RULES_CONFIGURATION_URL`                   | String (` `)                 | When provided, attempts to fetch rules configuration from given URL. URL should point to `.json` file ([example structure](./src/config/rules.json)).                                                                                                   |
+| `IS_GET_FILES_REQUEST_PAGINATED`            | boolean (`false`)            | Controls files fetching strategy. Unpaginated response includes a maximum of 3000 files which is sufficient in 99.9999999999% of cases.                                                                                                                 |
+| `DELAY_BETWEEN_COMMENT_REQUESTS_IN_SECONDS` | Number (`3`)                 | After pull request review is done, delays time between each comment POST request to not overload GitHub API. Creating content too quickly may result in secondary rate limiting.                                                                        |
+| `IS_OWNER_ASSIGNING_ENABLED`                | boolean (`true`)             | When true, PR owner will be automatically assigned on issueing pull request.                                                                                                                                                                            |
+| `IS_REVIEW_SUMMARY_ENABLED`                 | boolean (`false`)            | When true, at the end of the PR review, app will post summary that contains various information e.g. total comments that were successfully posted.                                                                                                      |
+| `IS_STORING_LOGS_ENABLED`                   | boolean (`false`)            | When true, logs are also stored physically in `.logs` directory. Log files are named in following format: `YYYY-MM-DD`.                                                                                                                                 |
+| `MAX_COMMENTS_PER_REVIEW`                   | Number (`25`)                | Limits number of comments that can be posted in single review under single pull request.                                                                                                                                                                |
+| `SENDERS`                                   | Array&lt;`string`&gt; (`[]`) | Allows to limit pull requests reviews to certain users. Pass GitHub usernames as array e.g. `['trolit'].`.                                                                                                                                              |
+| `APPROVE_PULL_ON_EMPTY_REVIEW_COMMENTS`     | boolean (`true`)             | When true, approves pull request on empty review comments.                                                                                                                                                                                              |
 
 ## 3. Useful links
 
