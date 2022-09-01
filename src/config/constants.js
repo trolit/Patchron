@@ -22,6 +22,8 @@ module.exports = Object.freeze({
     HUNK_HEADER_INDICATOR: '@@',
 
     TEST_ENVIRONMENT: 'test',
+    GITHUB_ACTION_ENVIRONMENT: 'github',
+    PRODUCTION_ENVIRONMENT: 'production',
 
     DEFAULT_SENDERS: [],
     DEFAULT_IS_STORING_LOGS_ENABLED: false,
@@ -32,5 +34,8 @@ module.exports = Object.freeze({
     DEFAULT_IS_OWNER_ASSIGNING_ENABLED: true,
     DEFAULT_IS_GET_FILES_REQUEST_PAGINATED: false,
     DEFAULT_APPROVE_PULL_ON_EMPTY_REVIEW_COMMENTS: true,
-    DEFAULT_DELAY_BETWEEN_COMMENT_REQUESTS_IN_SECONDS: 3
+    DEFAULT_DELAY_BETWEEN_COMMENT_REQUESTS_IN_SECONDS: 3,
+
+    // @NOTE ⚠️ update it manually, in case of adding rules to not yet existing extensions (do not assign `common` here) ⚠️
+    SUPPORTED_EXTENSIONS: ['html', 'vue', 'js']
 });
