@@ -12,6 +12,11 @@ require('module-alias/register');
 
 const fetch = require('node-fetch');
 
+const {
+    TEST_ENVIRONMENT,
+    PRODUCTION_ENVIRONMENT,
+    GITHUB_ACTION_ENVIRONMENT
+} = require('./config/constants');
 const config = require('./config');
 const review = require('./rules/review');
 const getFiles = require('./github/getFiles');
@@ -19,7 +24,7 @@ const approvePull = require('./github/createReview');
 const addAssignees = require('./github/addAssignees');
 const postSummary = require('./pull-request/postSummary');
 const reviewFiles = require('./pull-request/reviewFiles');
-const { TEST_ENVIRONMENT } = require('./config/constants');
+
 const postComments = require('./pull-request/postComments');
 const configureRules = require('./utilities/configureRules');
 const PatchronContext = require('./builders/PatchronContext');
@@ -73,6 +78,14 @@ module.exports = (app) => {
             const files = await getFiles(patchronContext);
 
             reviewComments.push(...reviewFiles(patchronContext, files));
+        }
+
+        if (
+            ![PRODUCTION_ENVIRONMENT, GITHUB_ACTION_ENVIRONMENT].includes(
+                nodeEnvironment
+            )
+        ) {
+            return;
         }
 
         const numberOfPostedComments = await postComments(

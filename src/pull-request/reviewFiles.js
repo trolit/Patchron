@@ -1,6 +1,9 @@
-const { rules } = require('src/config');
+const {
+    SUPPORTED_EXTENSIONS,
+    HUNK_HEADER_INDICATOR
+} = require('src/config/constants');
+const config = require('src/config');
 const review = require('src/rules/review');
-const { HUNK_HEADER_INDICATOR } = require('src/config/constants');
 
 /**
  * triggers `Patchron` to review files against configured rules
@@ -21,8 +24,9 @@ module.exports = (patchronContext, files) => {
     for (const file of files) {
         _setupFileForReview(file);
 
-        const { extension } = file;
-        const relatedRules = rules.files[extension];
+        const { filename, extension } = file;
+
+        const relatedRules = _getRelatedRules(filename, extension);
 
         if (!relatedRules) {
             log.information(
@@ -104,4 +108,39 @@ function _splitPatchByHunkHeader(patch) {
     );
 
     return chunks;
+}
+
+/**
+ * attempts to return rules from expected "bucket"
+ */
+function _getRelatedRules(filename, extension) {
+    const { rules } = config;
+    const filePath = filename.substring(0, filename.lastIndexOf('/'));
+
+    for (const key in rules.files) {
+        let isPathMatched = false;
+        const isPathWithAsterisk = key.endsWith('*');
+
+        if (SUPPORTED_EXTENSIONS.includes(key)) {
+            return rules.files[extension];
+        }
+
+        if (isPathWithAsterisk) {
+            const fixedPath = key.slice(0, -1);
+
+            isPathMatched = filename.startsWith(fixedPath);
+        } else {
+            const fixedKey = key.endsWith('/')
+                ? key.substring(0, key.lastIndexOf('/'))
+                : key;
+
+            isPathMatched = filePath === fixedKey;
+        }
+
+        if (isPathMatched) {
+            return rules.files[key][extension];
+        }
+    }
+
+    return null;
 }

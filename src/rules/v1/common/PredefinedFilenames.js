@@ -28,6 +28,7 @@ class PredefinedFilenamesRule extends BaseRule {
         }
 
         const { filename } = this.file;
+        const filePath = filename.substring(0, filename.lastIndexOf('/'));
 
         for (const { path, expectedName } of this.restrictions) {
             let isFilenameMatched = false;
@@ -38,10 +39,11 @@ class PredefinedFilenamesRule extends BaseRule {
 
                 isFilenameMatched = filename.startsWith(fixedPath);
             } else {
-                const fixedPath = `${path}${path.endsWith('/') ? '' : '/'}`;
-                const modifiedPath = fixedPath.replace(fixedPath, '');
+                const fixedPath = path.endsWith('/')
+                    ? path.substring(0, path.lastIndexOf('/'))
+                    : path;
 
-                isFilenameMatched = !modifiedPath.includes('/');
+                isFilenameMatched = filePath === fixedPath;
             }
 
             const rawFilename = filename.split('/').pop();
