@@ -211,19 +211,6 @@ There might be a case where single repository is used to store more app parts (e
 }
 ```
 
-⚠️ It is required to provide full relative path. Assuming that repository has structure presented below:
-
-```
-.
-├── .github
-├── solution/
-│   ├── client
-│   └── server
-└── README.md
-```
-
-and you would like to review files under `client` directory, you would have to provide full relative path (`solution/client/*`).
-
 ⚠️ End relative paths with asterisks (e.g. `server/*`) if you want to match files that are stored under `server/` regardless of the nesting level.
 
 -   `server/*`
