@@ -49,6 +49,12 @@ module.exports = (app) => {
     app.on(['pull_request.opened'], async (context) => {
         patchronContext.initializePullRequestData(context);
 
+        const { owner } = context.pullRequest();
+
+        if (senders?.length && !senders.includes(owner)) {
+            return;
+        }
+
         if (nodeEnvironment !== TEST_ENVIRONMENT && rulesConfigurationUrl) {
             try {
                 const response = await fetch(rulesConfigurationUrl);
@@ -61,17 +67,12 @@ module.exports = (app) => {
             }
         }
 
-        const { owner } = context.pullRequest();
-
-        if (senders?.length && !senders.includes(owner)) {
-            return;
-        }
-
         if (isOwnerAssigningEnabled) {
             await addAssignees(patchronContext, [owner]);
         }
 
         const reviewComments = review(patchronContext, config.rules?.pull);
+
         const isReviewAborted = _isReviewAborted(reviewComments);
 
         if (!isReviewAborted) {
