@@ -38,7 +38,7 @@
         "node-fetch": "^2.6.7",
         "pino-multi-stream": "6.0.0",
         "pino-tee": "0.3.0",
-        "probot": "12.2.5"
+        "probot": "12.2.7"
     },
     "devDependencies": {
         "eslint": "8.18.0",
