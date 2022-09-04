@@ -23,7 +23,7 @@ module.exports = async (
     const { commits, additions, deletions, changed_files } = pull_request;
 
     const unpostedComments = reviewComments.length - successfullyPostedComments;
-    const unpostedCommentsStatus = `⚠️ ${unpostedComments} comments were not posted. (Comments limit per PR: ${maxCommentsPerReview})`;
+    const unpostedCommentsStatus = `⚠️ ${unpostedComments} comment(s) were not posted. (Limit per PR: ${maxCommentsPerReview})`;
 
     const title = `pull request review ${
         isReviewAborted ? 'aborted 😥' : 'completed ✅'
