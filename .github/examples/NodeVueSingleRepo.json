@@ -467,7 +467,7 @@
                     "config": {
                         "keywords": [
                             {
-                                "name": "require",
+                                "name": "import",
                                 "regex": "import.*(?:from|{)",
                                 "position": {
                                     "BOF": true,
@@ -765,7 +765,7 @@
                     "config": {
                         "keywords": [
                             {
-                                "name": "require",
+                                "name": "import",
                                 "regex": "import.*(?:from|{)",
                                 "position": {
                                     "BOF": false,

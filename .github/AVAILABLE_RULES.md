@@ -82,16 +82,36 @@
 {
     "keywords": [
         {
-            "name": "require (packages)",
-            "regex": "require(?!.*@).*",
+            "name": "import (packages)",
+            "regex": "import.*(?:from(?!.*[@,.]/)|{)",
             "order": "ascending",
-            "ignoreNewline": false
+            "ignoreNewline": false,
+            "multiLineOptions": [
+                {
+                    "indicator": {
+                        "notIncludes": "from"
+                    },
+                    "limiter": {
+                        "regex": "from(?!.*[@,.]/)"
+                    }
+                }
+            ]
         },
         {
-            "name": "require (other)",
-            "regex": "require.*@.*",
+            "name": "import (files)",
+            "regex": "import.*(?:from.*[@,.]/|{)",
             "order": "ascending",
-            "ignoreNewline": false
+            "ignoreNewline": false,
+            "multiLineOptions": [
+                {
+                    "indicator": {
+                        "notIncludes": "from"
+                    },
+                    "limiter": {
+                        "regex": "from.*[@,.]/"
+                    }
+                }
+            ]
         }
     ]
 }
@@ -169,13 +189,10 @@
     "keywords": [
         {
             "name": "import",
-            "regex": "import.*",
+            "regex": "import.*(?:from|{)",
             "position": {
-                "custom": {
-                    "name": "<script>",
-                    "regex": "<script>"
-                },
-                "BOF": false
+                "BOF": true,
+                "custom": null
             },
             "maxLineBreaks": 0,
             "enforced": true,
@@ -194,11 +211,11 @@
             "order": [
                 {
                     "name": "packages",
-                    "regex": "import(?!.*@).*"
+                    "regex": "from(?!.*[@,.]/)"
                 },
                 {
-                    "name": "other",
-                    "regex": "import.*"
+                    "name": "others",
+                    "regex": "from.*[@,.]/"
                 }
             ]
         }
