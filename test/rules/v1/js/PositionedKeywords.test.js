@@ -70,7 +70,7 @@ describe('invoke function', () => {
      * ---------------------------------------------------
      */
 
-    it('returns empty array on valid require BOF position', () => {
+    it('returns empty array on valid require BOF position + order', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
             patchronContext,
             validConfig,
@@ -95,7 +95,7 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
-    it('returns review on invalid require BOF position', () => {
+    it('returns review on invalid require BOF position + order', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
             patchronContext,
             validConfig,
@@ -126,7 +126,7 @@ describe('invoke function', () => {
         expect(result[1]).toHaveProperty('line', 8);
     });
 
-    it('returns empty array on valid require BOF position (enforced)', () => {
+    it('returns empty array on valid require BOF position + order (enforced)', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
             patchronContext,
             validConfig,
@@ -150,7 +150,7 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
-    it('returns review on invalid require BOF position (enforced)', () => {
+    it('returns review on invalid require BOF position + order (enforced)', () => {
         const positionedKeywordsRule = new PositionedKeywordsRule(
             patchronContext,
             validConfig,
