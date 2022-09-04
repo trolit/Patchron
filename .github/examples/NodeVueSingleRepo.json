@@ -376,7 +376,7 @@
             ]
         },
 
-        "client/*": {
+        "frontend/*": {
             "js": [
                 {
                     "enabled": true,
@@ -595,7 +595,6 @@
                         "curlyBraces": true
                     }
                 },
-
                 {
                     "enabled": true,
                     "rulename": "v1/js/AsynchronousPattern",
@@ -908,7 +907,6 @@
                         "curlyBraces": true
                     }
                 },
-
                 {
                     "enabled": true,
                     "rulename": "v1/html/MarkedComments",
