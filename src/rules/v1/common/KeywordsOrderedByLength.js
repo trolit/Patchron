@@ -89,7 +89,8 @@ class KeywordsOrderedByLengthRule extends BaseRule {
                 const multiLineStructure = this.helpers.getMultiLineStructure(
                     data,
                     index,
-                    multiLineOptions
+                    multiLineOptions,
+                    keyword.regex
                 );
 
                 const { isMultiLine } = multiLineStructure;

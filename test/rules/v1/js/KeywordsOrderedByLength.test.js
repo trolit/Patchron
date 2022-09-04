@@ -30,7 +30,7 @@ const importKeywordConfig = {
 
 const importPackageKeywordConfig = {
     name: 'import (packages)',
-    regex: /import(?!.*@).*/,
+    regex: 'import.*(?:from(?!.*[@,.]/)|{)',
     order: 'ascending',
     ignoreNewline: false,
     multiLineOptions: [
@@ -39,15 +39,15 @@ const importPackageKeywordConfig = {
                 notIncludes: 'from'
             },
             limiter: {
-                startsWith: '} from'
+                regex: 'from(?!.*[@,.]/)'
             }
         }
     ]
 };
 
-const importComponentKeywordConfig = {
-    name: 'import (components)',
-    regex: /import.*@\/components.*/,
+const importFileKeywordConfig = {
+    name: 'import (files)',
+    regex: 'import.*(?:from.*[@,.]/|{)',
     order: 'ascending',
     ignoreNewline: false,
     multiLineOptions: [
@@ -56,7 +56,7 @@ const importComponentKeywordConfig = {
                 notIncludes: 'from'
             },
             limiter: {
-                startsWith: '} from'
+                regex: 'from.*[@,.]/'
             }
         }
     ]
@@ -348,14 +348,11 @@ describe('invoke function', () => {
         expect(result[3]).toHaveProperty('line', 15);
     });
 
-    it('returns empty array on valid `import` order split into packages and components', () => {
+    it('returns empty array on valid `import` order split into packages and files', () => {
         const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
             patchronContext,
             {
-                keywords: [
-                    importPackageKeywordConfig,
-                    importComponentKeywordConfig
-                ]
+                keywords: [importPackageKeywordConfig, importFileKeywordConfig]
             },
             {
                 ...file,
@@ -380,14 +377,11 @@ describe('invoke function', () => {
         expect(result).toEqual([]);
     });
 
-    it('returns review on invalid `import` order split into packages and components', () => {
+    it('returns review on invalid `import` order split into packages and files', () => {
         const keywordsOrderedByLengthRule = new KeywordsOrderedByLengthRule(
             patchronContext,
             {
-                keywords: [
-                    importPackageKeywordConfig,
-                    importComponentKeywordConfig
-                ]
+                keywords: [importPackageKeywordConfig, importFileKeywordConfig]
             },
             {
                 ...file,
