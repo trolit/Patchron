@@ -13,13 +13,13 @@ const PositionedKeywordsRule = require('src/rules/v1/common/PositionedKeywords')
 
 const requireKeywordBOFConfig = {
     name: 'require',
-    regex: /const.*(?:require|{)/,
+    regex: 'const.*(?:require|{)',
     position: {
         BOF: true,
         custom: null
     },
-    enforced: true,
     maxLineBreaks: 0,
+    enforced: true,
     breakOnFirstOccurence: false,
     countDifferentCodeAsLineBreak: false,
     multiLineOptions: [
@@ -28,19 +28,18 @@ const requireKeywordBOFConfig = {
                 notIncludes: 'require'
             },
             limiter: {
-                startsWith: '} = require',
-                indentation: 'eq-indicator'
+                startsWith: '} = require'
             }
         }
     ],
     order: [
         {
             name: 'packages',
-            regex: /require(?!.*@).*/
+            regex: 'require(?!.*[@,.]/)'
         },
         {
-            name: 'other',
-            regex: /require.*/
+            name: 'others',
+            regex: 'require(.*[@,.]/)'
         }
     ]
 };
@@ -106,7 +105,7 @@ describe('invoke function', () => {
                     `@@ -10,13 +1,7 @@`,
                     `-removed line`,
                     `+some code`,
-                    `+const method1 = require('@/helpers/methods');`,
+                    `+const method1 = require('../helpers/methods');`,
                     `-`,
                     `+const {`,
                     `+    method2`,
@@ -140,7 +139,7 @@ describe('invoke function', () => {
                     `+const {`,
                     `+    method2`,
                     `+    method3`,
-                    `+} = require('@/helpers/methods2')`,
+                    `+} = require('./helpers/methods2')`,
                     `+const method1 = require('@/helpers/methods');`
                 ]
             }
@@ -164,7 +163,7 @@ describe('invoke function', () => {
                     `+const {`,
                     `+    method2`,
                     `+    method3`,
-                    `+} = require('@/helpers/methods2')`,
+                    `+} = require('./helpers/methods2')`,
                     `+`,
                     `+const method4 = require('package2');`
                 ]
@@ -179,5 +178,113 @@ describe('invoke function', () => {
         expect(result[0]).toHaveProperty('line', 11);
 
         expect(result[1]).toHaveProperty('line', 11);
+    });
+
+    it('returns empty array on valid require order (example1, enforced)', () => {
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            patchronContext,
+            validConfig,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    `+const method4 = require('package2');`,
+                    `+const {`,
+                    `+    method2`,
+                    `+    method3`,
+                    `+} = require('./helpers/methods2')`,
+                    `+const method1 = require('@/helpers/methods');`
+                ]
+            }
+        );
+
+        const result = positionedKeywordsRule.invoke();
+
+        expect(result).toEqual([]);
+    });
+
+    it('returns review on invalid require order (example1, enforced)', () => {
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            patchronContext,
+            validConfig,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    `+const {`,
+                    `+    method2`,
+                    `+    method3`,
+                    `+} = require('./helpers/methods2')`,
+                    `+const method1 = require('@/helpers/methods');`,
+                    `+const method4 = require('package2');`
+                ]
+            }
+        );
+
+        const result = positionedKeywordsRule.invoke();
+
+        expect(result).toHaveLength(1);
+
+        expect(result[0]).toHaveProperty('line', 10);
+    });
+
+    it('returns empty array on valid require order (example2, enforced)', () => {
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            patchronContext,
+            validConfig,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    `+const {`,
+                    `+    method5`,
+                    `+    method6`,
+                    `+} = require('package3')`,
+                    `+const method4 = require('package2');`,
+                    `+const method7 = require('package3/index');`,
+                    `+const {`,
+                    `+    method2`,
+                    `+    method3`,
+                    `+} = require('./helpers/methods2')`,
+                    `+const method1 = require('@/helpers/methods');`
+                ]
+            }
+        );
+
+        const result = positionedKeywordsRule.invoke();
+
+        expect(result).toEqual([]);
+    });
+
+    it('returns review on invalid require order (example2, enforced)', () => {
+        const positionedKeywordsRule = new PositionedKeywordsRule(
+            patchronContext,
+            validConfig,
+            {
+                ...file,
+                splitPatch: [
+                    `@@ -10,13 +5,7 @@`,
+                    `+const method7 = require('package3/index');`,
+                    `+const {`,
+                    `+    method2`,
+                    `+    method3`,
+                    `+} = require('./helpers/methods2')`,
+                    `+const method1 = require('@/helpers/methods');`,
+                    `+const {`,
+                    `+    method5`,
+                    `+    method6`,
+                    `+} = require('package3')`,
+                    `+const method4 = require('package2');`
+                ]
+            }
+        );
+
+        const result = positionedKeywordsRule.invoke();
+
+        expect(result).toHaveLength(2);
+
+        expect(result[0]).toHaveProperty('line', 11);
+
+        expect(result[1]).toHaveProperty('line', 15);
     });
 });
