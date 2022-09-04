@@ -768,11 +768,11 @@
                                 "name": "require",
                                 "regex": "import.*(?:from|{)",
                                 "position": {
+                                    "BOF": false,
                                     "custom": {
                                         "name": "<script>",
                                         "regex": "<script>"
-                                    },
-                                    "BOF": false
+                                    }
                                 },
                                 "maxLineBreaks": 0,
                                 "enforced": true,
