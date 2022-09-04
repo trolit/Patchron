@@ -75,9 +75,7 @@ function _setupEnv() {
 
     if (nodeEnvironment === GITHUB_ACTION_ENVIRONMENT) {
         const githubEnv = {
-            SENDERS: process.env.SENDERS
-                ? process.env.SENDERS.split(',')
-                : undefined,
+            SENDERS: process.env.SENDERS,
             IS_GET_FILES_REQUEST_PAGINATED:
                 process.env.IS_GET_FILES_REQUEST_PAGINATED,
             APPROVE_PULL_ON_EMPTY_REVIEW_COMMENTS:

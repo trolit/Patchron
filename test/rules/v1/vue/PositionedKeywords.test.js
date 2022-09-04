@@ -17,9 +17,9 @@ const importKeywordCustomConfig = {
     position: {
         custom: {
             name: '<script>',
-            regex: /<script>/,
-            BOF: false
-        }
+            regex: /<script>/
+        },
+        BOF: false
     },
     maxLineBreaks: 0,
     enforced: true,

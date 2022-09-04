@@ -166,7 +166,17 @@ jobs:
 
 <details>
 <summary>
-How to arrange own rules 🤔❔
+Rules configuration examples 🧩
+</summary>
+
+-   [Default](./src/config/rules.json) (rules categorised by file extension)
+-   [Node (commonjs) + Vue in single repository](.github/examples/NodeVueSingleRepo.json) (rules split by relative path and file extension)
+
+</details>
+
+<details>
+<summary>
+How to arrange own rules 🤔
 </summary>
 
 Rules config file is expected to be expressed as `.json` with specific structure to unify app behaviour between all available ways of serving it. It should have `pull` array and `files` object. Pull rules are intended to verify pull request data (not changes in files) and that's why it has separated section. You can manage configuration in two ways:
@@ -188,7 +198,7 @@ It's used in repository as default configuration [here](./src/config/rules.json)
 
 ### via relative paths
 
-There might be a case where single repository is used to store more app parts (e.g. `client` and `server`) and you would like to separate `client` rules from `server` (because for example `server` is in `commonjs` type and `client` in `module`). To solve it, you can prepare [structure](./.github/examples/rulesByRelativePaths.json) that groups rules by relative paths:
+There might be a case where single repository is used to store more app parts (e.g. `client` and `server`) and you would like to separate `client` rules from `server` (because for example `server` is in `commonjs` type and `client` in `module`). To solve it, you can group rules by relative paths:
 
 ```json
 {

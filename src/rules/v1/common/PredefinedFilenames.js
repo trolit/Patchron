@@ -1,3 +1,4 @@
+const isString = require('lodash/isString');
 const BaseRule = require('src/rules/Base');
 
 class PredefinedFilenamesRule extends BaseRule {
@@ -34,6 +35,10 @@ class PredefinedFilenamesRule extends BaseRule {
             let isFilenameMatched = false;
             const isPathWithAsterisk = path.endsWith('*');
 
+            const parsedExpectedName = isString(expectedName)
+                ? new RegExp(expectedName)
+                : expectedName;
+
             if (isPathWithAsterisk) {
                 const fixedPath = path.slice(0, -1);
 
@@ -47,11 +52,11 @@ class PredefinedFilenamesRule extends BaseRule {
             }
 
             const rawFilename = filename.split('/').pop();
-            const isFilenameValid = rawFilename.match(expectedName);
+            const isFilenameValid = rawFilename.match(parsedExpectedName);
 
             if (isFilenameMatched && !isFilenameValid) {
                 return {
-                    body: this._getCommentBody(filename, expectedName)
+                    body: this._getCommentBody(filename, parsedExpectedName)
                 };
             }
         }
@@ -62,10 +67,10 @@ class PredefinedFilenamesRule extends BaseRule {
     /**
      * @returns {string}
      */
-    _getCommentBody(filename, expectedName) {
+    _getCommentBody(filename, parsedExpectedName) {
         return `Filename <em>${filename
             .split('/')
-            .pop()}</em> (\`${filename}\`) should match following regex: \`${expectedName}\``;
+            .pop()}</em> (\`${filename}\`) should match following regex: \`${parsedExpectedName}\``;
     }
 }
 
