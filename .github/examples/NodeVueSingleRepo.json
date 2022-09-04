@@ -296,7 +296,6 @@
                         "curlyBraces": true
                     }
                 },
-
                 {
                     "enabled": true,
                     "rulename": "v1/js/AsynchronousPattern",
