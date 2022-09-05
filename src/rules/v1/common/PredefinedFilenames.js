@@ -35,10 +35,6 @@ class PredefinedFilenamesRule extends BaseRule {
             let isFilenameMatched = false;
             const isPathWithAsterisk = path.endsWith('*');
 
-            const parsedExpectedName = isString(expectedName)
-                ? new RegExp(expectedName)
-                : expectedName;
-
             if (isPathWithAsterisk) {
                 const fixedPath = path.slice(0, -1);
 
@@ -52,9 +48,13 @@ class PredefinedFilenamesRule extends BaseRule {
             }
 
             const rawFilename = filename.split('/').pop();
-            const isFilenameValid = rawFilename.match(parsedExpectedName);
+            const isFilenameValid = rawFilename.match(expectedName);
 
             if (isFilenameMatched && !isFilenameValid) {
+                const parsedExpectedName = isString(expectedName)
+                    ? new RegExp(expectedName)
+                    : expectedName;
+
                 return {
                     body: this._getCommentBody(filename, parsedExpectedName)
                 };
