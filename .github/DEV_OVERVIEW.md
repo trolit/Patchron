@@ -1,8 +1,8 @@
 ## Short dev overview
 
--   [Data acquisition](#1-🎬-basics)
--   [Data processing](#2-🔄-data-processing)
--   [Creating new rule](#3-💡-rule-creation)
+-   [Data acquisition](#1--basics)
+-   [Data processing](#2--data-processing)
+-   [Creating new rule](#3--rule-creation)
 
 ## 1. 🎬 Basics
 
@@ -48,7 +48,7 @@ Hunk header e.g. `@@ -10,13 +10,7 @@` contains following information:
 
 ## 2. 🔄 Data processing
 
-In all rules that analyze source code, received data is organized via [setupData](https://github.com/trolit/Patchron/blob/0cefee8ba7437f55d98c07f3cc67b310851f47d8/src/rules/Base.js#L105) that "unpacks" patch content into collection. Each object contains information mentioned below:
+In all rules that analyze source code, received data is organized via [setupData](https://github.com/trolit/Patchron/blob/0cefee8ba7437f55d98c07f3cc67b310851f47d8/src/rules/Base.js#L105) method that "unpacks" patch content into collection. Each object contains information mentioned below:
 
 ```ts
 {
@@ -102,11 +102,9 @@ class TemplateRule extends BaseRule {
 
         const data = this.setupData(splitPatch);
 
-        // 2. apply logic to determine wrong cases
+        // 2. determine wrong cases and add comments to array
 
-        // 3. add comments to array (use getMultiLineComment, getSingleLineComment helpers)
-
-        // 4. done
+        // 3. done
         return reviewComments;
     }
 
