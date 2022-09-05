@@ -11,16 +11,9 @@ const setupPatchronContext = require('test/setupPatchronContext');
 const initializeFile = require('test/rules/helpers/initializeFile');
 const PositionedKeywordsRule = require('src/rules/v1/common/PositionedKeywords');
 
-const importKeywordCustomConfig = {
+const importKeywordBaseConfig = {
     name: 'import',
-    regex: /import.*/,
-    position: {
-        custom: {
-            name: '<script>',
-            regex: /<script>/,
-            BOF: false
-        }
-    },
+    regex: /import.*(?:from|{)/,
     maxLineBreaks: 0,
     enforced: true,
     breakOnFirstOccurence: false,
@@ -33,31 +26,37 @@ const importKeywordCustomConfig = {
             limiter: {
                 startsWith: '} from'
             }
+        }
+    ],
+    order: [
+        {
+            name: 'packages',
+            regex: /from(?!.*[@,.]\/)/
+        },
+        {
+            name: 'others',
+            regex: /from.*[@,.]\//
         }
     ]
 };
 
-const importKeywordBOFConfig = {
-    name: 'import',
-    regex: /import.*/,
+const importKeywordCustomConfig = {
+    ...importKeywordBaseConfig,
     position: {
-        custom: null,
-        BOF: true
-    },
-    maxLineBreaks: 0,
-    enforced: true,
-    breakOnFirstOccurence: false,
-    countDifferentCodeAsLineBreak: false,
-    multiLineOptions: [
-        {
-            indicator: {
-                notIncludes: 'from'
-            },
-            limiter: {
-                startsWith: '} from'
-            }
+        BOF: false,
+        custom: {
+            name: '<script>',
+            regex: '<script>'
         }
-    ]
+    }
+};
+
+const importKeywordBOFConfig = {
+    ...importKeywordBaseConfig,
+    position: {
+        BOF: true,
+        custom: null
+    }
 };
 
 const requireKeywordConfig = (position, override = null) => {
