@@ -1,10 +1,7 @@
-const jsonpath = require('jsonpath');
 const isPlainObject = require('lodash/isPlainObject');
 
 /**
- * takes collection of rules configuration (json file) and adjusts it by:
- * - swapping `rulename` for rule instance through `reference` property
- * - parsing all config properties that are named `regex`
+ * takes collection of rules configuration (json file) and swaps `rulename` of each rule with `reference`
  *
  * @param {object} rules
  */
@@ -38,14 +35,10 @@ module.exports = (rules) => {
 
 function _setupRules(arrayOfRules) {
     for (const rule of arrayOfRules) {
-        const { rulename, config } = rule;
+        const { rulename } = rule;
 
         rule.reference = require(`src/rules/${rulename}`);
 
         delete rule.rulename;
-
-        jsonpath.apply(config, '$..regex', (value) => {
-            return new RegExp(value);
-        });
     }
 }

@@ -1,6 +1,6 @@
 {
     "name": "@trolit/patchron",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "private": true,
     "description": "GitHub bot intended to provide first pull request review and faster further reviews done by devs.",
     "author": "p4w31 !d21k0w5k1 <iddziku@gmail.com>",
@@ -32,7 +32,6 @@
         "dotenv-parse-variables": "2.0.0",
         "http-status-codes": "2.2.0",
         "js-base64": "3.7.2",
-        "jsonpath": "1.1.1",
         "lodash": "4.17.21",
         "module-alias": "2.2.2",
         "node-fetch": "^2.6.7",
