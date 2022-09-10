@@ -24,7 +24,7 @@
         "docker:build": "docker build -t patchron ."
     },
     "dependencies": {
-        "@probot/adapter-github-actions": "3.1.1",
+        "@probot/adapter-github-actions": "3.1.2",
         "cron": "2.1.0",
         "dayjs": "1.11.5",
         "dedent-js": "1.0.1",
@@ -37,7 +37,7 @@
         "node-fetch": "^2.6.7",
         "pino-multi-stream": "6.0.0",
         "pino-tee": "0.3.0",
-        "probot": "12.2.7"
+        "probot": "12.2.8"
     },
     "devDependencies": {
         "eslint": "8.18.0",
