@@ -28,7 +28,7 @@
         "cron": "2.1.0",
         "dayjs": "1.11.5",
         "dedent-js": "1.0.1",
-        "dotenv": "16.0.2",
+        "dotenv": "16.0.3",
         "dotenv-parse-variables": "2.0.0",
         "http-status-codes": "2.2.0",
         "js-base64": "3.7.2",
